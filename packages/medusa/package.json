@@ -46,7 +46,7 @@
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
     "serve": "node dist/app.js",
-    "test": "jest --silent --bail --maxWorkers=50% --forceExit"
+    "test": "jest --silent=false --bail --maxWorkers=50% --forceExit"
   },
   "peerDependencies": {
     "medusa-interfaces": "^1.3.7",
@@ -102,7 +102,8 @@
     "scrypt-kdf": "^2.0.1",
     "ulid": "^2.3.0",
     "uuid": "^9.0.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "zod": "^3.22.4"
   },
   "gitHead": "cd1f5afa5aa8c0b15ea957008ee19f1d695cbd2e"
 }
