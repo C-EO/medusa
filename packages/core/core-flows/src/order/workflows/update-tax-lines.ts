@@ -1,15 +1,13 @@
-import { OrderWorkflowDTO } from "@medusajs/types"
+import { OrderWorkflowDTO } from "@medusajs/framework/types"
 import {
   WorkflowData,
   createWorkflow,
   transform,
   when,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../common"
-import {
-  getOrderItemTaxLinesStep,
-  setOrderTaxLinesForItemsStep,
-} from "../steps"
+import { getItemTaxLinesStep } from "../../tax/steps/get-item-tax-lines"
+import { setOrderTaxLinesForItemsStep } from "../steps"
 
 const completeOrderFields = [
   "id",
@@ -174,7 +172,7 @@ export const updateOrderTaxLinesWorkflow = createWorkflow(
       }).config({ name: "query-order-shipping-methods" })
     })
 
-    const taxLineItems = getOrderItemTaxLinesStep(
+    const taxLineItems = getItemTaxLinesStep(
       transform(
         { input, order, items, shippingMethods, isFullOrder },
         (data) => {
@@ -187,7 +185,7 @@ export const updateOrderTaxLinesWorkflow = createWorkflow(
             : data.items ?? []
 
           return {
-            order: data.order,
+            orderOrCart: data.order,
             items: lineItems,
             shipping_methods: shippingMethods,
             force_tax_calculation: data.input.force_tax_calculation,

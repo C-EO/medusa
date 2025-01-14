@@ -13,16 +13,14 @@ This documentation provides a reference to the data models in the Customer Modul
 
 ```mermaid
 erDiagram
-	CustomerAddress }|--|{ Customer : customer
 	Customer }|--|{ CustomerGroup : groups
-	CustomerGroupCustomer }|--|{ Customer : customer
-	CustomerGroupCustomer }|--|{ CustomerGroup : customer_group
+	Customer ||--|| CustomerAddress : addresses
 
 ```
 
-## Classes
+## Data Models
 
-- [CustomerAddress](../../customer_models/classes/customer_models.CustomerAddress/page.mdx)
-- [CustomerGroupCustomer](../../customer_models/classes/customer_models.CustomerGroupCustomer/page.mdx)
-- [CustomerGroup](../../customer_models/classes/customer_models.CustomerGroup/page.mdx)
-- [Customer](../../customer_models/classes/customer_models.Customer/page.mdx)
+- [Customer](../../customer_models/variables/customer_models.Customer/page.mdx)
+- [CustomerAddress](../../customer_models/variables/customer_models.CustomerAddress/page.mdx)
+- [CustomerGroup](../../customer_models/variables/customer_models.CustomerGroup/page.mdx)
+- [CustomerGroupCustomer](../../customer_models/variables/customer_models.CustomerGroupCustomer/page.mdx)

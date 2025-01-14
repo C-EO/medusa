@@ -100,6 +100,10 @@ export default async function ({
           mkdirSync(filePath)
         }
 
+        if (spec.displayName === "Drawer.Content") {
+          console.log("here", spec)
+        }
+
         // write spec to output path
         writeFileSync(
           path.join(filePath, `${spec.displayName}.json`),

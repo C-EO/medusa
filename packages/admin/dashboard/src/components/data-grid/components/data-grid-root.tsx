@@ -50,13 +50,15 @@ import { isCellMatch, isSpecialFocusKey } from "../utils"
 import { DataGridKeyboardShortcutModal } from "./data-grid-keyboard-shortcut-modal"
 export interface DataGridRootProps<
   TData,
-  TFieldValues extends FieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues
 > {
   data?: TData[]
   columns: ColumnDef<TData>[]
   state: UseFormReturn<TFieldValues>
   getSubRows?: (row: TData) => TData[] | undefined
   onEditingChange?: (isEditing: boolean) => void
+  disableInteractions?: boolean
+  multiColumnSelection?: boolean
 }
 
 const ROW_HEIGHT = 40
@@ -89,19 +91,20 @@ const getCommonPinningStyles = <TData,>(
 
 /**
  * TODO:
- * - [Minor] Add shortcuts overview modal.
  * - [Minor] Extend the commands to also support modifying the anchor and rangeEnd, to restore the previous focus after undo/redo.
  */
 
 export const DataGridRoot = <
   TData,
-  TFieldValues extends FieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues
 >({
   data = [],
   columns,
   state,
   getSubRows,
   onEditingChange,
+  disableInteractions,
+  multiColumnSelection = false,
 }: DataGridRootProps<TData, TFieldValues>) => {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -114,7 +117,9 @@ export const DataGridRoot = <
     formState: { errors },
   } = state
 
-  const [trapActive, setTrapActive] = useState(true)
+  const [internalTrapActive, setTrapActive] = useState(true)
+
+  const trapActive = !disableInteractions && internalTrapActive
 
   const [anchor, setAnchor] = useState<DataGridCoordinates | null>(null)
   const [rangeEnd, setRangeEnd] = useState<DataGridCoordinates | null>(null)
@@ -227,8 +232,13 @@ export const DataGridRoot = <
   }
 
   const matrix = useMemo(
-    () => new DataGridMatrix<TData, TFieldValues>(flatRows, columns),
-    [flatRows, columns]
+    () =>
+      new DataGridMatrix<TData, TFieldValues>(
+        flatRows,
+        columns,
+        multiColumnSelection
+      ),
+    [flatRows, columns, multiColumnSelection]
   )
   const queryTool = useDataGridQueryTool(containerRef)
 
@@ -329,6 +339,7 @@ export const DataGridRoot = <
       setSelectionValues,
       onEditingChangeHandler,
       restoreSnapshot,
+      createSnapshot,
       setSingleRange,
       scrollToCoordinates,
       execute,
@@ -386,6 +397,7 @@ export const DataGridRoot = <
     setDragEnd,
     setValue,
     execute,
+    multiColumnSelection,
   })
 
   const { getCellErrorMetadata, getCellMetadata } = useDataGridCellMetadata<
@@ -533,7 +545,7 @@ export const DataGridRoot = <
         queryTool?.getContainer(anchor)?.focus()
       })
     }
-  }, [anchor, trapActive, queryTool])
+  }, [anchor, trapActive, setSingleRange, scrollToCoordinates, queryTool])
 
   return (
     <DataGridContext.Provider value={values}>
@@ -651,6 +663,7 @@ export const DataGridRoot = <
                       virtualPaddingLeft={virtualPaddingLeft}
                       virtualPaddingRight={virtualPaddingRight}
                       onDragToFillStart={onDragToFillStart}
+                      multiColumnSelection={multiColumnSelection}
                     />
                   )
                 })}
@@ -783,6 +796,7 @@ type DataGridCellProps<TData> = {
   rowIndex: number
   anchor: DataGridCoordinates | null
   onDragToFillStart: (e: React.MouseEvent<HTMLElement>) => void
+  multiColumnSelection: boolean
 }
 
 const DataGridCell = <TData,>({
@@ -791,6 +805,7 @@ const DataGridCell = <TData,>({
   rowIndex,
   anchor,
   onDragToFillStart,
+  multiColumnSelection,
 }: DataGridCellProps<TData>) => {
   const coords: DataGridCoordinates = {
     row: rowIndex,
@@ -824,7 +839,12 @@ const DataGridCell = <TData,>({
         {isAnchor && (
           <div
             onMouseDown={onDragToFillStart}
-            className="bg-ui-fg-interactive absolute bottom-0 right-0 z-[3] size-1.5 cursor-ns-resize"
+            className={clx(
+              "bg-ui-fg-interactive absolute bottom-0 right-0 z-[3] size-1.5 cursor-ns-resize",
+              {
+                "cursor-nwse-resize": multiColumnSelection,
+              }
+            )}
           />
         )}
       </div>
@@ -842,6 +862,7 @@ type DataGridRowProps<TData> = {
   flatColumns: Column<TData, unknown>[]
   anchor: DataGridCoordinates | null
   onDragToFillStart: (e: React.MouseEvent<HTMLElement>) => void
+  multiColumnSelection: boolean
 }
 
 const DataGridRow = <TData,>({
@@ -854,6 +875,7 @@ const DataGridRow = <TData,>({
   flatColumns,
   anchor,
   onDragToFillStart,
+  multiColumnSelection,
 }: DataGridRowProps<TData>) => {
   const visibleCells = row.getVisibleCells()
 
@@ -900,6 +922,7 @@ const DataGridRow = <TData,>({
             rowIndex={rowIndex}
             anchor={anchor}
             onDragToFillStart={onDragToFillStart}
+            multiColumnSelection={multiColumnSelection}
           />
         )
 

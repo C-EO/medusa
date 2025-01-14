@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { SignatureReflection } from "typedoc"
-import { getHookParams } from "../../utils/react-query-utils"
+import { getHookParams } from "../../utils/react-query-utils.js"
 
 export default function () {
   Handlebars.registerHelper(

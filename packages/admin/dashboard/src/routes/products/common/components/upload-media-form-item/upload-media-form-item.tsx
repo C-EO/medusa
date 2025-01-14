@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -45,25 +46,40 @@ export const UploadMediaFormItem = ({
 }) => {
   const { t } = useTranslation()
 
-  const hasInvalidFiles = (fileList: FileType[]) => {
-    const invalidFile = fileList.find(
-      (f) => !SUPPORTED_FORMATS.includes(f.file.type)
-    )
+  const hasInvalidFiles = useCallback(
+    (fileList: FileType[]) => {
+      const invalidFile = fileList.find(
+        (f) => !SUPPORTED_FORMATS.includes(f.file.type)
+      )
 
-    if (invalidFile) {
-      form.setError("media", {
-        type: "invalid_file",
-        message: t("products.media.invalidFileType", {
-          name: invalidFile.file.name,
-          types: SUPPORTED_FORMATS_FILE_EXTENSIONS.join(", "),
-        }),
-      })
+      if (invalidFile) {
+        form.setError("media", {
+          type: "invalid_file",
+          message: t("products.media.invalidFileType", {
+            name: invalidFile.file.name,
+            types: SUPPORTED_FORMATS_FILE_EXTENSIONS.join(", "),
+          }),
+        })
 
-      return true
-    }
+        return true
+      }
 
-    return false
-  }
+      return false
+    },
+    [form, t]
+  )
+
+  const onUploaded = useCallback(
+    (files: FileType[]) => {
+      form.clearErrors("media")
+      if (hasInvalidFiles(files)) {
+        return
+      }
+
+      files.forEach((f) => append({ ...f, isThumbnail: false }))
+    },
+    [form, append, hasInvalidFiles]
+  )
 
   return (
     <Form.Field
@@ -87,15 +103,7 @@ export const UploadMediaFormItem = ({
                   hint={t("products.media.uploadImagesHint")}
                   hasError={!!form.formState.errors.media}
                   formats={SUPPORTED_FORMATS}
-                  onUploaded={(files) => {
-                    form.clearErrors("media")
-                    if (hasInvalidFiles(files)) {
-                      return
-                    }
-
-                    // TODO: For now all files that get uploaded are not thumbnails, revisit this logic
-                    files.forEach((f) => append({ ...f, isThumbnail: false }))
-                  }}
+                  onUploaded={onUploaded}
                 />
               </Form.Control>
               <Form.ErrorMessage />

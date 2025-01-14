@@ -1,14 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as zod from "zod"
-
 import { HttpTypes, InventoryLevelDTO, StockLocationDTO } from "@medusajs/types"
 import { Button, Input, Text, toast } from "@medusajs/ui"
-import { RouteDrawer, useRouteModal } from "../../../../../../components/modals"
-
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { z } from "zod"
+
 import { Form } from "../../../../../../components/common/form"
+import { RouteDrawer, useRouteModal } from "../../../../../../components/modals"
+import { KeyboundForm } from "../../../../../../components/utilities/keybound-form"
 import { useUpdateInventoryLevel } from "../../../../../../hooks/api/inventory"
+import { castNumber } from "../../../../../../lib/cast-number"
 
 type AdjustInventoryFormProps = {
   item: HttpTypes.AdminInventoryItem
@@ -43,18 +44,52 @@ export const AdjustInventoryForm = ({
   const { t } = useTranslation()
   const { handleSuccess } = useRouteModal()
 
-  const AdjustInventorySchema = zod.object({
-    stocked_quantity: zod.number().min(level.reserved_quantity),
-  })
+  const AdjustInventorySchema = z
+    .object({
+      stocked_quantity: z.union([z.number(), z.string()]),
+    })
+    .superRefine((data, ctx) => {
+      const quantity = data.stocked_quantity
+        ? castNumber(data.stocked_quantity)
+        : null
 
-  const form = useForm<zod.infer<typeof AdjustInventorySchema>>({
+      if (quantity === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_type,
+          expected: "number",
+          received: "undefined",
+          path: ["stocked_quantity"],
+        })
+
+        return
+      }
+
+      if (quantity < level.reserved_quantity) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("inventory.adjustInventory.errors.stockedQuantity", {
+            quantity: level.reserved_quantity,
+          }),
+          path: ["stocked_quantity"],
+        })
+      }
+    })
+
+  const form = useForm<z.infer<typeof AdjustInventorySchema>>({
     defaultValues: {
       stocked_quantity: level.stocked_quantity,
     },
     resolver: zodResolver(AdjustInventorySchema),
   })
 
-  const stockedQuantityUpdate = form.watch("stocked_quantity")
+  const stockedQuantityUpdate = useWatch({
+    control: form.control,
+    name: "stocked_quantity",
+  })
+
+  const availableQuantity = stockedQuantityUpdate
+    ? castNumber(stockedQuantityUpdate) - level.reserved_quantity
+    : 0 - level.reserved_quantity
 
   const { mutateAsync, isPending: isLoading } = useUpdateInventoryLevel(
     item.id,
@@ -62,13 +97,9 @@ export const AdjustInventoryForm = ({
   )
 
   const handleSubmit = form.handleSubmit(async (value) => {
-    if (value.stocked_quantity === level.stocked_quantity) {
-      return handleSuccess()
-    }
-
     await mutateAsync(
       {
-        stocked_quantity: value.stocked_quantity,
+        stocked_quantity: castNumber(value.stocked_quantity),
       },
       {
         onSuccess: () => {
@@ -84,7 +115,7 @@ export const AdjustInventoryForm = ({
 
   return (
     <RouteDrawer.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex flex-1 flex-col overflow-hidden"
       >
@@ -105,7 +136,7 @@ export const AdjustInventoryForm = ({
             />
             <AttributeGridRow
               title={t("inventory.available")}
-              value={stockedQuantityUpdate - level.reserved_quantity}
+              value={availableQuantity}
             />
           </div>
           <Form.Field
@@ -118,17 +149,8 @@ export const AdjustInventoryForm = ({
                   <Form.Control>
                     <Input
                       type="number"
-                      min={level.reserved_quantity}
-                      value={value || ""}
-                      onChange={(e) => {
-                        const value = e.target.value
-
-                        if (value === "") {
-                          onChange(null)
-                        } else {
-                          onChange(parseFloat(value))
-                        }
-                      }}
+                      value={value}
+                      onChange={onChange}
                       {...field}
                     />
                   </Form.Control>
@@ -150,7 +172,7 @@ export const AdjustInventoryForm = ({
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

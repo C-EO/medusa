@@ -4,19 +4,19 @@ import {
   LinkDefinition,
   PricingTypes,
   ProductTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   MedusaError,
   Modules,
   ProductVariantWorkflowEvents,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createHook,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep } from "../../common"
 import { createLinksWorkflow } from "../../common/workflows/create-links"
 import { validateInventoryItems } from "../../inventory/steps/validate-inventory-items"
@@ -26,15 +26,36 @@ import { createProductVariantsStep } from "../steps/create-product-variants"
 import { createVariantPricingLinkStep } from "../steps/create-variant-pricing-link"
 
 /**
+ * 
+ * The data to create one or more product variants, along with custom data that's passed to the workflow's hooks.
+ * 
  * @privateRemarks
  * TODO: Create separate typings for the workflow input
  */
 export type CreateProductVariantsWorkflowInput = {
+  /**
+   * The product variants to create.
+   */
   product_variants: (ProductTypes.CreateProductVariantDTO & {
+    /**
+     * The product variant's prices.
+     */
     prices?: PricingTypes.CreateMoneyAmountDTO[]
   } & {
+    /**
+     * The inventory items to associate with managed product variants.
+     */
     inventory_items?: {
+      /**
+       * The inventory item's ID.
+       */
       inventory_item_id: string
+      /**
+       * The number of units a single quantity is equivalent to. For example, if a customer orders one quantity of the variant, 
+       * Medusa checks the availability of the quantity multiplied by the value set for `required_quantity`. 
+       * When the customer orders the quantity, Medusa reserves the ordered quantity multiplied by the value 
+       * set for `required_quantity`.
+       */
       required_quantity?: number
     }[]
   })[]
@@ -179,7 +200,44 @@ const buildVariantItemCreateMap = (data: {
 
 export const createProductVariantsWorkflowId = "create-product-variants"
 /**
- * This workflow creates one or more product variants.
+ * This workflow creates one or more product variants. It's used by the [Create Product Variant Admin API Route](https://docs.medusajs.com/api/admin#products_postproductsidvariants).
+ * 
+ * This workflow has a hook that allows you to perform custom actions on the created product variants. For example, you can pass under `additional_data` custom data that 
+ * allows you to create custom data models linked to the product variants.
+ * 
+ * You can also use this workflow within your own custom workflows, allowing you to wrap custom logic around product-variant creation.
+ * 
+ * @example
+ * const { result } = await createProductVariantsWorkflow(container)
+ * .run({
+ *   input: {
+ *     product_variants: [
+ *       {
+ *         product_id: "prod_123",
+ *         sku: "SHIRT-123",
+ *         title: "Small Shirt",
+ *         prices: [
+ *           {
+ *             amount: 10,
+ *             currency_code: "USD",
+ *           },
+ *         ],
+ *         options: {
+ *           Size: "Small",
+ *         },
+ *       },
+ *     ],
+ *     additional_data: {
+ *       erp_id: "123"
+ *     }
+ *   }
+ * })
+ * 
+ * @summary
+ * 
+ * Create one or more product variants.
+ * 
+ * @property hooks.productVariantsCreated - This hook is executed after the product variants are created. You can consume this hook to perform custom actions on the created product variants.
  */
 export const createProductVariantsWorkflow = createWorkflow(
   createProductVariantsWorkflowId,

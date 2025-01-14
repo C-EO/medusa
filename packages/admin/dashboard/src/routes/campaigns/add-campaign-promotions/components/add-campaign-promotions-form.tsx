@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AdminCampaign, PromotionDTO } from "@medusajs/types"
+import { AdminCampaign, HttpTypes } from "@medusajs/types"
 import { Button, Checkbox, Hint, Tooltip, toast } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import {
@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next"
 import * as zod from "zod"
 import { RouteFocusModal, useRouteModal } from "../../../../components/modals"
 import { DataTable } from "../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../components/utilities/keybound-form"
 import { useAddOrRemoveCampaignPromotions } from "../../../../hooks/api/campaigns"
 import { usePromotions } from "../../../../hooks/api/promotions"
 import { usePromotionTableColumns } from "../../../../hooks/table/columns/use-promotion-table-columns"
@@ -109,7 +110,7 @@ export const AddCampaignPromotionsForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -120,14 +121,6 @@ export const AddCampaignPromotionsForm = ({
                 {form.formState.errors.promotion_ids.message}
               </Hint>
             )}
-            <RouteFocusModal.Close asChild>
-              <Button size="small" variant="secondary">
-                {t("actions.cancel")}
-              </Button>
-            </RouteFocusModal.Close>
-            <Button size="small" type="submit" isLoading={isPending}>
-              {t("actions.save")}
-            </Button>
           </div>
         </RouteFocusModal.Header>
         <RouteFocusModal.Body className="flex size-full flex-col overflow-y-auto">
@@ -138,7 +131,12 @@ export const AddCampaignPromotionsForm = ({
             pageSize={PAGE_SIZE}
             isLoading={isLoading}
             filters={filters}
-            orderBy={["title", "status", "created_at", "updated_at"]}
+            orderBy={[
+              { key: "code", label: t("fields.code") },
+              { key: "type", label: t("fields.type") },
+              { key: "created_at", label: t("fields.createdAt") },
+              { key: "updated_at", label: t("fields.updatedAt") },
+            ]}
             queryObject={raw}
             layout="fill"
             pagination
@@ -148,12 +146,24 @@ export const AddCampaignPromotionsForm = ({
             }}
           />
         </RouteFocusModal.Body>
-      </form>
+        <RouteFocusModal.Footer>
+          <div className="flex items-center justify-end gap-x-2">
+            <RouteFocusModal.Close asChild>
+              <Button size="small" variant="secondary">
+                {t("actions.cancel")}
+              </Button>
+            </RouteFocusModal.Close>
+            <Button size="small" type="submit" isLoading={isPending}>
+              {t("actions.save")}
+            </Button>
+          </div>
+        </RouteFocusModal.Footer>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }
 
-const columnHelper = createColumnHelper<PromotionDTO>()
+const columnHelper = createColumnHelper<HttpTypes.AdminPromotion>()
 
 const useColumns = () => {
   const base = usePromotionTableColumns()

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
-import { Label } from "../label"
+import { TooltipProvider } from "../tooltip"
 import { CodeBlock } from "./code-block"
 
 const meta: Meta<typeof CodeBlock> = {
@@ -37,51 +37,70 @@ const snippets = [
 export const Default: Story = {
   render: () => {
     return (
-      <div className="h-[300px] w-[700px]">
-        <CodeBlock snippets={snippets}>
-          <CodeBlock.Header>
-            <CodeBlock.Header.Meta>
-              <Label size="small" weight={"plus"}>
-                /product-detail.js
-              </Label>
-            </CodeBlock.Header.Meta>
-          </CodeBlock.Header>
-          <CodeBlock.Body />
-        </CodeBlock>
-      </div>
+      <TooltipProvider>
+        <div className="h-[300px] w-[700px]">
+          <CodeBlock snippets={snippets}>
+            <CodeBlock.Header></CodeBlock.Header>
+            <CodeBlock.Body>
+              <span>/store/products/:id</span>
+            </CodeBlock.Body>
+          </CodeBlock>
+        </div>
+      </TooltipProvider>
     )
   },
 }
 
-const code = `medusa develop
-✔ Models initialized – 14ms
-✔ Repositories initialized – 35ms
-✔ Strategies initialized – 24ms
-✔ Modules initialized – 1ms
-✔ Database initialized – 654ms
-✔ Services initialized – 7ms
-✔ Express intialized – 5ms
-✔ Plugins intialized – 7ms
-✔ Subscribers initialized – 6ms
-✔ API initialized – 28ms
-✔ Server is ready on port: 9000`
+const generateStartupLog = () => {
+  const services = [
+    { name: "Models", time: 14 },
+    { name: "Repositories", time: 35 },
+    { name: "Strategies", time: 24 },
+    { name: "Modules", time: 1 },
+    { name: "Database", time: 654 },
+    { name: "Services", time: 7 },
+    { name: "Express", time: 5 },
+    { name: "Plugins", time: 7 },
+    { name: "Subscribers", time: 6 },
+    { name: "API", time: 28 },
+    { name: "Cache", time: 12 },
+    { name: "Queue", time: 45 },
+    { name: "Middleware", time: 8 },
+    { name: "WebSockets", time: 15 },
+    { name: "Authentication", time: 42 },
+  ]
+
+  const lines = services.flatMap((service) => [
+    `✔ ${service.name} initialized – ${service.time}ms`,
+    `✔ ${service.name} validated – ${service.time + 5}ms`,
+    `✔ ${service.name} configured – ${service.time + 10}ms`,
+    `✔ ${service.name} optimized – ${service.time + 3}ms`,
+  ])
+
+  return `medusa develop\n${lines.join("\n")}\n✔ Server is ready on port: 9000`
+}
+
+const code = generateStartupLog()
 
 export const ManyLines: Story = {
   render: () => {
     return (
-      <CodeBlock
-        snippets={[
-          {
-            code: code,
-            label: "Test",
-            language: "bash",
-            hideCopy: true,
-          },
-        ]}
-        className="w-[700px]"
-      >
-        <CodeBlock.Body />
-      </CodeBlock>
+      <TooltipProvider>
+        <CodeBlock
+          snippets={[
+            {
+              code: code,
+              label: "Test",
+              language: "bash",
+              hideCopy: true,
+            },
+          ]}
+          className="h-full max-h-[300px] w-[700px]"
+        >
+          <CodeBlock.Header></CodeBlock.Header>
+          <CodeBlock.Body />
+        </CodeBlock>
+      </TooltipProvider>
     )
   },
 }

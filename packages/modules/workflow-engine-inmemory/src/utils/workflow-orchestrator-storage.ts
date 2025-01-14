@@ -6,9 +6,9 @@ import {
   TransactionCheckpoint,
   TransactionOptions,
   TransactionStep,
-} from "@medusajs/orchestration"
-import { Logger, ModulesSdkTypes } from "@medusajs/types"
-import { MedusaError, TransactionState } from "@medusajs/utils"
+} from "@medusajs/framework/orchestration"
+import { Logger, ModulesSdkTypes } from "@medusajs/framework/types"
+import { MedusaError, TransactionState } from "@medusajs/framework/utils"
 import { WorkflowOrchestratorService } from "@services"
 import { CronExpression, parseExpression } from "cron-parser"
 
@@ -140,13 +140,10 @@ export class InMemoryDistributedTransactionStorage
       })
     }
 
-    const stringifiedData = JSON.stringify(data)
-    const parsedData = JSON.parse(stringifiedData)
-
     if (hasFinished && !retentionTime && !idempotent) {
-      await this.deleteFromDb(parsedData)
+      await this.deleteFromDb(data)
     } else {
-      await this.saveToDb(parsedData)
+      await this.saveToDb(data)
     }
 
     if (hasFinished) {
@@ -289,7 +286,7 @@ export class InMemoryDistributedTransactionStorage
   }
 
   async removeAll(): Promise<void> {
-    for (const [key, job] of this.scheduled) {
+    for (const [key] of this.scheduled) {
       await this.remove(key)
     }
   }

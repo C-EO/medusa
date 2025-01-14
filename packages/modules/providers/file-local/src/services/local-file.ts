@@ -1,5 +1,8 @@
-import { FileTypes, LocalFileServiceOptions } from "@medusajs/types"
-import { AbstractFileProviderService, MedusaError } from "@medusajs/utils"
+import { FileTypes, LocalFileServiceOptions } from "@medusajs/framework/types"
+import {
+  AbstractFileProviderService,
+  MedusaError,
+} from "@medusajs/framework/utils"
 import fs from "fs/promises"
 import path from "path"
 
@@ -39,7 +42,7 @@ export class LocalFileService extends AbstractFileProviderService {
     const parsedFilename = path.parse(file.filename)
     const baseDir =
       file.access === "public" ? this.uploadDir_ : this.privateUploadDir_
-    const dir = await this.ensureDirExists(baseDir, parsedFilename.dir)
+    await this.ensureDirExists(baseDir, parsedFilename.dir)
 
     const fileKey = path.join(
       parsedFilename.dir,
@@ -68,10 +71,13 @@ export class LocalFileService extends AbstractFileProviderService {
 
     const filePath = this.getUploadFilePath(baseDir, file.fileKey)
     try {
-      await fs.access(filePath, fs.constants.F_OK)
+      await fs.access(filePath, fs.constants.W_OK)
       await fs.unlink(filePath)
     } catch (e) {
-      // The file does not exist, so it's a noop.
+      // The file does not exist, we don't do anything
+      if (e.code !== "ENOENT") {
+        throw e
+      }
     }
 
     return

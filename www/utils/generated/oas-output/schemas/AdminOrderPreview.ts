@@ -6,9 +6,10 @@
  * required:
  *   - return_requested_total
  *   - order_change
+ *   - status
  *   - currency_code
- *   - version
  *   - id
+ *   - version
  *   - region_id
  *   - customer_id
  *   - sales_channel_id
@@ -17,7 +18,6 @@
  *   - payment_status
  *   - fulfillment_status
  *   - summary
- *   - metadata
  *   - created_at
  *   - updated_at
  *   - original_item_total
@@ -48,7 +48,7 @@
  *     title: return_requested_total
  *     description: The total of the requested return.
  *   order_change:
- *     $ref: "#/components/schemas/BaseOrderChange"
+ *     $ref: "#/components/schemas/AdminOrderChange"
  *   items:
  *     type: array
  *     description: The order's items.
@@ -120,7 +120,7 @@
  *               title: variant_id
  *               description: The ID of the associated variant.
  *             product:
- *               $ref: "#/components/schemas/BaseProduct"
+ *               $ref: "#/components/schemas/AdminProduct"
  *             product_id:
  *               type: string
  *               title: product_id
@@ -178,8 +178,8 @@
  *               description: Whether the item's price includes taxes.
  *             compare_at_unit_price:
  *               type: number
- *               title: The original price of the item before a promotion or sale.
- *               description: The 
+ *               title: compare_at_unit_price
+ *               description: The original price of the item before a promotion or sale.
  *             unit_price:
  *               type: number
  *               title: unit_price
@@ -493,7 +493,7 @@
  *     type: array
  *     description: The order's fulfillments.
  *     items:
- *       $ref: "#/components/schemas/BaseOrderFulfillment"
+ *       $ref: "#/components/schemas/AdminOrderFulfillment"
  *   fulfillment_status:
  *     type: string
  *     description: The order's fulfillment status.
@@ -618,6 +618,10 @@
  *     $ref: "#/components/schemas/AdminCustomer"
  *   sales_channel:
  *     $ref: "#/components/schemas/AdminSalesChannel"
+ *   status:
+ *     type: string
+ *     title: status
+ *     description: The order's status.
  * 
 */
 

@@ -7,23 +7,23 @@ export const metadata = {
 
 # {metadata.title}
 
-This document provides an example of implementing the digital product recipe.
+In this guide, you'll learn how to support digital products in Medusa.
 
-<Note>
+When you install a Medusa application, you get a fully-fledged commerce platform with support for customizations. Medusa provides all features related to products and managing them, and its framework allows you to extend those features and implement your custom use case.
 
-You can implement digital products as you see fit for your use case. This is only an example of one way to implement it.
+You can extend Medusa's product features to support selling, storing, and fulfilling digital products. In this guide, you'll customize Medusa to add the following features:
 
-</Note>
-
-## Features
-
-By following this example, you’ll have a commerce application with the following features:
-
-1. Digital products with multiple media items.
+1. Support digital products with multiple media items.
 2. Manage digital products from the admin dashboard.
 3. Handle and fulfill digital product orders.
 4. Allow customers to download their digital product purchases from the storefront.
 5. All other commerce features that Medusa provides.
+
+<Note>
+
+This guide provides an example of an approach to implement digital products. You're free to choose a different approach using Medusa's framework.
+
+</Note>
 
 <CardList items={[
   {
@@ -42,16 +42,56 @@ By following this example, you’ll have a commerce application with the followi
 
 ---
 
+## Step 1: Install a Medusa Application
+
 <Prerequisites items={[
   {
-    text: "A new Medusa application installed.",
-    link: "!docs!#get-started"
+    text: "Node.js v20+",
+    link: "https://nodejs.org/en/download"
   },
+  {
+    text: "Git CLI tool",
+    link: "https://git-scm.com/downloads"
+  },
+  {
+    text: "PostgreSQL",
+    link: "https://www.postgresql.org/download/"
+  }
 ]} />
 
-## Step 1: Create the Digital Product Module
+Start by installing the Medusa application on your machine with the following command:
 
-The first step is to create a digital product module that holds the data models related to a digital product.
+```bash
+npx create-medusa-app@latest
+```
+
+You'll first be asked for the project's name. You can also optionally choose to install the [Next.js starter storefront](../../../../nextjs-starter/page.mdx).
+
+Afterwards, the installation process will start, which will install the Medusa application in a directory with your project's name. If you chose to install the Next.js starter, it'll be installed in a separate directory with the `{project-name}-storefront` name.
+
+<Note title="Why is the storefront installed separately?">
+
+The Medusa application is composed of a headless Node.js server and an admin dashboard. The storefront is installed or custom-built separately and connects to the Medusa application through its REST endpoints, called [API routes](!docs!/learn/fundamentals/api-routes). Learn more about Medusa's architecture in [this documentation](!docs!/learn/introduction/architecture).
+
+</Note>
+
+Once the installation finishes successfully, the Medusa Admin dashboard will open with a form to create a new user. Enter the user's credential and submit the form. Afterwards, you can login with the new user and explore the dashboard.
+
+<Note title="Ran to Errors?">
+
+Check out the [troubleshooting guides](../../../../troubleshooting/create-medusa-app-errors/page.mdx) for help.
+
+</Note>
+
+---
+
+## Step 2: Create the Digital Product Module
+
+Medusa creates commerce features in modules. For example, product features and data models are created in the Product Module.
+
+You also create custom commerce data models and features in custom modules. They're integrated into the Medusa application similar to Medusa's modules without side effects.
+
+So, you'll create a digital product module that holds the data models related to a digital product and allows you to manage them.
 
 Create the directory `src/modules/digital-product`.
 
@@ -60,7 +100,7 @@ Create the directory `src/modules/digital-product`.
 Create the file `src/modules/digital-product/models/digital-product.ts` with the following content:
 
 ```ts title="src/modules/digital-product/models/digital-product.ts"
-import { model } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 import DigitalProductMedia from "./digital-product-media"
 import DigitalProductOrder from "./digital-product-order"
 
@@ -90,7 +130,7 @@ export const dpmModelHighlights = [
 ]
 
 ```ts title="src/modules/digital-product/models/digital-product-media.ts" highlights={dpmModelHighlights}
-import { model } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 import { MediaType } from "../types"
 import DigitalProduct from "./digital-product"
 
@@ -123,7 +163,7 @@ This enum indicates that a digital product media can either be used to preview t
 Next, create the file `src/modules/digital-product/models/digital-product-order.ts` with the following content:
 
 ```ts title="src/modules/digital-product/models/digital-product-order.ts"
-import { model } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 import { OrderStatus } from "../types"
 import DigitalProduct from "./digital-product"
 
@@ -132,6 +172,7 @@ const DigitalProductOrder = model.define("digital_product_order", {
   status: model.enum(OrderStatus),
   products: model.manyToMany(() => DigitalProduct, {
     mappedBy: "orders",
+    pivotTable: "digitalproduct_digitalproductorders",
   }),
 })
 
@@ -154,7 +195,7 @@ export enum OrderStatus {
 Next, create the main service of the module at `src/modules/digital-product/service.ts` with the following content:
 
 ```ts title="src/modules/digital-product/service.ts"
-import { MedusaService } from "@medusajs/utils"
+import { MedusaService } from "@medusajs/framework/utils"
 import DigitalProduct from "./models/digital-product"
 import DigitalProductOrder from "./models/digital-product-order"
 import DigitalProductMedia from "./models/digital-product-media"
@@ -170,7 +211,7 @@ class DigitalProductModuleService extends MedusaService({
 export default DigitalProductModuleService
 ```
 
-The service extends the [service factory](https://docs.medusajs.com/v2/advanced-development/modules/service-factory), which provides basic data-management features.
+The service extends the [service factory](!docs!/learn/fundamentals/modules/service-factory), which provides basic data-management features.
 
 ### Create Module Definition
 
@@ -178,7 +219,7 @@ After that, create the module definition at `src/modules/digital-product/index.t
 
 ```ts title="src/modules/digital-product/index.ts"
 import DigitalProductModuleService from "./service"
-import { Module } from "@medusajs/utils"
+import { Module } from "@medusajs/framework/utils"
 
 export const DIGITAL_PRODUCT_MODULE = "digitalProductModuleService"
 
@@ -189,44 +230,59 @@ export default Module(DIGITAL_PRODUCT_MODULE, {
 
 ### Add Module to Medusa Configuration
 
-Finally, add the module to the list of modules in `medusa-config.js`:
+Finally, add the module to the list of modules in `medusa-config.ts`:
 
-```tsx title="medusa-config.js"
+```ts title="medusa-config.ts"
 module.exports = defineConfig({
   // ...
-  modules: {
-    digitalProductModuleService: {
-      resolve: "./modules/digital-product",
+  modules: [
+    {
+      resolve: "./src/modules/digital-product",
     },
-  },
+  ],
 })
 ```
 
 ### Further Reads
 
-- [How to Create a Module](!docs!/basics/modules-and-services)
-- [How to Create a Data Model](!docs!/basics/data-models)
+- [How to Create a Module](!docs!/learn/fundamentals/modules)
+- [How to Create a Data Model](!docs!/learn/fundamentals/modules#1-create-data-model)
 
 ---
 
-## Step 2: Define Links
+## Step 3: Define Links
 
-In this step, you’ll define links between your module’s data models and data models from Medusa’s commerce modules.
+Modules are isolated in Medusa, making them reusable, replaceable, and integrable in your application without side effects.
+
+So, you can't have relations between data models in modules. Instead, you define a link between them.
+
+Links are relations between data models of different modules that maintain the isolation between the modules.
+
+In this step, you’ll define links between your module’s data models and data models from Medusa’s commerce modules:
+
+1. Link between the `DigitalProduct` model and the Product Module's `ProductVariant` model.
+2. Link between the `DigitalProductOrder` model and the Order Module's `Order` model.
 
 Start by creating the file `src/links/digital-product-variant.ts` with the following content:
 
 ```ts title="src/links/digital-product-variant.ts"
 import DigitalProductModule from "../modules/digital-product"
-import ProductModule from "@medusajs/product"
-import { defineLink } from "@medusajs/utils"
+import ProductModule from "@medusajs/medusa/product"
+import { defineLink } from "@medusajs/framework/utils"
 
 export default defineLink(
-  DigitalProductModule.linkable.digitalProduct,
+  {
+    linkable: DigitalProductModule.linkable.digitalProduct,
+    deleteCascade: true,
+  },
   ProductModule.linkable.productVariant
 )
+
 ```
 
 This defines a link between `DigitalProduct` and the Product Module’s `ProductVariant`. This allows product variants that customers purchase to be digital products.
+
+`deleteCascades` is enabled on the `digitalProduct` so that when a product variant is deleted, its linked digital product is also deleted.
 
 Next, create the file `src/links/digital-product-order.ts` with the following content:
 
@@ -236,8 +292,8 @@ export const orderLinkHighlights = [
 
 ```ts title="src/links/digital-product-order.ts"
 import DigitalProductModule from "../modules/digital-product"
-import OrderModule from "@medusajs/order"
-import { defineLink } from "@medusajs/utils"
+import OrderModule from "@medusajs/medusa/order"
+import { defineLink } from "@medusajs/framework/utils"
 
 export default defineLink(
   {
@@ -255,11 +311,11 @@ This defines a link between `DigitalProductOrder` and the Order Module’s `Orde
 
 ### Further Read
 
-- [How to Define Module Links](!docs!/advanced-development/modules/module-links)
+- [How to Define Module Links](!docs!/learn/fundamentals/module-links)
 
 ---
 
-## Step 3: Run Migrations and Sync Links
+## Step 4: Run Migrations and Sync Links
 
 To create tables for the digital product data models in the database, start by generating the migrations for the Digital Product Module with the following command:
 
@@ -277,7 +333,9 @@ npx medusa db:migrate
 
 ---
 
-## Step 4: List Digital Products Admin API Route
+## Step 5: List Digital Products Admin API Route
+
+To expose custom commerce features to frontend applications, such as the Medusa Admin dashboard or a storefront, you expose an endpoint by creating an API route.
 
 In this step, you’ll create the admin API route to list digital products.
 
@@ -287,8 +345,8 @@ Create the file `src/api/admin/digital-products/route.ts` with the following con
 import { 
   AuthenticatedMedusaRequest, 
   MedusaResponse,
-} from "@medusajs/medusa"
-import { ContainerRegistrationKeys } from "@medusajs/utils"
+} from "@medusajs/framework/http"
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -361,14 +419,16 @@ Make sure to replace `{token}` with the JWT token you retrieved.
 
 ### Further Reads
 
-- [How to Create an API Route](!docs!/basics/api-routes)
-- [Learn more about Query](!docs!/advanced-development/modules/query)
+- [How to Create an API Route](!docs!/learn/fundamentals/api-routes)
+- [Learn more about Query](!docs!/learn/fundamentals/module-links/query)
 
 ---
 
-## Step 5: Create Digital Product Workflow
+## Step 6: Create Digital Product Workflow
 
-In this step, you’ll create a workflow that creates a digital product. You’ll use this workflow in the next section.
+To implement and expose a feature that manipulates data, you create a workflow that uses services to implement the functionality, then create an API route that executes that workflow.
+
+In this step, you’ll create a workflow that creates a digital product. You’ll use this workflow in an API route in the next section.
 
 This workflow has the following steps:
 
@@ -379,10 +439,10 @@ graph TD
   createDigitalProductMediasStep --> createRemoteLinkStep["createRemoteLinkStep (Medusa)"]
 ```
 
-1. `createProductsWorkflow`: Create the Medusa product that the digital product is associated with its variant. Medusa provides this workflow through the `@medusajs/core-flows` package, which you can use as a step.
+1. `createProductsWorkflow`: Create the Medusa product that the digital product is associated with its variant. Medusa provides this workflow through the `@medusajs/medusa/core-flows` package, which you can use as a step.
 2. `createDigitalProductStep`: Create the digital product.
 3. `createDigitalProductMediasStep`: Create the medias associated with the digital product.
-4. `createRemoteLinkStep`: Create the link between the digital product and the product variant. Medusa provides this step through the `@medusajs/core-flows` package.
+4. `createRemoteLinkStep`: Create the link between the digital product and the product variant. Medusa provides this step through the `@medusajs/medusa/core-flows` package.
 
 You’ll implement the second and third steps.
 
@@ -400,7 +460,7 @@ export const createDpHighlights = [
 import {
   createStep,
   StepResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import DigitalProductModuleService from "../../../modules/digital-product/service"
 import { DIGITAL_PRODUCT_MODULE } from "../../../modules/digital-product"
 
@@ -454,7 +514,7 @@ export const createDigitalProductMediaHighlights = [
 import {
   createStep,
   StepResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import DigitalProductModuleService from "../../../modules/digital-product/service"
 import { DIGITAL_PRODUCT_MODULE } from "../../../modules/digital-product"
 import { MediaType } from "../../../modules/digital-product/types"
@@ -520,17 +580,17 @@ import {
   createWorkflow,
   transform,
   WorkflowResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import {
   CreateProductWorkflowInputDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import { 
   createProductsWorkflow,
   createRemoteLinkStep,
-} from "@medusajs/core-flows"
+} from "@medusajs/medusa/core-flows"
 import { 
   Modules,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import createDigitalProductStep, { 
   CreateDigitalProductStepInput,
 } from "./steps/create-digital-product"
@@ -609,15 +669,15 @@ You’ll test out the workflow in the next section.
 
 ### Further Reads
 
-- [How to Create a Workflow](!docs!/basics/workflows)
-- [What is the Compensation Function](!docs!/advanced-development/workflows/compensation-function)
-- [Learn more about the remote link function](!docs!/advanced-development/modules/remote-link)
+- [How to Create a Workflow](!docs!/learn/fundamentals/workflows)
+- [What is the Compensation Function](!docs!/learn/fundamentals/workflows/compensation-function)
+- [Learn more about Link functions](!docs!/learn/fundamentals/module-links/link)
 
 ---
 
-## Step 6: Create Digital Product API Route
+## Step 7: Create Digital Product API Route
 
-In this step, you’ll add the API route to create a digital product.
+In this step, you’ll add the API route to create a digital product using the `createDigitalProductWorkflow`.
 
 In the file `src/api/admin/digital-products/route.ts` add a new route handler:
 
@@ -667,7 +727,7 @@ The route handler imports a validation schema from a `validation-schema` file. S
 ```ts title="src/api/validation-schemas.ts"
 import { 
   AdminCreateProduct,
-} from "@medusajs/medusa/dist/api/admin/products/validators"
+} from "@medusajs/medusa/api/admin/products/validators"
 import { z } from "zod"
 import { MediaType } from "../modules/digital-product/types"
 
@@ -687,10 +747,10 @@ This defines the expected request body schema.
 Finally, create the file `src/api/middlewares.ts` with the following content:
 
 ```ts title="src/api/middlewares.ts"
-import { defineMiddlewares } from "@medusajs/medusa"
 import { 
+  defineMiddlewares,
   validateAndTransformBody,
-} from "@medusajs/medusa/dist/api/utils/validate-body"
+} from "@medusajs/framework/http"
 import { createDigitalProductsSchema } from "./validation-schemas"
 
 export default defineMiddlewares({
@@ -710,21 +770,21 @@ This adds a validation middleware to ensure that the body of `POST` requests sen
 
 ### Further Read
 
-- [How to Create a Middleware](!docs!/advanced-development/api-routes/middlewares)
+- [How to Create a Middleware](!docs!/learn/fundamentals/api-routes/middlewares)
 
 ---
 
-## Step 7: Upload Digital Product Media API Route
+## Step 8: Upload Digital Product Media API Route
 
-To upload the digital product media files, use Medusa’s file module.
-
-In this step, you’ll create an API route for uploading preview and main digital product media files.
+To upload the digital product media files, use Medusa’s File Module.
 
 <Note>
 
 Your Medusa application uses the local file module provider by default, which uploads files to a local directory. However, you can use other file module providers, such as the [S3 module provider](../../../../architectural-modules/file/s3/page.mdx).
 
 </Note>
+
+In this step, you’ll create an API route for uploading preview and main digital product media files.
 
 Before creating the API route, install the [multer express middleware](https://expressjs.com/en/resources/middleware/multer.html) to support file uploads:
 
@@ -743,9 +803,9 @@ export const uploadHighlights = [
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "@medusajs/medusa"
-import { uploadFilesWorkflow } from "@medusajs/core-flows"
-import { MedusaError } from "@medusajs/utils"
+} from "@medusajs/framework/http"
+import { uploadFilesWorkflow } from "@medusajs/medusa/core-flows"
+import { MedusaError } from "@medusajs/framework/utils"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest,
@@ -779,7 +839,7 @@ export const POST = async (
 
 This adds a `POST` API route at `/admin/digital-products/upload/[type]` where `[type]` is either `preview` or `main`.
 
-In the route handler, you use the `uploadFilesWorkflow` imported from `@medusajs/core-flows` to upload the file. If the file type is `main`, it’s uploaded with private access, as only customers who purchased it can download it. Otherwise, it’s uploaded with `public` access.
+In the route handler, you use `uploadFilesWorkflow` from Medusa's core workflows to upload the file. If the file type is `main`, it’s uploaded with private access, as only customers who purchased it can download it. Otherwise, it’s uploaded with `public` access.
 
 Next, add to the file `src/api/middlewares.ts` the `multer` middleware on this API route:
 
@@ -807,14 +867,16 @@ You’ll test out this API route in the next step as you use these API routes in
 
 ---
 
-## Step 8: Add Digital Products UI Route in Admin
+## Step 9: Add Digital Products UI Route in Admin
+
+The Medusa Admin is customizable, allowing you to inject widgets into existing pages or add UI routes to create new pages.
 
 In this step, you’ll add a UI route to the Medusa Admin that displays a list of digital products.
 
 Before you create the UI route, create the file `src/admin/types/index.ts` that holds the following types:
 
 ```ts title="src/admin/types/index.ts"
-import { ProductVariantDTO } from "@medusajs/types"
+import { ProductVariantDTO } from "@medusajs/framework/types"
 
 export enum MediaType {
   MAIN = "main",
@@ -880,7 +942,7 @@ const DigitalProductsPage = () => {
                 {digitalProduct.name}
               </Table.Cell>
               <Table.Cell>
-                <Link to={`/products/${digitalProduct.product_variant.product_id}`}>
+                <Link to={`/products/${digitalProduct.product_variant?.product_id}`}>
                   View Product
                 </Link>
               </Table.Cell>
@@ -1043,12 +1105,12 @@ Once you log in, you’ll find a new sidebar item, “Digital Products.” If yo
 
 ### Further Reads
 
-- [How to Create UI Routes](!docs!/advanced-development/admin/ui-routes)
-- [How to Create Admin Widgets](!docs!/advanced-development/admin/widgets)
+- [How to Create UI Routes](!docs!/learn/fundamentals/admin/ui-routes)
+- [How to Create Admin Widgets](!docs!/learn/fundamentals/admin/widgets)
 
 ---
 
-## Step 9: Add Create Digital Product Form in Admin
+## Step 10: Add Create Digital Product Form in Admin
 
 In this step, you’ll add a form for admins to create digital products. The form opens in a drawer or side window from within the Digital Products UI route you created in the previous section.
 
@@ -1143,7 +1205,7 @@ return (
             onChange={(e) => changeFiles(
               index,
               {
-                file: e.target.files[0],
+                file: e.target.files?.[0],
               }
             )}
             className="mt-2"
@@ -1223,6 +1285,9 @@ const uploadMediaFiles = async (
   }
 
   mediaWithFiles.forEach((media) => {
+      if (!media.file) {
+        return
+      }
     formData.append("files", media.file)
   })
 
@@ -1263,7 +1328,11 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       files: mainFiles,
     } = await uploadMediaFiles(MediaType.MAIN) || {}
 
-    const mediaData = []
+    const mediaData: {
+        type: MediaType
+        file_id: string
+        mime_type: string
+      }[] = []
 
     previewMedias?.forEach((media, index) => {
       mediaData.push({
@@ -1424,7 +1493,208 @@ To use this digital product in later steps (such as to create an order), you mus
 
 ---
 
-## Step 10: Create Digital Product Fulfillment Module Provider
+## Step 11: Handle Product Deletion
+
+When a product is deleted, its product variants are also deleted, meaning that their associated digital products should also be deleted.
+
+In this step, you'll build a flow that deletes the digital products associated with a deleted product's variants. Then, you'll execute this workflow whenever a product is deleted.
+
+The workflow has the following steps:
+
+- `retrieveDigitalProductsToDeleteStep`: Retrieve the digital products associated with a deleted product's variants.
+- `deleteDigitalProductsStep`: Delete the digital products.
+
+### retrieveDigitalProductsToDeleteStep
+
+The first step of the workflow receives the ID of the deleted product as an input and retrieves the digital products associated with its variants.
+
+Create the file `src/workflows/delete-product-digital-products/steps/retrieve-digital-products-to-delete.ts` with the following content:
+
+export const retrieveDigitalProductsHighlights = [
+  ["14", "productVariants", "Retrieve the product variants of the deleted product."],
+  ["17", "withDeleted", "Include deleted product variants in the result."],
+  ["20", "graph", "Retrieve the digital products associated with the product variants."],
+  ["21", "DigitalProductVariantLink.entryPoint", "Pass the link as an entry point."],
+  ["28", "digitalProductIds", "Extract the IDs of the digital products."],
+  ["30", "digitalProductIds", "Return the digital product IDs."],
+]
+
+```ts title="src/workflows/delete-product-digital-products/steps/retrieve-digital-products-to-delete.ts" highlights={retrieveDigitalProductsHighlights}
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
+import DigitalProductVariantLink from "../../../links/digital-product-variant"
+
+type RetrieveDigitalProductsToDeleteStepInput = {
+  product_id: string
+}
+
+export const retrieveDigitalProductsToDeleteStep = createStep(
+  "retrieve-digital-products-to-delete",
+  async ({ product_id }: RetrieveDigitalProductsToDeleteStepInput, { container }) => {
+    const productService = container.resolve("product")
+    const query = container.resolve("query")
+
+    const productVariants = await productService.listProductVariants({
+      product_id: product_id,
+    }, {
+      withDeleted: true,
+    })
+
+    const { data } = await query.graph({
+      entity: DigitalProductVariantLink.entryPoint,
+      fields: ["digital_product.*"],
+      filters: {
+        product_variant_id: productVariants.map((v) => v.id),
+      },
+    })
+
+    const digitalProductIds = data.map((d) => d.digital_product.id)
+
+    return new StepResponse(digitalProductIds)
+  }
+)
+```
+
+You create a `retrieveDigitalProductsToDeleteStep` step that retrieves the product variants of the deleted product. Notice that you pass in the second object parameter of `listProductVariants` a `withDeleted` property that ensures deleted variants are included in the result.
+
+Then, you use Query to retrieve the digital products associated with the product variants. Links created with `defineLink` have an `entryPoint` property that you can use with Query to retrieve data from the pivot table of the link between the data models.
+
+Finally, you return the IDs of the digital products to delete.
+
+## deleteDigitalProductsSteps
+
+Next, you'll implement the step that deletes those digital products.
+
+Create the file `src/workflows/delete-product-digital-products/steps/delete-digital-products.ts` with the following content:
+
+export const deleteDigitalProductsHighlights = [
+  ["15", "softDeleteDigitalProducts", "Soft delete the digital products."],
+  ["27", "restoreDigitalProducts", "Restore the digital products if an error occurs."]
+]
+
+```ts title="src/workflows/delete-product-digital-products/steps/delete-digital-products.ts"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
+import { DIGITAL_PRODUCT_MODULE } from "../../../modules/digital-product"
+import DigitalProductModuleService from "../../../modules/digital-product/service"
+
+type DeleteDigitalProductsStep = {
+  ids: string[]
+}
+
+export const deleteDigitalProductsSteps = createStep(
+  "delete-digital-products",
+  async ({ ids }: DeleteDigitalProductsStep, { container }) => {
+    const digitalProductService: DigitalProductModuleService = 
+      container.resolve(DIGITAL_PRODUCT_MODULE)
+
+    await digitalProductService.softDeleteDigitalProducts(ids)
+
+    return new StepResponse({}, ids)
+  },
+  async (ids, { container }) => {
+    if (!ids) {
+      return
+    }
+
+    const digitalProductService: DigitalProductModuleService = 
+      container.resolve(DIGITAL_PRODUCT_MODULE)
+
+    await digitalProductService.restoreDigitalProducts(ids)
+  }
+)
+```
+
+In the `deleteDigitalProductsSteps`, you soft delete the digital products by the ID passed as a parameter. In the compensation function, you restore the digital products if an error occurs.
+
+### Create deleteProductDigitalProductsWorkflow
+
+You can now create the workflow that executes those steps.
+
+Create the file `src/workflows/delete-product-digital-products/index.ts` with the following content:
+
+```ts title="src/workflows/delete-product-digital-products/index.ts"
+import { createWorkflow, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { deleteDigitalProductsSteps } from "./steps/delete-digital-products"
+import { retrieveDigitalProductsToDeleteStep } from "./steps/retrieve-digital-products-to-delete"
+
+type DeleteProductDigitalProductsInput = {
+  id: string
+}
+
+export const deleteProductDigitalProductsWorkflow = createWorkflow(
+  "delete-product-digital-products",
+  (input: DeleteProductDigitalProductsInput) => {
+    const digitalProductsToDelete = retrieveDigitalProductsToDeleteStep({
+      product_id: input.id,
+    })
+
+    deleteDigitalProductsSteps({
+      ids: digitalProductsToDelete,
+    })
+
+    return new WorkflowResponse({})
+  }
+)
+```
+
+The `deleteProductDigitalProductsWorkflow` receives the ID of the deleted product as an input. In the workflow, you:
+
+- Run the `retrieveDigitalProductsToDeleteStep` to retrieve the digital products associated with the deleted product.
+- Run the `deleteDigitalProductsSteps` to delete the digital products.
+
+### Execute Workflow on Product Deletion
+
+When a product is deleted, Medusa emits a `product.deleted` event. You can handle this event with a subscriber. A subscriber is an asynchronous function that, when an event is emitted, is executed. You can implement in subscribers features that aren't essential to the original flow that emitted the event.
+
+<Note>
+
+Learn more about subscribers in [this documentation](!docs!/learn/fundamentals/events-and-subscribers).
+
+</Note>
+
+So, you'll listen to the `product.deleted` event in a subscriber, and execute the workflow whenever the product is deleted.
+
+Create the file `src/subscribers/handle-product-deleted.ts` with the following content:
+
+```ts title="src/subscribers/handle-product-deleted.ts"
+import { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
+import { 
+  deleteProductDigitalProductsWorkflow,
+} from "../workflows/delete-product-digital-products"
+
+export default async function handleProductDeleted({
+  event: { data },
+  container,
+}: SubscriberArgs<{ id: string }>) {
+  await deleteProductDigitalProductsWorkflow(container)
+    .run({
+      input: data,
+    })
+}
+
+export const config: SubscriberConfig = {
+  event: "product.deleted",
+}
+```
+
+A subscriber file must export:
+
+- An asynchronous function that's executed whenever the specified event is emitted.
+- A configuration object that specifies the event the subscriber listens to, which is in this case `product.deleted`.
+
+The subscriber function receives as a parameter an object having the following properties:
+
+- `event`: An object containing the data payload of the emitted event.
+- `container`: Instance of the [Medusa Container](!docs!/learn/fundamentals/medusa-container).
+
+In the subscriber, you execute the workflow by invoking it, passing the Medusa container as an input, then executing its `run` method. You pass the product's ID, which is received through the event's data payload, as an input to the workflow.
+
+### Test it Out
+
+To test this out, start the Medusa application and, from the Medusa Admin dashboard, delete a product that has digital products. You can confirm that the digital product was deleted by checking the Digital Products page.
+
+---
+
+## Step 12: Create Digital Product Fulfillment Module Provider
 
 In this step, you'll create a fulfillment module provider for digital products. It doesn't have any real fulfillment functionality as digital products aren't physically fulfilled.
 
@@ -1435,7 +1705,14 @@ Start by creating the `src/modules/digital-product-fulfillment` directory.
 Then, create the file `src/modules/digital-product-fulfillment/service.ts` with the following content:
 
 ```ts title="src/modules/digital-product-fulfillment/service.ts"
-import { AbstractFulfillmentProviderService } from "@medusajs/utils"
+import { AbstractFulfillmentProviderService } from "@medusajs/framework/utils"
+import { 
+  CreateFulfillmentResult, 
+  FulfillmentDTO, 
+  FulfillmentItemDTO, 
+  FulfillmentOption, 
+  FulfillmentOrderDTO,
+} from "@medusajs/framework/types"
 
 class DigitalProductFulfillmentService extends AbstractFulfillmentProviderService {
   static identifier = "digital"
@@ -1444,7 +1721,7 @@ class DigitalProductFulfillmentService extends AbstractFulfillmentProviderServic
     super()
   }
 
-  async getFulfillmentOptions(): Promise<Record<string, unknown>[]> {
+  async getFulfillmentOptions(): Promise<FulfillmentOption[]> {
     return [
       {
         id: "digital-fulfillment",
@@ -1464,9 +1741,17 @@ class DigitalProductFulfillmentService extends AbstractFulfillmentProviderServic
     return true
   }
 
-  async createFulfillment(): Promise<Record<string, any>> {
+  async createFulfillment(
+    data: Record<string, unknown>, 
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[], 
+    order: Partial<FulfillmentOrderDTO> | undefined, 
+    fulfillment: Partial<Omit<FulfillmentDTO, "provider_id" | "data" | "items">>
+  ): Promise<CreateFulfillmentResult> {
     // No data is being sent anywhere
-    return {}
+    return {
+      data,
+      labels: [],
+    }
   }
 
   async cancelFulfillment(): Promise<any> {
@@ -1488,7 +1773,7 @@ The fulfillment provider registers one fulfillment option, and doesn't perform a
 Then, create the module provider's definition in the file `src/modules/digital-product-fulfillment/index.ts`:
 
 ```ts title="src/modules/digital-product-fulfillment/index.ts"
-import { ModuleProviderExports } from "@medusajs/types"
+import { ModuleProviderExports } from "@medusajs/framework/types"
 import DigitalProductFulfillmentService from "./service"
 
 const services = [DigitalProductFulfillmentService]
@@ -1502,31 +1787,31 @@ export default providerExport
 
 ### Register Module Provider in Medusa's Configurations
 
-Finally, register the module provider in `medusa-config.js`:
+Finally, register the module provider in `medusa-config.ts`:
 
-```js title="medusa-config.js"
+```ts title="medusa-config.ts"
 // other imports...
-const { Modules } = require("@medusajs/utils")
+import { Modules } from "@medusajs/framework/utils"
 
 module.exports = defineConfig({
-  modules: {
+  modules: [
     // ...
-    [Modules.FULFILLMENT]: {
-      resolve: "@medusajs/fulfillment",
+    {
+      resolve: "@medusajs/medusa/fulfillment",
       options: {
         providers: [
           {
-            resolve: "@medusajs/fulfillment-manual",
+            resolve: "@medusajs/medusa/fulfillment-manual",
             id: "manual",
           },
           {
-            resolve: "./modules/digital-product-fulfillment",
+            resolve: "./src/modules/digital-product-fulfillment",
             id: "digital",
           },
         ],
       },
     },
-  },
+  ],
 })
 ```
 
@@ -1540,7 +1825,7 @@ This is necessary to use the fulfillment provider's shipping option during check
 
 ---
 
-## Step 11: Customize Cart Completion
+## Step 13: Customize Cart Completion
 
 In this step, you’ll customize the cart completion flow to not only create a Medusa order, but also create a digital product order.
 
@@ -1548,8 +1833,8 @@ To customize the cart completion flow, you’ll create a workflow and then use t
 
 ```mermaid
 graph TD
-  completeCartWorkflow["completeCartWorkflow (Medusa)"] --> useRemoteQueryStep["useRemoteQueryStep (Medusa)"]
-  useRemoteQueryStep --> when{order has digital products?}
+  completeCartWorkflow["completeCartWorkflow (Medusa)"] --> useQueryGraphStep["useQueryGraphStep (Medusa)"]
+  useQueryGraphStep --> when{order has digital products?}
   when -->|Yes| createDigitalProductOrderStep
   createDigitalProductOrderStep --> createRemoteLinkStep["createRemoteLinkStep (Medusa)"]
   createRemoteLinkStep --> createOrderFulfillmentWorkflow["createOrderFulfillmentWorkflow (Medusa)"]
@@ -1560,13 +1845,13 @@ graph TD
 
 The workflow has the following steps:
 
-1. `completeCartWorkflow` to create a Medusa order from the cart. Medusa provides this workflow through the `@medusajs/core-flows` package and you can use it as a step.
-2. `useRemoteQueryStep` to retrieve the order’s items with the digital products associated with the purchased product variants. Medusa provides this step through the `@medusajs/core-flows` package.
+1. `completeCartWorkflow` to create a Medusa order from the cart. Medusa provides this workflow through the `@medusajs/medusa/core-flows` package and you can use it as a step.
+2. `useQueryGraphStep` to retrieve the order’s items with the digital products associated with the purchased product variants. Medusa provides this step through the `@medusajs/medusa/core-flows` package.
 3. If the order has digital products, you:
     1. create the digital product order.
-    2. link the digital product order with the Medusa order. Medusa provides a `createRemoteLinkStep` in the `@medusajs/core-flows` package that can be used here.
-    3. Create a fulfillment for the digital products in the order. Medusa provides a `createOrderFulfillmentWorkflow` in the `@medusajs/core-flows` package that you can use as a step here.
-    4. Emit the `digital_product_order.created` custom event to handle it later in a subscriber and send the customer an email. Medusa provides a `emitEventStep` in the `@medusajs/core-flows` that you can use as a step here.
+    2. link the digital product order with the Medusa order. Medusa provides a `createRemoteLinkStep` in the `@medusajs/medusa/core-flows` package that can be used here.
+    3. Create a fulfillment for the digital products in the order. Medusa provides a `createOrderFulfillmentWorkflow` in the `@medusajs/medusa/core-flows` package that you can use as a step here.
+    4. Emit the `digital_product_order.created` custom event to handle it later in a subscriber and send the customer an email. Medusa provides a `emitEventStep` in the `@medusajs/medusa/core-flows` that you can use as a step here.
 
 You’ll only implement the `3.a` step of the workflow.
 
@@ -1575,31 +1860,31 @@ You’ll only implement the `3.a` step of the workflow.
 Create the file `src/workflows/create-digital-product-order/steps/create-digital-product-order.ts` with the following content:
 
 export const createDpoHighlights = [
+  ["18", "InferTypeOf", "Infer the type of the `DigitalProduct` data model since it's a variable."],
   ["33", "createDigitalProductOrders", "Create the digital product order."],
   ["41", "digital_product_order", "Pass the created digital product order to the compensation function."],
   ["48", "deleteDigitalProductOrders", "Delete the digital product order if an error occurs in the workflow."]
 ]
 
-```ts title="src/workflows/create-digital-product-order/steps/create-digital-product-order.ts" highlights={createDpoHighlights} collapsibleLines="1-15" expandMoreLabel="Show Imports"
+```ts title="src/workflows/create-digital-product-order/steps/create-digital-product-order.ts" highlights={createDpoHighlights} collapsibleLines="1-14" expandMoreLabel="Show Imports"
 import {
   createStep,
   StepResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { 
   OrderLineItemDTO,
   ProductVariantDTO,
-} from "@medusajs/types"
-import { 
-  DigitalProductData, 
-  OrderStatus,
-} from "../../../modules/digital-product/types"
+  InferTypeOf,
+} from "@medusajs/framework/types"
+import { OrderStatus } from "../../../modules/digital-product/types"
 import DigitalProductModuleService from "../../../modules/digital-product/service"
 import { DIGITAL_PRODUCT_MODULE } from "../../../modules/digital-product"
+import DigitalProduct from "../../../modules/digital-product/models/digital-product"
 
 type StepInput = {
   items: (OrderLineItemDTO & {
     variant: ProductVariantDTO & {
-      digital_product: DigitalProductData
+      digital_product: InferTypeOf<typeof DigitalProduct>
     }
   })[]
 }
@@ -1646,14 +1931,14 @@ In the compensation function, you delete the digital product order.
 Create the file `src/workflows/create-digital-product-order/index.ts` with the following content:
 
 export const createDpoWorkflowHighlights = [
-  ["25", "completeCartWorkflow", "Create an order for the cart."],
-  ["31", "useRemoteQueryStep", "Retrieve the order's items and their associated variants and linked digital products."],
-  ["56", "when", "Check whether the order has any digital products."],
-  ["61", "then", "Perform the callback function if an order has digital products."],
-  ["64", "createDigitalProductOrderStep", "Create the digital product order."],
-  ["66", "createRemoteLinkStep", "Link the digital product order to the Medusa order."],
-  ["75", "createOrderFulfillmentWorkflow", "Create a fulfillment for the digital products in the order."],
-  ["89", "emitEventStep", "Emit the `digital_product_order.created` event."]
+  ["27", "completeCartWorkflow", "Create an order for the cart."],
+  ["33", "useQueryGraphStep", "Retrieve the order's items and their associated variants and linked digital products."],
+  ["57", "when", "Check whether the order has any digital products."],
+  ["63", "then", "Perform the callback function if an order has digital products."],
+  ["66", "createDigitalProductOrderStep", "Create the digital product order."],
+  ["70", "createRemoteLinkStep", "Link the digital product order to the Medusa order."],
+  ["79", "createOrderFulfillmentWorkflow", "Create a fulfillment for the digital products in the order."],
+  ["93", "emitEventStep", "Emit the `digital_product_order.created` event."]
 ]
 
 ```ts title="src/workflows/create-digital-product-order/index.ts" highlights={createDpoWorkflowHighlights} collapsibleLines="1-17" expandMoreLabel="Show Imports"
@@ -1662,15 +1947,17 @@ import {
   transform,
   when,
   WorkflowResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import {
   completeCartWorkflow,
-  useRemoteQueryStep,
+  useQueryGraphStep,
   createRemoteLinkStep,
   createOrderFulfillmentWorkflow,
   emitEventStep,
-} from "@medusajs/core-flows"
-import { Modules } from "@medusajs/utils"
+} from "@medusajs/medusa/core-flows"
+import {
+  Modules,
+} from "@medusajs/framework/utils"
 import createDigitalProductOrderStep from "./steps/create-digital-product-order"
 import { DIGITAL_PRODUCT_MODULE } from "../../modules/digital-product"
 
@@ -1681,57 +1968,61 @@ type WorkflowInput = {
 const createDigitalProductOrderWorkflow = createWorkflow(
   "create-digital-product-order",
   (input: WorkflowInput) => {
-    const order = completeCartWorkflow.runAsStep({
+    const { id } = completeCartWorkflow.runAsStep({
       input: {
         id: input.cart_id,
       },
     })
 
-    const { items } = useRemoteQueryStep({
-      entry_point: "order",
+    const { data: orders } = useQueryGraphStep({
+      entity: "order",
       fields: [
         "*",
         "items.*",
         "items.variant.*",
         "items.variant.digital_product.*",
       ],
-      variables: {
-        filters: {
-          id: order.id,
-        },
+      filters: {
+        id,
       },
-      throw_if_key_not_found: true,
-      list: false,
+      options: {
+        throwIfKeyNotFound: true,
+      },
     })
 
     const itemsWithDigitalProducts = transform({
-      items,
+      orders,
     },
     (data) => {
-      return data.items.filter((item) => item.variant.digital_product !== undefined)
-    }
+        return data.orders[0].items.filter((item) => item.variant.digital_product !== undefined)
+      }
     )
 
-    const digital_product_order = when(itemsWithDigitalProducts, (itemsWithDigitalProducts) => {
-      return itemsWithDigitalProducts.length
-    })
-    .then(() => {
+    const digital_product_order = when(
+      "create-digital-product-order-condition", 
+      itemsWithDigitalProducts, 
+      (itemsWithDigitalProducts) => {
+        return itemsWithDigitalProducts.length
+      }
+    ).then(() => {
       const { 
         digital_product_order,
-      } = createDigitalProductOrderStep({ items })
+      } = createDigitalProductOrderStep({
+        items: orders[0].items,
+      })
   
       createRemoteLinkStep([{
         [DIGITAL_PRODUCT_MODULE]: {
           digital_product_order_id: digital_product_order.id,
         },
         [Modules.ORDER]: {
-          order_id: order.id,
+          order_id: id,
         },
       }])
 
       createOrderFulfillmentWorkflow.runAsStep({
         input: {
-          order_id: order.id,
+          order_id: id,
           items: transform({
             itemsWithDigitalProducts,
           }, (data) => {
@@ -1754,7 +2045,7 @@ const createDigitalProductOrderWorkflow = createWorkflow(
     })
 
     return new WorkflowResponse({
-      order,
+      order: orders[0],
       digital_product_order,
     })
   }
@@ -1766,7 +2057,7 @@ export default createDigitalProductOrderWorkflow
 This creates the workflow `createDigitalProductOrderWorkflow`. It runs the following steps:
 
 1. `completeCartWorkflow` as a step to create the Medusa order.
-2. `useRemoteQueryStep` to retrieve the order’s items with their associated variants and linked digital products.
+2. `useQueryGraphStep` to retrieve the order’s items with their associated variants and linked digital products.
 3. Use `when` to check whether the order has digital products. If so:
     1. Use the `createDigitalProductOrderStep` to create the digital product order.
     2. Use the `createRemoteLinkStep` to link the digital product order to the Medusa order.
@@ -1780,7 +2071,7 @@ The workflow returns the Medusa order and the digital product order, if created.
 Next, create the file `src/api/store/carts/[id]/complete/route.ts` with the following content:
 
 ```ts title="src/api/store/carts/[id]/complete/route.ts"
-import { MedusaRequest, MedusaResponse } from "@medusajs/medusa"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import createDigitalProductOrderWorkflow from "../../../../../workflows/create-digital-product-order"
 
 export const POST = async (
@@ -1813,83 +2104,85 @@ In a later step, you’ll add an API route to allow customers to view and downlo
 
 ### Further Read
 
-- [Conditions in Workflows with When-Then](!docs!/advanced-development/workflows/conditions)
+- [Conditions in Workflows with When-Then](!docs!/learn/fundamentals/workflows/conditions)
 
 ---
 
-## Step 12: Handle the Digital Product Order Event
+## Step 14: Fulfill Digital Order Workflow
 
-In this step, you'll create a subscriber that listens to the `digital_product_order.created` event and sends a customer an email with the digital products they purchased.
+In this step, you'll create a workflow that fulfills a digital order by sending a notification to the customer. Later, you'll execute this workflow in a subscriber that listens to the `digital_product_order.created` event.
 
-Create the file `digital-product/src/subscribers/handle-digital-order.ts` with the following content:
+The workflow has the following steps:
 
-export const subscriberHighlight = [
-  ["20", "notificationModuleService", "Resolve the Notification Module's service to use it later to send a notification."],
-  ["22", "fileModuleService", "Resolve the File Module's service to use it later to retrieve a media's URL."],
-  ["26", "query", "Run the query to retrieve the digital product order."]
-]
+1. Retrieve the digital product order's details. For this, you'll use `useQueryGraphStep` from Medusa's core workflows.
+2. Send a notification to the customer with the digital products to download.
 
-```ts title="digital-product/src/subscribers/handle-digital-order.ts" highlights={subscriberHighlight} collapsibleLines="1-14" expandMoreLabel="Show Imports"
-import type {
-  SubscriberArgs,
-  SubscriberConfig,
-} from "@medusajs/medusa"
+So, you only need to implement the second step.
+
+### Add Types
+
+Before creating the step, add to `src/modules/digital-product/types/index.ts` the following:
+
+```ts
+import { OrderDTO, InferTypeOf } from "@medusajs/framework/types"
+import DigitalProductOrder from "../models/digital-product-order"
+
+// ...
+
+export type DigitalProductOrder = 
+  InferTypeOf<typeof DigitalProductOrder> & {
+    order?: OrderDTO
+  }
+```
+
+This adds a type for a digital product order, which you'll use next.
+
+You use `InferTypeOf` to infer the type of the `DigitalProductOrder` data model, and add to it the optional `order` property, which is the linked order.
+
+### Create sendDigitalOrderNotificationStep
+
+To create the step, create the file `src/workflows/fulfill-digital-order/steps/send-digital-order-notification.ts` with the following content:
+
+```ts title="src/workflows/fulfill-digital-order/steps/send-digital-order-notification.ts" collapsibleLines="1-11" expandMoreLabel="Show Imports"
+import {
+  createStep,
+  StepResponse,
+} from "@medusajs/framework/workflows-sdk"
 import { 
   INotificationModuleService,
   IFileModuleService,
-} from "@medusajs/types"
-import { 
-  Modules,
-  ContainerRegistrationKeys,
-} from "@medusajs/utils"
-import { MediaType } from "../modules/digital-product/types"
+} from "@medusajs/framework/types"
+import { ModuleRegistrationName } from "@medusajs/framework/utils"
+import { DigitalProductOrder, MediaType } from "../../../modules/digital-product/types"
 
-async function digitalProductOrderCreatedHandler({
-  event: { data },
-  container,
-}: SubscriberArgs<{ id: string }>) {
-  const query = container.resolve(ContainerRegistrationKeys.QUERY)
-  const notificationModuleService: INotificationModuleService = container
-    .resolve(Modules.NOTIFICATION)
-  const fileModuleService: IFileModuleService = container.resolve(
-    Modules.FILE
-  )
-
-  const { data: [digitalProductOrder] } = await query.graph({
-    entity: "digital_product_order",
-    fields: [
-      "*",
-      "products.*",
-      "products.medias.*",
-      "order.*",
-    ],
-    filters: {
-      id: data.id,
-    },
-  })
-
-  // TODO format and send notification
+type SendDigitalOrderNotificationStepInput = {
+  digital_product_order: DigitalProductOrder
 }
 
-export default digitalProductOrderCreatedHandler
+export const sendDigitalOrderNotificationStep = createStep(
+  "send-digital-order-notification",
+  async ({ 
+    digital_product_order: digitalProductOrder, 
+  }: SendDigitalOrderNotificationStepInput, 
+  { container }) => {
+    const notificationModuleService: INotificationModuleService = container
+    .resolve(ModuleRegistrationName.NOTIFICATION)
+    const fileModuleService: IFileModuleService = container.resolve(
+      ModuleRegistrationName.FILE
+    )
 
-export const config: SubscriberConfig = {
-  event: "digital_product_order.created",
-}
+    // TODO assemble notification
+  }
+)
 ```
 
-This adds a subscriber that listens to the `digital_product_order.created` event. For now, it just resolves dependencies and retrieves the digital product order.
+This creates the `sendDigitalOrderNotificationStep` step that receives a digital product order as an input.
 
-Next, replace the `TODO` with the following:
+In the step, so far you resolve the main services of the Notification and File Modules.
 
-export const subscriber2Highlights = [
-  ["1", "notificationData", "Format the data to be sent as a notification payload."],
-  ["10", "retrieveFile", "Retrieve the media's URL using the File Module's service."],
-  ["22", "createNotifications", "Send the notification to the customer."],
-  ["24", `"digital-order-template"`, "Replace with a real template ID."]
-]
+Replace the `TODO` with the following:
 
-```ts highlights={subscriber2Highlights}
+```ts title="src/workflows/fulfill-digital-order/steps/send-digital-order-notification.ts"
 const notificationData = await Promise.all(
   digitalProductOrder.products.map(async (product) => {
     const medias = []
@@ -1911,7 +2204,15 @@ const notificationData = await Promise.all(
   })
 )
 
-await notificationModuleService.createNotifications({
+// TODO send notification
+```
+
+In this snippet, you put together the data to send in the notification. You loop over the digital products in the order and retrieve the URL of their main files using the File Module.
+
+Finally, replace the new `TODO` with the following:
+
+```ts title="src/workflows/fulfill-digital-order/steps/send-digital-order-notification.ts"
+const notification = await notificationModuleService.createNotifications({
   to: digitalProductOrder.order.email,
   template: "digital-order-template",
   channel: "email",
@@ -1919,31 +2220,147 @@ await notificationModuleService.createNotifications({
     products: notificationData,
   },
 })
+
+return new StepResponse(notification)
 ```
 
-First, you format the data payload to send in the notification by retrieving the URLs of the purchased products' main medias. You use the File Module's service to retrieve the media URLs.
+You use the `createNotifications` method of the Notification Module's main service to send an email using the installed provider.
 
-Then, you use the Notification Module's service to send the notification as an email.
+### Create Workflow
 
-<Note title="Tip">
+Create the workflow in the file `src/workflows/fulfill-digital-order/index.ts`:
 
-Replace the `digital-order-template` with a real template ID from your third-party notification service.
+export const fulfillWorkflowHighlights = [
+  ["17", "useQueryGraphStep", "Retrieve the digital product order's details."],
+  ["33", "sendDigitalOrderNotificationStep", "Send a notification to the customer."]
+]
 
-</Note>
+```ts title="src/workflows/fulfill-digital-order/index.ts" highlights={fulfillWorkflowHighlights} collapsibleLines="1-10" expandMoreLabel="Show Imports"
+import {
+  createWorkflow,
+  WorkflowResponse,
+} from "@medusajs/framework/workflows-sdk"
+import {
+  useQueryGraphStep,
+} from "@medusajs/medusa/core-flows"
+import { sendDigitalOrderNotificationStep } from "./steps/send-digital-order-notification"
+
+type FulfillDigitalOrderWorkflowInput = {
+  id: string
+}
+
+export const fulfillDigitalOrderWorkflow = createWorkflow(
+  "fulfill-digital-order",
+  ({ id }: FulfillDigitalOrderWorkflowInput) => {
+    const { data: digitalProductOrders } = useQueryGraphStep({
+      entity: "digital_product_order",
+      fields: [
+        "*",
+        "products.*",
+        "products.medias.*",
+        "order.*",
+      ],
+      filters: {
+        id,
+      },
+      options: {
+        throwIfKeyNotFound: true,
+      },
+    })
+
+    sendDigitalOrderNotificationStep({
+      digital_product_order: digitalProductOrders[0],
+    })
+
+    return new WorkflowResponse(
+      digitalProductOrders[0]
+    )
+  }
+)
+```
+
+In the workflow, you:
+
+1. Retrieve the digital product order's details using `useQueryGraphStep` from Medusa's core workflows.
+2. Send a notification to the customer with the digital product download links using the `sendDigitalOrderNotificationStep`.
+
+### Configure Notification Module Provider
+
+In the `sendDigitalOrderNotificationStep`, you use a notification provider configured for the `email` channel to send the notification.
+
+Check out the [Integrations page](../../../../integrations/page.mdx) to find Notification Module Providers.
+
+For testing purposes, add to `medusa-config.ts` the following to use the Local Notification Module Provider:
+
+```ts title="medusa-config.ts"
+module.exports = defineConfig({
+  // ...
+  modules: [
+    // ...
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/notification-local",
+            id: "local",
+            options: {
+              name: "Local Notification Provider",
+              channels: ["email"],
+            },
+          },
+        ],
+      },
+    },
+  ],
+})
+
+```
+
+---
+
+## Step 15: Handle the Digital Product Order Event
+
+In this step, you'll create a subscriber that listens to the `digital_product_order.created` event and executes the workflow from the above step.
+
+Create the file `src/subscribers/handle-digital-order.ts` with the following content:
+
+```ts title="src/subscribers/handle-digital-order.ts" collapsibleLines="1-8" expandMoreLabel="Show Imports"
+import type {
+  SubscriberArgs,
+  SubscriberConfig,
+} from "@medusajs/framework"
+import { 
+  fulfillDigitalOrderWorkflow,
+} from "../workflows/fulfill-digital-order"
+
+async function digitalProductOrderCreatedHandler({
+  event: { data },
+  container,
+}: SubscriberArgs<{ id: string }>) {
+  await fulfillDigitalOrderWorkflow(container).run({
+    input: {
+      id: data.id,
+    },
+  })
+}
+
+export default digitalProductOrderCreatedHandler
+
+export const config: SubscriberConfig = {
+  event: "digital_product_order.created",
+}
+```
+
+This adds a subscriber that listens to the `digital_product_order.created` event. It executes the `fulfillDigitalOrderWorkflow` to send the customer an email and mark the order's fulfillment as fulfilled.
 
 ### Test Subscriber Out
 
 To test out the subscriber, place an order with digital products. This triggers the `digital_product_order.created` event which executes the subscriber.
 
-<Note title="Tip">
-
-Check out the [integrations page](../../../../integrations/page.mdx) to find notification and file modules.
-
-</Note>
-
 ---
 
-## Step 13: Create Store API Routes
+## Step 16: Create Store API Routes
 
 In this step, you’ll create three store API routes:
 
@@ -1964,10 +2381,10 @@ export const previewRouteHighlights = [
 import { 
   MedusaRequest, 
   MedusaResponse,
-} from "@medusajs/medusa"
+} from "@medusajs/framework/http"
 import {
   Modules,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { 
   DIGITAL_PRODUCT_MODULE,
 } from "../../../../../modules/digital-product"
@@ -2030,10 +2447,10 @@ export const purchasedDpHighlights = [
 import { 
   AuthenticatedMedusaRequest, 
   MedusaResponse,
-} from "@medusajs/medusa"
+} from "@medusajs/framework/http"
 import { 
   ContainerRegistrationKeys,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -2086,12 +2503,12 @@ export const downloadUrlHighlights = [
 import { 
   AuthenticatedMedusaRequest, 
   MedusaResponse,
-} from "@medusajs/medusa"
+} from "@medusajs/framework/http"
 import { 
   Modules,
   ContainerRegistrationKeys,
   MedusaError,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest,
@@ -2168,11 +2585,11 @@ You’ll test out these API routes in the next step.
 
 ### Further Reads
 
-- [What are protected API routes](!docs!/advanced-development/api-routes/protected-routes)
+- [What are protected API routes](!docs!/learn/fundamentals/api-routes/protected-routes)
 
 ---
 
-## Step 14: Customize Next.js Starter
+## Step 17: Customize Next.js Starter
 
 In this section, you’ll customize the [Next.js Starter storefront](../../../../nextjs-starter/page.mdx) to:
 
@@ -2180,12 +2597,17 @@ In this section, you’ll customize the [Next.js Starter storefront](../../../..
 2. Add a new tab in the customer’s dashboard to view their purchased digital products.
 3. Allow customers to download the digital products through the new page in the dashboard.
 
+If you haven't installed the Next.js Starter storefront in the first step, refer to [this guide](../../../../nextjs-starter/page.mdx#approach-2-install-separately) to learn how to install it.
+
 ### Add Types
 
 In `src/types/global.ts`, add the following types that you’ll use in your customizations:
 
 ```ts title="src/types/global.ts"
-import { BaseProductVariant } from "@medusajs/types/dist/http/product/common"
+import { 
+  // other imports...
+  StoreProductVariant,
+} from "@medusajs/types"
 
 // ...
 
@@ -2200,9 +2622,14 @@ export type DigitalProductMedia = {
   fileId: string
   type: "preview" | "main"
   mimeType: string
+  digitalProduct?: DigitalProduct[]
 }
 
-export type VariantWithDigitalProduct = BaseProductVariant & {
+export type DigitalProductPreview = DigitalProductMedia & {
+  url: string
+}
+
+export type VariantWithDigitalProduct = StoreProductVariant & {
   digital_product?: DigitalProduct
 }
 
@@ -2210,71 +2637,84 @@ export type VariantWithDigitalProduct = BaseProductVariant & {
 
 ### Retrieve Digital Products with Variants
 
-To retrieve the digital products details when retrieving a product and its variants, in the `src/lib/data/products.ts` file, change the `getProductsById` and `getProductByHandle` functions to pass the digital products in the `fields` property passed to the `sdk.store.product.list` method:
+To retrieve the digital products details when retrieving a product and its variants, in the `src/lib/data/products.ts` file, change the `listProducts` function to pass the digital products in the `fields` property passed to the `sdk.store.product.list` method:
 
 export const fieldHighlights = [
-  ["12"], ["27"]
+  ["24"]
 ]
 
 ```ts title="src/lib/data/products.ts" highlights={fieldHighlights}
-export const getProductsById = cache(async function ({
-  ids,
+export const listProducts = async ({
+  pageParam = 1,
+  queryParams,
+  countryCode,
   regionId,
 }: {
-  ids: string[]
-  regionId: string
-}) {
-  return sdk.store.product
-    .list(
+  pageParam?: number
+  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+  countryCode?: string
+  regionId?: string
+}): Promise<{
+  response: { products: HttpTypes.StoreProduct[]; count: number }
+  nextPage: number | null
+  queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
+}> => {
+  // ...
+  return sdk.client
+    .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
+      `/store/products`,
       {
         // ...
-        fields: "*variants.calculated_price,*variants.digital_product",
+        query: {
+          // ...
+          fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags,*variants.calculated_price,*variants.digital_product",
+        },
       }
-      // ...
     )
     // ...
-})
-
-export const getProductByHandle = cache(async function (
-  handle: string,
-  regionId: string
-) {
-  return sdk.store.product
-    .list(
-      {
-        // ...
-        fields: "*variants.calculated_price,*variants.digital_product",
-      }
-      // ...
-    )
-    // ...
-})
+}
 ```
 
 When a customer views a product’s details page, digital products linked to variants are also retrieved.
 
 ### Get Digital Product Preview Links
 
-To retrieve the links of a digital product’s preview media, add in `src/lib/data/products.ts` the following function:
+To retrieve the links of a digital product’s preview media, first, add the following import at the top of `src/lib/data/products.ts`:
 
 ```ts title="src/lib/data/products.ts"
-export const getDigitalProductPreview = cache(async function ({
+import { DigitalProductPreview } from "../../types/global"
+```
+
+Then, add the following function at the end of the file:
+
+```ts title="src/lib/data/products.ts"
+export const getDigitalProductPreview = async function ({
   id,
 }: {
   id: string
 }) {
-  const { previews } = await fetch(
-    `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/digital-products/${id}/preview`, {
-    credentials: "include",
-    headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
-    },
-  }).then((res) => res.json())
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions("products")),
+  }
+  const { previews } = await sdk.client.fetch<{
+    previews: DigitalProductPreview[]
+  }>(
+    `/store/digital-products/${id}/preview`, 
+    {
+      headers,
+      next,
+      cache: "force-cache",
+    }
+  )
 
   // for simplicity, return only the first preview url
   // instead you can show all the preview media to the customer
   return previews.length ? previews[0].url : ""
-})
+}
 ```
 
 This function uses the API route you created in the previous section to get the preview links and return the first preview link.
@@ -2371,17 +2811,25 @@ Start by creating the file `src/lib/data/digital-products.ts` with the following
 "use server"
 
 import { DigitalProduct } from "../../types/global"
-import { getAuthHeaders } from "./cookies"
+import { sdk } from "../config"
+import { getAuthHeaders, getCacheOptions } from "./cookies"
 
 export const getCustomerDigitalProducts = async () => {
-  const { digital_products } = await fetch(
-    `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/customers/me/digital-products`, {
-    credentials: "include",
-    headers: {
-      ...getAuthHeaders(),
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
-    },
-  }).then((res) => res.json())
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions("products")),
+  }
+  const { digital_products } = await sdk.client.fetch<{
+    digital_products: DigitalProduct[]
+  }>(`/store/customers/me/digital-products`, {
+    
+    headers,
+    next,
+    cache: "force-cache",
+  })
 
   return digital_products as DigitalProduct[]
 }
@@ -2396,7 +2844,6 @@ Then, create the file `src/modules/account/components/digital-products-list/inde
 
 import { Table } from "@medusajs/ui"
 import { DigitalProduct } from "../../../../types/global"
-import { getDigitalMediaDownloadLink } from "../../../../lib/data/digital-products"
 
 type Props = {
   digitalProducts: DigitalProduct[]
@@ -2442,9 +2889,7 @@ export const DigitalProductsList = ({
 }
 ```
 
-This adds a `DigitalProductsList` component that receives a list of digital products and shows them in a table.
-
-Each digital product’s media has a download link. You’ll implement its functionality afterwards.
+This adds a `DigitalProductsList` component that receives a list of digital products and shows them in a table. Each digital product’s media has a download link. You’ll implement its functionality afterwards.
 
 Next, create the file `src/app/[countryCode]/(main)/account/@dashboard/digital-products/page.tsx` with the following content:
 
@@ -2497,26 +2942,44 @@ const AccountNav = ({
     
   return (
     <div>
-      {/* Add before log out */}
-      <li>
-        <LocalizedClientLink
-          href="/account/digital-products"
-          className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-          data-testid="digital-products-link"
-        >
-          <div className="flex items-center gap-x-2">
-            <Photo />
-            <span>Digital Products</span>
-          </div>
-          <ChevronDown className="transform -rotate-90" />
-        </LocalizedClientLink>
-      </li>
+      <div className="small:hidden">
+        {/* ... */}
+        {/* Add before log out */}
+        <li>
+          <LocalizedClientLink
+            href="/account/digital-products"
+            className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+            data-testid="digital-products-link"
+          >
+            <div className="flex items-center gap-x-2">
+              <Photo />
+              <span>Digital Products</span>
+            </div>
+            <ChevronDown className="transform -rotate-90" />
+          </LocalizedClientLink>
+        </li>
+        {/* ... */}
+      </div>
+      <div className="hidden small:block">
+        {/* ... */}
+        {/* Add before log out */}
+        <li>
+          <AccountNavLink
+            href="/account/digital-products"
+            route={route!}
+            data-testid="digital-products-link"
+          >
+            Digital Products
+          </AccountNavLink>
+        </li>
+        {/* ... */}
+      </div>
     </div>
   )
 }
 ```
 
-You add a link to the new route before the log out tab.
+You add a link to the new route before the log out tab both for small and large devices.
 
 ### Test Purchased Digital Products Page
 
@@ -2530,17 +2993,21 @@ To add a download link for the purchased digital products’ medias, first, add 
 
 ```ts title="src/lib/data/digital-products.ts"
 export const getDigitalMediaDownloadLink = async (mediaId: string) => {
-  const { url } = await fetch(
-    `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/customers/me/digital-products/${
-      mediaId
-    }/download`, {
-    credentials: "include",
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions("products")),
+  }
+  const { url } = await sdk.client.fetch<{
+    url: string
+  }>(`/store/customers/me/digital-products/${mediaId}/download`, {
     method: "POST",
-    headers: {
-      ...getAuthHeaders(),
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
-    },
-  }).then((res) => res.json())
+    headers,
+    next,
+    cache: "force-cache",
+  })
 
   return url
 }
@@ -2548,7 +3015,13 @@ export const getDigitalMediaDownloadLink = async (mediaId: string) => {
 
 In this function, you send a request to the download API route you created earlier to retrieve the download URL of a purchased digital product media.
 
-Then, in `src/modules/account/components/digital-products-list/index.tsx`, add a `handleDownload` function in the `DigitalProductsList` component:
+Then, in `src/modules/account/components/digital-products-list/index.tsx`, import the `getDigitalMediaDownloadLink` at the top of the file:
+
+```tsx title="src/modules/account/components/digital-products-list/index.tsx"
+import { getDigitalMediaDownloadLink } from "../../../../lib/data/digital-products"
+```
+
+And add a `handleDownload` function in the `DigitalProductsList` component:
 
 ```tsx title="src/modules/account/components/digital-products-list/index.tsx"
 const handleDownload = async (
@@ -2577,12 +3050,6 @@ Finally, add an `onClick` handler to the digital product medias’ link in the r
 
 To test the latest changes out, open the purchased digital products page and click on the Download link of any media in the table. The media’s download link will open in a new page.
 
-<Note>
-
-The local file module provider doesn't support private uploads, so the download link won't actually be useful. Instead, use the [S3 module provider](../../../../architectural-modules/file/s3/page.mdx) in production.
-
-</Note>
-
 ---
 
 ## Next Steps
@@ -2595,4 +3062,4 @@ Aside from customizing the Next.js Starter storefront, you can also create a cus
 
 ### Admin Development
 
-In this recipe, you learned how to customize the admin with UI routes. You can also do further customization using widgets. Learn more in [this documentation](!docs!/advanced-development/admin).
+In this recipe, you learned how to customize the admin with UI routes. You can also do further customization using widgets. Learn more in [this documentation](!docs!/learn/fundamentals/admin).

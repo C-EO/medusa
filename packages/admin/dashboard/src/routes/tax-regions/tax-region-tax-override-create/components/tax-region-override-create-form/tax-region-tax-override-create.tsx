@@ -26,6 +26,7 @@ import {
   useRouteModal,
   useStackedModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCreateTaxRate } from "../../../../../hooks/api/tax-rates"
 import { TargetForm } from "../../../common/components/target-form/target-form"
 import { TargetItem } from "../../../common/components/target-item/target-item"
@@ -38,7 +39,7 @@ import { createTaxRulePayload } from "../../../common/utils"
 
 const TaxRegionCreateTaxOverrideSchema = z.object({
   name: z.string().min(1),
-  code: z.string().optional(),
+  code: z.string().min(1),
   rate: z
     .object({
       float: z.number().optional(),
@@ -47,17 +48,17 @@ const TaxRegionCreateTaxOverrideSchema = z.object({
     .optional(),
   is_combinable: z.boolean().optional(),
   enabled_rules: z.object({
-    products: z.boolean(),
-    product_collections: z.boolean(),
-    product_tags: z.boolean(),
-    product_types: z.boolean(),
-    customer_groups: z.boolean(),
+    product: z.boolean(),
+    product_type: z.boolean(),
+    // product_collection: z.boolean(),
+    // product_tag: z.boolean(),
+    // customer_group: z.boolean(),
   }),
-  products: z.array(TaxRateRuleReferenceSchema).optional(),
-  product_collections: z.array(TaxRateRuleReferenceSchema).optional(),
-  product_tags: z.array(TaxRateRuleReferenceSchema).optional(),
-  product_types: z.array(TaxRateRuleReferenceSchema).optional(),
-  customer_groups: z.array(TaxRateRuleReferenceSchema).optional(),
+  product: z.array(TaxRateRuleReferenceSchema).optional(),
+  product_type: z.array(TaxRateRuleReferenceSchema).optional(),
+  // product_collection: z.array(TaxRateRuleReferenceSchema).optional(),
+  // product_tag: z.array(TaxRateRuleReferenceSchema).optional(),
+  // customer_group: z.array(TaxRateRuleReferenceSchema).optional(),
 })
 
 type TaxRegionCreateTaxOverrideFormProps = {
@@ -84,17 +85,17 @@ export const TaxRegionCreateTaxOverrideForm = ({
         value: "",
       },
       enabled_rules: {
-        products: true,
-        product_collections: false,
-        product_tags: false,
-        product_types: false,
-        customer_groups: false,
+        product: true,
+        product_type: false,
+        // product_collection: false,
+        // product_tag: false,
+        // customer_group: false,
       },
-      products: [],
-      product_collections: [],
-      product_tags: [],
-      product_types: [],
-      customer_groups: [],
+      product: [],
+      product_type: [],
+      // product_collection: [],
+      // product_tag: [],
+      // customer_group: [],
     },
     resolver: zodResolver(TaxRegionCreateTaxOverrideSchema),
   })
@@ -103,40 +104,40 @@ export const TaxRegionCreateTaxOverrideForm = ({
 
   const handleSubmit = form.handleSubmit(async (values) => {
     const {
-      products,
-      customer_groups,
-      product_collections,
-      product_tags,
-      product_types,
+      product,
+      product_type,
+      // customer_group,
+      // product_collection,
+      // product_tag,
     } = values
 
     const productRules = createTaxRulePayload({
       reference_type: TaxRateRuleReferenceType.PRODUCT,
-      references: products || [],
-    })
-    const customerGroupRules = createTaxRulePayload({
-      reference_type: TaxRateRuleReferenceType.CUSTOMER_GROUP,
-      references: customer_groups || [],
-    })
-    const productCollectionRules = createTaxRulePayload({
-      reference_type: TaxRateRuleReferenceType.PRODUCT_COLLECTION,
-      references: product_collections || [],
-    })
-    const productTagRules = createTaxRulePayload({
-      reference_type: TaxRateRuleReferenceType.PRODUCT_TAG,
-      references: product_tags || [],
+      references: product || [],
     })
     const productTypeRules = createTaxRulePayload({
       reference_type: TaxRateRuleReferenceType.PRODUCT_TYPE,
-      references: product_types || [],
+      references: product_type || [],
     })
+    // const customerGroupRules = createTaxRulePayload({
+    //   reference_type: TaxRateRuleReferenceType.CUSTOMER_GROUP,
+    //   references: customer_group || [],
+    // })
+    // const productCollectionRules = createTaxRulePayload({
+    //   reference_type: TaxRateRuleReferenceType.PRODUCT_COLLECTION,
+    //   references: product_collection || [],
+    // })
+    // const productTagRules = createTaxRulePayload({
+    //   reference_type: TaxRateRuleReferenceType.PRODUCT_TAG,
+    //   references: product_tag || [],
+    // })
 
     const rules = [
       productRules,
-      customerGroupRules,
-      productCollectionRules,
-      productTagRules,
       productTypeRules,
+      // customerGroupRules,
+      // productCollectionRules,
+      // productTagRules,
     ]
       .filter((rule) => Boolean(rule))
       .flatMap((r) => r) as HttpTypes.AdminCreateTaxRate["rules"]
@@ -164,41 +165,42 @@ export const TaxRegionCreateTaxOverrideForm = ({
 
   const products = useFieldArray({
     control: form.control,
-    name: "products",
-  })
-
-  const productCollections = useFieldArray({
-    control: form.control,
-    name: "product_collections",
-  })
-
-  const productTags = useFieldArray({
-    control: form.control,
-    name: "product_tags",
+    name: TaxRateRuleReferenceType.PRODUCT,
   })
 
   const productTypes = useFieldArray({
     control: form.control,
-    name: "product_types",
+    name: TaxRateRuleReferenceType.PRODUCT_TYPE,
   })
 
-  const customerGroups = useFieldArray({
-    control: form.control,
-    name: "customer_groups",
-  })
+  // const productCollections = useFieldArray({
+  //   control: form.control,
+  //   name: TaxRateRuleReferenceType.PRODUCT_COLLECTION,
+  // })
+  //
+  // const productTags = useFieldArray({
+  //   control: form.control,
+  //   name: TaxRateRuleReferenceType.PRODUCT_TAG,
+  // })
+  //
+  //
+  // const customerGroups = useFieldArray({
+  //   control: form.control,
+  //   name: TaxRateRuleReferenceType.CUSTOMER_GROUP,
+  // })
 
   const getControls = (type: TaxRateRuleReferenceType) => {
     switch (type) {
       case TaxRateRuleReferenceType.PRODUCT:
         return products
-      case TaxRateRuleReferenceType.PRODUCT_COLLECTION:
-        return productCollections
-      case TaxRateRuleReferenceType.PRODUCT_TAG:
-        return productTags
       case TaxRateRuleReferenceType.PRODUCT_TYPE:
         return productTypes
-      case TaxRateRuleReferenceType.CUSTOMER_GROUP:
-        return customerGroups
+      // case TaxRateRuleReferenceType.PRODUCT_COLLECTION:
+      //   return productCollections
+      // case TaxRateRuleReferenceType.PRODUCT_TAG:
+      //   return productTags
+      // case TaxRateRuleReferenceType.CUSTOMER_GROUP:
+      //   return customerGroups
     }
   }
 
@@ -208,39 +210,39 @@ export const TaxRegionCreateTaxOverrideForm = ({
       label: t("taxRegions.fields.targets.options.product"),
     },
     {
-      value: TaxRateRuleReferenceType.PRODUCT_COLLECTION,
-      label: t("taxRegions.fields.targets.options.productCollection"),
-    },
-    {
-      value: TaxRateRuleReferenceType.PRODUCT_TAG,
-      label: t("taxRegions.fields.targets.options.productTag"),
-    },
-    {
       value: TaxRateRuleReferenceType.PRODUCT_TYPE,
       label: t("taxRegions.fields.targets.options.productType"),
     },
-    {
-      value: TaxRateRuleReferenceType.CUSTOMER_GROUP,
-      label: t("taxRegions.fields.targets.options.customerGroup"),
-    },
+    // {
+    //   value: TaxRateRuleReferenceType.PRODUCT_COLLECTION,
+    //   label: t("taxRegions.fields.targets.options.productCollection"),
+    // },
+    // {
+    //   value: TaxRateRuleReferenceType.PRODUCT_TAG,
+    //   label: t("taxRegions.fields.targets.options.productTag"),
+    // },
+    // {
+    //   value: TaxRateRuleReferenceType.CUSTOMER_GROUP,
+    //   label: t("taxRegions.fields.targets.options.customerGroup"),
+    // },
   ]
 
   const searchPlaceholders = {
     [TaxRateRuleReferenceType.PRODUCT]: t(
       "taxRegions.fields.targets.placeholders.product"
     ),
-    [TaxRateRuleReferenceType.PRODUCT_COLLECTION]: t(
-      "taxRegions.fields.targets.placeholders.productCollection"
-    ),
-    [TaxRateRuleReferenceType.PRODUCT_TAG]: t(
-      "taxRegions.fields.targets.placeholders.productTag"
-    ),
     [TaxRateRuleReferenceType.PRODUCT_TYPE]: t(
       "taxRegions.fields.targets.placeholders.productType"
     ),
-    [TaxRateRuleReferenceType.CUSTOMER_GROUP]: t(
-      "taxRegions.fields.targets.placeholders.customerGroup"
-    ),
+    // [TaxRateRuleReferenceType.PRODUCT_COLLECTION]: t(
+    //   "taxRegions.fields.targets.placeholders.productCollection"
+    // ),
+    // [TaxRateRuleReferenceType.PRODUCT_TAG]: t(
+    //   "taxRegions.fields.targets.placeholders.productTag"
+    // ),
+    // [TaxRateRuleReferenceType.CUSTOMER_GROUP]: t(
+    //   "taxRegions.fields.targets.placeholders.customerGroup"
+    // ),
   }
 
   const getFieldHandler = (type: TaxRateRuleReferenceType) => {
@@ -337,7 +339,7 @@ export const TaxRegionCreateTaxOverrideForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -408,7 +410,7 @@ export const TaxRegionCreateTaxOverrideForm = ({
                       render={({ field }) => {
                         return (
                           <Form.Item>
-                            <Form.Label optional>
+                            <Form.Label>
                               {t("taxRegions.fields.taxCode")}
                             </Form.Label>
                             <Form.Control>
@@ -640,7 +642,7 @@ export const TaxRegionCreateTaxOverrideForm = ({
             </Button>
           </div>
         </RouteFocusModal.Footer>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

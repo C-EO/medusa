@@ -1,8 +1,14 @@
-import { MiddlewareRoute } from "@medusajs/framework"
-import { maybeApplyLinkFilter } from "../../utils/maybe-apply-link-filter"
-import { unlessPath } from "../../utils/unless-path"
-import { validateAndTransformBody } from "../../utils/validate-body"
-import { validateAndTransformQuery } from "../../utils/validate-query"
+import {
+  validateAndTransformBody,
+  validateAndTransformQuery,
+} from "@medusajs/framework"
+import {
+  maybeApplyLinkFilter,
+  MiddlewareRoute,
+  unlessPath,
+} from "@medusajs/framework/http"
+import multer from "multer"
+import { DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT } from "../../../utils/middlewares"
 import { createBatchBody } from "../../utils/validators"
 import * as QueryConfig from "./query-config"
 import { maybeApplyPriceListsFilter } from "./utils"
@@ -29,7 +35,6 @@ import {
   CreateProduct,
   CreateProductVariant,
 } from "./validators"
-import multer from "multer"
 
 // TODO: For now we keep the files in memory, as that's how they get passed to the workflows
 // This will need revisiting once we are closer to prod-ready v2, since with workflows and potentially
@@ -67,6 +72,9 @@ export const adminProductRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/products/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(CreateProduct, AdminBatchUpdateProduct)
@@ -164,6 +172,9 @@ export const adminProductRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/products/:id/variants/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(CreateProductVariant, AdminBatchUpdateProductVariant)
@@ -278,6 +289,9 @@ export const adminProductRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/products/:id/variants/inventory-items/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(

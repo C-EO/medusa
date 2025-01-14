@@ -1,7 +1,7 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { CommentTag } from "typedoc"
-import { camelToTitleCase } from "../../utils"
-import { MarkdownTheme } from "../../theme"
+import { camelToTitleCase } from "../../utils.js"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

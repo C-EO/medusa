@@ -1,5 +1,5 @@
 {
-  "description": "",
+  "description": "This component is used to create the trigger button that opens the drawer.\nIt accepts props from the [Radix UI Dialog Trigger](https://www.radix-ui.com/primitives/docs/components/dialog#trigger) component.",
   "methods": [],
   "displayName": "Drawer.Trigger",
   "props": {}

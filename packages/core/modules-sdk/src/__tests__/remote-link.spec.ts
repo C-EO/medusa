@@ -4,7 +4,7 @@ import { ProductInventoryLinkModule } from "../__mocks__/product-inventory-link"
 import { ProductModule } from "../__mocks__/product-module"
 import { StockLocationModule } from "../__mocks__/stock-location-module"
 
-import { RemoteLink } from "../remote-link"
+import { Link } from "../link"
 
 const allModules = [
   // modules
@@ -17,7 +17,7 @@ const allModules = [
 ]
 describe("Remote Link", function () {
   it("Should get all loaded modules and compose their relationships", async function () {
-    const remoteLink = new RemoteLink(allModules as any)
+    const remoteLink = new Link(allModules as any)
 
     const relations = remoteLink.getRelationships()
 
@@ -84,7 +84,7 @@ describe("Remote Link", function () {
   })
 
   it("Should call the correct link module to create relation between 2 keys", async function () {
-    const remoteLink = new RemoteLink(allModules as any)
+    const remoteLink = new Link(allModules as any)
 
     await remoteLink.create([
       {
@@ -123,7 +123,7 @@ describe("Remote Link", function () {
   })
 
   it("Should call delete in cascade all the modules involved in the link", async function () {
-    const remoteLink = new RemoteLink(allModules as any)
+    const remoteLink = new Link(allModules as any)
 
     ProductInventoryLinkModule.softDelete.mockImplementation(() => {
       return {

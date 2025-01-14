@@ -8,17 +8,17 @@ export const metadata = {
 
 In this document, you’ll learn about the Google Auth Module Provider and how to install and use it in the Auth Module.
 
-The Google Auth Module Provider handles authenticating users with their Google account.
+The Google Auth Module Provider authenticates users with their Google account.
 
 <Note title="Tip">
 
-Learn about the authentication flow in [this guide](../../authentication-route/page.mdx).
+Learn about the authentication flow for third-party providers in [this guide](../../authentication-route/page.mdx#2-third-party-service-authenticate-flow).
 
 </Note>
 
 ---
 
-## Install the Google Auth Module Provider
+## Register the Google Auth Module Provider
 
 <Prerequisites
   items={[
@@ -33,39 +33,39 @@ Learn about the authentication flow in [this guide](../../authentication-route/p
   ]}
 />
 
-To install the Google auth module provider, run the following command in the directory of your Medusa application:
+Add the module to the array of providers passed to the Auth Module:
 
-```bash npm2yarn
-npm install @medusajs/auth-google@preview
-```
-
-Next, add the module to the array of providers passed to the Auth Module:
-
-```js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
+```ts title="medusa-config.ts"
+import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 // ...
 
-const modules = {
+module.exports = defineConfig({
   // ...
-  [Modules.AUTH]: {
-    resolve: "@medusajs/auth",
-    options: {
-      providers: [
-        // other providers...
-        {
-          resolve: "@medusajs/auth-google",
-          id: "google",
-          options: {
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackUrl: process.env.GOOGLE_CALLBACK_URL,
-          },
+  modules: [
+    {
+      // ...
+      [Modules.AUTH]: {
+        resolve: "@medusajs/medusa/auth",
+        dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
+        options: {
+          providers: [
+            // other providers...
+            {
+              resolve: "@medusajs/medusa/auth-google",
+              id: "google",
+              options: {
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+              },
+            },
+          ],
         },
-      ],
+      },
     },
-  },
-}
+  ],
+})
 ```
 
 ### Environment Variables
@@ -147,6 +147,16 @@ GOOGLE_CALLBACK_URL=<YOUR_GOOGLE_CALLBACK_URL>
 
 ---
 
+---
+
+## Override Callback URL During Authentication
+
+In many cases, you may have different callback URL for actor types. For example, you may redirect admin users to a different URL than customers after authentication.
+
+The [Authenticate or Login API Route](../../authentication-route/page.mdx#login-route) can accept a `callback_url` body parameter to override the provider's `callbackUrl` option. Learn more in [this documentation](../../authentication-route/page.mdx#login-route).
+
+---
+
 ## Examples
 
-- [How to implement Google social login in the storefront.](../../../../storefront-development/customers/third-party-login/page.mdx).
+- [How to implement Google social login in the storefront](../../../../storefront-development/customers/third-party-login/page.mdx).

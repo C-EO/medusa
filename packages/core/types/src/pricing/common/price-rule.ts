@@ -133,3 +133,14 @@ export interface FilterablePriceRuleProps
    */
   price_set_id?: string[]
 }
+
+/**
+ * The possible operators to use in a price rule.
+ */
+export type PricingRuleOperatorValues = "gt" | "lt" | "eq" | "lte" | "gte"
+
+export interface PriceRule {
+  attribute: string
+  operator: PricingRuleOperatorValues
+  value: number
+}

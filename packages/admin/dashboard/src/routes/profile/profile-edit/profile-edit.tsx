@@ -16,11 +16,11 @@ export const ProfileEdit = () => {
   return (
     <RouteDrawer>
       <RouteDrawer.Header className="capitalize">
-        <Heading>{t("profile.edit.header")}</Heading>
+        <RouteDrawer.Title asChild>
+          <Heading>{t("profile.edit.header")}</Heading>
+        </RouteDrawer.Title>
       </RouteDrawer.Header>
-      {!isLoading && user && (
-        <EditProfileForm user={user} usageInsights={false} />
-      )}
+      {!isLoading && user && <EditProfileForm user={user} />}
     </RouteDrawer>
   )
 }

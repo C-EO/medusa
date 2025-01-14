@@ -1,25 +1,24 @@
-import { UpdateLineItemInCartWorkflowInputDTO } from "@medusajs/types"
+import { UpdateLineItemInCartWorkflowInputDTO } from "@medusajs/framework/types"
+import { isDefined, MedusaError } from "@medusajs/framework/utils"
 import {
-  WorkflowData,
-  WorkflowResponse,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+  when,
+  WorkflowData,
+} from "@medusajs/framework/workflows-sdk"
+import { useQueryGraphStep } from "../../common"
 import { useRemoteQueryStep } from "../../common/steps/use-remote-query"
 import { updateLineItemsStepWithSelector } from "../../line-item/steps"
-import { refreshCartShippingMethodsStep } from "../steps"
 import { validateCartStep } from "../steps/validate-cart"
 import { validateVariantPricesStep } from "../steps/validate-variant-prices"
 import {
-  cartFieldsForRefreshSteps,
+  cartFieldsForPricingContext,
   productVariantsFields,
 } from "../utils/fields"
 import { confirmVariantInventoryWorkflow } from "./confirm-variant-inventory"
-import { refreshPaymentCollectionForCartWorkflow } from "./refresh-payment-collection"
-import { updateCartPromotionsWorkflow } from "./update-cart-promotions"
+import { refreshCartItemsWorkflow } from "./refresh-cart-items"
 
-// TODO: The UpdateLineItemsWorkflow are missing the following steps:
-// - Validate shipping methods for new items (fulfillment module)
+const cartFields = cartFieldsForPricingContext.concat(["items.*"])
 
 export const updateLineItemInCartWorkflowId = "update-line-item-in-cart"
 /**
@@ -28,87 +27,93 @@ export const updateLineItemInCartWorkflowId = "update-line-item-in-cart"
 export const updateLineItemInCartWorkflow = createWorkflow(
   updateLineItemInCartWorkflowId,
   (input: WorkflowData<UpdateLineItemInCartWorkflowInputDTO>) => {
-    validateCartStep(input)
+    const cartQuery = useQueryGraphStep({
+      entity: "cart",
+      filters: { id: input.cart_id },
+      fields: cartFields,
+      options: { throwIfKeyNotFound: true },
+    }).config({ name: "get-cart" })
 
-    const variantIds = transform({ input }, (data) => {
-      return [data.input.item.variant_id]
+    const cart = transform({ cartQuery }, ({ cartQuery }) => cartQuery.data[0])
+    const item = transform({ cart, input }, ({ cart, input }) => {
+      return cart.items.find((i) => i.id === input.item_id)
     })
 
-    // TODO: This is on par with the context used in v1.*, but we can be more flexible.
-    const pricingContext = transform({ cart: input.cart }, (data) => {
-      return {
-        currency_code: data.cart.currency_code,
-        region_id: data.cart.region_id,
-        customer_id: data.cart.customer_id,
-      }
+    validateCartStep({ cart })
+
+    const variantIds = transform({ item }, ({ item }) => {
+      return [item.variant_id].filter(Boolean)
     })
 
-    const variants = useRemoteQueryStep({
-      entry_point: "variants",
-      fields: productVariantsFields,
-      variables: {
-        id: variantIds,
-        calculated_price: {
-          context: pricingContext,
+    const variants = when({ variantIds }, ({ variantIds }) => {
+      return !!variantIds.length
+    }).then(() => {
+      return useRemoteQueryStep({
+        entry_point: "variants",
+        fields: productVariantsFields,
+        variables: {
+          id: variantIds,
+          calculated_price: {
+            context: cart,
+          },
         },
-      },
-      throw_if_key_not_found: true,
+      }).config({ name: "fetch-variants" })
     })
 
     validateVariantPricesStep({ variants })
 
-    const items = transform({ input }, (data) => {
-      return [data.input.item]
+    const items = transform({ input, item }, (data) => {
+      return [Object.assign(data.item, { quantity: data.input.update.quantity })]
     })
 
     confirmVariantInventoryWorkflow.runAsStep({
       input: {
-        sales_channel_id: input.cart.sales_channel_id as string,
+        sales_channel_id: cart.sales_channel_id,
         variants,
         items,
       },
     })
 
-    const lineItemUpdate = transform({ input, variants }, (data) => {
-      const variant = data.variants[0]
-      const item = data.input.item
+    const lineItemUpdate = transform({ input, variants, item }, (data) => {
+      const variant = data.variants?.[0] ?? undefined
+      const item = data.item
+
+      const updateData = {
+        ...data.input.update,
+        unit_price: isDefined(data.input.update.unit_price)
+          ? data.input.update.unit_price
+          : item.unit_price,
+        is_custom_price: isDefined(data.input.update.unit_price)
+          ? true
+          : item.is_custom_price,
+        is_tax_inclusive:
+          item.is_tax_inclusive ||
+          variant?.calculated_price?.is_calculated_price_tax_inclusive,
+      }
+
+      if (variant && !updateData.is_custom_price) {
+        updateData.unit_price = variant.calculated_price.calculated_amount
+      }
+
+      if (!isDefined(updateData.unit_price)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Line item ${item.title} has no unit price`
+        )
+      }
 
       return {
-        data: {
-          ...data.input.update,
-          unit_price: variant.calculated_price.calculated_amount,
-          is_tax_inclusive:
-            !!variant.calculated_price.is_calculated_price_tax_inclusive,
-        },
+        data: updateData,
         selector: {
-          id: item.id,
+          id: data.input.item_id,
         },
       }
     })
 
-    const result = updateLineItemsStepWithSelector(lineItemUpdate)
+    updateLineItemsStepWithSelector(lineItemUpdate)
 
-    const cart = useRemoteQueryStep({
-      entry_point: "cart",
-      fields: cartFieldsForRefreshSteps,
-      variables: { id: input.cart.id },
-      list: false,
-    }).config({ name: "refetch–cart" })
-
-    refreshCartShippingMethodsStep({ cart })
-
-    updateCartPromotionsWorkflow.runAsStep({
-      input: {
-        cart_id: input.cart.id,
-      },
+    refreshCartItemsWorkflow.runAsStep({
+      input: { cart_id: input.cart_id },
     })
-
-    refreshPaymentCollectionForCartWorkflow.runAsStep({
-      input: { cart_id: input.cart.id },
-    })
-
-    const updatedItem = transform({ result }, (data) => data.result?.[0])
-
-    return new WorkflowResponse(updatedItem)
   }
 )

@@ -1,42 +1,33 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import AreaProvider from "@/providers/area"
-import StoreContentV2 from "../_mdx/store.mdx"
-import ClientLibrariesV2 from "../_mdx/client-libraries.mdx"
-import Section from "@/components/Section"
+import StoreContent from "@/markdown/store.mdx"
 import Tags from "@/components/Tags"
-import DividedLayout from "@/layouts/Divided"
 import PageTitleProvider from "@/providers/page-title"
+import { getBaseSpecs } from "../../lib"
+import BaseSpecsProvider from "../../providers/base-specs"
 
-const ReferencePage = async () => {
+const StorePage = async () => {
+  const data = await getBaseSpecs("store")
+
   return (
-    <AreaProvider area={"store"}>
-      <PageTitleProvider>
-        <h1 className="!text-h2 scroll-m-56 lg:pl-4" id="introduction">
-          Medusa V2 Store API Reference
-        </h1>
-        <DividedLayout
-          mainContent={
-            <Section checkActiveOnScroll={true}>
-              <StoreContentV2 />
-            </Section>
-          }
-          codeContent={
-            <div className="mb-1 lg:mb-0 hidden lg:block">
-              <ClientLibrariesV2 />
-            </div>
-          }
-        />
-        <Tags />
-      </PageTitleProvider>
-    </AreaProvider>
+    <BaseSpecsProvider baseSpecs={data}>
+      <AreaProvider area={"store"}>
+        <PageTitleProvider>
+          {/* @ts-ignore React v19 doesn't see MDX as valid component */}
+          <StoreContent />
+          <Tags tags={data?.tags} />
+        </PageTitleProvider>
+      </AreaProvider>
+    </BaseSpecsProvider>
   )
 }
 
-export default ReferencePage
+export default StorePage
 
 export function generateMetadata() {
   return {
     title: `Medusa Store API Reference`,
-    description: `REST API reference for the Medusa store API. This reference includes code snippets and examples for Medusa JS Client and cURL.`,
+    description: `REST API reference for the Medusa v2 store API, with code snippets and examples.`,
     metadataBase: process.env.NEXT_PUBLIC_BASE_URL,
   }
 }

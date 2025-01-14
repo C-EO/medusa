@@ -1,3 +1,5 @@
+import "dotenv/config"
+
 import { defineDocumentType, makeSource } from "contentlayer/source-files"
 import { rehypeComponent } from "./src/lib/rehype-component"
 import rehypeSlug from "rehype-slug"
@@ -28,5 +30,11 @@ export default makeSource({
   documentTypes: [Doc],
   mdx: {
     rehypePlugins: [[rehypeComponent], [rehypeSlug]],
+    mdxOptions: (options) => {
+      return {
+        ...options,
+        development: process.env.NODE_ENV === "development",
+      }
+    },
   },
 })

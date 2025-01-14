@@ -1,4 +1,8 @@
-import { ChangeActionType, MathBN, MedusaError } from "@medusajs/utils"
+import {
+  ChangeActionType,
+  MathBN,
+  MedusaError,
+} from "@medusajs/framework/utils"
 import { VirtualOrder } from "@types"
 import { OrderChangeProcessing } from "../calculate-order-change"
 import { setActionReference } from "../set-action-reference"
@@ -27,6 +31,7 @@ OrderChangeProcessing.registerActionType(ChangeActionType.ITEM_ADD, {
         exchange_id: action.exchange_id,
 
         unit_price: action.details.unit_price,
+        compare_at_unit_price: action.details.compare_at_unit_price,
         quantity: action.details.quantity,
       } as VirtualOrder["items"][0]
 

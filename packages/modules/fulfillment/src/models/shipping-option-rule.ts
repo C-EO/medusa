@@ -1,100 +1,12 @@
-import { DAL } from "@medusajs/types"
-import {
-  createPsqlIndexStatementHelper,
-  DALUtils,
-  generateEntityId,
-  RuleOperator,
-} from "@medusajs/utils"
-import {
-  BeforeCreate,
-  Entity,
-  Enum,
-  Filter,
-  ManyToOne,
-  OnInit,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-  Rel,
-} from "@mikro-orm/core"
-import ShippingOption from "./shipping-option"
+import { model, RuleOperator } from "@medusajs/framework/utils"
+import { ShippingOption } from "./shipping-option"
 
-type ShippingOptionRuleOptionalProps = DAL.SoftDeletableModelDateColumns
-
-const DeletedAtIndex = createPsqlIndexStatementHelper({
-  tableName: "shipping_option_rule",
-  columns: "deleted_at",
-  where: "deleted_at IS NOT NULL",
+export const ShippingOptionRule = model.define("shipping_option_rule", {
+  id: model.id({ prefix: "sorul" }).primaryKey(),
+  attribute: model.text(),
+  operator: model.enum(RuleOperator),
+  value: model.json().nullable(),
+  shipping_option: model.belongsTo(() => ShippingOption, {
+    mappedBy: "rules",
+  }),
 })
-
-const ShippingOptionIdIndex = createPsqlIndexStatementHelper({
-  tableName: "shipping_option_rule",
-  columns: "shipping_option_id",
-  where: "deleted_at IS NULL",
-})
-
-@Entity()
-@Filter(DALUtils.mikroOrmSoftDeletableFilterOptions)
-export default class ShippingOptionRule {
-  [OptionalProps]?: ShippingOptionRuleOptionalProps
-
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({ columnType: "text" })
-  attribute: string
-
-  @Enum({
-    items: () => Object.values(RuleOperator),
-    columnType: "text",
-  })
-  operator: Lowercase<keyof typeof RuleOperator>
-
-  @Property({ columnType: "jsonb", nullable: true })
-  value: string | string[] | null = null
-
-  @ManyToOne(() => ShippingOption, {
-    type: "text",
-    mapToPk: true,
-    fieldName: "shipping_option_id",
-    onDelete: "cascade",
-  })
-  @ShippingOptionIdIndex.MikroORMIndex()
-  shipping_option_id: string
-
-  @ManyToOne(() => ShippingOption, {
-    persist: false,
-  })
-  shipping_option: Rel<ShippingOption>
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  updated_at: Date
-
-  @DeletedAtIndex.MikroORMIndex()
-  @Property({ columnType: "timestamptz", nullable: true })
-  deleted_at: Date | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "sorul")
-    this.shipping_option_id ??= this.shipping_option?.id
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "sorul")
-    this.shipping_option_id ??= this.shipping_option?.id
-  }
-}

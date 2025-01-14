@@ -49,15 +49,22 @@ export function Module<
       DmlEntity.isDmlEntity(model)
     )
 
+    // TODO: Custom joiner config should take precedence over the DML auto generated linkable
+    // Thats in the case of manually providing models in custom joiner config.
+    // TODO: Add support for non linkable modifier DML object to be skipped from the linkable generation
+
+    const linkableKeys = service.prototype.__joinerConfig().linkableKeys
+
     if (dmlObjects.length) {
       linkable = buildLinkConfigFromModelObjects<ServiceName, ModelObjects>(
         serviceName,
-        modelObjects
+        modelObjects,
+        linkableKeys
       ) as Linkable
     } else {
       linkable = buildLinkConfigFromLinkableKeys(
         serviceName,
-        service.prototype.__joinerConfig().linkableKeys
+        linkableKeys
       ) as Linkable
     }
   }

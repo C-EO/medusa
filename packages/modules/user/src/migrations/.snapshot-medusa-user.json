@@ -99,34 +99,28 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_invite_email",
-          "columnNames": [
-            "email"
-          ],
+          "keyName": "IDX_invite_deleted_at",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_invite_email\" ON \"invite\" (email) WHERE deleted_at IS NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_invite_deleted_at\" ON \"invite\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_invite_email_unique",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_invite_email_unique\" ON \"invite\" (email) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_invite_token",
-          "columnNames": [
-            "token"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_invite_token\" ON \"invite\" (token) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_invite_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_invite_deleted_at\" ON \"invite\" (deleted_at) WHERE deleted_at IS NOT NULL"
         },
         {
           "keyName": "invite_pkey",
@@ -234,24 +228,20 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_user_email",
-          "columnNames": [
-            "email"
-          ],
+          "keyName": "IDX_user_deleted_at",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_user_email\" ON \"user\" (email) WHERE deleted_at IS NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_user_deleted_at\" ON \"user\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "IDX_user_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "keyName": "IDX_user_email_unique",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_user_deleted_at\" ON \"user\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_user_email_unique\" ON \"user\" (email) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "user_pkey",

@@ -4,7 +4,26 @@ import {
   ExportDefaultDeclaration,
   ExportNamedDeclaration,
   File,
+  isArrayExpression,
+  isCallExpression,
+  isFunctionDeclaration,
+  isIdentifier,
+  isJSXElement,
+  isJSXFragment,
+  isMemberExpression,
+  isObjectExpression,
+  isObjectProperty,
+  isStringLiteral,
+  isTemplateLiteral,
+  isVariableDeclaration,
+  isVariableDeclarator,
+  Node,
+  ObjectExpression,
+  ObjectMethod,
   ObjectProperty,
+  SpreadElement,
+  StringLiteral,
+  VariableDeclarator,
 } from "@babel/types"
 
 /**
@@ -20,13 +39,35 @@ if (typeof _traverse === "function") {
   traverse = (_traverse as any).default
 }
 
-export { parse, traverse }
+export {
+  isArrayExpression,
+  isCallExpression,
+  isFunctionDeclaration,
+  isIdentifier,
+  isJSXElement,
+  isJSXFragment,
+  isMemberExpression,
+  isObjectExpression,
+  isObjectProperty,
+  isStringLiteral,
+  isTemplateLiteral,
+  isVariableDeclaration,
+  isVariableDeclarator,
+  parse,
+  traverse,
+}
 export type {
   ExportDefaultDeclaration,
   ExportNamedDeclaration,
   File,
+  Node,
   NodePath,
+  ObjectExpression,
+  ObjectMethod,
   ObjectProperty,
   ParseResult,
   ParserOptions,
+  SpreadElement,
+  StringLiteral,
+  VariableDeclarator,
 }

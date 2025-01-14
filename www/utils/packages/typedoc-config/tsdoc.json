@@ -49,6 +49,14 @@
     {
       "tagName": "@parentIgnore",
       "syntaxKind": "block"
+    },
+    {
+      "tagName": "@version",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@tags",
+      "syntaxKind": "block"
     }
   ]
 }

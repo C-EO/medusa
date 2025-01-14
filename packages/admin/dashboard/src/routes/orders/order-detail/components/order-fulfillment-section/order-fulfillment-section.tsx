@@ -2,6 +2,7 @@ import { Buildings, XCircle } from "@medusajs/icons"
 import {
   AdminOrder,
   AdminOrderFulfillment,
+  AdminOrderLineItem,
   HttpTypes,
   OrderLineItemDTO,
 } from "@medusajs/types"
@@ -72,14 +73,14 @@ const UnfulfilledItem = ({
           >
             {item.title}
           </Text>
-          {item.variant.sku && (
+          {item.variant_sku && (
             <div className="flex items-center gap-x-1">
-              <Text size="small">{item.variant.sku}</Text>
-              <Copy content={item.variant.sku} className="text-ui-fg-muted" />
+              <Text size="small">{item.variant_sku}</Text>
+              <Copy content={item.variant_sku} className="text-ui-fg-muted" />
             </div>
           )}
           <Text size="small">
-            {item.variant.options.map((o) => o.value).join(" · ")}
+            {item.variant?.options.map((o) => o.value).join(" · ")}
           </Text>
         </div>
       </div>
@@ -108,25 +109,67 @@ const UnfulfilledItem = ({
 }
 
 const UnfulfilledItemBreakdown = ({ order }: { order: AdminOrder }) => {
-  const { t } = useTranslation()
-
   // Create an array of order items that haven't been fulfilled or at least not fully fulfilled
-  const unfulfilledItems = order.items!.filter(
-    (i) => i.detail.fulfilled_quantity < i.quantity
+  const unfulfilledItemsWithShipping = order.items!.filter(
+    (i) => i.requires_shipping && i.detail.fulfilled_quantity < i.quantity
   )
 
-  if (!unfulfilledItems.length) {
-    return null
+  const unfulfilledItemsWithoutShipping = order.items!.filter(
+    (i) => !i.requires_shipping && i.detail.fulfilled_quantity < i.quantity
+  )
+
+  return (
+    <>
+      {!!unfulfilledItemsWithShipping.length && (
+        <UnfulfilledItemDisplay
+          order={order}
+          unfulfilledItems={unfulfilledItemsWithShipping}
+          requiresShipping={true}
+        />
+      )}
+
+      {!!unfulfilledItemsWithoutShipping.length && (
+        <UnfulfilledItemDisplay
+          order={order}
+          unfulfilledItems={unfulfilledItemsWithoutShipping}
+          requiresShipping={false}
+        />
+      )}
+    </>
+  )
+}
+
+const UnfulfilledItemDisplay = ({
+  order,
+  unfulfilledItems,
+  requiresShipping = false,
+}: {
+  order: AdminOrder
+  unfulfilledItems: AdminOrderLineItem[]
+  requiresShipping: boolean
+}) => {
+  const { t } = useTranslation()
+
+  if (order.status === "canceled") {
+    return
   }
 
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">{t("orders.fulfillment.unfulfilledItems")}</Heading>
+
         <div className="flex items-center gap-x-4">
+          {requiresShipping && (
+            <StatusBadge color="red" className="text-nowrap">
+              {t("orders.fulfillment.requiresShipping")}
+            </StatusBadge>
+          )}
+
           <StatusBadge color="red" className="text-nowrap">
             {t("orders.fulfillment.awaitingFulfillmentBadge")}
           </StatusBadge>
+
           <ActionMenu
             groups={[
               {
@@ -134,7 +177,7 @@ const UnfulfilledItemBreakdown = ({ order }: { order: AdminOrder }) => {
                   {
                     label: t("orders.fulfillment.fulfillItems"),
                     icon: <Buildings />,
-                    to: `/orders/${order.id}/fulfillment`,
+                    to: `/orders/${order.id}/fulfillment?requires_shipping=${requiresShipping}`,
                   },
                 ],
               },
@@ -143,7 +186,7 @@ const UnfulfilledItemBreakdown = ({ order }: { order: AdminOrder }) => {
         </div>
       </div>
       <div>
-        {unfulfilledItems.map((item) => (
+        {unfulfilledItems.map((item: AdminOrderLineItem) => (
           <UnfulfilledItem
             key={item.id}
             item={item}
@@ -178,7 +221,9 @@ const Fulfillment = ({
     }
   )
 
-  let statusText = "Awaiting shipping"
+  let statusText = fulfillment.requires_shipping
+    ? "Awaiting shipping"
+    : "Awaiting delivery"
   let statusColor: "blue" | "green" | "red" = "blue"
   let statusTimestamp = fulfillment.created_at
 
@@ -205,7 +250,8 @@ const Fulfillment = ({
   const showShippingButton =
     !fulfillment.canceled_at &&
     !fulfillment.shipped_at &&
-    !fulfillment.delivered_at
+    !fulfillment.delivered_at &&
+    fulfillment.requires_shipping
   const showDeliveryButton =
     !fulfillment.canceled_at && !fulfillment.delivered_at
 
@@ -385,7 +431,7 @@ const Fulfillment = ({
       </div>
 
       {(showShippingButton || showDeliveryButton) && (
-        <div className="bg-ui-bg-subtle flex items-center justify-end rounded-b-xl px-4 py-4 gap-x-2">
+        <div className="bg-ui-bg-subtle flex items-center justify-end gap-x-2 rounded-b-xl px-4 py-4">
           {showDeliveryButton && (
             <Button onClick={handleMarkAsDelivered} variant="secondary">
               {t("orders.fulfillment.markAsDelivered")}

@@ -1,45 +1,14 @@
-import {
-  BeforeCreate,
-  Collection,
-  Entity,
-  OnInit,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from "@mikro-orm/core"
+import { model } from "@medusajs/framework/utils"
+import { ProviderIdentity } from "./provider-identity"
 
-import { generateEntityId } from "@medusajs/utils"
-import ProviderIdentity from "./provider-identity"
-
-@Entity()
-export default class AuthIdentity {
-  @PrimaryKey({ columnType: "text" })
-  id!: string
-
-  @OneToMany(() => ProviderIdentity, (o) => o.auth_identity)
-  provider_identities = new Collection<ProviderIdentity>(this)
-
-  @Property({ columnType: "jsonb", nullable: true })
-  app_metadata: Record<string, unknown> | null
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
+export const AuthIdentity = model
+  .define("auth_identity", {
+    id: model.id({ prefix: "authid" }).primaryKey(),
+    provider_identities: model.hasMany(() => ProviderIdentity, {
+      mappedBy: "auth_identity",
+    }),
+    app_metadata: model.json().nullable(),
   })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
+  .cascades({
+    delete: ["provider_identities"],
   })
-  updated_at: Date
-
-  @BeforeCreate()
-  @OnInit()
-  onCreate() {
-    this.id = generateEntityId(this.id, "authid")
-  }
-}

@@ -63,9 +63,11 @@ export const useSelect = ({
 
   const handleChange = (selectedValue: string, wasSelected: boolean) => {
     if (multiple) {
-      wasSelected
-        ? removeSelected?.(selectedValue)
-        : addSelected?.(selectedValue)
+      if (wasSelected) {
+        removeSelected?.(selectedValue)
+      } else {
+        addSelected?.(selectedValue)
+      }
     } else {
       setSelected?.(selectedValue)
     }

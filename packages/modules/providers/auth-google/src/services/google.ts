@@ -1,11 +1,15 @@
+import crypto from "crypto"
 import {
   AuthenticationInput,
   AuthenticationResponse,
   AuthIdentityProviderService,
   GoogleAuthProviderOptions,
   Logger,
-} from "@medusajs/types"
-import { AbstractAuthModuleProvider, MedusaError } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  AbstractAuthModuleProvider,
+  MedusaError,
+} from "@medusajs/framework/utils"
 import jwt, { JwtPayload } from "jsonwebtoken"
 
 type InjectedDependencies = {
@@ -13,9 +17,10 @@ type InjectedDependencies = {
 }
 
 interface LocalServiceConfig extends GoogleAuthProviderOptions {}
-
-// TODO: Add state param that is stored in Redis, to prevent CSRF attacks
 export class GoogleAuthService extends AbstractAuthModuleProvider {
+  static identifier = "google"
+  static DISPLAY_NAME = "Google Authentication"
+
   protected config_: LocalServiceConfig
   protected logger_: Logger
 
@@ -37,7 +42,8 @@ export class GoogleAuthService extends AbstractAuthModuleProvider {
     { logger }: InjectedDependencies,
     options: GoogleAuthProviderOptions
   ) {
-    super({}, { provider: "google", displayName: "Google Authentication" })
+    // @ts-ignore
+    super(...arguments)
     this.config_ = options
     this.logger_ = logger
   }
@@ -50,39 +56,53 @@ export class GoogleAuthService extends AbstractAuthModuleProvider {
   }
 
   async authenticate(
-    req: AuthenticationInput
+    req: AuthenticationInput,
+    authIdentityService: AuthIdentityProviderService
   ): Promise<AuthenticationResponse> {
-    if (req.query?.error) {
+    const query: Record<string, string> = req.query ?? {}
+    const body: Record<string, string> = req.body ?? {}
+
+    if (query.error) {
       return {
         success: false,
-        error: `${req.query.error_description}, read more at: ${req.query.error_uri}`,
+        error: `${query.error_description}, read more at: ${query.error_uri}`,
       }
     }
 
-    return this.getRedirect(this.config_)
+    const stateKey = crypto.randomBytes(32).toString("hex")
+    const state = {
+      callback_url: body?.callback_url ?? this.config_.callbackUrl,
+    }
+
+    await authIdentityService.setState(stateKey, state)
+    return this.getRedirect(this.config_.clientId, state.callback_url, stateKey)
   }
 
   async validateCallback(
     req: AuthenticationInput,
     authIdentityService: AuthIdentityProviderService
   ): Promise<AuthenticationResponse> {
-    if (req.query && req.query.error) {
+    const query: Record<string, string> = req.query ?? {}
+    const body: Record<string, string> = req.body ?? {}
+
+    if (query.error) {
       return {
         success: false,
-        error: `${req.query.error_description}, read more at: ${req.query.error_uri}`,
+        error: `${query.error_description}, read more at: ${query.error_uri}`,
       }
     }
 
-    const code = req.query?.code ?? req.body?.code
+    const code = query?.code ?? body?.code
     if (!code) {
       return { success: false, error: "No code provided" }
     }
 
-    const params = `client_id=${this.config_.clientId}&client_secret=${
-      this.config_.clientSecret
-    }&code=${code}&redirect_uri=${encodeURIComponent(
-      this.config_.callbackUrl
-    )}&grant_type=authorization_code`
+    const state = await authIdentityService.getState(query?.state as string)
+    if (!state) {
+      return { success: false, error: "No state provided, or session expired" }
+    }
+
+    const params = `client_id=${this.config_.clientId}&client_secret=${this.config_.clientSecret}&code=${code}&redirect_uri=${state.callback_url}&grant_type=authorization_code`
     const exchangeTokenUrl = new URL(
       `https://oauth2.googleapis.com/token?${params}`
     )
@@ -135,10 +155,10 @@ export class GoogleAuthService extends AbstractAuthModuleProvider {
       )
     }
 
-    // TODO: We should probably use something else than email here, like the `sub` field (which is more constant than the email)
-    const entity_id = payload.email
+    const entity_id = payload.sub
     const userMetadata = {
       name: payload.name,
+      email: payload.email,
       picture: payload.picture,
       given_name: payload.given_name,
       family_name: payload.family_name,
@@ -168,20 +188,13 @@ export class GoogleAuthService extends AbstractAuthModuleProvider {
     }
   }
 
-  private getRedirect({ clientId, callbackUrl }: LocalServiceConfig) {
-    const redirectUrlParam = `redirect_uri=${encodeURIComponent(callbackUrl)}`
-    const clientIdParam = `client_id=${clientId}`
-    const responseTypeParam = "response_type=code"
-    const scopeParam = "scope=email+profile+openid"
-
-    const authUrl = new URL(
-      `https://accounts.google.com/o/oauth2/v2/auth?${[
-        redirectUrlParam,
-        clientIdParam,
-        responseTypeParam,
-        scopeParam,
-      ].join("&")}`
-    )
+  private getRedirect(clientId: string, callbackUrl: string, stateKey: string) {
+    const authUrl = new URL(`https://accounts.google.com/o/oauth2/v2/auth`)
+    authUrl.searchParams.set("redirect_uri", callbackUrl)
+    authUrl.searchParams.set("client_id", clientId)
+    authUrl.searchParams.set("response_type", "code")
+    authUrl.searchParams.set("scope", "email profile openid")
+    authUrl.searchParams.set("state", stateKey)
 
     return { success: true, location: authUrl.toString() }
   }

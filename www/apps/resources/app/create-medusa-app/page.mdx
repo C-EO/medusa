@@ -35,8 +35,31 @@ The `create-medusa-app` CLI tool simplifies the process of creating a new Medusa
 ## Usage
 
 ```bash
-npx create-medusa-app@latest
+npx create-medusa-app@latest [project-name]
 ```
+
+### Arguments
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Option</Table.HeaderCell>
+      <Table.HeaderCell>Description</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>
+
+        `project-name`
+
+      </Table.Cell>
+      <Table.Cell>
+        The name of the project's directory and PostgreSQL database to be created. For example, `my-medusa-store`. If not provided, you'll be prompted to enter a project name.
+      </Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
 
 ### Command Options
 
@@ -61,21 +84,6 @@ npx create-medusa-app@latest
       <Table.Cell>
       
       `https://github.com/medusajs/medusa-starter-default`
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-        `--seed`
-
-      </Table.Cell>
-      <Table.Cell>
-        Whether to seed the database with demo data.
-      </Table.Cell>
-      <Table.Cell>
-      
-        `false`
 
       </Table.Cell>
     </Table.Row>
@@ -190,23 +198,6 @@ npx create-medusa-app@latest
       <Table.Cell>
 
         Shows detailed logs. Useful when you're reporting an issue with the tool.
-
-      </Table.Cell>
-      <Table.Cell>
-      
-        `false`
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-        `--v2`
-
-      </Table.Cell>
-      <Table.Cell>
-
-        Installs Medusa v2, which is still not ready for production.
 
       </Table.Cell>
       <Table.Cell>

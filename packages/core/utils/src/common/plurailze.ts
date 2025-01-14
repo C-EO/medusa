@@ -1,4 +1,5 @@
 import pluralizeEN from "pluralize"
+pluralizeEN.addUncountableRule("info")
 
 /**
  * Function to pluralize English words.

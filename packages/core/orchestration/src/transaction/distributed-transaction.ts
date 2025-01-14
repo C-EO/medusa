@@ -9,6 +9,7 @@ import {
   TransactionHandlerType,
   TransactionState,
 } from "./types"
+import { NonSerializableCheckPointError } from "./errors"
 
 /**
  * @typedef TransactionMetadata
@@ -82,6 +83,14 @@ class DistributedTransaction extends EventEmitter {
   private readonly errors: TransactionStepError[] = []
   private readonly context: TransactionContext = new TransactionContext()
   private static keyValueStore: IDistributedTransactionStorage
+
+  /**
+   * Store data during the life cycle of the current transaction execution.
+   * Store non persistent data such as transformers results, temporary data, etc.
+   *
+   * @private
+   */
+  #temporaryStorage = new Map<string, unknown>()
 
   public static setStorage(storage: IDistributedTransactionStorage) {
     this.keyValueStore = storage
@@ -196,20 +205,17 @@ class DistributedTransaction extends EventEmitter {
       return
     }
 
-    const data = new TransactionCheckpoint(
-      this.getFlow(),
-      this.getContext(),
-      this.getErrors()
-    )
-
     const key = TransactionOrchestrator.getKeyName(
       DistributedTransaction.keyPrefix,
       this.modelId,
       this.transactionId
     )
-    await DistributedTransaction.keyValueStore.save(key, data, ttl, options)
 
-    return data
+    const rawData = this.#serializeCheckpointData()
+
+    await DistributedTransaction.keyValueStore.save(key, rawData, ttl, options)
+
+    return rawData
   }
 
   public static async loadTransaction(
@@ -238,6 +244,10 @@ class DistributedTransaction extends EventEmitter {
     step: TransactionStep,
     interval: number
   ): Promise<void> {
+    if (this.hasFinished()) {
+      return
+    }
+
     await this.saveCheckpoint()
     await DistributedTransaction.keyValueStore.scheduleRetry(
       this,
@@ -297,6 +307,88 @@ class DistributedTransaction extends EventEmitter {
     }
 
     await DistributedTransaction.keyValueStore.clearStepTimeout(this, step)
+  }
+
+  public setTemporaryData(key: string, value: unknown) {
+    this.#temporaryStorage.set(key, value)
+  }
+
+  public getTemporaryData(key: string) {
+    return this.#temporaryStorage.get(key)
+  }
+
+  public hasTemporaryData(key: string) {
+    return this.#temporaryStorage.has(key)
+  }
+
+  /**
+   * Try to serialize the checkpoint data
+   * If it fails, it means that the context or the errors are not serializable
+   * and we should handle it
+   *
+   * @internal
+   * @returns
+   */
+  #serializeCheckpointData() {
+    const data = new TransactionCheckpoint(
+      this.getFlow(),
+      this.getContext(),
+      this.getErrors()
+    )
+
+    const isSerializable = (obj) => {
+      try {
+        JSON.parse(JSON.stringify(obj))
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    let rawData
+    try {
+      rawData = JSON.parse(JSON.stringify(data))
+    } catch (e) {
+      if (!isSerializable(this.context)) {
+        // This is a safe guard, we should never reach this point
+        // If we do, it means that the context is not serializable
+        // and we should throw an error
+        throw new NonSerializableCheckPointError(
+          "Unable to serialize context object. Please make sure the workflow input and steps response are serializable."
+        )
+      }
+
+      if (!isSerializable(this.errors)) {
+        const nonSerializableErrors: TransactionStepError[] = []
+        for (const error of this.errors) {
+          if (!isSerializable(error.error)) {
+            error.error = {
+              name: error.error.name,
+              message: error.error.message,
+              stack: error.error.stack,
+            }
+            nonSerializableErrors.push({
+              ...error,
+              error: e,
+            })
+          }
+        }
+
+        if (nonSerializableErrors.length) {
+          this.errors.push(...nonSerializableErrors)
+        }
+      }
+
+      const data = new TransactionCheckpoint(
+        this.getFlow(),
+        this.getContext(),
+        this.getErrors()
+      )
+
+      rawData = JSON.parse(JSON.stringify(data))
+    }
+
+    return rawData
   }
 }
 

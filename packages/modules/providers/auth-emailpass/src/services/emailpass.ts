@@ -5,12 +5,12 @@ import {
   AuthIdentityProviderService,
   EmailPassAuthProviderOptions,
   Logger,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AbstractAuthModuleProvider,
   isString,
   MedusaError,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import Scrypt from "scrypt-kdf"
 
 type InjectedDependencies = {
@@ -20,6 +20,9 @@ type InjectedDependencies = {
 interface LocalServiceConfig extends EmailPassAuthProviderOptions {}
 
 export class EmailPassAuthService extends AbstractAuthModuleProvider {
+  static identifier = "emailpass"
+  static DISPLAY_NAME = "Email/Password Authentication"
+
   protected config_: LocalServiceConfig
   protected logger_: Logger
 
@@ -27,10 +30,8 @@ export class EmailPassAuthService extends AbstractAuthModuleProvider {
     { logger }: InjectedDependencies,
     options: EmailPassAuthProviderOptions
   ) {
-    super(
-      {},
-      { provider: "emailpass", displayName: "Email/Password Authentication" }
-    )
+    // @ts-ignore
+    super(...arguments)
     this.config_ = options
     this.logger_ = logger
   }
@@ -42,15 +43,15 @@ export class EmailPassAuthService extends AbstractAuthModuleProvider {
   }
 
   async update(
-    data: { email: string; password: string },
+    data: { password: string; entity_id: string },
     authIdentityService: AuthIdentityProviderService
   ) {
-    const { email, password } = data ?? {}
+    const { password, entity_id } = data ?? {}
 
-    if (!email || !isString(email)) {
+    if (!entity_id) {
       return {
         success: false,
-        error: `Cannot update ${this.provider} provider identity without email`,
+        error: `Cannot update ${this.provider} provider identity without entity_id`,
       }
     }
 
@@ -63,7 +64,7 @@ export class EmailPassAuthService extends AbstractAuthModuleProvider {
     try {
       const passwordHash = await this.hashPassword(password)
 
-      authIdentity = await authIdentityService.update(email, {
+      authIdentity = await authIdentityService.update(entity_id, {
         provider_metadata: {
           password: passwordHash,
         },

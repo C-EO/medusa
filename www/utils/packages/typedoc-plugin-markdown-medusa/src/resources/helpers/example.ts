@@ -1,4 +1,4 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { Reflection, SignatureReflection } from "typedoc"
 import { isWorkflow, isWorkflowStep } from "utils"
 

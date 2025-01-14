@@ -1,39 +1,35 @@
-import {
-  AdminCreateInventoryLocationLevelType,
-  AdminUpdateInventoryLocationLevelType,
-} from "../../../validators"
-import { MedusaRequest, MedusaResponse } from "../../../../../../types/routing"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AdminBatchInventoryItemLocationsLevelType } from "../../../validators"
 
-import { bulkCreateDeleteLevelsWorkflow } from "@medusajs/core-flows"
-import { BatchMethodRequest } from "@medusajs/types"
+import { batchInventoryItemLevelsWorkflow } from "@medusajs/core-flows"
 
 export const POST = async (
-  req: MedusaRequest<
-    BatchMethodRequest<
-      AdminCreateInventoryLocationLevelType,
-      AdminUpdateInventoryLocationLevelType
-    >
-  >,
-  res: MedusaResponse<{ inventory_item: {} }>
+  req: MedusaRequest<AdminBatchInventoryItemLocationsLevelType>,
+  res: MedusaResponse
 ) => {
   const { id } = req.params
 
-  // TODO: Normalize workflow and response, and add support for updates
-  const workflow = bulkCreateDeleteLevelsWorkflow(req.scope)
-  await workflow.run({
+  const workflow = batchInventoryItemLevelsWorkflow(req.scope)
+  const output = await workflow.run({
     input: {
-      deletes:
-        req.validatedBody.delete?.map((location_id) => ({
-          location_id,
-          inventory_item_id: id,
-        })) ?? [],
-      creates:
+      delete: req.validatedBody.delete ?? [],
+      create:
         req.validatedBody.create?.map((c) => ({
           ...c,
           inventory_item_id: id,
         })) ?? [],
+      update:
+        req.validatedBody.update?.map((u) => ({
+          ...u,
+          inventory_item_id: id,
+        })) ?? [],
+      force: req.validatedBody.force ?? false,
     },
   })
 
-  res.status(200).json({ inventory_item: {} })
+  res.status(200).json({
+    created: output.result.created,
+    updated: output.result.updated,
+    deleted: output.result.deleted,
+  })
 }

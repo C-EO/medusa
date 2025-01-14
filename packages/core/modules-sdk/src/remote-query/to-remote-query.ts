@@ -2,9 +2,9 @@ import {
   RemoteQueryEntryPoints,
   RemoteQueryFilters,
   RemoteQueryGraph,
-  RemoteQueryObjectConfig,
+  RemoteQueryInput,
 } from "@medusajs/types"
-import { QueryContext, QueryFilter, isObject } from "@medusajs/utils"
+import { isObject, QueryContext } from "@medusajs/utils"
 import { parseAndAssignFilters } from "./parse-filters"
 
 const FIELDS = "__fields"
@@ -14,6 +14,7 @@ const ARGUMENTS = "__args"
  * convert a specific API configuration to a remote query object
  *
  * @param config
+ * @param entitiesMap
  *
  * @example
  * const remoteQueryObject = toRemoteQuery({
@@ -31,12 +32,9 @@ const ARGUMENTS = "__args"
 export function toRemoteQuery<const TEntity extends string>(
   config: {
     entity: TEntity | keyof RemoteQueryEntryPoints
-    fields: RemoteQueryObjectConfig<TEntity>["fields"]
+    fields: RemoteQueryInput<TEntity>["fields"]
     filters?: RemoteQueryFilters<TEntity>
-    pagination?: {
-      skip?: number
-      take?: number
-    }
+    pagination?: Partial<RemoteQueryInput<TEntity>["pagination"]>
     context?: Record<string, any>
   },
   entitiesMap: Map<string, any>
@@ -62,11 +60,11 @@ export function toRemoteQuery<const TEntity extends string>(
         continue
       }
 
-      if (QueryContext.isQueryContext(src) || QueryFilter.isQueryFilter(src)) {
+      if (QueryContext.isQueryContext(src)) {
         const normalizedFilters = { ...src } as any
         delete normalizedFilters.__type
 
-        const prop = QueryFilter.isQueryFilter(src) ? "filters" : "context"
+        const prop = "context"
 
         if (topLevel) {
           target[ARGUMENTS] ??= {}
@@ -112,7 +110,7 @@ export function toRemoteQuery<const TEntity extends string>(
   }
 
   if (config.pagination) {
-    joinerQuery[entity][ARGUMENTS] ??= {}
+    joinerQuery[entity][ARGUMENTS] ??= {} as any
     joinerQuery[entity][ARGUMENTS] = {
       ...joinerQuery[entity][ARGUMENTS],
       ...config.pagination,

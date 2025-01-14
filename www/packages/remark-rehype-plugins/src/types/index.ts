@@ -98,15 +98,6 @@ export declare type CloudinaryConfig = {
   roundCorners?: number
 }
 
-export declare type FrontMatter = {
-  slug?: string
-  sidebar_label?: string
-  sidebar_group?: string
-  sidebar_group_main?: boolean
-  sidebar_position?: number
-  sidebar_autogenerate_exclude?: boolean
-}
-
 export declare type CrossProjectLinksOptions = {
   baseUrl: string
   projectUrls?: {
@@ -116,6 +107,16 @@ export declare type CrossProjectLinksOptions = {
     }
   }
   useBaseUrl?: boolean
+}
+
+export declare type BrokenLinkCheckerOptions = {
+  crossProjects: {
+    [k: string]: {
+      projectPath: string
+      contentPath?: string
+      hasGeneratedSlugs?: boolean
+    }
+  }
 }
 
 export declare type ComponentLinkFixerLinkType = "md" | "value"

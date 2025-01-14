@@ -1,3 +1,10 @@
+---
+tags:
+  - product
+  - product category
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -28,7 +35,7 @@ export const fetchHighlights = [
   fetch(`http://localhost:9000/store/product-categories/${id}`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -42,9 +49,8 @@ export const fetchHighlights = [
   <CodeTab label="React" value="react">
 
 export const highlights = [
-  ["12", "{ params: { id } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["23"], ["24"], ["25"], ["26"],
-  ["27"], ["28"], ["29"], ["30"], ["31"], ["32"], ["33"]
+  ["21"], ["22"], ["23"], ["24"],
+  ["25"], ["26"], ["27"], ["28"], ["29"], ["30"], ["31"]
 ]
 
   ```tsx highlights={highlights}
@@ -53,13 +59,11 @@ export const highlights = [
   import { useEffect, useState } from "react"
   import { HttpTypes } from "@medusajs/types"
 
-  type Params = {
-    params: {
-      id: string
-    }
+  type Props = {
+    id: string
   }
 
-  export default function Category({ params: { id } }: Params) {
+  export default function Category({ id }: Props) {
     const [loading, setLoading] = useState(true)
     const [category, setCategory] = useState<
       HttpTypes.StoreProductCategory | undefined
@@ -73,7 +77,7 @@ export const highlights = [
       fetch(`http://localhost:9000/store/product-categories/${id}`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())
@@ -121,7 +125,7 @@ export const handleFetchHighlights = [
   }`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -139,10 +143,9 @@ export const handleFetchHighlights = [
   <CodeTab label="React" value="react">
 
 export const handleHighlights = [
-  ["12", "{ params: { handle } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["23"], ["24"], ["25"], ["26"],
-  ["27"], ["28"], ["29"], ["30"],
-  ["31"], ["32"], ["33"], ["34"], ["35"], ["36"], ["37"]
+  ["21"], ["22"], ["23"], ["24"],
+  ["25"], ["26"], ["27"], ["28"],
+  ["29"], ["30"], ["31"], ["32"], ["33"], ["34"], ["35"]
 ]
 
   ```tsx highlights={handleHighlights}
@@ -151,13 +154,11 @@ export const handleHighlights = [
   import { useEffect, useState } from "react"
   import { HttpTypes } from "@medusajs/types"
 
-  type Params = {
-    params: {
-      handle: string
-    }
+  type Props = {
+    handle: string
   }
 
-  export default function Category({ params: { handle } }: Params) {
+  export default function Category({ handle }: Props) {
     const [loading, setLoading] = useState(true)
     const [category, setCategory] = useState<
       HttpTypes.StoreProductCategory | undefined
@@ -173,7 +174,7 @@ export const handleHighlights = [
       }`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())

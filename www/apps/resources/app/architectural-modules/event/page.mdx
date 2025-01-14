@@ -1,4 +1,4 @@
-import { ChildDocs } from "docs-ui"
+import { CardList } from "docs-ui"
 
 export const metadata = {
   title: `Event Modules`,
@@ -18,7 +18,26 @@ By default, Medusa uses the Local Event Module. This module uses Node’s EventE
 
 This is useful for development. However, for production, it’s highly recommended to use other Event Modules, Redis Event Module.
 
-<ChildDocs type="item" hideItems={["Guides"]} onlyTopLevel={true} />
+<CardList
+  items={[
+    {
+      title: "Local",
+      href: "/architectural-modules/event/local",
+      badge: {
+        variant: "neutral",
+        children: "For Development"
+      }
+    },
+    {
+      title: "Redis",
+      href: "/architectural-modules/event/redis",
+      badge: {
+        variant: "green",
+        children: "For Production"
+      }
+    }
+  ]}
+/>
 
 ---
 

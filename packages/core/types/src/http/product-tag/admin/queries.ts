@@ -5,6 +5,9 @@ import { BaseProductTagListParams } from "../common"
 export interface AdminProductTagListParams
   extends BaseProductTagListParams,
     BaseFilterable<AdminProductTagListParams> {
+  /**
+   * Apply filters on the tag's deletion date.
+   */
   deleted_at?: OperatorMap<string>
 }
 

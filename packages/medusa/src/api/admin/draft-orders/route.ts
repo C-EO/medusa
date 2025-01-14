@@ -1,17 +1,21 @@
-import { createOrdersWorkflow } from "@medusajs/core-flows"
+import { createOrderWorkflow } from "@medusajs/core-flows"
 import {
   ContainerRegistrationKeys,
   OrderStatus,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminCreateDraftOrderType } from "./validators"
 import { refetchOrder } from "./helpers"
-import { AdditionalData, CreateOrderDTO, HttpTypes } from "@medusajs/types"
+import {
+  AdditionalData,
+  CreateOrderDTO,
+  HttpTypes,
+} from "@medusajs/framework/types"
 
 export const GET = async (
   req: MedusaRequest<HttpTypes.AdminOrderFilters>,
@@ -26,9 +30,9 @@ export const GET = async (
         ...req.filterableFields,
         is_draft_order: true,
       },
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: draft_orders, metadata } = await remoteQuery(queryObject)
@@ -79,14 +83,14 @@ export const POST = async (
     input.email = customer?.email
   }
 
-  const { result } = await createOrdersWorkflow(req.scope).run({
+  const { result } = await createOrderWorkflow(req.scope).run({
     input: workflowInput,
   })
 
   const draftOrder = await refetchOrder(
     result.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ draft_order: draftOrder })

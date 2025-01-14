@@ -2,10 +2,10 @@ import { minimatch } from "minimatch"
 import {
   Application,
   Comment,
-  Context,
   Converter,
   DeclarationReflection,
   ParameterType,
+  ProjectReflection,
   ReflectionKind,
 } from "typedoc"
 import { NamespaceGenerateDetails } from "types"
@@ -35,17 +35,18 @@ export function load(app: Application) {
       "generatePathNamespaces"
     ) as unknown as NamespaceGenerateDetails[]
 
-    const generatePathNamespaces = (ns: NamespaceGenerateDetails[]) => {
+    const generatePathNamespaces = (
+      ns: NamespaceGenerateDetails[],
+      parent: ProjectReflection | DeclarationReflection = context.project
+    ) => {
       const createdNamespaces: DeclarationReflection[] = []
       ns.forEach((namespace) => {
-        const genNamespace = createNamespace(context, namespace)
+        const genNamespace = createNamespace(parent, namespace)
 
         generatedNamespaces.set(namespace.pathPattern, genNamespace)
 
         if (namespace.children) {
-          generatePathNamespaces(namespace.children).forEach((child) =>
-            genNamespace.addChild(child)
-          )
+          generatePathNamespaces(namespace.children, genNamespace)
         }
 
         createdNamespaces.push(genNamespace)
@@ -102,24 +103,27 @@ export function load(app: Application) {
 
       const namespace = findNamespace(namespaces)
 
-      namespace?.addChild(reflection)
+      if (namespace) {
+        context.project.removeChild(reflection)
+        namespace?.addChild(reflection)
+      }
     }
   )
 }
 
 function createNamespace(
-  context: Context,
+  parent: DeclarationReflection | ProjectReflection,
   namespace: NamespaceGenerateDetails
 ): DeclarationReflection {
-  const genNamespace = context.createDeclarationReflection(
+  const reflection = new DeclarationReflection(
+    namespace.name,
     ReflectionKind.Namespace,
-    void 0,
-    void 0,
-    namespace.name
+    parent
   )
+  parent.addChild(reflection)
 
   if (namespace.description) {
-    genNamespace.comment = new Comment([
+    reflection.comment = new Comment([
       {
         kind: "text",
         text: namespace.description,
@@ -127,5 +131,5 @@ function createNamespace(
     ])
   }
 
-  return genNamespace
+  return reflection
 }

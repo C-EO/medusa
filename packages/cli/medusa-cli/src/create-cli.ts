@@ -1,7 +1,6 @@
 import { sync as existsSync } from "fs-exists-cached"
-import { setTelemetryEnabled } from "medusa-telemetry"
+import { setTelemetryEnabled } from "@medusajs/telemetry"
 import path from "path"
-
 import resolveCwd from "resolve-cwd"
 import { newStarter } from "./commands/new"
 import { didYouMean } from "./did-you-mean"
@@ -19,8 +18,7 @@ const handlerP =
   }
 
 function buildLocalCommands(cli, isLocalProject) {
-  const defaultHost = `localhost`
-  const defaultPort = `9000`
+  const defaultPort = "9000"
   const directory = path.resolve(`.`)
 
   const projectInfo = { directory }
@@ -39,9 +37,7 @@ function buildLocalCommands(cli, isLocalProject) {
     }
 
     try {
-      const cmdPath = resolveCwd.silent(
-        `@medusajs/medusa/dist/commands/${command}`
-      )!
+      const cmdPath = resolveCwd.silent(`@medusajs/medusa/commands/${command}`)!
       return require(cmdPath).default
     } catch (err) {
       console.error(err)
@@ -209,6 +205,7 @@ function buildLocalCommands(cli, isLocalProject) {
       desc: "Rollback last batch of executed migrations for a given module",
       builder: {
         modules: {
+          type: "array",
           description: "Modules for which to rollback migrations",
           demand: true,
         },
@@ -225,6 +222,7 @@ function buildLocalCommands(cli, isLocalProject) {
       desc: "Generate migrations for a given module",
       builder: {
         modules: {
+          type: "array",
           description: "Modules for which to generate migration files",
           demand: true,
         },
@@ -257,6 +255,57 @@ function buildLocalCommands(cli, isLocalProject) {
       ),
     })
     .command({
+      command: "plugin:build",
+      desc: "Build plugin source for publishing to a package registry",
+      handler: handlerP(
+        getCommandHandler("plugin/build", (args, cmd) => {
+          process.env.NODE_ENV = process.env.NODE_ENV || `development`
+          cmd(args)
+          return new Promise((resolve) => {})
+        })
+      ),
+    })
+    .command({
+      command: "plugin:develop",
+      desc: "Start plugin development process in watch mode. Changes will be re-published to the local packages registry",
+      handler: handlerP(
+        getCommandHandler("plugin/develop", (args, cmd) => {
+          process.env.NODE_ENV = process.env.NODE_ENV || `development`
+          cmd(args)
+          return new Promise(() => {})
+        })
+      ),
+    })
+    .command({
+      command: "plugin:publish",
+      desc: "Publish the plugin to the local packages registry",
+      handler: handlerP(
+        getCommandHandler("plugin/publish", (args, cmd) => {
+          process.env.NODE_ENV = process.env.NODE_ENV || `development`
+          cmd(args)
+          return new Promise(() => {})
+        })
+      ),
+    })
+    .command({
+      command: "plugin:add [plugin_names...]",
+      desc: "Add the specified plugin to the project from the local packages registry",
+      builder: {
+        plugin_names: {
+          type: "array",
+          description: "The name of the plugins to add",
+          demand: true,
+        },
+      },
+      handler: handlerP(
+        getCommandHandler("plugin/add", (args, cmd) => {
+          process.env.NODE_ENV = process.env.NODE_ENV || `development`
+          cmd(args)
+          return new Promise(() => {})
+        })
+      ),
+    })
+    .command({
       command: `telemetry`,
       describe: `Enable or disable collection of anonymous usage data.`,
       builder: (yargs) =>
@@ -279,66 +328,6 @@ function buildLocalCommands(cli, isLocalProject) {
       }),
     })
     .command({
-      command: `seed`,
-      desc: `Migrates and populates the database with the provided file.`,
-      builder: (_) =>
-        _.option(`f`, {
-          alias: `seed-file`,
-          type: `string`,
-          describe: `Path to the file where the seed is defined.`,
-          required: true,
-        }).option(`m`, {
-          alias: `migrate`,
-          type: `boolean`,
-          default: true,
-          describe: `Flag to indicate if migrations should be run prior to seeding the database`,
-        }),
-      handler: handlerP(
-        getCommandHandler(`seed`, (args, cmd) => {
-          process.env.NODE_ENV ??= `development`
-          return cmd(args)
-        })
-      ),
-    })
-    .command({
-      command: `migrations [action] [modules...]`,
-      desc: `Manage migrations from the core and your own project`,
-      builder: {
-        action: {
-          demand: true,
-          description: "The action to perform on migrations",
-          choices: ["run", "revert", "show", "generate"],
-        },
-        modules: {
-          description: "Modules for which to run the action (revert, generate)",
-          demand: false,
-        },
-      },
-      handler: handlerP(
-        getCommandHandler(`migrate`, (args, cmd) => {
-          process.env.NODE_ENV = process.env.NODE_ENV || `development`
-          return cmd(args)
-        })
-      ),
-    })
-    .command({
-      command: `links [action]`,
-      desc: `Manage migrations for the links from the core, your project and packages`,
-      builder: {
-        action: {
-          demand: true,
-          description: "The action to perform on links",
-          choices: ["sync"],
-        },
-      },
-      handler: handlerP(
-        getCommandHandler(`links`, (args, cmd) => {
-          process.env.NODE_ENV = process.env.NODE_ENV || `development`
-          return cmd(args)
-        })
-      ),
-    })
-    .command({
       command: `develop`,
       desc: `Start development server. Watches file and rebuilds when something changes`,
       builder: (_) =>
@@ -351,8 +340,10 @@ function buildLocalCommands(cli, isLocalProject) {
           .option(`H`, {
             alias: `host`,
             type: `string`,
-            default: defaultHost,
-            describe: `Set host. Defaults to ${defaultHost}`,
+            default: process.env.HOST,
+            describe: process.env.HOST
+              ? `Set host. Defaults to ${process.env.HOST} (set by env.HOST)`
+              : "",
           })
           .option(`p`, {
             alias: `port`,
@@ -370,13 +361,13 @@ function buildLocalCommands(cli, isLocalProject) {
           // Return an empty promise to prevent handlerP from exiting early.
           // The development server shouldn't ever exit until the user directly
           // kills it so this is fine.
-          return new Promise((resolve) => {})
+          return new Promise(() => {})
         })
       ),
     })
     .command({
       command: `start`,
-      desc: `Start development server.`,
+      desc: `Start production server.`,
       builder: (_) =>
         _.option("types", {
           type: "boolean",
@@ -387,8 +378,10 @@ function buildLocalCommands(cli, isLocalProject) {
           .option(`H`, {
             alias: `host`,
             type: `string`,
-            default: defaultHost,
-            describe: `Set host. Defaults to ${defaultHost}`,
+            default: process.env.HOST,
+            describe: process.env.HOST
+              ? `Set host. Defaults to ${process.env.HOST} (set by env.HOST)`
+              : ``,
           })
           .option(`p`, {
             alias: `port`,
@@ -397,6 +390,11 @@ function buildLocalCommands(cli, isLocalProject) {
             describe: process.env.PORT
               ? `Set port. Defaults to ${process.env.PORT} (set by env.PORT) (otherwise defaults ${defaultPort})`
               : `Set port. Defaults to ${defaultPort}`,
+          })
+          .option(`cluster`, {
+            type: `number`,
+            describe:
+              "Start the Node.js server in cluster mode. You can specify the number of cpus to use, which defaults to (env.CPUS)",
           }),
       handler: handlerP(
         getCommandHandler(`start`, (args, cmd) => {
@@ -410,50 +408,20 @@ function buildLocalCommands(cli, isLocalProject) {
       ),
     })
     .command({
-      command: `build`,
-      desc: `Build your project.`,
-      builder: (_) => _,
+      command: "build",
+      desc: "Build your project.",
+      builder: (_) =>
+        _.option("admin-only", {
+          default: false,
+          type: "boolean",
+          describe:
+            "Only build the admin to serve it separately (outDir .medusa/admin)",
+        }),
       handler: handlerP(
         getCommandHandler(`build`, (args, cmd) => {
           process.env.NODE_ENV = process.env.NODE_ENV || `development`
           cmd(args)
 
-          return new Promise((resolve) => {})
-        })
-      ),
-    })
-    .command({
-      command: `start-cluster`,
-      desc: `Start development server in cluster mode (beta).`,
-      builder: (_) =>
-        _.option(`H`, {
-          alias: `host`,
-          type: `string`,
-          default: defaultHost,
-          describe: `Set host. Defaults to ${defaultHost}`,
-        })
-          .option(`p`, {
-            alias: `port`,
-            type: `string`,
-            default: process.env.PORT || defaultPort,
-            describe: process.env.PORT
-              ? `Set port. Defaults to ${process.env.PORT} (set by env.PORT) (otherwise defaults ${defaultPort})`
-              : `Set port. Defaults to ${defaultPort}`,
-          })
-          .option(`c`, {
-            alias: `cpus`,
-            type: `number`,
-            default: process.env.CPUS,
-            describe:
-              "Set number of cpus to use. Defaults to max number of cpus available on the system (set by env.CPUS)",
-          }),
-      handler: handlerP(
-        getCommandHandler(`start-cluster`, (args, cmd) => {
-          process.env.NODE_ENV = process.env.NODE_ENV || `development`
-          cmd(args)
-          // Return an empty promise to prevent handlerP from exiting early.
-          // The development server shouldn't ever exit until the user directly
-          // kills it so this is fine.
           return new Promise((resolve) => {})
         })
       ),

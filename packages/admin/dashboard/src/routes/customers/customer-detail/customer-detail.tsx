@@ -2,13 +2,12 @@ import { useLoaderData, useParams } from "react-router-dom"
 
 import { SingleColumnPageSkeleton } from "../../../components/common/skeleton"
 import { SingleColumnPage } from "../../../components/layout/pages"
+import { useDashboardExtension } from "../../../extensions"
 import { useCustomer } from "../../../hooks/api/customers"
 import { CustomerGeneralSection } from "./components/customer-general-section"
 import { CustomerGroupSection } from "./components/customer-group-section"
+import { CustomerOrderSection } from "./components/customer-order-section"
 import { customerLoader } from "./loader"
-
-import after from "virtual:medusa/widgets/customer/details/after"
-import before from "virtual:medusa/widgets/customer/details/before"
 
 export const CustomerDetail = () => {
   const { id } = useParams()
@@ -19,6 +18,8 @@ export const CustomerDetail = () => {
   const { customer, isLoading, isError, error } = useCustomer(id!, undefined, {
     initialData,
   })
+
+  const { getWidgets } = useDashboardExtension()
 
   if (isLoading || !customer) {
     return <SingleColumnPageSkeleton sections={2} showJSON showMetadata />
@@ -31,8 +32,8 @@ export const CustomerDetail = () => {
   return (
     <SingleColumnPage
       widgets={{
-        before,
-        after,
+        before: getWidgets("customer.details.before"),
+        after: getWidgets("customer.details.after"),
       }}
       data={customer}
       hasOutlet
@@ -40,9 +41,7 @@ export const CustomerDetail = () => {
       showMetadata
     >
       <CustomerGeneralSection customer={customer} />
-      {/* <CustomerOrderSection customer={customer} />
-      // TODO: re-add when order endpoints are added to api-v2
-      */}
+      <CustomerOrderSection customer={customer} />
       <CustomerGroupSection customer={customer} />
     </SingleColumnPage>
   )

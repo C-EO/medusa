@@ -18,10 +18,10 @@ Start by creating a new directory for your module. For example, `src/modules/my-
 
 ## 2. Create the File Provider Service
 
-Create the file `src/modules/my-file/service.ts` that holds the implementation of the module's main service. It must extend the `AbstractFileProviderService` class imported from `@medusajs/utils`:
+Create the file `src/modules/my-file/service.ts` that holds the implementation of the module's main service. It must extend the `AbstractFileProviderService` class imported from `@medusajs/framework/utils`:
 
 ```ts title="src/modules/my-file/service.ts"
-import { AbstractFileProviderService } from "@medusajs/utils"
+import { AbstractFileProviderService } from "@medusajs/framework/utils"
 
 class MyFileProviderService extends AbstractFileProviderService {
   // TODO implement methods
@@ -40,8 +40,8 @@ If you're creating a client or establishing a connection with a third-party serv
 #### Example
 
 ```ts
-import { Logger } from "@medusajs/types"
-import { AbstractFileProviderService } from "@medusajs/utils"
+import { Logger } from "@medusajs/framework/types"
+import { AbstractFileProviderService } from "@medusajs/framework/utils"
 
 type InjectedDependencies = {
   logger: Logger
@@ -54,6 +54,7 @@ type Options = {
 class MyFileProviderService extends AbstractFileProviderService {
   protected logger_: Logger
   protected options_: Options
+  static identifier = "my-file"
   // assuming you're initializing a client
   protected client
 
@@ -74,19 +75,50 @@ class MyFileProviderService extends AbstractFileProviderService {
 export default MyFileProviderService
 ```
 
-### constructor
+### identifier
+
+Each file provider has a unique ID used to identify it. The provider's ID
+will be stored as `fs_{identifier}_{id}`, where `{id}` is the provider's `id` 
+property in the `medusa-config.ts`.
+
+#### Example
+
+```ts
+class MyFileProviderService extends AbstractFileProviderService {
+  static identifier = "my-file"
+  // ...
+}
+```
 
 ### validateOptions
 
-Override this static method in order for the loader to validate the options provided to the module provider.
+This method validates the options of the provider set in `medusa-config.ts`.
+Implementing this method is optional. It's useful if your provider requires custom validation.
+
+If the options aren't valid, throw an error.
+
+#### Example
+
+```ts
+class MyFileProviderService extends AbstractFileProviderService {
+  static validateOptions(options: Record<any, any>) {
+    if (!options.apiKey) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        "API key is required in the provider's options."
+      )
+    }
+  }
+}
+```
 
 #### Parameters
 
-<TypeList types={[{"name":"options","type":"`Record<any, any>`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
+<TypeList types={[{"name":"options","type":"`Record<any, any>`","description":"The provider's options.","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
 
 #### Returns
 
-<TypeList types={[{"name":"void","type":"`void`","optional":false,"defaultValue":"","description":"Override this static method in order for the loader to validate the options provided to the module provider.","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
+<TypeList types={[{"name":"void","type":"`void`","optional":false,"defaultValue":"","description":"This method validates the options of the provider set in `medusa-config.ts`.\nImplementing this method is optional. It's useful if your provider requires custom validation.\n\nIf the options aren't valid, throw an error.","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
 
 ### upload
 
@@ -113,11 +145,11 @@ class MyFileProviderService extends AbstractFileProviderService {
 
 #### Parameters
 
-<TypeList types={[{"name":"file","type":"[ProviderUploadFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderUploadFileDTO/page.mdx)","description":"The file to upload","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"filename","type":"`string`","description":"The filename of the uploaded file","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"mimeType","type":"`string`","description":"The mimetype of the uploaded file","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"content","type":"`string`","description":"The file content as a binary-encoded string","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"access","type":"`\"public\"` \\| `\"private\"`","description":"The access level of the file. Defaults to private if not passed","optional":true,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="upload"/>
+<TypeList types={[{"name":"file","type":"[ProviderUploadFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderUploadFileDTO/page.mdx)","description":"The file to upload","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"filename","type":"`string`","description":"The filename of the uploaded file","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"mimeType","type":"`string`","description":"The mimetype of the uploaded file","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"content","type":"`string`","description":"The file content as a binary-encoded string","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"access","type":"`\"public\"` \\| `\"private\"`","description":"The access level of the file. Defaults to private if not passed","optional":true,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="upload"/>
 
 #### Returns
 
-<TypeList types={[{"name":"Promise","type":"Promise&#60;[ProviderFileResultDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderFileResultDTO/page.mdx)&#62;","optional":false,"defaultValue":"","description":"The uploaded file's details.","expandable":false,"children":[{"name":"ProviderFileResultDTO","type":"[ProviderFileResultDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderFileResultDTO/page.mdx)","optional":false,"defaultValue":"","description":"","expandable":false,"children":[{"name":"url","type":"`string`","description":"The file's URL.","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"key","type":"`string`","description":"The file's key.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="upload"/>
+<TypeList types={[{"name":"Promise","type":"Promise&#60;[ProviderFileResultDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderFileResultDTO/page.mdx)&#62;","optional":false,"defaultValue":"","description":"The uploaded file's details.","expandable":false,"children":[{"name":"ProviderFileResultDTO","type":"[ProviderFileResultDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderFileResultDTO/page.mdx)","optional":false,"defaultValue":"","description":"","expandable":false,"children":[{"name":"url","type":"`string`","description":"The file's URL.","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"key","type":"`string`","description":"The file's key.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="upload"/>
 
 ### delete
 
@@ -139,11 +171,11 @@ class MyFileProviderService extends AbstractFileProviderService {
 
 #### Parameters
 
-<TypeList types={[{"name":"file","type":"[ProviderDeleteFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderDeleteFileDTO/page.mdx)","description":"The details of the file to delete.","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"fileKey","type":"`string`","description":"The file's key. When uploading a file, the\nreturned key is used here.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="delete"/>
+<TypeList types={[{"name":"file","type":"[ProviderDeleteFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderDeleteFileDTO/page.mdx)","description":"The details of the file to delete.","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"fileKey","type":"`string`","description":"The file's key. When uploading a file, the\nreturned key is used here.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="delete"/>
 
 #### Returns
 
-<TypeList types={[{"name":"Promise","type":"Promise&#60;void&#62;","optional":false,"defaultValue":"","description":"Resolves when the file is deleted.","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="delete"/>
+<TypeList types={[{"name":"Promise","type":"Promise&#60;void&#62;","optional":false,"defaultValue":"","description":"Resolves when the file is deleted.","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="delete"/>
 
 ### getPresignedDownloadUrl
 
@@ -171,11 +203,11 @@ class MyFileProviderService extends AbstractFileProviderService {
 
 #### Parameters
 
-<TypeList types={[{"name":"fileData","type":"[ProviderGetFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderGetFileDTO/page.mdx)","description":"The details of the file to get its\npresigned URL.","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"fileKey","type":"`string`","description":"The file's key.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="getPresignedDownloadUrl"/>
+<TypeList types={[{"name":"fileData","type":"[ProviderGetFileDTO](../../../types/FileTypes/interfaces/types.FileTypes.ProviderGetFileDTO/page.mdx)","description":"The details of the file to get its\npresigned URL.","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"fileKey","type":"`string`","description":"The file's key.","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="getPresignedDownloadUrl"/>
 
 #### Returns
 
-<TypeList types={[{"name":"Promise","type":"Promise&#60;string&#62;","optional":false,"defaultValue":"","description":"The file's presigned URL.","expandable":false,"children":[{"name":"string","type":"`string`","optional":false,"defaultValue":"","description":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="getPresignedDownloadUrl"/>
+<TypeList types={[{"name":"Promise","type":"Promise&#60;string&#62;","optional":false,"defaultValue":"","description":"The file's presigned URL.","expandable":false,"children":[{"name":"string","type":"`string`","optional":false,"defaultValue":"","description":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="getPresignedDownloadUrl"/>
 
 ---
 
@@ -185,10 +217,14 @@ Create the file `src/modules/my-file/index.ts` with the following content:
 
 ```ts title="src/modules/my-file/index.ts"
 import MyFileProviderService from "./service"
+import { 
+  ModuleProvider, 
+  Modules
+} from "@medusajs/framework/utils"
 
-export default {
+export default ModuleProvider(Modules.FILE, {
   services: [MyFileProviderService],
-}
+})
 ```
 
 This exports the module's definition, indicating that the `MyFileProviderService` is the module's service.
@@ -197,7 +233,7 @@ This exports the module's definition, indicating that the `MyFileProviderService
 
 ## 4. Use Module
 
-To use your File Module Provider, add it to the `providers` array of the File Module:
+To use your File Module Provider, add it to the `providers` array of the File Module in `medusa-config.ts`:
 
 <Note>
 
@@ -205,20 +241,21 @@ The File Module accepts one provider only.
 
 </Note>
 
-```js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
-
-// ...
-
+```ts title="medusa-config.ts"
 module.exports = defineConfig({
   // ...
-  modules: {
-    [Modules.FILE]: {
-      resolve: "@medusajs/file",
+  modules: [
+    {
+      resolve: "@medusajs/medusa/file",
       options: {
         providers: [
+          // default provider
           {
-            resolve: "./modules/my-file",
+            resolve: "@medusajs/medusa/file-local",
+            id: "local",
+          },
+          {
+            resolve: "./src/modules/my-file",
             id: "my-file",
             options: {
               // provider options...
@@ -227,6 +264,12 @@ module.exports = defineConfig({
         ],
       },
     },
-  }
+  ]
 })
 ```
+
+---
+
+## 5. Test it Out
+
+To test out your file provider, use the Medusa Admin or the [Upload API route](https://docs.medusajs.com/v2/api/admin#uploads_postuploads) to upload a file.

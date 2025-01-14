@@ -1,13 +1,13 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { HttpTypes } from "@medusajs/types"
+} from "@medusajs/framework/utils"
+import { HttpTypes } from "@medusajs/framework/types"
 
 // TODO: Add more fields to provider, such as default name and maybe logo.
 export const GET = async (
@@ -28,9 +28,9 @@ export const GET = async (
       filters: {
         region_id: req.filterableFields.region_id,
       },
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields.map((f) => `payment_provider.${f}`),
+    fields: req.queryConfig.fields.map((f) => `payment_provider.${f}`),
   })
 
   const { rows: regionPaymentProvidersRelation, metadata } = await remoteQuery(

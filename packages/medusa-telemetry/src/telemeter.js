@@ -96,14 +96,9 @@ class Telemeter {
   getCliVersion() {
     try {
       const jsonfile = join(
-        require
-          .resolve(`@medusajs/medusa-cli`) // Resolve where current gatsby-cli would be loaded from.
-          .split(sep)
-          .slice(0, -2) // drop lib/index.js
-          .join(sep),
-        `package.json`
+        require.resolve(`@medusajs/cli`).split(`${sep}dist`).shift(),
+        "package.json"
       )
-
       const { version } = require(jsonfile)
       return version
     } catch (e) {

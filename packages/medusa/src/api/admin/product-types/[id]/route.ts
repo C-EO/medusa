@@ -5,15 +5,15 @@ import {
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import { refetchProductType } from "../helpers"
 import {
   AdminGetProductTypeParamsType,
   AdminUpdateProductTypeType,
 } from "../validators"
-import { HttpTypes } from "@medusajs/types"
-import { MedusaError } from "@medusajs/utils"
+import { HttpTypes } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetProductTypeParamsType>,
@@ -22,7 +22,7 @@ export const GET = async (
   const productType = await refetchProductType(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ product_type: productType })
@@ -55,7 +55,7 @@ export const POST = async (
   const productType = await refetchProductType(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ product_type: productType })

@@ -1,12 +1,12 @@
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
-import { HttpTypes } from "@medusajs/types"
+} from "@medusajs/framework/http"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminPaymentFilters>,
@@ -17,9 +17,9 @@ export const GET = async (
     entryPoint: "payment",
     variables: {
       filters: req.filterableFields,
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: payments, metadata } = await remoteQuery(queryObject)

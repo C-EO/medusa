@@ -3,7 +3,7 @@ import {
   createAdminUser,
 } from "../../../../helpers/create-admin-user"
 
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 
 jest.setTimeout(30000)
 
@@ -39,7 +39,10 @@ medusaIntegrationTestRunner({
 
         expect(response.status).toEqual(200)
         expect(response.data.stock_location.fulfillment_providers).toEqual([
-          { id: "manual_test-provider", is_enabled: true },
+          expect.objectContaining({
+            id: "manual_test-provider",
+            is_enabled: true,
+          }),
         ])
       })
 

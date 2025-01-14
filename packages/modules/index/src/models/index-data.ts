@@ -1,45 +1,35 @@
-import {
-  Cascade,
-  Collection,
-  Entity,
-  Index,
-  ManyToMany,
-  OptionalProps,
-  PrimaryKey,
-  PrimaryKeyType,
-  Property,
-} from "@mikro-orm/core"
-import { IndexRelation } from "./index-relation"
+import { model } from "@medusajs/framework/utils"
+import IndexRelation from "./index-relation"
 
-type OptionalRelations = "parents"
-
-@Entity({
-  tableName: "index_data",
-})
-export class IndexData {
-  [OptionalProps]: OptionalRelations
-
-  @PrimaryKey({ columnType: "text" })
-  @Index({ name: "IDX_index_data_id" })
-  id!: string
-
-  @PrimaryKey({ columnType: "text" })
-  @Index({ name: "IDX_index_data_name" })
-  name: string;
-
-  [PrimaryKeyType]?: [string, string]
-
-  @Index({ name: "IDX_index_data_gin", type: "GIN" })
-  @Property({ columnType: "jsonb", default: "{}" })
-  data: Record<string, unknown>
-
-  @ManyToMany({
-    owner: true,
-    entity: () => IndexData,
-    pivotEntity: () => IndexRelation,
-    cascade: [Cascade.REMOVE],
-    inverseJoinColumns: ["parent_id", "parent_name"],
-    joinColumns: ["child_id", "child_name"],
+const IndexData = model
+  .define("IndexData", {
+    id: model.text().primaryKey(),
+    name: model.text().primaryKey(),
+    data: model.json().default({}),
+    parents: model.manyToMany(() => IndexData, {
+      mappedBy: "children",
+      pivotEntity: () => IndexRelation,
+      joinColumn: ["child_id", "child_name"],
+      inverseJoinColumn: ["parent_id", "parent_name"],
+    }),
+    children: model.manyToMany(() => IndexData, {
+      mappedBy: "parents",
+    }),
   })
-  parents = new Collection<IndexData>(this)
-}
+  .indexes([
+    {
+      name: "IDX_index_data_gin",
+      type: "GIN",
+      on: ["data"],
+    },
+    {
+      name: "IDX_index_data_id",
+      on: ["id"],
+    },
+    {
+      name: "IDX_index_data_name",
+      on: ["name"],
+    },
+  ])
+
+export default IndexData

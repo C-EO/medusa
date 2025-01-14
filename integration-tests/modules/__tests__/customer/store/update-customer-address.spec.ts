@@ -1,6 +1,6 @@
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ICustomerModuleService } from "@medusajs/types"
 import { Modules } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
 import {
   generatePublishableKey,
   generateStoreHeaders,
@@ -32,7 +32,8 @@ medusaIntegrationTestRunner({
 
       it.only("should update a customer address", async () => {
         const { customer, jwt } = await createAuthenticatedCustomer(
-          appContainer
+          api,
+          storeHeaders
         )
 
         const address = await customerModuleService.createCustomerAddresses({
@@ -66,7 +67,7 @@ medusaIntegrationTestRunner({
       })
 
       it("should fail to update another customer's address", async () => {
-        const { jwt } = await createAuthenticatedCustomer(appContainer)
+        const { jwt } = await createAuthenticatedCustomer(api, storeHeaders)
 
         const otherCustomer = await customerModuleService.createCustomers({
           first_name: "Jane",

@@ -1,12 +1,12 @@
 import { PencilSquare } from "@medusajs/icons"
-import { UserDTO } from "@medusajs/types"
-import { Container, Heading, StatusBadge, Text } from "@medusajs/ui"
+import { HttpTypes } from "@medusajs/types"
+import { Container, Heading, Text } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { ActionMenu } from "../../../../../components/common/action-menu"
 import { languages } from "../../../../../i18n/languages"
 
 type ProfileGeneralSectionProps = {
-  user: UserDTO
+  user: HttpTypes.AdminUser
 }
 
 export const ProfileGeneralSection = ({ user }: ProfileGeneralSectionProps) => {
@@ -62,14 +62,15 @@ export const ProfileGeneralSection = ({ user }: ProfileGeneralSectionProps) => {
             ?.display_name || "-"}
         </Text>
       </div>
-      <div className="grid grid-cols-2 items-center px-6 py-4">
+      {/* TODO: Do we want to implement usage insights in V2? */}
+      {/* <div className="grid grid-cols-2 items-center px-6 py-4">
         <Text size="small" leading="compact" weight="plus">
           {t("profile.fields.usageInsightsLabel")}
         </Text>
         <StatusBadge color="red" className="w-fit">
           {t("general.disabled")}
         </StatusBadge>
-      </div>
+      </div> */}
     </Container>
   )
 }

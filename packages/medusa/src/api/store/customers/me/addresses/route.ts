@@ -1,7 +1,7 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import { createCustomerAddressesWorkflow } from "@medusajs/core-flows"
 import {
@@ -11,9 +11,9 @@ import {
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { refetchCustomer } from "../../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<StoreGetCustomerAddressesParamsType>,
@@ -26,9 +26,9 @@ export const GET = async (
     entryPoint: "customer_address",
     variables: {
       filters: { ...req.filterableFields, customer_id: customerId },
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: addresses, metadata } = await remoteQuery(queryObject)
@@ -62,7 +62,7 @@ export const POST = async (
   const customer = await refetchCustomer(
     customerId,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ customer })

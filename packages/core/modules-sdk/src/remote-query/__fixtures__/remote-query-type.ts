@@ -18,7 +18,6 @@ export type Incremental<T> =
   | {
       [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never
     }
-
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string }
@@ -33,203 +32,232 @@ export type Scalars = {
 export type SimpleProduct = {
   id: Scalars["ID"]["output"]
   handle: string
-  title?: Scalars["String"]["output"]
-  variants?: Maybe<Array<Maybe<Pick<ProductVariant, "id">>>>
-  sales_channels_link?: Array<
+  title: Scalars["String"]["output"]
+  variants: Maybe<Array<Maybe<Pick<ProductVariant, "id">>>>
+  sales_channels_link: Array<
     Pick<LinkProductSalesChannel, "product_id" | "sales_channel_id">
   >
-  sales_channels?: Array<Pick<SalesChannel, "id" | "name">>
+  sales_channels: Array<Pick<SalesChannel, "id" | "name">>
 }
 
 export type Product = {
-  __typename?: "Product"
+  __typename: "Product"
   id: Scalars["ID"]["output"]
   handle: Scalars["String"]["output"]
   title: Scalars["String"]["output"]
-  description?: Scalars["String"]["output"]
-  variants?: Array<ProductVariant>
-  sales_channels_link?: Array<LinkProductSalesChannel>
-  sales_channels?: Array<SalesChannel>
-  metadata?: Maybe<Scalars["JSON"]["output"]>
+  description: Scalars["String"]["output"]
+  variants: Array<ProductVariant>
+  sales_channels_link: Array<LinkProductSalesChannel>
+  sales_channels: Array<SalesChannel>
+  metadata: Maybe<Scalars["JSON"]["output"]>
+  translation: Maybe<ProductTranslation>
+  categories: Array<ProductCategory>
+}
+
+export type ProductTranslation = {
+  __typename: "ProductTranslation"
+  id: Scalars["ID"]["output"]
+  title: Scalars["String"]["output"]
+  description: Scalars["String"]["output"]
+  product: Maybe<Product>
 }
 
 export type ProductVariant = {
-  __typename?: "ProductVariant"
+  __typename: "ProductVariant"
   id: Scalars["ID"]["output"]
   handle: Scalars["String"]["output"]
   title: Scalars["String"]["output"]
   sku: Scalars["String"]["output"]
-  product?: Maybe<Product>
+  product: Maybe<Product>
+  calculated_price: Maybe<Scalars["JSON"]["output"]>
+  translation: Maybe<ProductVariantTranslation>
+}
+
+export type ProductVariantTranslation = {
+  __typename: "ProductVariantTranslation"
+  id: Scalars["ID"]["output"]
+  title: Scalars["String"]["output"]
+  description: Scalars["String"]["output"]
+  variant: Maybe<ProductVariant>
 }
 
 export type ProductCategory = {
-  __typename?: "ProductCategory"
+  __typename: "ProductCategory"
   id: Scalars["ID"]["output"]
   handle: Scalars["String"]["output"]
-  title?: Maybe<Scalars["String"]["output"]>
+  title: Maybe<Scalars["String"]["output"]>
+  translation: Maybe<ProductCategoryTranslation>
+}
+
+export type ProductCategoryTranslation = {
+  __typename: "ProductCategoryTranslation"
+  id: Scalars["ID"]["output"]
+  title: Scalars["String"]["output"]
+  description: Scalars["String"]["output"]
+  category: Maybe<ProductCategory>
 }
 
 export type SalesChannel = {
-  __typename?: "SalesChannel"
+  __typename: "SalesChannel"
   id: Scalars["ID"]["output"]
-  name?: Maybe<Scalars["String"]["output"]>
-  description?: Maybe<Scalars["String"]["output"]>
-  created_at?: Maybe<Scalars["DateTime"]["output"]>
-  updated_at?: Maybe<Scalars["DateTime"]["output"]>
-  products_link?: Maybe<Array<Maybe<LinkProductSalesChannel>>>
-  api_keys_link?: Maybe<Array<Maybe<LinkPublishableApiKeySalesChannel>>>
-  locations_link?: Maybe<Array<Maybe<LinkSalesChannelStockLocation>>>
+  name: Maybe<Scalars["String"]["output"]>
+  description: Maybe<Scalars["String"]["output"]>
+  created_at: Maybe<Scalars["DateTime"]["output"]>
+  updated_at: Maybe<Scalars["DateTime"]["output"]>
+  products_link: Maybe<Array<Maybe<LinkProductSalesChannel>>>
+  api_keys_link: Maybe<Array<Maybe<LinkPublishableApiKeySalesChannel>>>
+  locations_link: Maybe<Array<Maybe<LinkSalesChannelStockLocation>>>
 }
 
 export type LinkCartPaymentCollection = {
-  __typename?: "LinkCartPaymentCollection"
+  __typename: "LinkCartPaymentCollection"
   cart_id: Scalars["String"]["output"]
   payment_collection_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkCartPromotion = {
-  __typename?: "LinkCartPromotion"
+  __typename: "LinkCartPromotion"
   cart_id: Scalars["String"]["output"]
   promotion_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkLocationFulfillmentProvider = {
-  __typename?: "LinkLocationFulfillmentProvider"
+  __typename: "LinkLocationFulfillmentProvider"
   stock_location_id: Scalars["String"]["output"]
   fulfillment_provider_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkLocationFulfillmentSet = {
-  __typename?: "LinkLocationFulfillmentSet"
+  __typename: "LinkLocationFulfillmentSet"
   stock_location_id: Scalars["String"]["output"]
   fulfillment_set_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkOrderCart = {
-  __typename?: "LinkOrderCart"
+  __typename: "LinkOrderCart"
   order_id: Scalars["String"]["output"]
   cart_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkOrderFulfillment = {
-  __typename?: "LinkOrderFulfillment"
+  __typename: "LinkOrderFulfillment"
   order_id: Scalars["String"]["output"]
   fulfillment_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkOrderPaymentCollection = {
-  __typename?: "LinkOrderPaymentCollection"
+  __typename: "LinkOrderPaymentCollection"
   order_id: Scalars["String"]["output"]
   payment_collection_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkOrderPromotion = {
-  __typename?: "LinkOrderPromotion"
+  __typename: "LinkOrderPromotion"
   order_id: Scalars["String"]["output"]
   promotion_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkReturnFulfillment = {
-  __typename?: "LinkReturnFulfillment"
+  __typename: "LinkReturnFulfillment"
   return_id: Scalars["String"]["output"]
   fulfillment_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkProductSalesChannel = {
-  __typename?: "LinkProductSalesChannel"
+  __typename: "LinkProductSalesChannel"
   product_id: Scalars["String"]["output"]
   sales_channel_id: Scalars["String"]["output"]
-  product?: Maybe<Product>
-  sales_channel?: Maybe<SalesChannel>
+  product: Maybe<Product>
+  sales_channel: Maybe<SalesChannel>
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkProductVariantInventoryItem = {
-  __typename?: "LinkProductVariantInventoryItem"
+  __typename: "LinkProductVariantInventoryItem"
   variant_id: Scalars["String"]["output"]
   inventory_item_id: Scalars["String"]["output"]
   required_quantity: Scalars["Int"]["output"]
-  variant?: Maybe<Product>
+  variant: Maybe<Product>
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkProductVariantPriceSet = {
-  __typename?: "LinkProductVariantPriceSet"
+  __typename: "LinkProductVariantPriceSet"
   variant_id: Scalars["String"]["output"]
   price_set_id: Scalars["String"]["output"]
-  variant?: Maybe<Product>
+  variant: Maybe<Product>
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkPublishableApiKeySalesChannel = {
-  __typename?: "LinkPublishableApiKeySalesChannel"
+  __typename: "LinkPublishableApiKeySalesChannel"
   publishable_key_id: Scalars["String"]["output"]
   sales_channel_id: Scalars["String"]["output"]
-  sales_channel?: Maybe<SalesChannel>
+  sales_channel: Maybe<SalesChannel>
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkRegionPaymentProvider = {
-  __typename?: "LinkRegionPaymentProvider"
+  __typename: "LinkRegionPaymentProvider"
   region_id: Scalars["String"]["output"]
   payment_provider_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkSalesChannelStockLocation = {
-  __typename?: "LinkSalesChannelStockLocation"
+  __typename: "LinkSalesChannelStockLocation"
   sales_channel_id: Scalars["String"]["output"]
   stock_location_id: Scalars["String"]["output"]
-  sales_channel?: Maybe<SalesChannel>
+  sales_channel: Maybe<SalesChannel>
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export type LinkShippingOptionPriceSet = {
-  __typename?: "LinkShippingOptionPriceSet"
+  __typename: "LinkShippingOptionPriceSet"
   shipping_option_id: Scalars["String"]["output"]
   price_set_id: Scalars["String"]["output"]
   createdAt: Scalars["String"]["output"]
   updatedAt: Scalars["String"]["output"]
-  deletedAt?: Maybe<Scalars["String"]["output"]>
+  deletedAt: Maybe<Scalars["String"]["output"]>
 }
 
 export interface FixtureEntryPoints {

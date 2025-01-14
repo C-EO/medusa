@@ -1,3 +1,9 @@
+---
+tags:
+  - region
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -70,7 +76,7 @@ export const RegionProvider = (
       fetch(`http://localhost:9000/store/regions`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())
@@ -82,7 +88,7 @@ export const RegionProvider = (
       fetch(`http://localhost:9000/store/regions/${regionId}`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())

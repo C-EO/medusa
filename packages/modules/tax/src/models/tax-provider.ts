@@ -1,16 +1,12 @@
-import { Entity, OptionalProps, PrimaryKey, Property } from "@mikro-orm/core"
+import { model } from "@medusajs/framework/utils"
+import { TaxRegion } from "@models"
 
-const TABLE_NAME = "tax_provider"
-@Entity({ tableName: TABLE_NAME })
-export default class TaxProvider {
-  [OptionalProps]?: "is_enabled"
+const TaxProvider = model.define("TaxProvider", {
+  id: model.id().primaryKey(),
+  is_enabled: model.boolean().default(true),
+  regions: model.hasMany(() => TaxRegion, {
+    mappedBy: "provider",
+  }),
+})
 
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({
-    default: true,
-    columnType: "boolean",
-  })
-  is_enabled: boolean = true
-}
+export default TaxProvider

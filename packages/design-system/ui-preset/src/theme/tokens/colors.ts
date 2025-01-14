@@ -104,7 +104,6 @@ export const colors = {
     "--tag-neutral-text": "rgba(82, 82, 91, 1)",
     "--tag-red-text": "rgba(159, 18, 57, 1)",
     "--contrast-bg-base": "rgba(24, 24, 27, 1)",
-    "--fg-disabled": "rgba(212, 212, 216, 1)",
     "--border-strong": "rgba(212, 212, 216, 1)",
     "--contrast-border-base": "rgba(255, 255, 255, 0.15)",
     "--bg-field": "rgba(250, 250, 250, 1)",
@@ -115,7 +114,6 @@ export const colors = {
     "--contrast-bg-subtle": "rgba(39, 39, 42, 1)",
     "--bg-highlight": "rgba(239, 246, 255, 1)",
     "--contrast-fg-secondary": "rgba(255, 255, 255, 0.56)",
-    "--fg-muted": "rgba(161, 161, 170, 1)",
     "--tag-red-bg": "rgba(255, 228, 230, 1)",
     "--button-transparent": "rgba(255, 255, 255, 0)",
     "--button-danger-pressed": "rgba(159, 18, 57, 1)",
@@ -177,6 +175,8 @@ export const colors = {
     "--tag-orange-bg": "rgba(255, 237, 213, 1)",
     "--fg-base": "rgba(24, 24, 27, 1)",
     "--contrast-border-top": "rgba(24, 24, 27, 1)",
-    "--bg-overlay": "rgba(24, 24, 27, 0.4)"
+    "--bg-overlay": "rgba(24, 24, 27, 0.4)",
+    "--fg-disabled": "rgba(161, 161, 170, 1)",
+    "--fg-muted": "rgba(113, 113, 122, 1)"
   }
 }

@@ -2,12 +2,12 @@ import {
   removeCustomerAccountWorkflow,
   updateCustomersWorkflow,
 } from "@medusajs/core-flows"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
-import { MedusaError } from "@medusajs/utils"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchCustomer } from "../helpers"
 import { AdminUpdateCustomerType } from "../validators"
 
@@ -18,7 +18,7 @@ export const GET = async (
   const customer = await refetchCustomer(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!customer) {
@@ -58,7 +58,7 @@ export const POST = async (
   const customer = await refetchCustomer(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ customer })
 }

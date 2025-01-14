@@ -123,16 +123,16 @@ export const useDataGridCell = <TData, TValue>({
 
   const validateKeyStroke = useCallback(
     (key: string) => {
-      if (type === "number") {
-        return numberCharacterRegex.test(key)
+      switch (type) {
+        case "togglable-number":
+        case "number":
+          return numberCharacterRegex.test(key)
+        case "text":
+          return textCharacterRegex.test(key)
+        default:
+          // KeyboardEvents should not be forwareded to other types of cells
+          return false
       }
-
-      if (type === "text") {
-        return textCharacterRegex.test(key)
-      }
-
-      // KeyboardEvents should not be forwareded to other types of cells
-      return false
     },
     [type]
   )

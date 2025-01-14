@@ -27,4 +27,5 @@ export enum OrderChangeType {
   EXCHANGE = "exchange",
   CLAIM = "claim",
   EDIT = "edit",
+  CREDIT_LINE = "credit_line",
 }

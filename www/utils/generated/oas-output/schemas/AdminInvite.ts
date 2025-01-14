@@ -8,6 +8,9 @@
  *   - email
  *   - accepted
  *   - token
+ *   - expires_at
+ *   - created_at
+ *   - updated_at
  * properties:
  *   id:
  *     type: string

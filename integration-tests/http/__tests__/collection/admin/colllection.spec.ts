@@ -1,7 +1,7 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
-  createAdminUser,
   adminHeaders,
+  createAdminUser,
 } from "../../../../helpers/create-admin-user"
 
 jest.setTimeout(30000)
@@ -49,6 +49,7 @@ medusaIntegrationTestRunner({
           "/admin/products",
           {
             title: "test-product",
+            options: [{ title: "size", values: ["x", "l"] }],
           },
           adminHeaders
         )
@@ -59,6 +60,7 @@ medusaIntegrationTestRunner({
           "/admin/products",
           {
             title: "test-product1",
+            options: [{ title: "size", values: ["x", "l"] }],
           },
           adminHeaders
         )
@@ -77,17 +79,16 @@ medusaIntegrationTestRunner({
         )
 
         expect(response.status).toEqual(200)
-        expect(response.data).toEqual(
-          expect.objectContaining({
-            collection: expect.objectContaining({
-              id: expect.stringMatching(/^pcol_*/),
-              title: "New collection",
-              handle: "test-new-collection",
-              created_at: expect.any(String),
-              updated_at: expect.any(String),
-            }),
-          })
-        )
+        expect(response.data).toEqual({
+          collection: {
+            id: expect.stringMatching(/^pcol_*/),
+            title: "New collection",
+            handle: "test-new-collection",
+            created_at: expect.any(String),
+            updated_at: expect.any(String),
+            metadata: null,
+          },
+        })
       })
 
       it("lists collections", async () => {
@@ -96,22 +97,33 @@ medusaIntegrationTestRunner({
         expect(response.data).toEqual(
           expect.objectContaining({
             count: 3,
+            limit: 10,
+            offset: 0,
             collections: expect.arrayContaining([
-              expect.objectContaining({
-                id: baseCollection2.id,
-                created_at: expect.any(String),
-                updated_at: expect.any(String),
-              }),
-              expect.objectContaining({
-                id: baseCollection1.id,
-                created_at: expect.any(String),
-                updated_at: expect.any(String),
-              }),
-              expect.objectContaining({
+              {
                 id: baseCollection.id,
                 created_at: expect.any(String),
                 updated_at: expect.any(String),
-              }),
+                handle: "test-collection",
+                metadata: null,
+                title: "test-collection",
+              },
+              {
+                id: baseCollection1.id,
+                created_at: expect.any(String),
+                updated_at: expect.any(String),
+                handle: "test-collection1",
+                metadata: null,
+                title: "test-collection1",
+              },
+              {
+                id: baseCollection2.id,
+                created_at: expect.any(String),
+                updated_at: expect.any(String),
+                handle: "test-collection2",
+                metadata: null,
+                title: "test-collection2",
+              },
             ]),
           })
         )
@@ -127,11 +139,14 @@ medusaIntegrationTestRunner({
           expect.objectContaining({
             count: 1,
             collections: expect.arrayContaining([
-              expect.objectContaining({
+              {
                 id: baseCollection.id,
                 created_at: expect.any(String),
                 updated_at: expect.any(String),
-              }),
+                handle: "test-collection",
+                metadata: null,
+                title: "test-collection",
+              },
             ]),
           })
         )
@@ -154,13 +169,14 @@ medusaIntegrationTestRunner({
         expect(response.status).toEqual(200)
         expect(response.data).toEqual(
           expect.objectContaining({
-            collection: expect.objectContaining({
+            collection: {
               id: expect.stringMatching(/^pcol_*/),
               title: "test collection creation",
               handle: "test-handle-creation",
               created_at: expect.any(String),
               updated_at: expect.any(String),
-            }),
+              metadata: null,
+            },
           })
         )
       })
@@ -200,9 +216,7 @@ medusaIntegrationTestRunner({
       it("adds products to collection", async () => {
         const response = await api.post(
           `/admin/collections/${baseCollection.id}/products?fields=*products`,
-          {
-            add: [baseProduct.id, baseProduct1.id],
-          },
+          { add: [baseProduct.id, baseProduct1.id] },
           adminHeaders
         )
 
@@ -212,6 +226,54 @@ medusaIntegrationTestRunner({
             id: baseCollection.id,
             created_at: expect.any(String),
             updated_at: expect.any(String),
+            products: expect.arrayContaining([
+              expect.objectContaining({
+                collection_id: baseCollection.id,
+                title: "test-product",
+              }),
+              expect.objectContaining({
+                collection_id: baseCollection.id,
+                title: "test-product1",
+              }),
+            ]),
+          })
+        )
+      })
+
+      it("should not remove products from collection when updating collection", async () => {
+        const addProductsResponse = await api.post(
+          `/admin/collections/${baseCollection.id}/products?fields=*products`,
+          { add: [baseProduct.id, baseProduct1.id] },
+          adminHeaders
+        )
+
+        expect(addProductsResponse.status).toEqual(200)
+        expect(addProductsResponse.data.collection).toEqual(
+          expect.objectContaining({
+            id: baseCollection.id,
+            products: expect.arrayContaining([
+              expect.objectContaining({
+                collection_id: baseCollection.id,
+                title: "test-product",
+              }),
+              expect.objectContaining({
+                collection_id: baseCollection.id,
+                title: "test-product1",
+              }),
+            ]),
+          })
+        )
+
+        const updateCollectionResponse = await api.post(
+          `/admin/collections/${baseCollection.id}?fields=*products`,
+          { title: "test collection update" },
+          adminHeaders
+        )
+
+        expect(updateCollectionResponse.status).toEqual(200)
+        expect(updateCollectionResponse.data.collection).toEqual(
+          expect.objectContaining({
+            title: "test collection update",
             products: expect.arrayContaining([
               expect.objectContaining({
                 collection_id: baseCollection.id,

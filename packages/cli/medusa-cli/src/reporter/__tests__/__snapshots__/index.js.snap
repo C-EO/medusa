@@ -9,16 +9,10 @@ exports[`Reporter handles "Error" signature correctly 1`] = `
 `;
 
 exports[`Reporter handles "String" signature correctly 1`] = `
-{
-  "level": "error",
-  "message": "Test log",
-}
-`;
-
-exports[`Reporter handles "String, Error" signature correctly 1`] = `
-{
-  "level": "error",
-  "message": "Test log",
-  "stack": Any<Array>,
-}
+[
+  {
+    "level": "error",
+    "message": "Test log",
+  },
+]
 `;

@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { PageEvent } from "typedoc"
-import { MarkdownTheme } from "../../theme"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

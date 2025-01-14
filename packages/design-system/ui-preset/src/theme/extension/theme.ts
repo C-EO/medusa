@@ -233,37 +233,6 @@ export const theme = {
             }
           }
         },
-        "fg": {
-          "disabled": {
-            "DEFAULT": "var(--fg-disabled)"
-          },
-          "muted": {
-            "DEFAULT": "var(--fg-muted)"
-          },
-          "on": {
-            "color": {
-              "DEFAULT": "var(--fg-on-color)"
-            },
-            "inverted": {
-              "DEFAULT": "var(--fg-on-inverted)"
-            }
-          },
-          "interactive": {
-            "hover": {
-              "DEFAULT": "var(--fg-interactive-hover)"
-            },
-            "DEFAULT": "var(--fg-interactive)"
-          },
-          "error": {
-            "DEFAULT": "var(--fg-error)"
-          },
-          "subtle": {
-            "DEFAULT": "var(--fg-subtle)"
-          },
-          "base": {
-            "DEFAULT": "var(--fg-base)"
-          }
-        },
         "button": {
           "inverted": {
             "pressed": {
@@ -301,6 +270,37 @@ export const theme = {
               "DEFAULT": "var(--button-neutral-pressed)"
             }
           }
+        },
+        "fg": {
+          "on": {
+            "color": {
+              "DEFAULT": "var(--fg-on-color)"
+            },
+            "inverted": {
+              "DEFAULT": "var(--fg-on-inverted)"
+            }
+          },
+          "interactive": {
+            "hover": {
+              "DEFAULT": "var(--fg-interactive-hover)"
+            },
+            "DEFAULT": "var(--fg-interactive)"
+          },
+          "error": {
+            "DEFAULT": "var(--fg-error)"
+          },
+          "subtle": {
+            "DEFAULT": "var(--fg-subtle)"
+          },
+          "base": {
+            "DEFAULT": "var(--fg-base)"
+          },
+          "disabled": {
+            "DEFAULT": "var(--fg-disabled)"
+          },
+          "muted": {
+            "DEFAULT": "var(--fg-muted)"
+          }
         }
       }
     },
@@ -315,7 +315,6 @@ export const theme = {
       "buttons-danger": "var(--buttons-danger)",
       "buttons-inverted-focus": "var(--buttons-inverted-focus)",
       "elevation-card-hover": "var(--elevation-card-hover)",
-      "buttons-inverted": "var(--buttons-inverted)",
       "details-switch-handle": "var(--details-switch-handle)",
       "buttons-neutral": "var(--buttons-neutral)",
       "borders-base": "var(--borders-base)",
@@ -327,7 +326,8 @@ export const theme = {
       "elevation-tooltip": "var(--elevation-tooltip)",
       "elevation-modal": "var(--elevation-modal)",
       "elevation-commandbar": "var(--elevation-commandbar)",
-      "elevation-code-block": "var(--elevation-code-block)"
+      "elevation-code-block": "var(--elevation-code-block)",
+      "buttons-inverted": "var(--buttons-inverted)"
     }
   }
 }

@@ -15,11 +15,11 @@ const redisUrl = process.env.REDIS_URL || "redis://localhost:6379"
 const redis = new Redis(redisUrl)
 
 interface TestDatabase {
-  clearTables(knex): Promise<void>
+  clearTables(): Promise<void>
 }
 
 export const TestDatabase: TestDatabase = {
-  clearTables: async (knex) => {
+  clearTables: async () => {
     await cleanRedis()
   },
 }

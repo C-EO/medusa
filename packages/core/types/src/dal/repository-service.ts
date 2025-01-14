@@ -1,15 +1,22 @@
 import { RepositoryTransformOptions } from "../common"
 import { Context } from "../shared-context"
 import {
-  BaseFilterable,
-  FilterQuery,
   FilterQuery as InternalFilterQuery,
   FindOptions,
   UpsertWithReplaceConfig,
 } from "./index"
+import { EntityClass } from "@mikro-orm/core"
+import { IDmlEntity, InferTypeOf } from "../dml"
 
 type EntityClassName = string
 type EntityValues = { id: string }[]
+
+/**
+ * Either infer the properties from a DML object or from a Mikro orm class prototype.
+ */
+export type InferRepositoryReturnType<T> = T extends IDmlEntity<any, any>
+  ? InferTypeOf<T>
+  : EntityClass<T>["prototype"]
 
 export type PerformedActions = {
   created: Record<EntityClassName, EntityValues>
@@ -22,7 +29,7 @@ export type PerformedActions = {
  * This layer helps to separate the business logic (service layer) from accessing the
  * ORM directly and allows to switch to another ORM without changing the business logic.
  */
-interface BaseRepositoryService<T = any> {
+interface BaseRepositoryService {
   transaction<TManager = unknown>(
     task: (transactionManager: TManager) => Promise<any>,
     context?: {
@@ -42,22 +49,28 @@ interface BaseRepositoryService<T = any> {
   ): Promise<TOutput>
 }
 
-export interface RepositoryService<T = any> extends BaseRepositoryService<T> {
-  find(options?: FindOptions<T>, context?: Context): Promise<T[]>
+export interface RepositoryService<T = any> extends BaseRepositoryService {
+  find(
+    options?: FindOptions<T>,
+    context?: Context
+  ): Promise<InferRepositoryReturnType<T>[]>
 
   findAndCount(
     options?: FindOptions<T>,
     context?: Context
-  ): Promise<[T[], number]>
+  ): Promise<[InferRepositoryReturnType<T>[], number]>
 
-  create(data: any[], context?: Context): Promise<T[]>
-
-  update(data: { entity; update }[], context?: Context): Promise<T[]>
-
-  delete(
-    idsOrPKs: FilterQuery<T> & BaseFilterable<FilterQuery<T>>,
+  create(
+    data: any[],
     context?: Context
-  ): Promise<void>
+  ): Promise<InferRepositoryReturnType<T>[]>
+
+  update(
+    data: { entity; update }[],
+    context?: Context
+  ): Promise<InferRepositoryReturnType<T>[]>
+
+  delete(idsOrPKs: FindOptions<T>["where"], context?: Context): Promise<void>
 
   /**
    * Soft delete entities and cascade to related entities if configured.
@@ -74,37 +87,45 @@ export interface RepositoryService<T = any> extends BaseRepositoryService<T> {
       | InternalFilterQuery
       | InternalFilterQuery[],
     context?: Context
-  ): Promise<[T[], Record<string, unknown[]>]>
+  ): Promise<[InferRepositoryReturnType<T>[], Record<string, unknown[]>]>
 
   restore(
     idsOrFilter: string[] | InternalFilterQuery,
     context?: Context
-  ): Promise<[T[], Record<string, unknown[]>]>
+  ): Promise<[InferRepositoryReturnType<T>[], Record<string, unknown[]>]>
 
-  upsert(data: any[], context?: Context): Promise<T[]>
+  upsert(
+    data: any[],
+    context?: Context
+  ): Promise<InferRepositoryReturnType<T>[]>
 
   upsertWithReplace(
     data: any[],
-    config?: UpsertWithReplaceConfig<T>,
+    config?: UpsertWithReplaceConfig<InferRepositoryReturnType<T>>,
     context?: Context
-  ): Promise<{ entities: T[]; performedActions: PerformedActions }>
+  ): Promise<{
+    entities: InferRepositoryReturnType<T>[]
+    performedActions: PerformedActions
+  }>
 }
 
-export interface TreeRepositoryService<T = any>
-  extends BaseRepositoryService<T> {
+export interface TreeRepositoryService<T = any> extends BaseRepositoryService {
   find(
     options?: FindOptions<T>,
     transformOptions?: RepositoryTransformOptions,
     context?: Context
-  ): Promise<T[]>
+  ): Promise<InferRepositoryReturnType<T>[]>
 
   findAndCount(
     options?: FindOptions<T>,
     transformOptions?: RepositoryTransformOptions,
     context?: Context
-  ): Promise<[T[], number]>
+  ): Promise<[InferRepositoryReturnType<T>[], number]>
 
-  create(data: unknown[], context?: Context): Promise<T[]>
+  create(
+    data: unknown[],
+    context?: Context
+  ): Promise<InferRepositoryReturnType<T>[]>
 
   delete(ids: string[], context?: Context): Promise<void>
 }

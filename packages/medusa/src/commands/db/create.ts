@@ -1,14 +1,23 @@
 import slugify from "slugify"
 import { basename } from "path"
 import input from "@inquirer/input"
-import { logger } from "@medusajs/framework"
+import { logger } from "@medusajs/framework/logger"
 import {
+  createClient,
   createDb,
   dbExists,
   EnvEditor,
-  createClient,
   parseConnectionString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
+
+async function connectClient(client: ReturnType<typeof createClient>) {
+  try {
+    await client.connect()
+    return { connected: true, error: null }
+  } catch (error) {
+    return { connected: false, error }
+  }
+}
 
 /**
  * A low-level utility to create the database. This util should
@@ -69,34 +78,67 @@ export async function dbCreate({
   /**
    * Parse connection string specified as "DATABASE_URL" inside the
    * .env file and create a client instance from it.
-   *
-   * Remember we should not specify the database name from the
-   * connection string, because this database might not
-   * exist
    */
   const connectionOptions = parseConnectionString(dbConnectionString)
-  const client = createClient({
+
+  /**
+   * The following client config is without any database name. This is because
+   * we want to connect to the default database (whatever it is) and create
+   * a new database that we expect not to exist.
+   */
+  const clientConfig = {
     host: connectionOptions.host!,
     port: connectionOptions.port ? Number(connectionOptions.port) : undefined,
     user: connectionOptions.user,
     password: connectionOptions.password,
-  })
+    ...(connectionOptions.ssl ? { ssl: connectionOptions.ssl as any } : {}),
+  }
 
-  try {
-    await client.connect()
-    logger.info(`Connection established with the database "${dbName}"`)
-  } catch (error) {
+  /**
+   * In some case the default database (which is same as the username) does
+   * not exist. For example: With Neon, there is no database name after
+   * the connection username. Hence, we will have to connect with the
+   * postgres database.
+   */
+  const clientConfigWithPostgresDB = {
+    host: connectionOptions.host!,
+    port: connectionOptions.port ? Number(connectionOptions.port) : undefined,
+    user: connectionOptions.user,
+    database: "postgres",
+    password: connectionOptions.password,
+    ...(connectionOptions.ssl ? { ssl: connectionOptions.ssl as any } : {}),
+  }
+
+  /**
+   * First connect with the default DB
+   */
+  let client = createClient(clientConfig)
+  let connectionState = await connectClient(client)
+
+  /**
+   * In case of an error, connect with the postgres DB
+   */
+  if (!connectionState.connected) {
+    client = createClient(clientConfigWithPostgresDB)
+    connectionState = await connectClient(client)
+  }
+
+  /**
+   * Notify user about the connection state
+   */
+  if (!connectionState.connected) {
     logger.error(
       "Unable to establish database connection because of the following error"
     )
-    logger.error(error)
+    logger.error(connectionState.error)
     return false
   }
 
+  logger.info(`Connection established with the database "${dbName}"`)
   if (await dbExists(client, dbName)) {
     logger.info(`Database "${dbName}" already exists`)
 
-    envEditor.set("DB_NAME", dbName)
+    envEditor.set("DB_NAME", dbName, { withEmptyTemplateValue: true })
     await envEditor.save()
     logger.info(`Updated .env file with "DB_NAME=${dbName}"`)
 

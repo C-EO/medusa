@@ -10,17 +10,9 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn about the Stripe Module Provider and how to install and use it in the Payment Module.
+In this document, you’ll learn about the Stripe Module Provider and how to configure it in the Payment Module.
 
-## Features
-
-[Stripe](https://stripe.com/) is a battle-tested and unified platform for transaction handling. Stripe supplies you with the technical components needed to handle transactions safely and all the analytical features necessary to gain insight into your sales.
-
-These features are also available in a safe test environment, allowing for a concern-free development process.
-
----
-
-## Install the Stripe Module Provider
+## Register the Stripe Module Provider
 
 <Prerequisites items={[
   {
@@ -32,39 +24,27 @@ These features are also available in a safe test environment, allowing for a con
     link: "https://support.stripe.com/questions/locate-api-keys-in-the-dashboard"
   },
   {
-    text: "For deployed Medusa applications, a Stripe webhook secret. When creating the Webhook, set the endpoint URL to {medusa_url}/hooks/payment/stripe, where {medusa_url} with the URL to your deployed Medusa application.",
+    text: "For deployed Medusa applications, a Stripe webhook secret. Refer to the end of this guide for details on the URL and events.",
     link: "https://docs.stripe.com/webhooks#add-a-webhook-endpoint"
   }
 ]} />
 
-To install the Stripe Module Provider, run the following command in the directory of your Medusa application:
+The Stripe Module Provider is installed by default in your application. To use it, add it to the array of providers passed to the Payment Module in `medusa-config.ts`:
 
-```bash npm2yarn
-npm install @medusajs/payment-stripe@preview
-```
-
-<Note>
-
-Make sure that the version added in `package.json` is `preview` to avoid errors with installation and updates in the future.
-
-</Note>
-
-Next, add the module to the array of providers passed to the Payment Module:
-
-```js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
+```ts title="medusa-config.ts"
+import { Modules } from "@medusajs/framework/utils"
 
 // ...
 
 module.exports = defineConfig({
   // ...
-  modules: {
-    [Modules.PAYMENT]: {
-      resolve: "@medusajs/payment",
+  modules: [
+    {
+      resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
           {
-            resolve: "@medusajs/payment-stripe",
+            resolve: "@medusajs/medusa/payment-stripe",
             id: "stripe",
             options: {
               apiKey: process.env.STRIPE_API_KEY,
@@ -73,7 +53,7 @@ module.exports = defineConfig({
         ],
       },
     },
-  },
+  ],
 })
 ```
 
@@ -115,7 +95,7 @@ STRIPE_API_KEY=<YOUR_STRIPE_API_KEY>
       </Table.Cell>
       <Table.Cell>
       
-      -
+      \-
       
       </Table.Cell>
     </Table.Row>
@@ -137,7 +117,7 @@ STRIPE_API_KEY=<YOUR_STRIPE_API_KEY>
       </Table.Cell>
       <Table.Cell>
       
-      -
+      \-
       
       </Table.Cell>
     </Table.Row>
@@ -210,22 +190,128 @@ STRIPE_API_KEY=<YOUR_STRIPE_API_KEY>
   </Table.Body>
 </Table>
 
-## Use Provider
+---
 
-To use the Stripe provider, create a payment session for the provider:
+## Setup Stripe Webhooks
 
-```ts
-const paymentSession =
-  await paymentModuleService.createPaymentSession(
-    "pay_col_123",
-    {
-      provider_id: "stripe-usd",
-      amount: 5000,
-      currency_code: "usd",
-      data: {
-        // any necessary data
-        // to pass to stripe
-      },
-    }
-  )
-```
+For production applications, you must set up webhooks in Stripe that inform Medusa of changes and updates to payments. Refer to [Stripe's documentation](https://docs.stripe.com/webhooks#add-a-webhook-endpoint) on how to setup webhooks.
+
+### Webhook URL
+
+Medusa has a `{server_url}/hooks/payment/{provider_id}` API route that you can use to register webhooks in Stripe, where:
+
+- `{server_url}` is the URL to your deployed Medusa application in server mode.
+- `{provider_id}` is the ID of the provider, such as `stripe_stripe` for basic payments.
+
+The Stripe Module Provider supports the following payment types, and the webhook endpoint URL is different for each:
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Stripe Payment Type</Table.HeaderCell>
+      <Table.HeaderCell>Webhook Endpoint URL</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>
+      
+      Basic Stripe Payment
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      Bancontact Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-bancontact_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      BLIK Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-blik_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      giropay Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-giropay_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      iDEAL Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-ideal_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      Przelewy24 Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-przelewy24_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>
+      
+      PromptPay Payments
+      
+      </Table.Cell>
+      <Table.Cell>
+      
+      `{server_url}/hooks/payment/stripe-promptpay_stripe`
+      
+      </Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
+
+### Webhook Events
+
+When you set up the webhook in Stripe, choose the following events to listen to:
+
+- `payment_intent.amount_capturable_updated`
+- `payment_intent.succeeded`
+- `payment_intent.payment_failed`
+
+---
+
+## Useful Guides
+
+- [Storefront guide: Add Stripe payment method during checkout](../../../../storefront-development/checkout/payment/stripe/page.mdx).
+- [Integrate in Next.js Starter](../../../../nextjs-starter/page.mdx#stripe-integration).
+- [Customize Stripe Integration in Next.js Starter](../../../../nextjs-starter/guides/customize-stripe/page.mdx).

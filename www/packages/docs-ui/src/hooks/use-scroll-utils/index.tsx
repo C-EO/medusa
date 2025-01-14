@@ -20,6 +20,7 @@ import React, {
   useState,
 } from "react"
 import { getScrolledTop as getScrolledTopUtil, isElmWindow } from "../../utils"
+import { useKeyboardShortcut } from "../use-keyboard-shortcut"
 
 type EventFunc = (...args: never[]) => unknown
 
@@ -39,7 +40,7 @@ export function useEvent<T extends EventFunc>(callback: T): T {
  * Gets `value` from the last render.
  */
 export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>()
+  const ref = useRef<T>(undefined)
 
   useLayoutEffect(() => {
     ref.current = value
@@ -96,10 +97,10 @@ function useScrollControllerContextValue({
       parentTop !== undefined
         ? parentTop
         : isElmWindow(scrollableElement)
-        ? 0
-        : scrollableElement instanceof HTMLElement
-        ? scrollableElement.offsetTop
-        : 0
+          ? 0
+          : scrollableElement instanceof HTMLElement
+            ? scrollableElement.offsetTop
+            : 0
 
     scrollableElement?.scrollTo({
       // 56 is the height of the navbar
@@ -137,9 +138,55 @@ export function ScrollControllerProvider({
   children: ReactNode
   scrollableSelector?: string
   restoreScrollOnReload?: boolean
-}): JSX.Element {
+}) {
   const value = useScrollControllerContextValue({
     scrollableSelector,
+  })
+  useKeyboardShortcut({
+    metakey: false,
+    shortcutKeys: ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"],
+    action: (e) => {
+      // check that document or body are focused
+      const activeElement = document.activeElement
+      if (
+        isElmWindow(value.scrollableElement) ||
+        !value.scrollableElement ||
+        (activeElement !== document.body &&
+          activeElement !== document.documentElement)
+      ) {
+        return
+      }
+
+      let newScroll = value.scrollableElement.scrollTop
+      const scrollThreshold = 50
+      const pageScrollAmount =
+        value.scrollableElement.clientHeight - scrollThreshold
+
+      switch (e.key) {
+        case "ArrowUp":
+          newScroll = -scrollThreshold
+          break
+        case "ArrowDown":
+          newScroll = scrollThreshold
+          break
+        case "PageUp":
+          newScroll = -pageScrollAmount
+          break
+        case "PageDown":
+          newScroll = pageScrollAmount
+          break
+        case "Home":
+          newScroll = -newScroll
+          break
+        case "End":
+          newScroll = value.scrollableElement.scrollHeight
+      }
+
+      value.scrollableElement?.scrollBy({
+        top: newScroll,
+        behavior: "smooth",
+      })
+    },
   })
   return (
     <ScrollMonitorContext.Provider value={value}>

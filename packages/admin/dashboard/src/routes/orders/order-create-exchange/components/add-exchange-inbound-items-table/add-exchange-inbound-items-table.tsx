@@ -2,6 +2,7 @@ import { AdminOrderLineItem, DateComparisonOperator } from "@medusajs/types"
 import { OnChangeFn, RowSelectionState } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 
+import { useTranslation } from "react-i18next"
 import { DataTable } from "../../../../../components/table/data-table"
 import { useDataTable } from "../../../../../hooks/use-data-table"
 import { getReturnableQuantity } from "../../../../../lib/rma"
@@ -25,6 +26,8 @@ export const AddExchangeInboundItemsTable = ({
   items,
   currencyCode,
 }: AddExchangeInboundItemsTableProps) => {
+  const { t } = useTranslation()
+
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(
     selectedItems.reduce((acc, id) => {
       acc[id] = true
@@ -53,9 +56,9 @@ export const AddExchangeInboundItemsTable = ({
     if (q) {
       results = results.filter((i) => {
         return (
-          i.variant.product.title.toLowerCase().includes(q.toLowerCase()) ||
-          i.variant.title.toLowerCase().includes(q.toLowerCase()) ||
-          i.variant.sku?.toLowerCase().includes(q.toLowerCase())
+          i.product_title.toLowerCase().includes(q.toLowerCase()) ||
+          i.variant_title.toLowerCase().includes(q.toLowerCase()) ||
+          i.variant_sku?.toLowerCase().includes(q.toLowerCase())
         )
       })
     }
@@ -108,7 +111,11 @@ export const AddExchangeInboundItemsTable = ({
         pagination
         layout="fill"
         search
-        orderBy={["product_title", "variant_title", "sku"]}
+        orderBy={[
+          { key: "product_title", label: t("fields.product") },
+          { key: "variant_title", label: t("fields.variant") },
+          { key: "sku", label: t("fields.sku") },
+        ]}
         prefix={PREFIX}
         queryObject={raw}
       />
@@ -126,14 +133,14 @@ const sortItems = (
     let bValue: any
 
     if (field === "product_title") {
-      aValue = a.variant.product.title
-      bValue = b.variant.product.title
+      aValue = a.product_title
+      bValue = b.product_title
     } else if (field === "variant_title") {
-      aValue = a.variant.title
-      bValue = b.variant.title
+      aValue = a.variant_title
+      bValue = b.variant_title
     } else if (field === "sku") {
-      aValue = a.variant.sku
-      bValue = b.variant.sku
+      aValue = a.variant_sku
+      bValue = b.variant_sku
     }
 
     if (aValue < bValue) {

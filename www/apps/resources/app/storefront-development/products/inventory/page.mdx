@@ -1,3 +1,10 @@
+---
+tags:
+  - product
+  - inventory
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -27,7 +34,7 @@ const queryParams = new URLSearchParams({
 fetch(`http://localhost:9000/store/products/${id}?${queryParams.toString()}`, {
   credentials: "include",
   headers: {
-    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
   },
 })
 .then((res) => res.json())
@@ -59,11 +66,10 @@ A variant is in stock if:
 ## Full React Example
 
 export const reactHighlights = [
-  ["12", "{ params: { id } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["25", "fields", "Pass `+variants.inventory_quantity` in the fields to retrieve."],
-  ["31", "process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY", "Pass the Publishable API key to retrieve the inventory quantity based on the associated sales channels' stock locations."], 
-  ["55", "isInStock", "Consider the selected variant in stock either if its `manage_inventory` property is disabled, or the `inventory_quantity` is greater than `0`."],
-  ["96", "isInStock", "Show whether the selected variant is in stock."]
+  ["23", "fields", "Pass `+variants.inventory_quantity` in the fields to retrieve."],
+  ["29", "process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY", "Pass the Publishable API key to retrieve the inventory quantity based on the associated sales channels' stock locations."], 
+  ["53", "isInStock", "Consider the selected variant in stock either if its `manage_inventory` property is disabled, or the `inventory_quantity` is greater than `0`."],
+  ["94", "isInStock", "Show whether the selected variant is in stock."]
 ]
 
 ```tsx title="React Storefront" highlights={reactHighlights}
@@ -72,13 +78,11 @@ export const reactHighlights = [
 import { useEffect, useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 
-type Params = {
-  params: {
-    id: string
-  }
+type Props = {
+  id: string
 }
 
-export default function Product({ params: { id } }: Params) {
+export default function Product({ id }: Props) {
   const [loading, setLoading] = useState(true)
   const [product, setProduct] = useState<
     HttpTypes.StoreProduct | undefined
@@ -97,7 +101,7 @@ export default function Product({ params: { id } }: Params) {
     fetch(`http://localhost:9000/store/products/${id}?${queryParams.toString()}`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())

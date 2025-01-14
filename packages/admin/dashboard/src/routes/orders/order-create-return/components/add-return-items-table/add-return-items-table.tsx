@@ -2,18 +2,19 @@ import { OnChangeFn, RowSelectionState } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 
 import {
+  AdminOrderLineItem,
   DateComparisonOperator,
   NumericalComparisonOperator,
 } from "@medusajs/types"
-import { AdminOrderLineItem } from "@medusajs/types"
 
+import { useTranslation } from "react-i18next"
+import { DataTable } from "../../../../../components/table/data-table"
+import { useDataTable } from "../../../../../hooks/use-data-table"
+import { getStylizedAmount } from "../../../../../lib/money-amount-helpers"
+import { getReturnableQuantity } from "../../../../../lib/rma"
 import { useReturnItemTableColumns } from "./use-return-item-table-columns"
 import { useReturnItemTableFilters } from "./use-return-item-table-filters"
 import { useReturnItemTableQuery } from "./use-return-item-table-query"
-import { useDataTable } from "../../../../../hooks/use-data-table"
-import { DataTable } from "../../../../../components/table/data-table"
-import { getStylizedAmount } from "../../../../../lib/money-amount-helpers"
-import { getReturnableQuantity } from "../../../../../lib/rma"
 
 const PAGE_SIZE = 50
 const PREFIX = "rit"
@@ -31,6 +32,8 @@ export const AddReturnItemsTable = ({
   items,
   currencyCode,
 }: AddReturnItemsTableProps) => {
+  const { t } = useTranslation()
+
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(
     selectedItems.reduce((acc, id) => {
       acc[id] = true
@@ -68,9 +71,9 @@ export const AddReturnItemsTable = ({
     if (q) {
       results = results.filter((i) => {
         return (
-          i.variant.product.title.toLowerCase().includes(q.toLowerCase()) ||
-          i.variant.title.toLowerCase().includes(q.toLowerCase()) ||
-          i.variant.sku?.toLowerCase().includes(q.toLowerCase())
+          i.product_title.toLowerCase().includes(q.toLowerCase()) ||
+          i.variant_title.toLowerCase().includes(q.toLowerCase()) ||
+          i.variant_sku?.toLowerCase().includes(q.toLowerCase())
         )
       })
     }
@@ -142,11 +145,17 @@ export const AddReturnItemsTable = ({
         layout="fill"
         search
         orderBy={[
-          "product_title",
-          "variant_title",
-          "sku",
-          "returnable_quantity",
-          "refundable_amount",
+          { key: "product_title", label: t("fields.product") },
+          { key: "variant_title", label: t("fields.variant") },
+          { key: "sku", label: t("fields.sku") },
+          {
+            key: "returnable_quantity",
+            label: t("orders.fields.returnableQuantity"),
+          },
+          {
+            key: "refundable_amount",
+            label: t("orders.fields.refundableAmount"),
+          },
         ]}
         prefix={PREFIX}
         queryObject={raw}
@@ -165,14 +174,14 @@ const sortItems = (
     let bValue: any
 
     if (field === "product_title") {
-      aValue = a.variant.product.title
-      bValue = b.variant.product.title
+      aValue = a.product_title
+      bValue = b.product_title
     } else if (field === "variant_title") {
-      aValue = a.variant.title
-      bValue = b.variant.title
+      aValue = a.variant_title
+      bValue = b.variant_title
     } else if (field === "sku") {
-      aValue = a.variant.sku
-      bValue = b.variant.sku
+      aValue = a.variant_sku
+      bValue = b.variant_sku
     } else if (field === "returnable_quantity") {
       aValue = a.quantity - (a.returned_quantity || 0)
       bValue = b.quantity - (b.returned_quantity || 0)

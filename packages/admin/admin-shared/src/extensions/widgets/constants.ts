@@ -7,15 +7,6 @@ const ORDER_INJECTION_ZONES = [
   "order.list.after",
 ] as const
 
-const DRAFT_ORDER_INJECTION_ZONES = [
-  "draft_order.list.before",
-  "draft_order.list.after",
-  "draft_order.details.side.before",
-  "draft_order.details.side.after",
-  "draft_order.details.before",
-  "draft_order.details.after",
-] as const
-
 const CUSTOMER_INJECTION_ZONES = [
   "customer.details.before",
   "customer.details.after",
@@ -37,6 +28,13 @@ const PRODUCT_INJECTION_ZONES = [
   "product.list.after",
   "product.details.side.before",
   "product.details.side.after",
+] as const
+
+const PRODUCT_VARIANT_INJECTION_ZONES = [
+  "product_variant.details.before",
+  "product_variant.details.after",
+  "product_variant.details.side.before",
+  "product_variant.details.side.after",
 ] as const
 
 const PRODUCT_COLLECTION_INJECTION_ZONES = [
@@ -94,15 +92,6 @@ const CAMPAIGN_INJECTION_ZONES = [
   "campaign.details.side.after",
   "campaign.list.before",
   "campaign.list.after",
-] as const
-
-const GIFT_CARD_INJECTION_ZONES = [
-  "gift_card.details.before",
-  "gift_card.details.after",
-  "gift_card.list.before",
-  "gift_card.list.after",
-  "custom_gift_card.before",
-  "custom_gift_card.after",
 ] as const
 
 const USER_INJECTION_ZONES = [
@@ -204,15 +193,16 @@ const INVENTORY_ITEM_INJECTION_ZONES = [
  */
 export const INJECTION_ZONES = [
   ...ORDER_INJECTION_ZONES,
-  ...DRAFT_ORDER_INJECTION_ZONES,
   ...CUSTOMER_INJECTION_ZONES,
   ...CUSTOMER_GROUP_INJECTION_ZONES,
   ...PRODUCT_INJECTION_ZONES,
+  ...PRODUCT_VARIANT_INJECTION_ZONES,
   ...PRODUCT_COLLECTION_INJECTION_ZONES,
   ...PRODUCT_CATEGORY_INJECTION_ZONES,
+  ...PRODUCT_TYPE_INJECTION_ZONES,
+  ...PRODUCT_TAG_INJECTION_ZONES,
   ...PRICE_LIST_INJECTION_ZONES,
   ...PROMOTION_INJECTION_ZONES,
-  ...GIFT_CARD_INJECTION_ZONES,
   ...USER_INJECTION_ZONES,
   ...STORE_INJECTION_ZONES,
   ...PROFILE_INJECTION_ZONES,
@@ -226,8 +216,6 @@ export const INJECTION_ZONES = [
   ...WORKFLOW_INJECTION_ZONES,
   ...CAMPAIGN_INJECTION_ZONES,
   ...TAX_INJECTION_ZONES,
-  ...PRODUCT_TYPE_INJECTION_ZONES,
-  ...PRODUCT_TAG_INJECTION_ZONES,
   ...RETURN_REASON_INJECTION_ZONES,
   ...INVENTORY_ITEM_INJECTION_ZONES,
 ] as const

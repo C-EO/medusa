@@ -1,8 +1,8 @@
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchCollection } from "../helpers"
 
 export const GET = async (
@@ -12,7 +12,7 @@ export const GET = async (
   const collection = await refetchCollection(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ collection })

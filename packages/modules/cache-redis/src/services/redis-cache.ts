@@ -1,4 +1,4 @@
-import { ICacheService } from "@medusajs/types"
+import { ICacheService } from "@medusajs/framework/types"
 import { Redis } from "ioredis"
 import { RedisCacheModuleOptions } from "../types"
 
@@ -76,14 +76,28 @@ class RedisCacheService implements ICacheService {
    * @param key
    */
   async invalidate(key: string): Promise<void> {
-    const keys = await this.redis.keys(this.getCacheKey(key))
-    const pipeline = this.redis.pipeline()
+    const pattern = this.getCacheKey(key)
+    let cursor = "0"
+    do {
+      const result = await this.redis.scan(
+        cursor,
+        "MATCH",
+        pattern,
+        "COUNT",
+        100
+      )
+      cursor = result[0]
+      const keys = result[1]
 
-    keys.forEach(function (key) {
-      pipeline.del(key)
-    })
+      if (keys.length > 0) {
+        const deletePipeline = this.redis.pipeline()
+        for (const key of keys) {
+          deletePipeline.del(key)
+        }
 
-    await pipeline.exec()
+        await deletePipeline.exec()
+      }
+    } while (cursor !== "0")
   }
 
   /**

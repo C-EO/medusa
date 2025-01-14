@@ -1,4 +1,8 @@
-import { EntityConstructor, PropertyMetadata } from "@medusajs/types"
+import {
+  EntityConstructor,
+  PropertyMetadata,
+  RelationshipMetadata,
+} from "@medusajs/types"
 import { Searchable } from "../../../dal"
 
 /**
@@ -6,11 +10,22 @@ import { Searchable } from "../../../dal"
  */
 export function applySearchable(
   MikroORMEntity: EntityConstructor<any>,
-  field: PropertyMetadata
+  fieldOrRelationship: PropertyMetadata | RelationshipMetadata
 ) {
-  if (!field.dataType.options?.searchable) {
+  let propertyName: string
+  let isSearchable: boolean
+
+  if ("fieldName" in fieldOrRelationship) {
+    propertyName = fieldOrRelationship.fieldName
+    isSearchable = !!fieldOrRelationship.dataType.options?.searchable
+  } else {
+    propertyName = fieldOrRelationship.name
+    isSearchable = fieldOrRelationship.searchable
+  }
+
+  if (!isSearchable) {
     return
   }
 
-  Searchable()(MikroORMEntity.prototype, field.fieldName)
+  Searchable()(MikroORMEntity.prototype, propertyName)
 }

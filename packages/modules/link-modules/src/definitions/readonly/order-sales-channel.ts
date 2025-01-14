@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { Modules } from "@medusajs/framework/utils"
 
 export const OrderSalesChannel: ModuleJoinerConfig = {
   isLink: true,
@@ -7,6 +7,7 @@ export const OrderSalesChannel: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.ORDER,
+      entity: "Order",
       relationship: {
         serviceName: Modules.SALES_CHANNEL,
         entity: "SalesChannel",
@@ -20,6 +21,7 @@ export const OrderSalesChannel: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.SALES_CHANNEL,
+      entity: "SalesChannel",
       relationship: {
         serviceName: Modules.ORDER,
         entity: "Order",

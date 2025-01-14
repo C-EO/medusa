@@ -1,4 +1,18 @@
-export class PermanentStepFailureError extends Error {
+class BaseStepErrror extends Error {
+  #stepResponse: unknown
+
+  constructor(name, message?: string, stepResponse?: unknown) {
+    super(message)
+    this.name = name
+    this.#stepResponse = stepResponse
+  }
+
+  getStepResponse(): unknown {
+    return this.#stepResponse
+  }
+}
+
+export class PermanentStepFailureError extends BaseStepErrror {
   static isPermanentStepFailureError(
     error: Error
   ): error is PermanentStepFailureError {
@@ -8,26 +22,24 @@ export class PermanentStepFailureError extends Error {
     )
   }
 
-  constructor(message?: string) {
-    super(message)
-    this.name = "PermanentStepFailure"
+  constructor(message?: string, stepResponse?: unknown) {
+    super("PermanentStepFailure", message, stepResponse)
   }
 }
 
-export class SkipStepResponse extends Error {
+export class SkipStepResponse extends BaseStepErrror {
   static isSkipStepResponse(error: Error): error is SkipStepResponse {
     return (
       error instanceof SkipStepResponse || error?.name === "SkipStepResponse"
     )
   }
 
-  constructor(message?: string) {
-    super(message)
-    this.name = "SkipStepResponse"
+  constructor(message?: string, stepResponse?: unknown) {
+    super("SkipStepResponse", message, stepResponse)
   }
 }
 
-export class TransactionStepTimeoutError extends Error {
+export class TransactionStepTimeoutError extends BaseStepErrror {
   static isTransactionStepTimeoutError(
     error: Error
   ): error is TransactionStepTimeoutError {
@@ -37,13 +49,12 @@ export class TransactionStepTimeoutError extends Error {
     )
   }
 
-  constructor(message?: string) {
-    super(message)
-    this.name = "TransactionStepTimeoutError"
+  constructor(message?: string, stepResponse?: unknown) {
+    super("TransactionStepTimeoutError", message, stepResponse)
   }
 }
 
-export class TransactionTimeoutError extends Error {
+export class TransactionTimeoutError extends BaseStepErrror {
   static isTransactionTimeoutError(
     error: Error
   ): error is TransactionTimeoutError {
@@ -53,35 +64,23 @@ export class TransactionTimeoutError extends Error {
     )
   }
 
+  constructor(message?: string, stepResponse?: unknown) {
+    super("TransactionTimeoutError", message, stepResponse)
+  }
+}
+
+export class NonSerializableCheckPointError extends Error {
+  static isNonSerializableCheckPointError(
+    error: Error
+  ): error is NonSerializableCheckPointError {
+    return (
+      error instanceof NonSerializableCheckPointError ||
+      error?.name === "NonSerializableCheckPointError"
+    )
+  }
+
   constructor(message?: string) {
     super(message)
-    this.name = "TransactionTimeoutError"
+    this.name = "NonSerializableCheckPointError"
   }
-}
-
-export function serializeError(error) {
-  const serialized = {
-    message: error.message,
-    name: error.name,
-    stack: error.stack,
-  }
-
-  Object.getOwnPropertyNames(error).forEach((key) => {
-    // eslint-disable-next-line no-prototype-builtins
-    if (!serialized.hasOwnProperty(key)) {
-      serialized[key] = error[key]
-    }
-  })
-
-  return serialized
-}
-
-export function isErrorLike(value) {
-  return (
-    !!value &&
-    typeof value === "object" &&
-    "name" in value &&
-    "message" in value &&
-    "stack" in value
-  )
 }

@@ -7,18 +7,18 @@ import {
   AdminServiceZoneResponse,
   HttpTypes,
   IFulfillmentModuleService,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   MedusaError,
   Modules,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminUpdateFulfillmentSetServiceZonesType } from "../../../validators"
 
 export const GET = async (
@@ -33,7 +33,7 @@ export const GET = async (
       variables: {
         id: req.params.zone_id,
       },
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
     })
   )
 
@@ -85,7 +85,7 @@ export const POST = async (
       variables: {
         id: req.params.id,
       },
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
     })
   )
 

@@ -1,5 +1,5 @@
 import { ArrowDownRightMini, DocumentText, XCircle } from "@medusajs/icons"
-import { AdminPaymentCollection, HttpTypes } from "@medusajs/types"
+import { AdminOrder, AdminPayment, HttpTypes } from "@medusajs/types"
 import {
   Badge,
   Button,
@@ -12,8 +12,9 @@ import {
   usePrompt,
 } from "@medusajs/ui"
 import { format } from "date-fns"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import DisplayId from "../../../../../components/common/display-id/display-id"
 import { useCapturePayment } from "../../../../../hooks/api"
 import { formatCurrency } from "../../../../../lib/format-currency"
 import {
@@ -53,10 +54,7 @@ export const OrderPaymentSection = ({ order }: OrderPaymentSectionProps) => {
         currencyCode={order.currency_code}
       />
 
-      <Total
-        paymentCollections={order.payment_collections}
-        currencyCode={order.currency_code}
-      />
+      <Total order={order} />
     </Container>
   )
 }
@@ -172,25 +170,40 @@ const Payment = ({
     )
   }
 
-  const [status, color] = (
-    payment.captured_at ? ["Captured", "green"] : ["Pending", "orange"]
-  ) as [string, "green" | "orange"]
+  const getPaymentStatusAttributes = (payment: AdminPayment) => {
+    if (payment.canceled_at) {
+      return ["Canceled", "red"]
+    } else if (payment.captured_at) {
+      return ["Captured", "green"]
+    } else {
+      return ["Pending", "orange"]
+    }
+  }
 
-  const cleanId = payment.id.replace("pay_", "")
+  const [status, color] = getPaymentStatusAttributes(payment) as [
+    string,
+    "green" | "orange" | "red",
+  ]
+
   const showCapture =
     payment.captured_at === null && payment.canceled_at === null
 
+  const totalRefunded = payment.refunds.reduce(
+    (acc, next) => next.amount + acc,
+    0
+  )
+
   return (
     <div className="divide-y divide-dashed">
-      <div className="text-ui-fg-subtle grid grid-cols-[1fr_1fr_1fr_1fr_20px] items-center gap-x-4 px-6 py-4">
-        <div className="w-full overflow-hidden">
+      <div className="text-ui-fg-subtle grid grid-cols-[1fr_1fr_1fr_20px] items-center gap-x-4 px-6 py-4 sm:grid-cols-[1fr_1fr_1fr_1fr_20px]">
+        <div className="w-full min-w-[60px] overflow-hidden">
           <Text
             size="small"
             leading="compact"
             weight="plus"
             className="truncate"
           >
-            {cleanId}
+            <DisplayId id={payment.id} />
           </Text>
           <Text size="small" leading="compact">
             {format(
@@ -199,7 +212,7 @@ const Payment = ({
             )}
           </Text>
         </div>
-        <div className="flex items-center justify-end">
+        <div className="hidden items-center justify-end sm:flex">
           <Text size="small" leading="compact" className="capitalize">
             {payment.provider_id}
           </Text>
@@ -222,7 +235,10 @@ const Payment = ({
                   label: t("orders.payment.refund"),
                   icon: <XCircle />,
                   to: `/orders/${order.id}/refund?paymentId=${payment.id}`,
-                  disabled: !payment.captured_at,
+                  disabled:
+                    !payment.captured_at ||
+                    !!payment.canceled_at ||
+                    totalRefunded >= payment.amount,
                 },
               ],
             },
@@ -232,16 +248,27 @@ const Payment = ({
       {showCapture && (
         <div className="bg-ui-bg-subtle flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-x-2">
-            <ArrowDownRightMini className="text-ui-fg-muted" />
+            <ArrowDownRightMini className="text-ui-fg-muted shrink-0" />
             <Text size="small" leading="compact">
-              {t("orders.payment.isReadyToBeCaptured", {
-                id: cleanId,
-              })}
+              <Trans
+                i18nKey="orders.payment.isReadyToBeCaptured"
+                components={[<DisplayId id={payment.id} />]}
+              />
             </Text>
           </div>
 
-          <Button size="small" variant="secondary" onClick={handleCapture}>
-            {t("orders.payment.capture")}
+          <Button
+            className="shrink-0"
+            size="small"
+            variant="secondary"
+            onClick={handleCapture}
+          >
+            <span className="hidden sm:block">
+              {t("orders.payment.capture")}
+            </span>
+            <span className="sm:hidden">
+              {t("orders.payment.capture_short")}
+            </span>
           </Button>
         </div>
       )}
@@ -315,15 +342,9 @@ const PaymentBreakdown = ({
   )
 }
 
-const Total = ({
-  paymentCollections,
-  currencyCode,
-}: {
-  paymentCollections: AdminPaymentCollection[]
-  currencyCode: string
-}) => {
+const Total = ({ order }: { order: AdminOrder }) => {
   const { t } = useTranslation()
-  const totalPending = getTotalPending(paymentCollections)
+  const totalPending = getTotalPending(order.payment_collections)
 
   return (
     <div>
@@ -334,20 +355,20 @@ const Total = ({
 
         <Text size="small" weight="plus" leading="compact">
           {getStylizedAmount(
-            getTotalCaptured(paymentCollections),
-            currencyCode
+            getTotalCaptured(order.payment_collections),
+            order.currency_code
           )}
         </Text>
       </div>
 
-      {totalPending > 0 && (
+      {order.status !== "canceled" && totalPending > 0 && (
         <div className="flex items-center justify-between px-6 py-4">
           <Text size="small" weight="plus" leading="compact">
             Total pending
           </Text>
 
           <Text size="small" weight="plus" leading="compact">
-            {getStylizedAmount(totalPending, currencyCode)}
+            {getStylizedAmount(totalPending, order.currency_code)}
           </Text>
         </div>
       )}

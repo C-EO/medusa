@@ -14,7 +14,11 @@ import {
   PathValue,
 } from "react-hook-form"
 
-export type DataGridColumnType = "text" | "number" | "boolean"
+export type DataGridColumnType =
+  | "text"
+  | "number"
+  | "boolean"
+  | "togglable-number"
 
 export type DataGridCoordinates = {
   row: number
@@ -96,10 +100,11 @@ export interface DataGridCellContainerProps extends PropsWithChildren<{}> {
   isDragSelected: boolean
   placeholder?: ReactNode
   showOverlay: boolean
+  outerComponent?: ReactNode
 }
 
 export type DataGridCellSnapshot<
-  TFieldValues extends FieldValues = FieldValues
+  TFieldValues extends FieldValues = FieldValues,
 > = {
   field: string
   value: PathValue<TFieldValues, Path<TFieldValues>>
@@ -158,4 +163,10 @@ export type GridColumnOption = {
   name: string
   checked: boolean
   disabled: boolean
+}
+
+export type DataGridToggleableNumber = {
+  quantity: number | string
+  checked: boolean
+  disabledToggle: boolean
 }

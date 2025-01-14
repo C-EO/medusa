@@ -3,7 +3,7 @@
 import React, { Suspense, cloneElement, useRef, useState } from "react"
 import { Loading } from "@/components"
 import clsx from "clsx"
-import { DetailsSummary } from "./Summary"
+import { DetailsSummary, DetailsSummaryProps } from "./Summary"
 import { useCollapsible } from "../../hooks"
 
 export type DetailsProps = {
@@ -22,12 +22,14 @@ export const Details = ({
   ...props
 }: DetailsProps) => {
   const [open, setOpen] = useState(openInitial)
+  const ref = useRef<HTMLDetailsElement>(null)
+  const childrenWrapperRef = useRef<HTMLDivElement>(null)
   const { getCollapsibleElms, setCollapsed } = useCollapsible({
     initialValue: !openInitial,
     heightAnimation,
     onClose: () => setOpen(false),
+    childrenRef: childrenWrapperRef,
   })
-  const ref = useRef<HTMLDetailsElement>(null)
 
   const handleToggle = (e: React.MouseEvent<HTMLElement>) => {
     const targetElm = e.target as HTMLElement
@@ -77,13 +79,19 @@ export const Details = ({
         />
       )}
       {summaryElm &&
-        cloneElement(summaryElm as React.ReactElement, {
-          open,
-          onClick: handleToggle,
-        })}
+        cloneElement<DetailsSummaryProps>(
+          summaryElm as React.ReactElement<
+            DetailsSummaryProps,
+            React.FunctionComponent<DetailsSummaryProps>
+          >,
+          {
+            open,
+            onClick: handleToggle,
+          }
+        )}
       {getCollapsibleElms(
         <Suspense fallback={<Loading className="!mb-docs_2 !mt-0" />}>
-          {children}
+          <div ref={childrenWrapperRef}>{children}</div>
         </Suspense>
       )}
     </details>

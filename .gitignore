@@ -20,7 +20,13 @@ www/**/.yarn/*
 .idea
 .turbo
 build/**
+dist/**
 **/dist
 **/stats
 .favorites.json
 .vscode
+
+**/tsconfig.tsbuildinfo
+
+# Cache File
+/packages/**/.cache

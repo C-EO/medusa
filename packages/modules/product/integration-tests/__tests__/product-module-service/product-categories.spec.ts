@@ -1,16 +1,17 @@
-import { IProductModuleService } from "@medusajs/types"
+import { IProductModuleService } from "@medusajs/framework/types"
 import {
   CommonEvents,
   composeMessage,
   Modules,
   ProductEvents,
   ProductStatus,
-} from "@medusajs/utils"
+  toMikroORMEntity,
+} from "@medusajs/framework/utils"
 import { Product, ProductCategory } from "@models"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
 import { productCategoriesRankData } from "../../__fixtures__/product-category/data"
 
 jest.setTimeout(30000)
@@ -31,15 +32,17 @@ moduleIntegrationTestRunner<IProductModuleService>({
       beforeEach(async () => {
         const testManager = await MikroOrmWrapper.forkManager()
 
-        productOne = testManager.create(Product, {
+        productOne = testManager.create(toMikroORMEntity(Product), {
           id: "product-1",
           title: "product 1",
+          handle: "product-1",
           status: ProductStatus.PUBLISHED,
         })
 
-        productTwo = testManager.create(Product, {
+        productTwo = testManager.create(toMikroORMEntity(Product), {
           id: "product-2",
           title: "product 2",
+          handle: "product-2",
           status: ProductStatus.PUBLISHED,
         })
 
@@ -680,7 +683,6 @@ moduleIntegrationTestRunner<IProductModuleService>({
           productCategoryTwo = categories[2]
         })
 
-        // TODO: Normalize delete events as well
         it("should emit events through event bus", async () => {
           const eventBusSpy = jest.spyOn(MockEventBusService.prototype, "emit")
           eventBusSpy.mockClear()
@@ -692,7 +694,7 @@ moduleIntegrationTestRunner<IProductModuleService>({
             [
               expect.objectContaining({
                 data: { id: productCategoryOne.id },
-                name: "Product.product-category.deleted",
+                name: "product.product-category.deleted",
                 metadata: {
                   action: CommonEvents.DELETED,
                   object: "product_category",

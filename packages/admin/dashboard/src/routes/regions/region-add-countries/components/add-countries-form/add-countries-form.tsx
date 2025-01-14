@@ -16,6 +16,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateRegion } from "../../../../../hooks/api/regions"
 import { useDataTable } from "../../../../../hooks/use-data-table"
 import { countries as staticCountries } from "../../../../../lib/data/countries"
@@ -124,7 +125,7 @@ export const AddCountriesForm = ({ region }: AddCountriesFormProps) => {
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -149,12 +150,15 @@ export const AddCountriesForm = ({ region }: AddCountriesFormProps) => {
             search="autofocus"
             pagination
             layout="fill"
-            orderBy={["name", "code"]}
+            orderBy={[
+              { key: "display_name", label: t("fields.name") },
+              { key: "iso_2", label: t("fields.code") },
+            ]}
             queryObject={raw}
             prefix={PREFIX}
           />
         </RouteFocusModal.Body>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

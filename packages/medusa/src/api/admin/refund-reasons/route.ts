@@ -1,13 +1,17 @@
 import { createRefundReasonsWorkflow } from "@medusajs/core-flows"
-import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework"
+import {
+  AuthenticatedMedusaRequest,
+  MedusaResponse,
+  refetchEntities,
+  refetchEntity,
+} from "@medusajs/framework/http"
 import {
   AdminCreateRefundReason,
   HttpTypes,
   PaginatedResponse,
   RefundReasonResponse,
   RefundReasonsResponse,
-} from "@medusajs/types"
-import { refetchEntities, refetchEntity } from "../../utils/refetch-entity"
+} from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.RefundReasonFilters>,
@@ -17,8 +21,8 @@ export const GET = async (
     "refund_reasons",
     req.filterableFields,
     req.scope,
-    req.remoteQueryConfig.fields,
-    req.remoteQueryConfig.pagination
+    req.queryConfig.fields,
+    req.queryConfig.pagination
   )
 
   res.json({
@@ -43,7 +47,7 @@ export const POST = async (
     "refund_reason",
     refundReason.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ refund_reason })

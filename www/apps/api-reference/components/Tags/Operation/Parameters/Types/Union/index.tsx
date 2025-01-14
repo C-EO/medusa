@@ -36,8 +36,8 @@ const TagOperationParametersUnion = ({
   const objectSchema = schema.anyOf
     ? schema.anyOf.find((item) => item.type === "object" && item.properties)
     : schema.allOf
-    ? mergeAllOfTypes(schema)
-    : undefined
+      ? mergeAllOfTypes(schema)
+      : undefined
 
   if (!objectSchema) {
     return (

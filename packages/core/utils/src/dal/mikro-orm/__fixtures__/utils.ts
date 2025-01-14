@@ -1,6 +1,8 @@
 import {
+  Cascade,
   Collection,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryKey,
@@ -8,6 +10,104 @@ import {
   Rel,
 } from "@mikro-orm/core"
 import { Searchable } from "../decorators/searchable"
+
+@Entity()
+class Product {
+  @PrimaryKey()
+  id: string
+
+  @Property()
+  name: string
+
+  @OneToMany(() => ProductOption, (o) => o.product, {
+    cascade: ["soft-remove"] as any,
+  })
+  options = new Collection<ProductOption>(this)
+
+  @OneToMany(() => ProductVariant, (variant) => variant.product, {
+    cascade: ["soft-remove"] as any,
+  })
+  variants = new Collection<ProductVariant>(this)
+}
+
+@Entity()
+class ProductOption {
+  @PrimaryKey()
+  id: string
+
+  @Property()
+  name: string
+
+  @ManyToOne(() => Product, {
+    persist: false,
+    nullable: true,
+  })
+  product: Product | null
+
+  @OneToMany(() => ProductOptionValue, (value) => value.option, {
+    cascade: [Cascade.PERSIST, "soft-remove" as any],
+  })
+  values = new Collection<ProductOptionValue>(this)
+}
+
+@Entity()
+class ProductOptionValue {
+  @PrimaryKey()
+  id: string
+
+  @Property()
+  name: string
+
+  @ManyToOne(() => ProductOption, {
+    columnType: "text",
+    fieldName: "option_id",
+    mapToPk: true,
+    nullable: true,
+    onDelete: "cascade",
+  })
+  option_id: string | null
+
+  @ManyToOne(() => ProductOption, {
+    nullable: true,
+    persist: false,
+  })
+  option: ProductOption | null
+
+  @ManyToMany(() => ProductVariant, (variant) => variant.options)
+  variants = new Collection<ProductVariant>(this)
+}
+
+@Entity()
+class ProductVariant {
+  @PrimaryKey()
+  id: string
+
+  @Property()
+  name: string
+
+  @ManyToOne(() => Product, {
+    columnType: "text",
+    nullable: true,
+    onDelete: "cascade",
+    fieldName: "product_id",
+    mapToPk: true,
+  })
+  product_id: string | null
+
+  @ManyToOne(() => Product, {
+    persist: false,
+    nullable: true,
+  })
+  product: Product | null
+
+  @ManyToMany(() => ProductOptionValue, "variants", {
+    owner: true,
+    pivotTable: "product_variant_option",
+    joinColumn: "variant_id",
+    inverseJoinColumn: "option_value_id",
+  })
+  options = new Collection<ProductOptionValue>(this)
+}
 
 // Circular dependency one level
 @Entity()
@@ -20,7 +120,7 @@ class RecursiveEntity1 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @OneToMany(() => RecursiveEntity2, (entity2) => entity2.entity1, {
@@ -44,7 +144,7 @@ class RecursiveEntity2 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => RecursiveEntity1, {
@@ -64,7 +164,7 @@ class Entity1 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @OneToMany(() => Entity2, (entity2) => entity2.entity1, {
@@ -89,7 +189,7 @@ class Entity2 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => Entity1, { mapToPk: true })
@@ -111,8 +211,13 @@ class DeepRecursiveEntity1 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
+
+  @OneToMany(() => DeepRecursiveEntity3, (entity3) => entity3.entity1, {
+    cascade: ["soft-remove"] as any,
+  })
+  entity3 = new Collection<DeepRecursiveEntity3>(this)
 
   @OneToMany(() => DeepRecursiveEntity2, (entity2) => entity2.entity1, {
     cascade: ["soft-remove"] as any,
@@ -136,7 +241,7 @@ class DeepRecursiveEntity2 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => DeepRecursiveEntity1)
@@ -163,7 +268,7 @@ class DeepRecursiveEntity3 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => DeepRecursiveEntity1, {
@@ -187,7 +292,7 @@ class DeepRecursiveEntity4 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => DeepRecursiveEntity1)
@@ -214,7 +319,7 @@ class InternalCircularDependencyEntity1 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @OneToMany(
@@ -226,7 +331,7 @@ class InternalCircularDependencyEntity1 {
   )
   children = new Collection<InternalCircularDependencyEntity1>(this)
 
-  @ManyToOne(() => InternalCircularDependencyEntity1)
+  @ManyToOne(() => InternalCircularDependencyEntity1, { nullable: true })
   parent: Rel<InternalCircularDependencyEntity1>
 }
 
@@ -244,7 +349,7 @@ class Entity1WithUnDecoratedProp {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @OneToMany(() => Entity2WithUnDecoratedProp, (entity2) => entity2.entity1, {
@@ -271,7 +376,7 @@ class Entity2WithUnDecoratedProp {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @ManyToOne(() => Entity1WithUnDecoratedProp, { mapToPk: true })
@@ -293,11 +398,11 @@ class SearchableEntity1 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @Searchable()
-  @Property()
+  @Property({ columnType: "text" })
   searchableField: string
 
   @Searchable()
@@ -321,11 +426,11 @@ class SearchableEntity2 {
   @PrimaryKey()
   id: string
 
-  @Property()
+  @Property({ nullable: true })
   deleted_at: Date | null
 
   @Searchable()
-  @Property()
+  @Property({ columnType: "text" })
   searchableField: string
 
   @ManyToOne(() => SearchableEntity1, { mapToPk: true })
@@ -345,6 +450,10 @@ export {
   Entity2,
   Entity2WithUnDecoratedProp,
   InternalCircularDependencyEntity1,
+  Product,
+  ProductOption,
+  ProductOptionValue,
+  ProductVariant,
   RecursiveEntity1,
   RecursiveEntity2,
   SearchableEntity1,

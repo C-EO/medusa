@@ -2,9 +2,9 @@ import { linkCustomersToCustomerGroupWorkflow } from "@medusajs/core-flows"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
+} from "@medusajs/framework/http"
 
-import { HttpTypes, LinkMethodRequest } from "@medusajs/types"
+import { HttpTypes, LinkMethodRequest } from "@medusajs/framework/types"
 import { refetchCustomerGroup } from "../../helpers"
 
 export const POST = async (
@@ -26,7 +26,7 @@ export const POST = async (
   const customerGroup = await refetchCustomerGroup(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ customer_group: customerGroup })
 }

@@ -1,15 +1,9 @@
-"use client"
-
 import {
   AnalyticsProvider,
-  ColorModeProvider,
-  MobileProvider,
-  ModalProvider,
   PageLoadingProvider,
   ScrollControllerProvider,
   SiteConfigProvider,
 } from "docs-ui"
-import BaseSpecsProvider from "./base-specs"
 import SidebarProvider from "./sidebar"
 import SearchProvider from "./search"
 import { config } from "../config"
@@ -24,21 +18,13 @@ const Providers = ({ children }: ProvidersProps) => {
     <AnalyticsProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_API_KEY}>
       <SiteConfigProvider config={config}>
         <PageLoadingProvider>
-          <ModalProvider>
-            <ColorModeProvider>
-              <BaseSpecsProvider>
-                <ScrollControllerProvider scrollableSelector="#main">
-                  <SidebarProvider>
-                    <MainNavProvider>
-                      <SearchProvider>
-                        <MobileProvider>{children}</MobileProvider>
-                      </SearchProvider>
-                    </MainNavProvider>
-                  </SidebarProvider>
-                </ScrollControllerProvider>
-              </BaseSpecsProvider>
-            </ColorModeProvider>
-          </ModalProvider>
+          <ScrollControllerProvider scrollableSelector="#main">
+            <SidebarProvider>
+              <MainNavProvider>
+                <SearchProvider>{children}</SearchProvider>
+              </MainNavProvider>
+            </SidebarProvider>
+          </ScrollControllerProvider>
         </PageLoadingProvider>
       </SiteConfigProvider>
     </AnalyticsProvider>

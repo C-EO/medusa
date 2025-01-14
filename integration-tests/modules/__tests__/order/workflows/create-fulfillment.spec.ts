@@ -20,7 +20,7 @@ import {
   Modules,
   remoteQueryObjectFromString,
 } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 
 jest.setTimeout(500000)
 
@@ -372,6 +372,7 @@ medusaIntegrationTestRunner({
             ],
             no_notification: false,
             location_id: undefined,
+            metadata: { meta_key: "meta_value" },
           }
 
         await createOrderFulfillmentWorkflow(container).run({
@@ -406,6 +407,9 @@ medusaIntegrationTestRunner({
         expect(orderFulfillItemWithInventory.detail.fulfilled_quantity).toEqual(
           1
         )
+        expect(orderFulfill.fulfillments[0].metadata).toEqual({
+          meta_key: "meta_value",
+        })
 
         const reservation = await inventoryModule.listReservationItems({
           line_item_id: itemWithInventory.id,

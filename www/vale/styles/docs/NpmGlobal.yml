@@ -1,6 +1,6 @@
 extends: existence
 message: "The -g option should be added at the end of the command"
-link: https://docs.medusajs.com/contribution-guidelines#global-option
+link: https://docs.medusajs.com/resources/contribution-guidelines/docs#global-option
 level: error
 scope: raw
 ignorecase: true

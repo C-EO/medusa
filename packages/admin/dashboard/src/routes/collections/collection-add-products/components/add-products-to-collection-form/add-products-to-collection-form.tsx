@@ -16,6 +16,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals/index.ts"
 import { DataTable } from "../../../../../components/table/data-table/data-table.tsx"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form/keybound-form.tsx"
 import { useUpdateCollectionProducts } from "../../../../../hooks/api/collections.tsx"
 import { useProducts } from "../../../../../hooks/api/products.tsx"
 import { useProductTableColumns } from "../../../../../hooks/table/columns/use-product-table-columns.tsx"
@@ -147,7 +148,7 @@ export const AddProductsToCollectionForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -174,7 +175,11 @@ export const AddProductsToCollectionForm = ({
             count={count}
             queryObject={raw}
             filters={filters}
-            orderBy={["title", "created_at", "updated_at"]}
+            orderBy={[
+              { key: "title", label: t("fields.title") },
+              { key: "created_at", label: t("fields.createdAt") },
+              { key: "updated_at", label: t("fields.updatedAt") },
+            ]}
             prefix={PREFIX}
             isLoading={isLoading}
             layout="fill"
@@ -182,7 +187,7 @@ export const AddProductsToCollectionForm = ({
             search="autofocus"
           />
         </RouteFocusModal.Body>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

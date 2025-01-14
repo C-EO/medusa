@@ -15,6 +15,12 @@ const customFulfillmentProvider = {
   id: "test-provider",
 }
 
+const customFulfillmentProviderCalculated = {
+  resolve: require("./dist/utils/providers/fulfillment-manual-calculated")
+    .default,
+  id: "test-provider-calculated",
+}
+
 module.exports = defineConfig({
   admin: {
     disable: true,
@@ -28,7 +34,10 @@ module.exports = defineConfig({
     [Modules.FULFILLMENT]: {
       /** @type {import('@medusajs/fulfillment').FulfillmentModuleOptions} */
       options: {
-        providers: [customFulfillmentProvider],
+        providers: [
+          customFulfillmentProvider,
+          customFulfillmentProviderCalculated,
+        ],
       },
     },
     [Modules.NOTIFICATION]: {
@@ -51,7 +60,7 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: "@medusajs/file-local-next",
+            resolve: "@medusajs/file-local",
             id: "local",
             options: {
               // This is the directory where we can reliably write in CI environments

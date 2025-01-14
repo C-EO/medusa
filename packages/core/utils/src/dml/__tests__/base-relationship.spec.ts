@@ -25,6 +25,7 @@ describe("Base relationship", () => {
       options: { mappedBy: "user_id" },
       mappedBy: "user_id",
       entity: entityRef,
+      searchable: false,
     })
   })
 })

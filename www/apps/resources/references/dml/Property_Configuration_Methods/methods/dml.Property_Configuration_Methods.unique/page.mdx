@@ -5,7 +5,7 @@ sidebar_label: unique
 
 import { TypeList } from "docs-ui"
 
-# unique Method - API Reference
+# unique Method - DML Reference
 
 This method indicates that a property's value must be unique in the database.
 A unique index is created on the property.
@@ -13,7 +13,7 @@ A unique index is created on the property.
 ## Example
 
 ```ts
-import { model } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 
 const User = model.define("user", {
   email: model.text().unique(),
@@ -25,4 +25,4 @@ export default User
 
 ## Parameters
 
-<TypeList types={[{"name":"name","type":"`string`","description":"The unique index's name. If not provided,\nMedusa generates the name.","optional":true,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="unique"/>
+<TypeList types={[{"name":"name","type":"`string`","description":"The unique index's name. If not provided,\nMedusa generates the name.","optional":true,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="unique"/>

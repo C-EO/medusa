@@ -1,11 +1,11 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import {
   DeclarationReflection,
   ProjectReflection,
   ReflectionGroup,
   ReflectionKind,
 } from "typedoc"
-import { MarkdownTheme } from "../../theme"
+import { MarkdownTheme } from "../../theme.js"
 import { escapeChars } from "utils"
 
 export default function (theme: MarkdownTheme) {
@@ -14,13 +14,15 @@ export default function (theme: MarkdownTheme) {
     function (this: ProjectReflection | DeclarationReflection) {
       const md: string[] = []
 
-      const { hideInPageTOC, allReflectionsHaveOwnDocumentInNamespace } = theme
+      const { hideInPageTOC } = theme
       const { hideTocHeaders, reflectionGroupRename = {} } =
         theme.getFormattingOptionsForLocation()
 
       const isNamespaceVisible =
         this.kind === ReflectionKind.Namespace &&
-        allReflectionsHaveOwnDocumentInNamespace.includes(this.name)
+        theme.getMappings(this as DeclarationReflection)[
+          ReflectionKind.Namespace
+        ]
       const isVisible =
         isNamespaceVisible ||
         this.groups?.some((group) => {
@@ -28,12 +30,16 @@ export default function (theme: MarkdownTheme) {
         })
 
       function pushGroup(group: ReflectionGroup, md: string[]) {
-        const children = group.children.map(
-          (child) =>
-            `- [${escapeChars(child.name)}](${Handlebars.helpers.relativeURL(
-              child.url
-            )})`
-        )
+        const children = group.children
+          .sort((childA, childB) => {
+            return childA.name.localeCompare(childB.name)
+          })
+          .map(
+            (child) =>
+              `- [${escapeChars(child.name)}](${Handlebars.helpers.relativeURL(
+                child.url
+              )})`
+          )
         md.push(children.join("\n"))
       }
 
@@ -42,26 +48,34 @@ export default function (theme: MarkdownTheme) {
           md.push(`## Table of contents\n\n`)
         }
         const headingLevel = hideInPageTOC ? `##` : `###`
-        this.groups?.forEach((group) => {
-          const groupTitle = Object.hasOwn(reflectionGroupRename, group.title)
-            ? reflectionGroupRename[group.title]
-            : group.title
-          if (group.categories) {
-            group.categories.forEach((category) => {
-              md.push(`${headingLevel} ${category.title} ${groupTitle}\n\n`)
-              pushGroup(category as ReflectionGroup, md)
-              md.push("\n")
-            })
-          } else {
-            if (!hideInPageTOC || isVisible) {
-              if (!hideTocHeaders) {
-                md.push(`${headingLevel} ${groupTitle}\n\n`)
+        this.groups
+          ?.sort((groupA, groupB) => {
+            return groupA.title.localeCompare(groupB.title)
+          })
+          .forEach((group) => {
+            const groupTitle = Object.hasOwn(reflectionGroupRename, group.title)
+              ? reflectionGroupRename[group.title]
+              : group.title
+            if (group.categories) {
+              group.categories
+                .sort((catA, catB) => {
+                  return catA.title.localeCompare(catB.title)
+                })
+                .forEach((category) => {
+                  md.push(`${headingLevel} ${category.title} ${groupTitle}\n\n`)
+                  pushGroup(category as ReflectionGroup, md)
+                  md.push("\n")
+                })
+            } else {
+              if (!hideInPageTOC || isVisible) {
+                if (!hideTocHeaders) {
+                  md.push(`${headingLevel} ${groupTitle}\n\n`)
+                }
+                pushGroup(group, md)
+                md.push("\n")
               }
-              pushGroup(group, md)
-              md.push("\n")
             }
-          }
-        })
+          })
       }
       return md.length > 0 ? md.join("\n") : null
     }

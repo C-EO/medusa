@@ -1,15 +1,13 @@
 import React from "react"
-import ReactMarkdown from "react-markdown"
-import { ReactMarkdownOptions } from "react-markdown/lib/react-markdown"
+import ReactMarkdown, {
+  Options as ReactMarkdownOptions,
+  Components,
+} from "react-markdown"
 import { MDXComponents, Link } from "@/components"
 import clsx from "clsx"
-import { NormalComponents } from "react-markdown/lib/complex-types"
-import { SpecialComponents } from "react-markdown/lib/ast-to-react"
 
 export type MarkdownContentProps = ReactMarkdownOptions & {
-  components?: Partial<
-    Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
-  >
+  components?: Partial<Components> | null | undefined
 }
 
 export const MarkdownContent = ({
@@ -18,6 +16,7 @@ export const MarkdownContent = ({
   ...props
 }: MarkdownContentProps) => {
   return (
+    // @ts-expect-error React v19 doesn't see this type as a React element
     <ReactMarkdown
       components={
         components || {

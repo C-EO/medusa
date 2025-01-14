@@ -1,7 +1,7 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { SignatureReflection } from "typedoc"
-import { getQueryReturn } from "../../utils/react-query-utils"
-import { MarkdownTheme } from "../../theme"
+import { getQueryReturn } from "../../utils/react-query-utils.js"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

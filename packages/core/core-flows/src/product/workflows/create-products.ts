@@ -3,27 +3,114 @@ import {
   CreateProductWorkflowInputDTO,
   PricingTypes,
   ProductTypes,
-} from "@medusajs/types"
-import { ProductWorkflowEvents, isPresent } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  ProductWorkflowEvents,
+  isPresent,
+  MedusaError,
+} from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createHook,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+  createStep,
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep } from "../../common"
 import { associateProductsWithSalesChannelsStep } from "../../sales-channel"
 import { createProductsStep } from "../steps/create-products"
 import { createProductVariantsWorkflow } from "./create-product-variants"
 
+interface ValidateProductInputStepInput {
+  products: CreateProductWorkflowInputDTO[]
+}
+
+const validateProductInputStepId = "validate-product-input"
+/**
+ * This step validates a product data before creation.
+ */
+export const validateProductInputStep = createStep(
+  validateProductInputStepId,
+  async (data: ValidateProductInputStepInput) => {
+    const { products } = data
+
+    const missingOptionsProductTitles = products
+      .filter((product) => !product.options?.length)
+      .map((product) => product.title)
+
+    if (missingOptionsProductTitles.length) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Product options are not provided for: [${missingOptionsProductTitles.join(
+          ", "
+        )}].`
+      )
+    }
+  }
+)
+
+/**
+ * The data to create one or more products, along with custom data that's passed to the workflow's hooks.
+ */
 export type CreateProductsWorkflowInput = {
+  /**
+   * The products to create.
+   */
   products: CreateProductWorkflowInputDTO[]
 } & AdditionalData
 
 export const createProductsWorkflowId = "create-products"
 /**
- * This workflow creates one or more products.
+ * This workflow creates one or more products. It's used by the [Create Product Admin API Route](https://docs.medusajs.com/api/admin#products_postproducts).
+ * It can also be useful to you when creating [seed scripts](https://docs.medusajs.com/learn/fundamentals/custom-cli-scripts/seed-data), for example.
+ * 
+ * This workflow has a hook that allows you to perform custom actions on the created products. You can see an example in [this guide](https://docs.medusajs.com/resources/commerce-modules/product/extend).
+ * 
+ * You can also use this workflow within your own custom workflows, allowing you to wrap custom logic around product creation.
+ * 
+ * @example
+ * const { result } = await createProductsWorkflow(container)
+ * .run({
+ *   input: {
+ *     products: [
+ *       {
+ *         title: "Shirt",
+ *         options: [
+ *           {
+ *             title: "Size",
+ *             values: ["S", "M", "L"]
+ *           }
+ *         ],
+ *         variants: [
+ *           {
+ *             title: "Small Shirt",
+ *             sku: "SMALLSHIRT",
+ *             options: {
+ *               Size: "S"
+ *             },
+ *             prices: [
+ *               {
+ *                 amount: 10,
+ *                 currency_code: "usd"
+ *               }
+ *             ],
+ *             manage_inventory: true,
+ *           },
+ *         ]
+ *       }
+ *     ],
+ *     additional_data: {
+ *       erp_id: "123"
+ *     }
+ *   }
+ * })
+ * 
+ * @summary
+ * 
+ * Create one or more products with options and variants.
+ * 
+ * @property hooks.productCreated - This hook is executed after the products are created. You can consume this hook to perform custom actions on the created products.
  */
 export const createProductsWorkflow = createWorkflow(
   createProductsWorkflowId,
@@ -36,6 +123,8 @@ export const createProductsWorkflow = createWorkflow(
         variants: undefined,
       }))
     )
+
+    validateProductInputStep({ products: productWithoutExternalRelations })
 
     const createdProducts = createProductsStep(productWithoutExternalRelations)
 

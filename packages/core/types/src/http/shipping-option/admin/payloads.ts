@@ -13,12 +13,24 @@ export interface AdminCreateShippingOptionType {
   code: string
 }
 
-export interface AdminCreateShippingOptionPriceWithCurrency {
+interface AdminShippingOptionPriceRulePayload {
+  operator: string
+  attribute: string
+  value: string | string[] | number
+}
+
+interface AdminShippingOptionPriceWithRules {
+  rules?: AdminShippingOptionPriceRulePayload[]
+}
+
+export interface AdminCreateShippingOptionPriceWithCurrency
+  extends AdminShippingOptionPriceWithRules {
   currency_code: string
   amount: number
 }
 
-export interface AdminCreateShippingOptionPriceWithRegion {
+export interface AdminCreateShippingOptionPriceWithRegion
+  extends AdminShippingOptionPriceWithRules {
   region_id: string
   amount: number
 }
@@ -40,16 +52,18 @@ export interface AdminCreateShippingOption {
 
 export interface AdminUpdateShippingOptionRule
   extends AdminCreateShippingOptionRule {
-  id?: string
+  id: string
 }
 
-export interface AdminUpdateShippingOptionPriceWithCurrency {
+export interface AdminUpdateShippingOptionPriceWithCurrency
+  extends AdminShippingOptionPriceWithRules {
   id?: string
   currency_code?: string
   amount?: number
 }
 
-export interface AdminUpdateShippingOptionPriceWithRegion {
+export interface AdminUpdateShippingOptionPriceWithRegion
+  extends AdminShippingOptionPriceWithRules {
   id?: string
   region_id?: string
   amount?: number

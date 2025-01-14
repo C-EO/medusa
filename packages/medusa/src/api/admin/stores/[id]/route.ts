@@ -1,16 +1,16 @@
 import { updateStoresWorkflow } from "@medusajs/core-flows"
 import {
-  remoteQueryObjectFromString,
   ContainerRegistrationKeys,
   MedusaError,
-} from "@medusajs/utils"
+  remoteQueryObjectFromString,
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminGetStoreParamsType, AdminUpdateStoreType } from "../validators"
 import { refetchStore } from "../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetStoreParamsType>,
@@ -22,7 +22,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "store",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [store] = await remoteQuery(queryObject)
@@ -51,7 +51,7 @@ export const POST = async (
   const store = await refetchStore(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ store })

@@ -1,27 +1,27 @@
-import { DeleteEntityInput, RemoteLink } from "@medusajs/modules-sdk"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+import { DeleteEntityInput, Link } from "@medusajs/framework/modules-sdk"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
-import { ContainerRegistrationKeys } from "@medusajs/utils"
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 type RemoveRemoteLinksStepInput = DeleteEntityInput | DeleteEntityInput[]
 
 export const removeRemoteLinkStepId = "remove-remote-links"
 /**
  * This step deletes linked records of a record.
- * 
- * Learn more in the [Remote Link documentation](https://docs.medusajs.com/v2/advanced-development/modules/remote-link#cascade-delete-linked-records)
- * 
+ *
+ * Learn more in the [Remote Link documentation](https://docs.medusajs.com/learn/fundamentals/module-links/remote-link#cascade-delete-linked-records)
+ *
  * @example
- * import { 
+ * import {
  *   createWorkflow
- * } from "@medusajs/workflows-sdk"
+ * } from "@medusajs/framework/workflows-sdk"
  * import {
  *   removeRemoteLinkStep
- * } from "@medusajs/core-flows"
+ * } from "@medusajs/medusa/core-flows"
  * import {
  *   Modules
- * } from "@medusajs/utils"
- * 
+ * } from "@medusajs/framework/utils"
+ *
  * const helloWorldWorkflow = createWorkflow(
  *   "hello-world",
  *   () => {
@@ -62,9 +62,7 @@ export const removeRemoteLinkStep = createStep(
       }
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
     await link.delete(grouped)
 
     return new StepResponse(grouped, grouped)
@@ -74,9 +72,7 @@ export const removeRemoteLinkStep = createStep(
       return
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
     await link.restore(removedLinks)
   }
 )

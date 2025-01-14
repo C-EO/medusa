@@ -1,5 +1,48 @@
 # @medusajs/payment-stripe
 
+## 2.2.0
+
+## 2.1.3
+
+## 2.1.2
+
+## 2.1.1
+
+## 2.1.0
+
+## 2.0.7
+
+## 2.0.6
+
+## 2.0.5
+
+### Patch Changes
+
+- [#10135](https://github.com/medusajs/medusa/pull/10135) [`b1b7a4abf10956d2d2863ba2b7e08e39b1abfbc1`](https://github.com/medusajs/medusa/commit/b1b7a4abf10956d2d2863ba2b7e08e39b1abfbc1) Thanks [@adrien2p](https://github.com/adrien2p)! - fix(payment): Idempotent cancellation and proper creationg fail handling
+
+## 2.0.4
+
+## 2.0.3
+
+### Patch Changes
+
+- [#9789](https://github.com/medusajs/medusa/pull/9789) [`6ead7bf92d69036c7900bf5b1a8af67bbd7585ae`](https://github.com/medusajs/medusa/commit/6ead7bf92d69036c7900bf5b1a8af67bbd7585ae) Thanks [@oDestroyeRo](https://github.com/oDestroyeRo)! - feat(stripe): add promptpay
+
+## 2.0.2
+
+## 2.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- [#7341](https://github.com/medusajs/medusa/pull/7341) [`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Medusa 2.0
+
+### Patch Changes
+
+- Updated dependencies [[`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e)]:
+  - @medusajs/framework@2.0.0
+
 ## 0.0.2
 
 ### Patch Changes

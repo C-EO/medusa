@@ -1,21 +1,12 @@
-import { makeExecutableSchema } from "@graphql-tools/schema"
+import { MedusaModule } from "@medusajs/framework/modules-sdk"
 import {
-  cleanGraphQLSchema,
-  gqlGetFieldsAndRelations,
-  MedusaModule,
-} from "@medusajs/modules-sdk"
-import {
+  IndexTypes,
   JoinerServiceConfigAlias,
   ModuleJoinerConfig,
   ModuleJoinerRelationship,
-} from "@medusajs/types"
-import { CommonEvents } from "@medusajs/utils"
-import {
-  SchemaObjectEntityRepresentation,
-  SchemaObjectRepresentation,
-  schemaObjectRepresentationPropertiesToOmit,
-} from "@types"
-import { Kind, ObjectTypeDefinitionNode } from "graphql/index"
+} from "@medusajs/framework/types"
+import { CommonEvents, GraphQLUtils } from "@medusajs/framework/utils"
+import { schemaObjectRepresentationPropertiesToOmit } from "@types"
 
 export const CustomDirectives = {
   Listeners: {
@@ -27,10 +18,10 @@ export const CustomDirectives = {
   },
 }
 
-function makeSchemaExecutable(inputSchema: string) {
-  const { schema: cleanedSchema } = cleanGraphQLSchema(inputSchema)
+export function makeSchemaExecutable(inputSchema: string) {
+  const { schema: cleanedSchema } = GraphQLUtils.cleanGraphQLSchema(inputSchema)
 
-  return makeExecutableSchema({ typeDefs: cleanedSchema })
+  return GraphQLUtils.makeExecutableSchema({ typeDefs: cleanedSchema })
 }
 
 function extractNameFromAlias(
@@ -269,7 +260,7 @@ function retrieveLinkModuleAndAlias({
 function getObjectRepresentationRef(
   entityName,
   { objectRepresentationRef }
-): SchemaObjectEntityRepresentation {
+): IndexTypes.SchemaObjectEntityRepresentation {
   return (objectRepresentationRef[entityName] ??= {
     entity: entityName,
     parents: [],
@@ -309,7 +300,7 @@ function processEntity(
   }: {
     entitiesMap: any
     moduleJoinerConfigs: ModuleJoinerConfig[]
-    objectRepresentationRef: SchemaObjectRepresentation
+    objectRepresentationRef: IndexTypes.SchemaObjectRepresentation
   }
 ) {
   /**
@@ -333,7 +324,7 @@ function processEntity(
   )
 
   currentObjectRepresentationRef.fields =
-    gqlGetFieldsAndRelations(entitiesMap, entityName) ?? []
+    GraphQLUtils.gqlGetFieldsAndRelations(entitiesMap, entityName) ?? []
 
   /**
    * Retrieve the module and alias for the current entity.
@@ -375,14 +366,16 @@ function processEntity(
   const schemaParentEntity = Object.values(entitiesMap).filter((value: any) => {
     return (
       value.astNode &&
-      (value.astNode as ObjectTypeDefinitionNode).fields?.some((field: any) => {
-        let currentType = field.type
-        while (currentType.type) {
-          currentType = currentType.type
-        }
+      (value.astNode as GraphQLUtils.ObjectTypeDefinitionNode).fields?.some(
+        (field: any) => {
+          let currentType = field.type
+          while (currentType.type) {
+            currentType = currentType.type
+          }
 
-        return currentType.name?.value === entityName
-      })
+          return currentType.name?.value === entityName
+        }
+      )
     )
   })
 
@@ -413,7 +406,7 @@ function processEntity(
     })
 
     const isEntityListInParent =
-      entityFieldInParent.type.kind === Kind.LIST_TYPE
+      entityFieldInParent.type.kind === GraphQLUtils.Kind.LIST_TYPE
     const entityTargetPropertyNameInParent = entityFieldInParent.name.value
 
     /**
@@ -616,8 +609,11 @@ function processEntity(
  *   }
  * }
  */
-function buildAliasMap(objectRepresentation: SchemaObjectRepresentation) {
-  const aliasMap: SchemaObjectRepresentation["_schemaPropertiesMap"] = {}
+function buildAliasMap(
+  objectRepresentation: IndexTypes.SchemaObjectRepresentation
+) {
+  const aliasMap: IndexTypes.SchemaObjectRepresentation["_schemaPropertiesMap"] =
+    {}
 
   function recursivelyBuildAliasPath(
     current,
@@ -705,7 +701,7 @@ function buildAliasMap(objectRepresentation: SchemaObjectRepresentation) {
  */
 export function buildSchemaObjectRepresentation(
   schema
-): [SchemaObjectRepresentation, Record<string, any>] {
+): [IndexTypes.SchemaObjectRepresentation, Record<string, any>] {
   const moduleJoinerConfigs = MedusaModule.getAllJoinerConfigs()
   const augmentedSchema = CustomDirectives.Listeners.definition + schema
   const executableSchema = makeSchemaExecutable(augmentedSchema)
@@ -713,7 +709,7 @@ export function buildSchemaObjectRepresentation(
 
   const objectRepresentation = {
     _serviceNameModuleConfigMap: {},
-  } as SchemaObjectRepresentation
+  } as IndexTypes.SchemaObjectRepresentation
 
   Object.entries(entitiesMap).forEach(([entityName, entityMapValue]) => {
     if (!entityMapValue.astNode) {

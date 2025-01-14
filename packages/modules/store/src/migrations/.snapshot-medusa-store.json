@@ -99,13 +99,11 @@
       "indexes": [
         {
           "keyName": "IDX_store_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_store_deleted_at\" ON \"store\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_store_deleted_at\" ON \"store\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "store_pkey",
@@ -196,14 +194,20 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_store_currency_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "keyName": "IDX_store_currency_store_id",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_store_currency_deleted_at\" ON \"store_currency\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_store_currency_store_id\" ON \"store_currency\" (store_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_store_currency_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_store_currency_deleted_at\" ON \"store_currency\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "store_currency_pkey",

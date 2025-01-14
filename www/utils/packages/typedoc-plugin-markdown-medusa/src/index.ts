@@ -1,6 +1,6 @@
 import { Application, ParameterType } from "typedoc"
-import { MarkdownThemeOptionsReader } from "./options-reader"
-import { MarkdownTheme } from "./theme"
+import { MarkdownThemeOptionsReader } from "./options-reader.js"
+import { MarkdownTheme } from "./theme.js"
 
 export function load(app: Application) {
   app.renderer.defineTheme("markdown", MarkdownTheme)
@@ -34,16 +34,16 @@ export function load(app: Application) {
   })
 
   app.options.addDeclaration({
-    help: "[Markdown Plugin] Specify module names where all reflections are outputted into seperate files.",
-    name: "allReflectionsHaveOwnDocument",
+    help: "[Markdown Plugin] Specify module names where property reflections are outputted into seperate files.",
+    name: "allPropertyReflectionsHaveOwnDocument",
     type: ParameterType.Array,
     defaultValue: [],
   })
 
   app.options.addDeclaration({
-    help: "[Markdown Plugin] Specify namespace names where all reflections are outputted into seperate files.",
-    name: "allReflectionsHaveOwnDocumentInNamespace",
-    type: ParameterType.Array,
+    help: "[Markdown Plugin] Specify for each project / module the allowed document types",
+    name: "allowedProjectDocuments",
+    type: ParameterType.Mixed,
     defaultValue: [],
   })
 

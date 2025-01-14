@@ -1,3 +1,4 @@
+import { globalConfig } from "docs-ui"
 import { DocsConfig } from "types"
 
 type SiteConfig = {
@@ -9,6 +10,7 @@ type SiteConfig = {
 const baseUrl = process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3000"
 
 export const siteConfig: SiteConfig = {
+  ...globalConfig,
   name: "Medusa UI",
   baseUrl,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
@@ -18,5 +20,17 @@ export const siteConfig: SiteConfig = {
   sidebar: {
     default: [],
     mobile: [],
+  },
+  project: {
+    title: "Medusa UI",
+    key: "ui",
+  },
+  breadcrumbOptions: {
+    showCategories: true,
+  },
+  logo: `${process.env.NEXT_PUBLIC_BASE_PATH}/images/logo.png`,
+  version: {
+    ...globalConfig.version,
+    hide: true,
   },
 }

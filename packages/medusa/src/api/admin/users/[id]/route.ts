@@ -2,17 +2,17 @@ import {
   removeUserAccountWorkflow,
   updateUsersWorkflow,
 } from "@medusajs/core-flows"
-import { HttpTypes, UpdateUserDTO } from "@medusajs/types"
+import { HttpTypes, UpdateUserDTO } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { refetchUser } from "../helpers"
 import { AdminUpdateUserType } from "../validators"
 
@@ -27,7 +27,7 @@ export const GET = async (
   const query = remoteQueryObjectFromString({
     entryPoint: "user",
     variables: { id },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [user] = await remoteQuery(query)
@@ -62,7 +62,7 @@ export const POST = async (
   const user = await refetchUser(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ user })

@@ -7,27 +7,26 @@ import { siteConfig } from "@/config/site"
 import { Metadata } from "next"
 
 interface DocPageProps {
-  params: {
+  params: Promise<{
     slug: string[]
-  }
+  }>
 }
 
-async function getDocFromParams({ params }: DocPageProps) {
+async function getDocFromParams(props: DocPageProps) {
+  const params = await props.params
   const slug = params.slug?.join("/") || ""
 
   const doc = allDocs.find((doc) => doc.slugAsParams === slug)
 
   if (!doc) {
-    null
+    return
   }
 
   return doc
 }
 
-export async function generateMetadata({
-  params,
-}: DocPageProps): Promise<Metadata> {
-  const doc = await getDocFromParams({ params })
+export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
+  const doc = await getDocFromParams(props)
 
   if (!doc) {
     return {}
@@ -44,16 +43,14 @@ export async function generateMetadata({
   }
 }
 
-export async function generateStaticParams(): Promise<
-  DocPageProps["params"][]
-> {
+export async function generateStaticParams() {
   return allDocs.map((doc) => ({
     slug: doc.slugAsParams.split("/"),
   }))
 }
 
-export default async function DocPage({ params }: DocPageProps) {
-  const doc = await getDocFromParams({ params })
+export default async function DocPage(props: DocPageProps) {
+  const doc = await getDocFromParams(props)
 
   if (!doc) {
     notFound()

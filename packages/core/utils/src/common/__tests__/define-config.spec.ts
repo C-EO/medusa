@@ -1,56 +1,74 @@
 import { Modules } from "../../modules-sdk"
-import { defineConfig } from "../define-config"
+import { DEFAULT_STORE_RESTRICTED_FIELDS, defineConfig } from "../define-config"
 
 describe("defineConfig", function () {
   it("should merge empty config with the defaults", function () {
     expect(defineConfig()).toMatchInlineSnapshot(`
       {
         "admin": {
-          "backendUrl": "http://localhost:9000",
+          "backendUrl": "/",
+          "path": "/app",
         },
         "featureFlags": {},
         "modules": {
-          "ApiKey": true,
-          "Auth": {
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
             "options": {
               "providers": [
                 {
                   "id": "emailpass",
-                  "resolve": "@medusajs/auth-emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
                 },
               ],
             },
-            "resolve": "@medusajs/auth",
+            "resolve": "@medusajs/medusa/auth",
           },
-          "Cache": true,
-          "Cart": true,
-          "Currency": true,
-          "Customer": true,
-          "EventBus": true,
-          "File": {
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "resolve": "@medusajs/medusa/cart",
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
             "options": {
               "providers": [
                 {
                   "id": "local",
-                  "resolve": "@medusajs/file-local-next",
+                  "resolve": "@medusajs/medusa/file-local",
                 },
               ],
             },
-            "resolve": "@medusajs/file",
+            "resolve": "@medusajs/medusa/file",
           },
-          "Fulfillment": {
+          "fulfillment": {
             "options": {
               "providers": [
                 {
                   "id": "manual",
-                  "resolve": "@medusajs/fulfillment-manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
                 },
               ],
             },
-            "resolve": "@medusajs/fulfillment",
+            "resolve": "@medusajs/medusa/fulfillment",
           },
-          "Inventory": true,
-          "Notification": {
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
+          },
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
             "options": {
               "providers": [
                 {
@@ -61,29 +79,51 @@ describe("defineConfig", function () {
                     ],
                     "name": "Local Notification Provider",
                   },
-                  "resolve": "@medusajs/notification-local",
+                  "resolve": "@medusajs/medusa/notification-local",
                 },
               ],
             },
-            "resolve": "@medusajs/notification",
+            "resolve": "@medusajs/medusa/notification",
           },
-          "Order": true,
-          "Payment": true,
-          "Pricing": true,
-          "Product": true,
-          "Promotion": true,
-          "Region": true,
-          "SalesChannel": true,
-          "StockLocation": true,
-          "Store": true,
-          "Tax": true,
-          "User": {
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
             "options": {
               "jwt_secret": "supersecret",
             },
-            "resolve": "@medusajs/user",
+            "resolve": "@medusajs/medusa/user",
           },
-          "Workflows": true,
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
         },
         "plugins": [],
         "projectConfig": {
@@ -93,7 +133,17 @@ describe("defineConfig", function () {
             "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
             "cookieSecret": "supersecret",
             "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
             "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
           },
         },
       }
@@ -112,54 +162,72 @@ describe("defineConfig", function () {
     ).toMatchInlineSnapshot(`
       {
         "admin": {
-          "backendUrl": "http://localhost:9000",
+          "backendUrl": "/",
+          "path": "/app",
         },
         "featureFlags": {},
         "modules": {
-          "ApiKey": true,
-          "Auth": {
+          "GithubModuleService": {
+            "resolve": "./modules/github",
+          },
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
             "options": {
               "providers": [
                 {
                   "id": "emailpass",
-                  "resolve": "@medusajs/auth-emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
                 },
               ],
             },
-            "resolve": "@medusajs/auth",
+            "resolve": "@medusajs/medusa/auth",
           },
-          "Cache": true,
-          "Cart": true,
-          "Currency": true,
-          "Customer": true,
-          "EventBus": true,
-          "File": {
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "resolve": "@medusajs/medusa/cart",
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
             "options": {
               "providers": [
                 {
                   "id": "local",
-                  "resolve": "@medusajs/file-local-next",
+                  "resolve": "@medusajs/medusa/file-local",
                 },
               ],
             },
-            "resolve": "@medusajs/file",
+            "resolve": "@medusajs/medusa/file",
           },
-          "Fulfillment": {
+          "fulfillment": {
             "options": {
               "providers": [
                 {
                   "id": "manual",
-                  "resolve": "@medusajs/fulfillment-manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
                 },
               ],
             },
-            "resolve": "@medusajs/fulfillment",
+            "resolve": "@medusajs/medusa/fulfillment",
           },
-          "GithubModuleService": {
-            "resolve": "./modules/github",
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
           },
-          "Inventory": true,
-          "Notification": {
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
             "options": {
               "providers": [
                 {
@@ -170,29 +238,51 @@ describe("defineConfig", function () {
                     ],
                     "name": "Local Notification Provider",
                   },
-                  "resolve": "@medusajs/notification-local",
+                  "resolve": "@medusajs/medusa/notification-local",
                 },
               ],
             },
-            "resolve": "@medusajs/notification",
+            "resolve": "@medusajs/medusa/notification",
           },
-          "Order": true,
-          "Payment": true,
-          "Pricing": true,
-          "Product": true,
-          "Promotion": true,
-          "Region": true,
-          "SalesChannel": true,
-          "StockLocation": true,
-          "Store": true,
-          "Tax": true,
-          "User": {
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
             "options": {
               "jwt_secret": "supersecret",
             },
-            "resolve": "@medusajs/user",
+            "resolve": "@medusajs/medusa/user",
           },
-          "Workflows": true,
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
         },
         "plugins": [],
         "projectConfig": {
@@ -202,7 +292,352 @@ describe("defineConfig", function () {
             "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
             "cookieSecret": "supersecret",
             "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
             "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
+          },
+        },
+      }
+    `)
+  })
+
+  it("should merge custom modules when an array is provided", function () {
+    expect(
+      defineConfig({
+        modules: [
+          {
+            resolve: require.resolve("../__fixtures__/define-config/github"),
+            options: {
+              apiKey: "test",
+            },
+          },
+        ],
+      })
+    ).toMatchInlineSnapshot(`
+      {
+        "admin": {
+          "backendUrl": "/",
+          "path": "/app",
+        },
+        "featureFlags": {},
+        "modules": {
+          "GithubModuleService": {
+            "options": {
+              "apiKey": "test",
+            },
+            "resolve": "${require.resolve(
+              "../__fixtures__/define-config/github"
+            )}",
+          },
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
+            "options": {
+              "providers": [
+                {
+                  "id": "emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/auth",
+          },
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "resolve": "@medusajs/medusa/cart",
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
+            "options": {
+              "providers": [
+                {
+                  "id": "local",
+                  "resolve": "@medusajs/medusa/file-local",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/file",
+          },
+          "fulfillment": {
+            "options": {
+              "providers": [
+                {
+                  "id": "manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/fulfillment",
+          },
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
+          },
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
+            "options": {
+              "providers": [
+                {
+                  "id": "local",
+                  "options": {
+                    "channels": [
+                      "feed",
+                    ],
+                    "name": "Local Notification Provider",
+                  },
+                  "resolve": "@medusajs/medusa/notification-local",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/notification",
+          },
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
+            "options": {
+              "jwt_secret": "supersecret",
+            },
+            "resolve": "@medusajs/medusa/user",
+          },
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
+        },
+        "plugins": [],
+        "projectConfig": {
+          "databaseUrl": "postgres://localhost/medusa-starter-default",
+          "http": {
+            "adminCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
+            "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
+            "cookieSecret": "supersecret",
+            "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
+            "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
+          },
+        },
+      }
+    `)
+  })
+
+  it("should merge custom modules when an array is provided with a key to override the module registration name", function () {
+    expect(
+      defineConfig({
+        modules: [
+          {
+            key: "GithubModuleServiceOverride",
+            resolve: require.resolve("../__fixtures__/define-config/github"),
+            options: {
+              apiKey: "test",
+            },
+          },
+        ],
+      })
+    ).toMatchInlineSnapshot(`
+      {
+        "admin": {
+          "backendUrl": "/",
+          "path": "/app",
+        },
+        "featureFlags": {},
+        "modules": {
+          "GithubModuleServiceOverride": {
+            "options": {
+              "apiKey": "test",
+            },
+            "resolve": "${require.resolve(
+              "../__fixtures__/define-config/github"
+            )}",
+          },
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
+            "options": {
+              "providers": [
+                {
+                  "id": "emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/auth",
+          },
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "resolve": "@medusajs/medusa/cart",
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
+            "options": {
+              "providers": [
+                {
+                  "id": "local",
+                  "resolve": "@medusajs/medusa/file-local",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/file",
+          },
+          "fulfillment": {
+            "options": {
+              "providers": [
+                {
+                  "id": "manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/fulfillment",
+          },
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
+          },
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
+            "options": {
+              "providers": [
+                {
+                  "id": "local",
+                  "options": {
+                    "channels": [
+                      "feed",
+                    ],
+                    "name": "Local Notification Provider",
+                  },
+                  "resolve": "@medusajs/medusa/notification-local",
+                },
+              ],
+            },
+            "resolve": "@medusajs/medusa/notification",
+          },
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
+            "options": {
+              "jwt_secret": "supersecret",
+            },
+            "resolve": "@medusajs/medusa/user",
+          },
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
+        },
+        "plugins": [],
+        "projectConfig": {
+          "databaseUrl": "postgres://localhost/medusa-starter-default",
+          "http": {
+            "adminCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
+            "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
+            "cookieSecret": "supersecret",
+            "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
+            "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
           },
         },
       }
@@ -221,51 +656,69 @@ describe("defineConfig", function () {
     ).toMatchInlineSnapshot(`
       {
         "admin": {
-          "backendUrl": "http://localhost:9000",
+          "backendUrl": "/",
+          "path": "/app",
         },
         "featureFlags": {},
         "modules": {
-          "ApiKey": true,
-          "Auth": {
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
             "options": {
               "providers": [
                 {
                   "id": "emailpass",
-                  "resolve": "@medusajs/auth-emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
                 },
               ],
             },
-            "resolve": "@medusajs/auth",
+            "resolve": "@medusajs/medusa/auth",
           },
-          "Cache": true,
-          "Cart": true,
-          "Currency": true,
-          "Customer": true,
-          "EventBus": true,
-          "File": {
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "resolve": "@medusajs/medusa/cart",
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
             "options": {
               "providers": [
                 {
                   "id": "local",
-                  "resolve": "@medusajs/file-local-next",
+                  "resolve": "@medusajs/medusa/file-local",
                 },
               ],
             },
-            "resolve": "@medusajs/file",
+            "resolve": "@medusajs/medusa/file",
           },
-          "Fulfillment": {
+          "fulfillment": {
             "options": {
               "providers": [
                 {
                   "id": "manual",
-                  "resolve": "@medusajs/fulfillment-manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
                 },
               ],
             },
-            "resolve": "@medusajs/fulfillment",
+            "resolve": "@medusajs/medusa/fulfillment",
           },
-          "Inventory": true,
-          "Notification": {
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
+          },
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
             "options": {
               "providers": [
                 {
@@ -276,29 +729,51 @@ describe("defineConfig", function () {
                     ],
                     "name": "Local Notification Provider",
                   },
-                  "resolve": "@medusajs/notification-local",
+                  "resolve": "@medusajs/medusa/notification-local",
                 },
               ],
             },
-            "resolve": "@medusajs/notification",
+            "resolve": "@medusajs/medusa/notification",
           },
-          "Order": true,
-          "Payment": true,
-          "Pricing": true,
-          "Product": true,
-          "Promotion": true,
-          "Region": true,
-          "SalesChannel": true,
-          "StockLocation": true,
-          "Store": true,
-          "Tax": true,
-          "User": {
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
             "options": {
               "jwt_secret": "supersecret",
             },
-            "resolve": "@medusajs/user",
+            "resolve": "@medusajs/medusa/user",
           },
-          "Workflows": true,
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
         },
         "plugins": [],
         "projectConfig": {
@@ -308,14 +783,24 @@ describe("defineConfig", function () {
             "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
             "cookieSecret": "supersecret",
             "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
             "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
           },
         },
       }
     `)
   })
 
-  it("should not include disabled modules", function () {
+  it("should include disabled modules", function () {
     expect(
       defineConfig({
         projectConfig: {
@@ -330,50 +815,69 @@ describe("defineConfig", function () {
     ).toMatchInlineSnapshot(`
       {
         "admin": {
-          "backendUrl": "http://localhost:9000",
+          "backendUrl": "/",
+          "path": "/app",
         },
         "featureFlags": {},
         "modules": {
-          "ApiKey": true,
-          "Auth": {
+          "api_key": {
+            "resolve": "@medusajs/medusa/api-key",
+          },
+          "auth": {
             "options": {
               "providers": [
                 {
                   "id": "emailpass",
-                  "resolve": "@medusajs/auth-emailpass",
+                  "resolve": "@medusajs/medusa/auth-emailpass",
                 },
               ],
             },
-            "resolve": "@medusajs/auth",
+            "resolve": "@medusajs/medusa/auth",
           },
-          "Cache": true,
-          "Currency": true,
-          "Customer": true,
-          "EventBus": true,
-          "File": {
+          "cache": {
+            "resolve": "@medusajs/medusa/cache-inmemory",
+          },
+          "cart": {
+            "disable": true,
+          },
+          "currency": {
+            "resolve": "@medusajs/medusa/currency",
+          },
+          "customer": {
+            "resolve": "@medusajs/medusa/customer",
+          },
+          "event_bus": {
+            "resolve": "@medusajs/medusa/event-bus-local",
+          },
+          "file": {
             "options": {
               "providers": [
                 {
                   "id": "local",
-                  "resolve": "@medusajs/file-local-next",
+                  "resolve": "@medusajs/medusa/file-local",
                 },
               ],
             },
-            "resolve": "@medusajs/file",
+            "resolve": "@medusajs/medusa/file",
           },
-          "Fulfillment": {
+          "fulfillment": {
             "options": {
               "providers": [
                 {
                   "id": "manual",
-                  "resolve": "@medusajs/fulfillment-manual",
+                  "resolve": "@medusajs/medusa/fulfillment-manual",
                 },
               ],
             },
-            "resolve": "@medusajs/fulfillment",
+            "resolve": "@medusajs/medusa/fulfillment",
           },
-          "Inventory": true,
-          "Notification": {
+          "inventory": {
+            "resolve": "@medusajs/medusa/inventory",
+          },
+          "locking": {
+            "resolve": "@medusajs/medusa/locking",
+          },
+          "notification": {
             "options": {
               "providers": [
                 {
@@ -384,29 +888,51 @@ describe("defineConfig", function () {
                     ],
                     "name": "Local Notification Provider",
                   },
-                  "resolve": "@medusajs/notification-local",
+                  "resolve": "@medusajs/medusa/notification-local",
                 },
               ],
             },
-            "resolve": "@medusajs/notification",
+            "resolve": "@medusajs/medusa/notification",
           },
-          "Order": true,
-          "Payment": true,
-          "Pricing": true,
-          "Product": true,
-          "Promotion": true,
-          "Region": true,
-          "SalesChannel": true,
-          "StockLocation": true,
-          "Store": true,
-          "Tax": true,
-          "User": {
+          "order": {
+            "resolve": "@medusajs/medusa/order",
+          },
+          "payment": {
+            "resolve": "@medusajs/medusa/payment",
+          },
+          "pricing": {
+            "resolve": "@medusajs/medusa/pricing",
+          },
+          "product": {
+            "resolve": "@medusajs/medusa/product",
+          },
+          "promotion": {
+            "resolve": "@medusajs/medusa/promotion",
+          },
+          "region": {
+            "resolve": "@medusajs/medusa/region",
+          },
+          "sales_channel": {
+            "resolve": "@medusajs/medusa/sales-channel",
+          },
+          "stock_location": {
+            "resolve": "@medusajs/medusa/stock-location",
+          },
+          "store": {
+            "resolve": "@medusajs/medusa/store",
+          },
+          "tax": {
+            "resolve": "@medusajs/medusa/tax",
+          },
+          "user": {
             "options": {
               "jwt_secret": "supersecret",
             },
-            "resolve": "@medusajs/user",
+            "resolve": "@medusajs/medusa/user",
           },
-          "Workflows": true,
+          "workflows": {
+            "resolve": "@medusajs/medusa/workflow-engine-inmemory",
+          },
         },
         "plugins": [],
         "projectConfig": {
@@ -416,7 +942,17 @@ describe("defineConfig", function () {
             "authCors": "http://localhost:7000,http://localhost:7001,http://localhost:5173",
             "cookieSecret": "supersecret",
             "jwtSecret": "supersecret",
+            "restrictedFields": {
+              "store": [
+                ${DEFAULT_STORE_RESTRICTED_FIELDS.map((v) => `"${v}"`).join(
+                  ",\n                "
+                )},
+              ],
+            },
             "storeCors": "http://localhost:8000",
+          },
+          "redisOptions": {
+            "retryStrategy": [Function],
           },
         },
       }

@@ -1,9 +1,9 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { SignatureReflection } from "typedoc"
 import {
   isReactQueryMutation,
   isReactQueryQuery,
-} from "../../utils/react-query-utils"
+} from "../../utils/react-query-utils.js"
 
 export default function () {
   Handlebars.registerHelper(

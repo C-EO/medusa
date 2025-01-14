@@ -1,8 +1,8 @@
-import { DALUtils } from "@medusajs/utils"
+import { DALUtils } from "@medusajs/framework/utils"
 import { Return } from "@models"
 import { setFindMethods } from "../utils/base-repository-find"
 
-export class ReturnRepository extends DALUtils.mikroOrmBaseRepositoryFactory<Return>(
+export class ReturnRepository extends DALUtils.mikroOrmBaseRepositoryFactory(
   Return
 ) {}
 

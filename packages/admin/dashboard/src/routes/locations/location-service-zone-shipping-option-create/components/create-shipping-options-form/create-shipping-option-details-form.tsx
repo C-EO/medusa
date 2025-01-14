@@ -1,8 +1,9 @@
-import { Heading, Input, RadioGroup, Text } from "@medusajs/ui"
+import { Heading, Input, RadioGroup, Select, Text } from "@medusajs/ui"
 import { UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
 import { HttpTypes } from "@medusajs/types"
+
 import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { SwitchBox } from "../../../../../components/common/switch-box"
@@ -18,6 +19,8 @@ type CreateShippingOptionDetailsFormProps = {
   isReturn?: boolean
   zone: HttpTypes.AdminServiceZone
   locationId: string
+  fulfillmentProviderOptions: HttpTypes.AdminFulfillmentProviderOption[]
+  selectedProviderId?: string
 }
 
 export const CreateShippingOptionDetailsForm = ({
@@ -25,6 +28,8 @@ export const CreateShippingOptionDetailsForm = ({
   isReturn = false,
   zone,
   locationId,
+  fulfillmentProviderOptions,
+  selectedProviderId,
 }: CreateShippingOptionDetailsFormProps) => {
   const { t } = useTranslation()
 
@@ -54,7 +59,7 @@ export const CreateShippingOptionDetailsForm = ({
 
   return (
     <div className="flex flex-1 flex-col items-center overflow-y-auto">
-      <div className="flex w-full max-w-[720px] flex-col gap-y-8 px-2 py-16">
+      <div className="flex w-full max-w-[720px] flex-col gap-y-8 px-6 py-16">
         <div>
           <Heading>
             {t(
@@ -134,9 +139,6 @@ export const CreateShippingOptionDetailsForm = ({
               )
             }}
           />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Form.Field
             control={form.control}
             name="shipping_profile_id"
@@ -160,7 +162,9 @@ export const CreateShippingOptionDetailsForm = ({
               )
             }}
           />
+        </div>
 
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Form.Field
             control={form.control}
             name="provider_id"
@@ -177,6 +181,10 @@ export const CreateShippingOptionDetailsForm = ({
                   <Form.Control>
                     <Combobox
                       {...field}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        form.setValue("fulfillment_option_id", "")
+                      }}
                       options={fulfillmentProviders.options}
                       searchValue={fulfillmentProviders.searchValue}
                       onSearchValueChange={
@@ -184,6 +192,45 @@ export const CreateShippingOptionDetailsForm = ({
                       }
                       disabled={fulfillmentProviders.disabled}
                     />
+                  </Form.Control>
+                  <Form.ErrorMessage />
+                </Form.Item>
+              )
+            }}
+          />
+
+          <Form.Field
+            control={form.control}
+            name="fulfillment_option_id"
+            render={({ field }) => {
+              return (
+                <Form.Item>
+                  <Form.Label>
+                    {t(
+                      "stockLocations.shippingOptions.fields.fulfillmentOption"
+                    )}
+                  </Form.Label>
+                  <Form.Control>
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      disabled={!selectedProviderId}
+                      key={selectedProviderId}
+                    >
+                      <Select.Trigger ref={field.ref}>
+                        <Select.Value />
+                      </Select.Trigger>
+
+                      <Select.Content>
+                        {fulfillmentProviderOptions
+                          ?.filter((fo) => !!fo.is_return === isReturn)
+                          .map((option) => (
+                            <Select.Item value={option.id} key={option.id}>
+                              {option.name || option.id}
+                            </Select.Item>
+                          ))}
+                      </Select.Content>
+                    </Select>
                   </Form.Control>
                   <Form.ErrorMessage />
                 </Form.Item>

@@ -1,11 +1,11 @@
-import { IPaymentModuleService } from "@medusajs/types"
-import { Module, Modules, promiseAll } from "@medusajs/utils"
+import { IPaymentModuleService } from "@medusajs/framework/types"
+import { Module, Modules, promiseAll } from "@medusajs/framework/utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
 import { PaymentModuleService } from "@services"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
 import {
   createPaymentCollections,
-  createPaymentSessions,
   createPayments,
+  createPaymentSessions,
 } from "../../../__fixtures__"
 
 jest.setTimeout(30000)
@@ -14,17 +14,22 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
   moduleName: Modules.PAYMENT,
   testSuite: ({ MikroOrmWrapper, service }) => {
     describe("Payment Module Service", () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+      })
+
       it(`should export the appropriate linkable configuration`, () => {
         const linkable = Module(Modules.PAYMENT, {
           service: PaymentModuleService,
         }).linkable
 
+        expect(Object.keys(linkable)).toHaveLength(5)
         expect(Object.keys(linkable)).toEqual([
-          "payment",
           "paymentCollection",
-          "paymentProvider",
           "paymentSession",
+          "payment",
           "refundReason",
+          "paymentProvider",
         ])
 
         Object.keys(linkable).forEach((key) => {
@@ -37,7 +42,7 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               linkable: "payment_id",
               entity: "Payment",
               primaryKey: "id",
-              serviceName: "Payment",
+              serviceName: "payment",
               field: "payment",
             },
           },
@@ -46,17 +51,8 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               linkable: "payment_collection_id",
               entity: "PaymentCollection",
               primaryKey: "id",
-              serviceName: "Payment",
+              serviceName: "payment",
               field: "paymentCollection",
-            },
-          },
-          paymentProvider: {
-            id: {
-              linkable: "payment_provider_id",
-              entity: "PaymentProvider",
-              primaryKey: "id",
-              serviceName: "Payment",
-              field: "paymentProvider",
             },
           },
           paymentSession: {
@@ -65,7 +61,7 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               entity: "PaymentSession",
               linkable: "payment_session_id",
               primaryKey: "id",
-              serviceName: "Payment",
+              serviceName: "payment",
             },
           },
           refundReason: {
@@ -73,8 +69,17 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               linkable: "refund_reason_id",
               entity: "RefundReason",
               primaryKey: "id",
-              serviceName: "Payment",
+              serviceName: "payment",
               field: "refundReason",
+            },
+          },
+          paymentProvider: {
+            id: {
+              linkable: "payment_provider_id",
+              entity: "PaymentProvider",
+              primaryKey: "id",
+              serviceName: "payment",
+              field: "paymentProvider",
             },
           },
         })
@@ -395,7 +400,6 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
                 customer: {},
                 billing_address: {},
                 email: "test@test.test.com",
-                resource_id: "cart_test",
               },
             })
 
@@ -422,6 +426,80 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               })
             )
           })
+
+          it("should gracefully handle payment session creation fails from external provider", async () => {
+            jest
+              .spyOn((service as any).paymentProviderService_, "createSession")
+              .mockImplementationOnce(() => {
+                throw new Error("Create session error")
+              })
+
+            const deleteProviderSessionMock = jest.spyOn(
+              (service as any).paymentProviderService_,
+              "deleteSession"
+            )
+
+            const deletePaymentSessionMock = jest.spyOn(
+              (service as any).paymentSessionService_,
+              "delete"
+            )
+
+            const error = await service
+              .createPaymentSession("pay-col-id-1", {
+                provider_id: "pp_system_default",
+                amount: 200,
+                currency_code: "usd",
+                data: {},
+                context: {
+                  extra: {},
+                  customer: {},
+                  billing_address: {},
+                  email: "test@test.test.com",
+                },
+              })
+              .catch((e) => e)
+
+            expect(deleteProviderSessionMock).toHaveBeenCalledTimes(0)
+            expect(deletePaymentSessionMock).toHaveBeenCalledTimes(1)
+            expect(error.message).toEqual("Create session error")
+          })
+
+          it("should gracefully handle payment session creation fails from internal failure", async () => {
+            jest
+              .spyOn((service as any).paymentSessionService_, "update")
+              .mockImplementationOnce(() => {
+                throw new Error("Update session error")
+              })
+
+            const deleteProviderSessionMock = jest.spyOn(
+              (service as any).paymentProviderService_,
+              "deleteSession"
+            )
+
+            const deletePaymentSessionMock = jest.spyOn(
+              (service as any).paymentSessionService_,
+              "delete"
+            )
+
+            const error = await service
+              .createPaymentSession("pay-col-id-1", {
+                provider_id: "pp_system_default",
+                amount: 200,
+                currency_code: "usd",
+                data: {},
+                context: {
+                  extra: {},
+                  customer: {},
+                  billing_address: {},
+                  email: "test@test.test.com",
+                },
+              })
+              .catch((e) => e)
+
+            expect(deleteProviderSessionMock).toHaveBeenCalledTimes(1)
+            expect(deletePaymentSessionMock).toHaveBeenCalledTimes(1)
+            expect(error.message).toEqual("Update session error")
+          })
         })
 
         describe("update", () => {
@@ -436,7 +514,6 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
                 customer: {},
                 billing_address: {},
                 email: "test@test.test.com",
-                resource_id: "cart_test",
               },
             })
 
@@ -446,7 +523,6 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               currency_code: "eur",
               data: {},
               context: {
-                resource_id: "res_id",
                 extra: {},
                 customer: {},
                 billing_address: {},
@@ -519,9 +595,6 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
                   data: {},
                   status: "authorized",
                   authorized_at: expect.any(Date),
-                  payment_collection: expect.objectContaining({
-                    id: expect.any(String),
-                  }),
                   payment_collection_id: expect.any(String),
                 }),
               })
@@ -639,21 +712,28 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
             )
           })
 
-          it("should fail to capture already captured payment", async () => {
+          it("should return payment if payment is already captured", async () => {
             await service.capturePayment({
               amount: 100,
               payment_id: "pay-id-1",
             })
 
-            const error = await service
-              .capturePayment({
-                amount: 100,
-                payment_id: "pay-id-1",
-              })
-              .catch((e) => e)
+            const capturedPayment = await service.capturePayment({
+              amount: 100,
+              payment_id: "pay-id-1",
+            })
 
-            expect(error.message).toEqual(
-              "You cannot capture more than the authorized amount substracted by what is already captured."
+            expect(capturedPayment).toEqual(
+              expect.objectContaining({
+                id: "pay-id-1",
+                amount: 100,
+                captures: [
+                  expect.objectContaining({
+                    amount: 100,
+                  }),
+                ],
+                captured_at: expect.any(Date),
+              })
             )
           })
 

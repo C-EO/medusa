@@ -1,7 +1,14 @@
+---
+tags:
+  - customer
+  - storefront
+  - auth
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
-  title: `Retrieve Customer in Storefront`,
+  title: `Retrieve Logged-In Customer in Storefront`,
 }
 
 # {metadata.title}
@@ -23,7 +30,7 @@ export const bearerHighlights = [
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     }
   )
@@ -48,7 +55,7 @@ export const sessionHighlights = [
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     }
   )

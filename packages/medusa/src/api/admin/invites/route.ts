@@ -1,15 +1,15 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 import { createInvitesWorkflow } from "@medusajs/core-flows"
 import { refetchInvite } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminGetInvitesParams>,
@@ -20,9 +20,9 @@ export const GET = async (
     entryPoint: "invite",
     variables: {
       filters: req.filterableFields,
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: invites, metadata } = await remoteQuery(queryObject)
@@ -52,7 +52,7 @@ export const POST = async (
   const invite = await refetchInvite(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ invite })

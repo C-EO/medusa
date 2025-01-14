@@ -4,16 +4,14 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
 
-import { UserDTO } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/types"
 import { Form } from "../../../../../components/common/form"
-import {
-  RouteDrawer,
-  useRouteModal,
-} from "../../../../../components/modals"
+import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateUser } from "../../../../../hooks/api/users"
 
 type EditUserFormProps = {
-  user: UserDTO
+  user: HttpTypes.AdminUser
 }
 
 const EditUserFormSchema = zod.object({
@@ -45,7 +43,7 @@ export const EditUserForm = ({ user }: EditUserFormProps) => {
 
   return (
     <RouteDrawer.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex flex-1 flex-col overflow-hidden"
       >
@@ -93,7 +91,7 @@ export const EditUserForm = ({ user }: EditUserFormProps) => {
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

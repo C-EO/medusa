@@ -10,6 +10,7 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCreatePriceList } from "../../../../../hooks/api/price-lists"
 import { exctractPricesFromProducts } from "../../../common/utils"
 import { PriceListDetailsForm } from "./price-list-details-form"
@@ -81,7 +82,7 @@ export const PriceListCreateForm = ({
     const { rules, products } = data
 
     const rulesPayload = rules?.customer_group_id?.length
-      ? { customer_group_id: rules.customer_group_id.map((cg) => cg.id) }
+      ? { "customer.groups.id": rules.customer_group_id.map((cg) => cg.id) }
       : undefined
 
     const prices = exctractPricesFromProducts(products, regions)
@@ -252,7 +253,7 @@ export const PriceListCreateForm = ({
         onValueChange={(tab) => handleChangeTab(tab as Tab)}
         className="flex h-full flex-col overflow-hidden"
       >
-        <form onSubmit={handleSubmit} className="flex h-full flex-col">
+        <KeyboundForm onSubmit={handleSubmit} className="flex h-full flex-col">
           <RouteFocusModal.Header>
             <div className="flex w-full items-center justify-between gap-x-4">
               <div className="-my-2 w-full max-w-[600px] border-l">
@@ -318,7 +319,7 @@ export const PriceListCreateForm = ({
               />
             </div>
           </RouteFocusModal.Footer>
-        </form>
+        </KeyboundForm>
       </ProgressTabs>
     </RouteFocusModal.Form>
   )

@@ -1,4 +1,4 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   adminHeaders,
   createAdminUser,
@@ -74,6 +74,14 @@ medusaIntegrationTestRunner({
             // BREAKING: Type input changed from {type: {value: string}} to {type_id: string}
             type_id: baseType.id,
             tags: [{ id: baseTag1.id }, { id: baseTag2.id }],
+            images: [
+              {
+                url: "image-one",
+              },
+              {
+                url: "image-two",
+              },
+            ],
           }),
           adminHeaders
         )
@@ -116,6 +124,23 @@ medusaIntegrationTestRunner({
 
     describe("/admin/products", () => {
       describe("GET /admin/products", () => {
+        it("returns a list of products with images ordered by rank", async () => {
+          const res = await api.get("/admin/products", adminHeaders)
+
+          expect(res.status).toEqual(200)
+          expect(res.data.products).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: baseProduct.id,
+                images: expect.arrayContaining([
+                  expect.objectContaining({ url: "image-one", rank: 0 }),
+                  expect.objectContaining({ url: "image-two", rank: 1 }),
+                ]),
+              }),
+            ])
+          )
+        })
+
         it("returns a list of products with all statuses when no status or invalid status is provided", async () => {
           const res = await api
             .get("/admin/products", adminHeaders)
@@ -667,10 +692,12 @@ medusaIntegrationTestRunner({
             title: "Test Giftcard",
             is_giftcard: true,
             description: "test-giftcard-description",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Test variant",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "x" },
               },
             ],
           }
@@ -963,6 +990,20 @@ medusaIntegrationTestRunner({
           expect(hasPrices).toBe(true)
         })
 
+        it("should get a product with images ordered by rank", async () => {
+          const res = await api.get(
+            `/admin/products/${baseProduct.id}`,
+            adminHeaders
+          )
+
+          expect(res.data.product.images).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({ url: "image-one", rank: 0 }),
+              expect.objectContaining({ url: "image-two", rank: 1 }),
+            ])
+          )
+        })
+
         it("should get a product with prices", async () => {
           const res = await api
             .get(
@@ -1056,10 +1097,12 @@ medusaIntegrationTestRunner({
           const payload = {
             title: "Test product - 1",
             handle: "test-1",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Custom inventory 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "x" },
                 manage_inventory: true,
                 inventory_items: [
                   {
@@ -1097,16 +1140,19 @@ medusaIntegrationTestRunner({
           const payload = {
             title: "Test product - 1",
             handle: "test-1",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Custom inventory 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
                 manage_inventory: true,
+                options: { size: "x" },
                 inventory_items: [],
               },
               {
                 title: "Custom inventory 2",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "l" },
                 manage_inventory: false,
               },
             ],
@@ -1277,16 +1323,10 @@ medusaIntegrationTestRunner({
                     expect.objectContaining({
                       id: expect.stringMatching(/^optval_*/),
                       value: "large",
-                      option: expect.objectContaining({
-                        title: "size",
-                      }),
                     }),
                     expect.objectContaining({
                       id: expect.stringMatching(/^optval_*/),
                       value: "green",
-                      option: expect.objectContaining({
-                        title: "color",
-                      }),
                     }),
                   ]),
                 }),
@@ -1300,9 +1340,11 @@ medusaIntegrationTestRunner({
             "/admin/products",
             {
               title: "Test create",
+              options: [{ title: "size", values: ["x", "l"] }],
               variants: [
                 {
                   title: "Price with rules",
+                  options: { size: "l" },
                   prices: [
                     {
                       currency_code: "usd",
@@ -1351,10 +1393,12 @@ medusaIntegrationTestRunner({
             images: [{ url: "test-image.png" }, { url: "test-image-2.png" }],
             collection_id: baseCollection.id,
             tags: [{ id: baseTag1.id }, { id: baseTag2.id }],
+            options: [{ title: "size", values: ["large"] }],
             variants: [
               {
                 title: "Test variant",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "large" },
               },
             ],
           }
@@ -1381,14 +1425,17 @@ medusaIntegrationTestRunner({
             images: [{ url: "test-image.png" }, { url: "test-image-2.png" }],
             collection_id: baseCollection.id,
             tags: [{ id: baseTag1.id }, { id: baseTag2.id }],
+            options: [{ title: "size", values: ["l", x] }],
             variants: [
               {
                 title: "Test variant 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "x" },
               },
               {
                 title: "Test variant 2",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "l" },
               },
             ],
           }
@@ -1429,10 +1476,12 @@ medusaIntegrationTestRunner({
             title: "Test Giftcard",
             is_giftcard: true,
             description: "test-giftcard-description",
+            options: [{ title: "size", values: ["large"] }],
             variants: [
               {
                 title: "Test variant",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "large" },
               },
             ],
           }
@@ -1557,9 +1606,6 @@ medusaIntegrationTestRunner({
                     expect.objectContaining({
                       id: expect.stringMatching(/^optval_*/),
                       value: "large",
-                      option: expect.objectContaining({
-                        title: "size",
-                      }),
                     }),
                   ]),
                   origin_country: null,
@@ -2105,11 +2151,13 @@ medusaIntegrationTestRunner({
           const payload = {
             title: "Test product - 1",
             handle: "test-1",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Custom inventory 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
                 manage_inventory: true,
+                options: { size: "l" },
                 inventory_items: [
                   {
                     inventory_item_id: inventoryItem1.id,
@@ -2216,10 +2264,12 @@ medusaIntegrationTestRunner({
           const payload = {
             title: "Test product - 1",
             handle: "test-1",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Custom inventory 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "l" },
                 manage_inventory: true,
                 inventory_items: [
                   {
@@ -2265,10 +2315,12 @@ medusaIntegrationTestRunner({
           const payload = {
             title: "Test product - 1",
             handle: "test-1",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Custom inventory 1",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "l" },
                 manage_inventory: true,
                 inventory_items: [
                   {
@@ -2388,6 +2440,218 @@ medusaIntegrationTestRunner({
           expect(variantPost).not.toBeTruthy()
         })
 
+        it("deletes product and inventory items that are only associated with that product's variants", async () => {
+          const stockLocation = (
+            await api.post(
+              `/admin/stock-locations`,
+              { name: "loc" },
+              adminHeaders
+            )
+          ).data.stock_location
+
+          const inventoryItem1 = (
+            await api.post(
+              `/admin/inventory-items`,
+              { sku: "inventory-1" },
+              adminHeaders
+            )
+          ).data.inventory_item
+
+          const inventoryItem2 = (
+            await api.post(
+              `/admin/inventory-items`,
+              { sku: "inventory-2-reused-across-products" },
+              adminHeaders
+            )
+          ).data.inventory_item
+
+          await api.post(
+            `/admin/inventory-items/${inventoryItem1.id}/location-levels`,
+            {
+              location_id: stockLocation.id,
+              stocked_quantity: 8,
+            },
+            adminHeaders
+          )
+
+          await api.post(
+            `/admin/inventory-items/${inventoryItem2.id}/location-levels`,
+            {
+              location_id: stockLocation.id,
+              stocked_quantity: 4,
+            },
+            adminHeaders
+          )
+
+          const productWithInventoryItems = (
+            await api.post(
+              `/admin/products`,
+              {
+                title: "Test product - 1",
+                handle: "test-1",
+                options: [{ title: "size", values: ["l"] }],
+                variants: [
+                  {
+                    title: "Custom inventory 1",
+                    prices: [{ currency_code: "usd", amount: 100 }],
+                    manage_inventory: true,
+                    options: { size: "l" },
+                    inventory_items: [
+                      {
+                        inventory_item_id: inventoryItem1.id,
+                        required_quantity: 4,
+                      },
+                      {
+                        inventory_item_id: inventoryItem2.id,
+                        required_quantity: 2,
+                      },
+                    ],
+                  },
+                ],
+              },
+              adminHeaders
+            )
+          ).data.product
+
+          // Another product that shares inventory item in the inventory kit
+          await api.post(
+            `/admin/products`,
+            {
+              title: "Test product - 2",
+              handle: "test-2",
+              options: [{ title: "size", values: ["l"] }],
+              variants: [
+                {
+                  title: "W/ shared inventory item",
+                  prices: [{ currency_code: "usd", amount: 100 }],
+                  manage_inventory: true,
+                  options: { size: "l" },
+                  inventory_items: [
+                    {
+                      inventory_item_id: inventoryItem2.id,
+                      required_quantity: 2,
+                    },
+                  ],
+                },
+              ],
+            },
+            adminHeaders
+          )
+
+          const response = await api
+            .delete(
+              `/admin/products/${productWithInventoryItems.id}`,
+              adminHeaders
+            )
+            .catch((err) => {
+              console.log(err)
+            })
+
+          expect(response.status).toEqual(200)
+          expect(response.data).toEqual(
+            expect.objectContaining({ deleted: true })
+          )
+
+          const item1Response = await api
+            .get(`/admin/inventory-items/${inventoryItem1.id}`, adminHeaders)
+            .catch((err) => {
+              return err.response
+            })
+
+          const item2Response = await api
+            .get(`/admin/inventory-items/${inventoryItem2.id}`, adminHeaders)
+            .catch((err) => {
+              console.log(err)
+            })
+
+          expect(item1Response.status).toEqual(404) // deleted since it's used only by the deleted product
+          expect(item2Response.status).toEqual(200) // not deleted since it belongs to other products
+          expect(item2Response.data.inventory_item).toEqual(
+            expect.objectContaining({ id: inventoryItem2.id })
+          )
+        })
+
+        it("should throw if product that has a reservation is being deleted", async () => {
+          const stockLocation = (
+            await api.post(
+              `/admin/stock-locations`,
+              { name: "loc" },
+              adminHeaders
+            )
+          ).data.stock_location
+
+          const inventoryItem1 = (
+            await api.post(
+              `/admin/inventory-items`,
+              { sku: "inventory-1" },
+              adminHeaders
+            )
+          ).data.inventory_item
+
+          await api.post(
+            `/admin/inventory-items/${inventoryItem1.id}/location-levels`,
+            {
+              location_id: stockLocation.id,
+              stocked_quantity: 8,
+            },
+            adminHeaders
+          )
+
+          const productWithInventoryItems = (
+            await api.post(
+              `/admin/products`,
+              {
+                title: "Test product - 1",
+                handle: "test-1",
+                options: [{ title: "size", values: ["l"] }],
+                variants: [
+                  {
+                    title: "Custom inventory 1",
+                    prices: [{ currency_code: "usd", amount: 100 }],
+                    manage_inventory: true,
+                    options: { size: "l" },
+                    inventory_items: [
+                      {
+                        inventory_item_id: inventoryItem1.id,
+                        required_quantity: 4,
+                      },
+                    ],
+                  },
+                ],
+              },
+              adminHeaders
+            )
+          ).data.product
+
+          const reservation = (
+            await api.post(
+              `/admin/reservations`,
+              {
+                line_item_id: "line-item-id-1",
+                inventory_item_id: inventoryItem1.id,
+                location_id: stockLocation.id,
+                description: "test description",
+                quantity: 1,
+              },
+              adminHeaders
+            )
+          ).data.reservation
+
+          const response = await api
+            .delete(
+              `/admin/products/${productWithInventoryItems.id}`,
+              adminHeaders
+            )
+            .catch((err) => {
+              return err.response
+            })
+
+          expect(response.status).toEqual(400)
+          expect(response.data.message).toEqual(
+            `Cannot remove following inventory item(s) since they have reservations: [${inventoryItem1.id}].`
+          )
+        })
+
         // TODO: Enable with http calls
         it.skip("successfully deletes a product variant and its associated prices", async () => {
           // // Validate that the price exists
@@ -2475,10 +2739,12 @@ medusaIntegrationTestRunner({
           const payload = {
             title: baseProduct.title,
             handle: baseProduct.handle,
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Test variant",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "x" },
               },
             ],
           }
@@ -2505,10 +2771,12 @@ medusaIntegrationTestRunner({
             title: baseProduct.title,
             handle: baseProduct.handle,
             description: "test-product-description",
+            options: [{ title: "size", values: ["x", "l"] }],
             variants: [
               {
                 title: "Test variant",
                 prices: [{ currency_code: "usd", amount: 100 }],
+                options: { size: "x" },
               },
             ],
           }
@@ -2641,33 +2909,6 @@ medusaIntegrationTestRunner({
           ).toEqual("Updated variant")
         })
 
-        it("removes options not present in update", async () => {
-          const baseVariant = baseProduct.variants[0]
-          const updatedProduct = (
-            await api.post(
-              `/admin/products/${baseProduct.id}/variants/${baseVariant.id}`,
-              {
-                title: "Updated variant",
-                options: {
-                  size: "small",
-                },
-              },
-              adminHeaders
-            )
-          ).data.product
-
-          expect(
-            updatedProduct.variants.find((v) => v.id === baseVariant.id).options
-          ).toEqual([
-            expect.objectContaining({
-              option: expect.objectContaining({
-                title: "size",
-              }),
-              value: "small",
-            }),
-          ])
-        })
-
         it("updates multiple options in the same call", async () => {
           const baseVariant = baseProduct.variants[0]
           const updatedProduct = (
@@ -2692,15 +2933,9 @@ medusaIntegrationTestRunner({
           expect(updatedOptions).toEqual(
             expect.arrayContaining([
               expect.objectContaining({
-                option: expect.objectContaining({
-                  title: "size",
-                }),
                 value: "small",
               }),
               expect.objectContaining({
-                option: expect.objectContaining({
-                  title: "color",
-                }),
                 value: "green",
               }),
             ])

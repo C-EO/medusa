@@ -9,6 +9,12 @@ export const fulfillmentProvidersQueryKeys = queryKeysFactory(
   FULFILLMENT_PROVIDERS_QUERY_KEY
 )
 
+const FULFILLMENT_PROVIDER_OPTIONS_QUERY_KEY =
+  "fulfillment_provider_options" as const
+export const fulfillmentProviderOptionsQueryKeys = queryKeysFactory(
+  FULFILLMENT_PROVIDER_OPTIONS_QUERY_KEY
+)
+
 export const useFulfillmentProviders = (
   query?: HttpTypes.AdminFulfillmentProviderListParams,
   options?: Omit<
@@ -24,6 +30,28 @@ export const useFulfillmentProviders = (
   const { data, ...rest } = useQuery({
     queryFn: () => sdk.admin.fulfillmentProvider.list(query),
     queryKey: fulfillmentProvidersQueryKeys.list(query),
+    ...options,
+  })
+
+  return { ...data, ...rest }
+}
+
+export const useFulfillmentProviderOptions = (
+  providerId: string,
+  options?: Omit<
+    UseQueryOptions<
+      HttpTypes.AdminFulfillmentProviderOptionsListResponse,
+      FetchError,
+      HttpTypes.AdminFulfillmentProviderOptionsListResponse,
+      QueryKey
+    >,
+    "queryFn" | "queryKey"
+  >
+) => {
+  const { data, ...rest } = useQuery({
+    queryFn: () =>
+      sdk.admin.fulfillmentProvider.listFulfillmentOptions(providerId),
+    queryKey: fulfillmentProviderOptionsQueryKeys.list(providerId),
     ...options,
   })
 

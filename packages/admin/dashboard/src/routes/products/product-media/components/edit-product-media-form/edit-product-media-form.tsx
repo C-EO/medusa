@@ -1,19 +1,41 @@
+import {
+  defaultDropAnimationSideEffects,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  DropAnimation,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, CommandBar } from "@medusajs/ui"
+import { ThumbnailBadge } from "@medusajs/icons"
+import { HttpTypes } from "@medusajs/types"
+import { Button, Checkbox, clx, CommandBar, toast, Tooltip } from "@medusajs/ui"
 import { Fragment, useCallback, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import { z } from "zod"
 
-import { HttpTypes } from "@medusajs/types"
-import { Link } from "react-router-dom"
 import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateProduct } from "../../../../../hooks/api/products"
 import { sdk } from "../../../../../lib/client"
-import { MediaGrid } from "../../../common/components/media-grid-view"
 import { UploadMediaFormItem } from "../../../common/components/upload-media-form-item"
 import {
   EditProductMediaSchema,
@@ -44,6 +66,38 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
     control: form.control,
     keyName: "field_id",
   })
+
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id)
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null)
+    const { active, over } = event
+
+    if (active.id !== over?.id) {
+      const oldIndex = fields.findIndex((item) => item.field_id === active.id)
+      const newIndex = fields.findIndex((item) => item.field_id === over?.id)
+
+      form.setValue("media", arrayMove(fields, oldIndex, newIndex), {
+        shouldDirty: true,
+        shouldTouch: true,
+      })
+    }
+  }
+
+  const handleDragCancel = () => {
+    setActiveId(null)
+  }
 
   const { mutateAsync, isPending } = useUpdateProduct(product.id!)
 
@@ -78,13 +132,16 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
 
     await mutateAsync(
       {
-        images: withUpdatedUrls.map((file) => ({ url: file.url })),
-        // Set thumbnail to empty string if no thumbnail is selected, as the API does not accept null
-        thumbnail: thumbnail || "",
+        images: withUpdatedUrls.map((file) => ({ url: file.url, id: file.id })),
+        thumbnail: thumbnail || null,
       },
       {
         onSuccess: () => {
+          toast.success(t("products.media.successToast"))
           handleSuccess()
+        },
+        onError: (error) => {
+          toast.error(error.message)
         },
       }
     )
@@ -141,36 +198,61 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
   const selectionCount = Object.keys(selection).length
 
   return (
-    <RouteFocusModal.Form blockSearch form={form}>
-      <form
+    <RouteFocusModal.Form blockSearchParams form={form}>
+      <KeyboundForm
         className="flex size-full flex-col overflow-hidden"
         onSubmit={handleSubmit}
       >
         <RouteFocusModal.Header>
           <div className="flex items-center justify-end gap-x-2">
-            <RouteFocusModal.Close asChild>
-              <Button variant="secondary" size="small">
-                {t("actions.cancel")}
-              </Button>
-            </RouteFocusModal.Close>
             <Button variant="secondary" size="small" asChild>
               <Link to={{ pathname: ".", search: undefined }}>
                 {t("products.media.galleryLabel")}
               </Link>
             </Button>
-            <Button size="small" type="submit" isLoading={isPending}>
-              {t("actions.save")}
-            </Button>
           </div>
         </RouteFocusModal.Header>
         <RouteFocusModal.Body className="flex flex-col overflow-hidden">
           <div className="flex size-full flex-col-reverse lg:grid lg:grid-cols-[1fr_560px]">
-            <MediaGrid
-              media={fields}
-              onCheckedChange={handleCheckedChange}
-              selection={selection}
-            />
-            <div className="bg-ui-bg-base border-b px-6 py-4 lg:border-b-0 lg:border-l">
+            <DndContext
+              sensors={sensors}
+              onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
+              onDragCancel={handleDragCancel}
+            >
+              <div className="bg-ui-bg-subtle size-full overflow-auto">
+                <div className="grid h-fit auto-rows-auto grid-cols-4 gap-6 p-6">
+                  <SortableContext
+                    items={fields.map((m) => m.field_id)}
+                    strategy={rectSortingStrategy}
+                  >
+                    {fields.map((m) => {
+                      return (
+                        <MediaGridItem
+                          onCheckedChange={handleCheckedChange(m.id!)}
+                          checked={!!selection[m.id!]}
+                          key={m.field_id}
+                          media={m}
+                        />
+                      )
+                    })}
+                  </SortableContext>
+                  <DragOverlay dropAnimation={dropAnimationConfig}>
+                    {activeId ? (
+                      <MediaGridItemOverlay
+                        media={fields.find((m) => m.field_id === activeId)!}
+                        checked={
+                          !!selection[
+                            fields.find((m) => m.field_id === activeId)!.id!
+                          ]
+                        }
+                      />
+                    ) : null}
+                  </DragOverlay>
+                </div>
+              </div>
+            </DndContext>
+            <div className="bg-ui-bg-base overflow-auto border-b px-6 py-4 lg:border-b-0 lg:border-l">
               <UploadMediaFormItem form={form} append={append} />
             </div>
           </div>
@@ -200,14 +282,26 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
             />
           </CommandBar.Bar>
         </CommandBar>
-      </form>
+        <RouteFocusModal.Footer>
+          <div className="flex items-center justify-end gap-x-2">
+            <RouteFocusModal.Close asChild>
+              <Button variant="secondary" size="small">
+                {t("actions.cancel")}
+              </Button>
+            </RouteFocusModal.Close>
+            <Button size="small" type="submit" isLoading={isPending}>
+              {t("actions.save")}
+            </Button>
+          </div>
+        </RouteFocusModal.Footer>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }
 
 const getDefaultValues = (
-  images: HttpTypes.AdminProductImage[] | undefined,
-  thumbnail: string | undefined
+  images: HttpTypes.AdminProductImage[] | null | undefined,
+  thumbnail: string | null | undefined
 ) => {
   const media: Media[] =
     images?.map((image) => ({
@@ -229,4 +323,134 @@ const getDefaultValues = (
   }
 
   return media
+}
+
+interface MediaView {
+  id?: string
+  field_id: string
+  url: string
+  isThumbnail: boolean
+}
+
+const dropAnimationConfig: DropAnimation = {
+  sideEffects: defaultDropAnimationSideEffects({
+    styles: {
+      active: {
+        opacity: "0.4",
+      },
+    },
+  }),
+}
+
+interface MediaGridItemProps {
+  media: MediaView
+  checked: boolean
+  onCheckedChange: (value: boolean) => void
+}
+
+const MediaGridItem = ({
+  media,
+  checked,
+  onCheckedChange,
+}: MediaGridItemProps) => {
+  const { t } = useTranslation()
+
+  const handleToggle = useCallback(
+    (value: boolean) => {
+      onCheckedChange(value)
+    },
+    [onCheckedChange]
+  )
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: media.field_id })
+
+  const style = {
+    opacity: isDragging ? 0.4 : undefined,
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      className={clx(
+        "shadow-elevation-card-rest hover:shadow-elevation-card-hover focus-visible:shadow-borders-focus bg-ui-bg-subtle-hover group relative aspect-square h-auto max-w-full overflow-hidden rounded-lg outline-none"
+      )}
+      style={style}
+      ref={setNodeRef}
+    >
+      {media.isThumbnail && (
+        <div className="absolute left-2 top-2">
+          <Tooltip content={t("products.media.thumbnailTooltip")}>
+            <ThumbnailBadge />
+          </Tooltip>
+        </div>
+      )}
+      <div
+        className={clx("absolute inset-0 cursor-grab touch-none outline-none", {
+          "cursor-grabbing": isDragging,
+        })}
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+      />
+      <div
+        className={clx("transition-fg absolute right-2 top-2 opacity-0", {
+          "group-focus-within:opacity-100 group-hover:opacity-100 group-focus:opacity-100":
+            !isDragging && !checked,
+          "opacity-100": checked,
+        })}
+      >
+        <Checkbox
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+          checked={checked}
+          onCheckedChange={handleToggle}
+        />
+      </div>
+      <img
+        src={media.url}
+        alt=""
+        className="size-full object-cover object-center"
+      />
+    </div>
+  )
+}
+
+export const MediaGridItemOverlay = ({
+  media,
+  checked,
+}: {
+  media: MediaView
+  checked: boolean
+}) => {
+  return (
+    <div className="shadow-elevation-card-rest hover:shadow-elevation-card-hover focus-visible:shadow-borders-focus bg-ui-bg-subtle-hover group relative aspect-square h-auto max-w-full cursor-grabbing overflow-hidden rounded-lg outline-none">
+      {media.isThumbnail && (
+        <div className="absolute left-2 top-2">
+          <ThumbnailBadge />
+        </div>
+      )}
+      <div
+        className={clx("transition-fg absolute right-2 top-2 opacity-0", {
+          "opacity-100": checked,
+        })}
+      >
+        <Checkbox checked={checked} />
+      </div>
+      <img
+        src={media.url}
+        alt=""
+        className="size-full object-cover object-center"
+      />
+    </div>
+  )
 }

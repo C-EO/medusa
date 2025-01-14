@@ -1,8 +1,8 @@
-import { DALUtils } from "@medusajs/utils"
+import { DALUtils } from "@medusajs/framework/utils"
 import { OrderClaim } from "@models"
 import { setFindMethods } from "../utils/base-repository-find"
 
-export class OrderClaimRepository extends DALUtils.mikroOrmBaseRepositoryFactory<OrderClaim>(
+export class OrderClaimRepository extends DALUtils.mikroOrmBaseRepositoryFactory(
   OrderClaim
 ) {}
 

@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
-import { DeclarationHierarchy } from "typedoc/dist/lib/models"
-import { spaces } from "../../utils"
+import Handlebars from "handlebars"
+import { DeclarationHierarchy } from "typedoc"
+import { spaces } from "../../utils.js"
 
 export default function () {
   Handlebars.registerHelper(

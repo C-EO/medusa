@@ -1,5 +1,5 @@
 import path from "path"
-import { getFileSlugSyncUtil } from "./get-file-slug.js"
+import { getFileSlugSync } from "docs-utils"
 
 export type FixLinkOptions = {
   currentPageFilePath: string
@@ -20,7 +20,7 @@ export function fixLinkUtil({
   fullLinkedFilePath = fullLinkedFilePath.replace(hash, "")
   // get absolute path of the URL
   const linkedFilePath = fullLinkedFilePath.replace(basePath, "")
-  const linkedFileSlug = getFileSlugSyncUtil(fullLinkedFilePath)
+  const linkedFileSlug = getFileSlugSync(fullLinkedFilePath)
 
   const newLink =
     linkedFileSlug ||

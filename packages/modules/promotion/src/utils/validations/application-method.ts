@@ -8,7 +8,8 @@ import {
   MathBN,
   MedusaError,
   PromotionType,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
+import { InferEntityType } from "@medusajs/types"
 import { Promotion } from "@models"
 import { CreateApplicationMethodDTO, UpdateApplicationMethodDTO } from "@types"
 
@@ -28,7 +29,7 @@ export const allowedAllocationForQuantity: string[] = [
 
 export function validateApplicationMethodAttributes(
   data: UpdateApplicationMethodDTO | CreateApplicationMethodDTO,
-  promotion: Promotion
+  promotion: InferEntityType<typeof Promotion>
 ) {
   const applicationMethod = promotion?.application_method || {}
   const buyRulesMinQuantity =

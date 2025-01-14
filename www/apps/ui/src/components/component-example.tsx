@@ -28,7 +28,7 @@ export function ComponentExample({
   }, [name])
 
   const CodeElement = children as React.ReactElement
-  const Code = CodeElement.props.code
+  const Code = (CodeElement.props as Record<string, string>).code
 
   return (
     <div className="relative my-4 flex flex-col space-y-2" {...props}>

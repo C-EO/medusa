@@ -59,9 +59,12 @@ export const PriceListCustomerGroupRuleForm = ({
     prefix: PREFIX,
   })
   const { customer_groups, count, isLoading, isError, error } =
-    useCustomerGroups(searchParams, {
-      placeholderData: keepPreviousData,
-    })
+    useCustomerGroups(
+      { ...searchParams, fields: "id,name,customers.id" },
+      {
+        placeholderData: keepPreviousData,
+      }
+    )
 
   const updater: OnChangeFn<RowSelectionState> = (value) => {
     const state = typeof value === "function" ? value(rowSelection) : value
@@ -123,7 +126,11 @@ export const PriceListCustomerGroupRuleForm = ({
           count={count}
           isLoading={isLoading}
           filters={filters}
-          orderBy={["name", "created_at", "updated_at"]}
+          orderBy={[
+            { key: "name", label: t("fields.name") },
+            { key: "created_at", label: t("fields.createdAt") },
+            { key: "updated_at", label: t("fields.updatedAt") },
+          ]}
           layout="fill"
           pagination
           search

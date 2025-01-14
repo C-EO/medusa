@@ -23,18 +23,16 @@ const withMDX = mdx({
           projectUrls: {
             docs: {
               url: process.env.NEXT_PUBLIC_DOCS_URL,
+              path: "",
             },
             resources: {
               url: process.env.NEXT_PUBLIC_RESOURCES_URL,
-              path: "resources",
             },
             ui: {
               url: process.env.NEXT_PUBLIC_UI_URL,
-              path: "ui",
             },
             api: {
               url: process.env.NEXT_PUBLIC_API_URL,
-              path: "v2/api",
             },
           },
           useBaseUrl:
@@ -82,7 +80,7 @@ const nextConfig = {
 
   transpilePackages: ["docs-ui"],
   // TODO uncomment if we decide on baes path
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/v2/user-guide",
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/user-guide",
 }
 
 export default withMDX(nextConfig)

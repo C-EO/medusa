@@ -152,7 +152,7 @@ export async function generateTokens({ output }: GenerateTokensArgs) {
       return acc
     }
 
-    const isCodeBlock = node.name.startsWith("Code Block")
+    const isCodeBlock = node.name.startsWith("Code")
 
     if (isCodeBlock) {
       const [_parent, identifier] = node.name.split("/")

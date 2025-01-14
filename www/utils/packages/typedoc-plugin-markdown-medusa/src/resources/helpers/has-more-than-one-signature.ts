@@ -1,7 +1,7 @@
 import { DeclarationReflection } from "typedoc"
-import * as Handlebars from "handlebars"
-import getCorrectDeclarationReflection from "../../utils/get-correct-declaration-reflection"
-import { MarkdownTheme } from "../../theme"
+import Handlebars from "handlebars"
+import getCorrectDeclarationReflection from "../../utils/get-correct-declaration-reflection.js"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

@@ -65,8 +65,8 @@ export const MermaidDiagram = ({ diagramContent }: MermaidDiagramProps) => {
             isZoomed
               ? `100vh`
               : matchedRegex && matchedRegex.length >= 1
-              ? `${matchedRegex[1]}px`
-              : "100%"
+                ? `${matchedRegex[1]}px`
+                : "100%"
           }
         />
       </ControlledZoom>

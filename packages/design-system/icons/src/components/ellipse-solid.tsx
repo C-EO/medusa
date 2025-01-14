@@ -12,10 +12,7 @@ const EllipseSolid = React.forwardRef<SVGSVGElement, IconProps>(
         {...props}
       >
         <g clipPath="url(#a)">
-          <path
-            fill={color}
-            d="M7.5 14.611A7.111 7.111 0 1 0 7.5.39a7.111 7.111 0 0 0 0 14.222"
-          />
+          <path fill={color} d="M7.5 11.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8" />
         </g>
         <defs>
           <clipPath id="a">

@@ -1,12 +1,13 @@
-import { Modules, SalesChannelWorkflowEvents } from "@medusajs/utils"
+import { Modules, SalesChannelWorkflowEvents } from "@medusajs/framework/utils"
 import {
   createWorkflow,
   transform,
   WorkflowData,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep } from "../../common"
 import { removeRemoteLinkStep } from "../../common/steps/remove-remote-links"
 import { deleteSalesChannelsStep } from "../steps/delete-sales-channels"
+import { canDeleteSalesChannelsOrThrowStep } from "../steps"
 
 export type DeleteSalesChannelsWorkflowInput = { ids: string[] }
 
@@ -19,6 +20,7 @@ export const deleteSalesChannelsWorkflow = createWorkflow(
   (
     input: WorkflowData<DeleteSalesChannelsWorkflowInput>
   ): WorkflowData<void> => {
+    canDeleteSalesChannelsOrThrowStep({ ids: input.ids })
     deleteSalesChannelsStep(input.ids)
 
     removeRemoteLinkStep({

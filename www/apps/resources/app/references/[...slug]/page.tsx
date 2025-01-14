@@ -12,38 +12,33 @@ import MDXComponents from "@/components/MDXComponents"
 import mdxOptions from "../../../mdx-options.mjs"
 import { slugChanges } from "../../../generated/slug-changes.mjs"
 import { filesMap } from "../../../generated/files-map.mjs"
+import { Metadata } from "next"
+import { cache } from "react"
 
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string[]
-  }
+  }>
 }
 
-export default async function ReferencesPage({ params }: PageProps) {
+export default async function ReferencesPage(props: PageProps) {
+  const params = await props.params
   const { slug } = params
 
-  // ensure that Vercel loads references files
-  path.join(process.cwd(), "references")
-  const monoRepoPath = path.resolve("..", "..", "..")
+  const fileData = await loadFile(slug)
 
-  const pathname = `/references/${slug.join("/")}`
-  const fileDetails =
-    slugChanges.find((f) => f.newSlug === pathname) ||
-    filesMap.find((f) => f.pathname === pathname)
-  if (!fileDetails) {
+  if (!fileData) {
     return notFound()
   }
-  const fullPath = path.join(monoRepoPath, fileDetails.filePath)
-  const fileContent = await fs.readFile(fullPath, "utf-8")
 
   const pluginOptions = {
-    filePath: fullPath,
+    filePath: fileData.path,
     basePath: process.cwd(),
   }
 
   return (
     <MDXRemote
-      source={fileContent}
+      source={fileData.content}
       components={MDXComponents}
       options={{
         mdxOptions: {
@@ -78,3 +73,55 @@ export default async function ReferencesPage({ params }: PageProps) {
     />
   )
 }
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  // read route params
+  const slug = (await params).slug
+  const metadata: Metadata = {}
+
+  const fileData = await loadFile(slug)
+
+  if (!fileData) {
+    return metadata
+  }
+
+  const pageTitleMatch = /#(?<title>[\w -]+)/.exec(fileData.content)
+
+  if (!pageTitleMatch?.groups?.title) {
+    return metadata
+  }
+
+  metadata.title = pageTitleMatch.groups.title
+
+  return metadata
+}
+
+const loadFile = cache(
+  async (
+    slug: string[]
+  ): Promise<
+    | {
+        content: string
+        path: string
+      }
+    | undefined
+  > => {
+    path.join(process.cwd(), "references")
+    const monoRepoPath = path.resolve("..", "..", "..")
+
+    const pathname = `/references/${slug.join("/")}`
+    const fileDetails =
+      slugChanges.find((f) => f.newSlug === pathname) ||
+      filesMap.find((f) => f.pathname === pathname)
+    if (!fileDetails) {
+      return undefined
+    }
+    const fullPath = path.join(monoRepoPath, fileDetails.filePath)
+    return {
+      content: await fs.readFile(fullPath, "utf-8"),
+      path: fullPath,
+    }
+  }
+)

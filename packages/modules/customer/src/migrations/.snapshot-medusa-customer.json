@@ -79,6 +79,15 @@
           "nullable": true,
           "mappedType": "json"
         },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -110,20 +119,19 @@
           "nullable": true,
           "length": 6,
           "mappedType": "datetime"
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
         }
       },
       "name": "customer",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "IDX_customer_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_deleted_at\" ON \"customer\" (deleted_at) WHERE deleted_at IS NULL"
+        },
         {
           "keyName": "IDX_customer_email_has_account_unique",
           "columnNames": [],
@@ -184,15 +192,6 @@
           "nullable": false,
           "default": "false",
           "mappedType": "boolean"
-        },
-        "customer_id": {
-          "name": "customer_id",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "text"
         },
         "company": {
           "name": "company",
@@ -293,6 +292,15 @@
           "nullable": true,
           "mappedType": "json"
         },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -314,19 +322,36 @@
           "length": 6,
           "default": "now()",
           "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "customer_address",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "customer_id"
-          ],
-          "composite": false,
           "keyName": "IDX_customer_address_customer_id",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_address_customer_id\" ON \"customer_address\" (customer_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_customer_address_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_address_deleted_at\" ON \"customer_address\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_customer_address_unique_customer_billing",
@@ -334,7 +359,7 @@
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_customer_address_unique_customer_billing\" ON \"customer_address\" (customer_id) WHERE \"is_default_billing\" = true"
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_customer_address_unique_customer_billing\" ON \"customer_address\" (customer_id) WHERE \"is_default_billing\" = true AND deleted_at IS NULL"
         },
         {
           "keyName": "IDX_customer_address_unique_customer_shipping",
@@ -342,7 +367,7 @@
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_customer_address_unique_customer_shipping\" ON \"customer_address\" (customer_id) WHERE \"is_default_shipping\" = true"
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_customer_address_unique_customer_shipping\" ON \"customer_address\" (customer_id) WHERE \"is_default_shipping\" = true AND deleted_at IS NULL"
         },
         {
           "keyName": "customer_address_pkey",
@@ -446,10 +471,16 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "IDX_customer_group_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_group_deleted_at\" ON \"customer_group\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "IDX_customer_group_name_unique",
-          "columnNames": [
-            "name"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -479,6 +510,24 @@
           "nullable": false,
           "mappedType": "text"
         },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "customer_id": {
           "name": "customer_id",
           "type": "text",
@@ -496,15 +545,6 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -528,36 +568,43 @@
           "default": "now()",
           "mappedType": "datetime"
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "customer_group_customer",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "customer_group_id"
-          ],
+          "keyName": "IDX_customer_group_customer_customer_id",
+          "columnNames": [],
           "composite": false,
-          "keyName": "IDX_customer_group_customer_group_id",
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_group_customer_customer_id\" ON \"customer_group_customer\" (customer_id) WHERE deleted_at IS NULL"
         },
         {
-          "columnNames": [
-            "customer_id"
-          ],
+          "keyName": "IDX_customer_group_customer_customer_group_id",
+          "columnNames": [],
           "composite": false,
-          "keyName": "IDX_customer_group_customer_customer_id",
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_group_customer_customer_group_id\" ON \"customer_group_customer\" (customer_group_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_customer_group_customer_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_customer_group_customer_deleted_at\" ON \"customer_group_customer\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "customer_group_customer_pkey",
@@ -570,32 +617,7 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {
-        "customer_group_customer_customer_group_id_foreign": {
-          "constraintName": "customer_group_customer_customer_group_id_foreign",
-          "columnNames": [
-            "customer_group_id"
-          ],
-          "localTableName": "public.customer_group_customer",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.customer_group",
-          "deleteRule": "cascade"
-        },
-        "customer_group_customer_customer_id_foreign": {
-          "constraintName": "customer_group_customer_customer_id_foreign",
-          "columnNames": [
-            "customer_id"
-          ],
-          "localTableName": "public.customer_group_customer",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.customer",
-          "deleteRule": "cascade"
-        }
-      }
+      "foreignKeys": {}
     }
   ]
 }

@@ -1,13 +1,11 @@
 import { Product } from "@models"
 
-import { Context, DAL } from "@medusajs/types"
+import { Context, DAL } from "@medusajs/framework/types"
+import { DALUtils } from "@medusajs/framework/utils"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
-import { DALUtils } from "@medusajs/utils"
-
-import { UpdateProductInput } from "../types"
 
 // eslint-disable-next-line max-len
-export class ProductRepository extends DALUtils.mikroOrmBaseRepositoryFactory<Product>(
+export class ProductRepository extends DALUtils.mikroOrmBaseRepositoryFactory(
   Product
 ) {
   constructor(...args: any[]) {
@@ -21,7 +19,9 @@ export class ProductRepository extends DALUtils.mikroOrmBaseRepositoryFactory<Pr
    * first find all products that are in the categories, and then exclude them
    */
   protected async mutateNotInCategoriesConstraints(
-    findOptions: DAL.FindOptions<Product> = { where: {} },
+    findOptions: DAL.FindOptions<typeof Product> = {
+      where: {},
+    },
     context: Context = {}
   ): Promise<void> {
     const manager = this.getActiveManager<SqlEntityManager>(context)
@@ -31,7 +31,7 @@ export class ProductRepository extends DALUtils.mikroOrmBaseRepositoryFactory<Pr
       findOptions.where.categories?.id?.["$nin"]
     ) {
       const productsInCategories = await manager.find(
-        Product,
+        this.entity,
         {
           categories: {
             id: { $in: findOptions.where.categories.id["$nin"] },

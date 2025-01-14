@@ -1,4 +1,4 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { Comment } from "typedoc"
 
 export default function () {

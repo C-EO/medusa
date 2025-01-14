@@ -6,9 +6,10 @@ x-schemaName: AdminOrderPreview
 required:
   - return_requested_total
   - order_change
+  - status
   - currency_code
-  - version
   - id
+  - version
   - region_id
   - customer_id
   - sales_channel_id
@@ -17,7 +18,6 @@ required:
   - payment_status
   - fulfillment_status
   - summary
-  - metadata
   - created_at
   - updated_at
   - original_item_total
@@ -48,7 +48,7 @@ properties:
     title: return_requested_total
     description: The total of the requested return.
   order_change:
-    $ref: ./BaseOrderChange.yaml
+    $ref: ./AdminOrderChange.yaml
   items:
     type: array
     description: The order's items.
@@ -120,7 +120,7 @@ properties:
               title: variant_id
               description: The ID of the associated variant.
             product:
-              $ref: ./BaseProduct.yaml
+              $ref: ./AdminProduct.yaml
             product_id:
               type: string
               title: product_id
@@ -181,8 +181,8 @@ properties:
               description: Whether the item's price includes taxes.
             compare_at_unit_price:
               type: number
-              title: The original price of the item before a promotion or sale.
-              description: The
+              title: compare_at_unit_price
+              description: The original price of the item before a promotion or sale.
             unit_price:
               type: number
               title: unit_price
@@ -519,7 +519,7 @@ properties:
     type: array
     description: The order's fulfillments.
     items:
-      $ref: ./BaseOrderFulfillment.yaml
+      $ref: ./AdminOrderFulfillment.yaml
   fulfillment_status:
     type: string
     description: The order's fulfillment status.
@@ -644,3 +644,7 @@ properties:
     $ref: ./AdminCustomer.yaml
   sales_channel:
     $ref: ./AdminSalesChannel.yaml
+  status:
+    type: string
+    title: status
+    description: The order's status.

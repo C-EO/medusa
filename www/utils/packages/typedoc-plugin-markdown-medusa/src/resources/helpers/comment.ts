@@ -1,6 +1,6 @@
 import * as fs from "fs"
-import * as Handlebars from "handlebars"
-import { CommentDisplayPart } from "typedoc/dist/lib/models/comments/comment"
+import Handlebars from "handlebars"
+import { CommentDisplayPart } from "typedoc"
 import { escapeChars } from "utils"
 
 export default function () {

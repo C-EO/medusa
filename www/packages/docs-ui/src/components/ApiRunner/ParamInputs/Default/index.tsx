@@ -94,8 +94,8 @@ export const ApiRunnerParamInput = ({
         typeof paramValue === "string"
           ? (paramValue as string)
           : typeof paramValue === "number"
-          ? (paramValue as number)
-          : `${paramValue}`
+            ? (paramValue as number)
+            : `${paramValue}`
       }
       className="w-full"
     />

@@ -4,19 +4,21 @@
  * description: The product's details.
  * x-schemaName: AdminProduct
  * required:
+ *   - variants
  *   - type
+ *   - options
+ *   - images
  *   - length
  *   - title
  *   - status
- *   - options
  *   - description
  *   - id
  *   - created_at
  *   - updated_at
- *   - handle
  *   - subtitle
- *   - is_giftcard
  *   - thumbnail
+ *   - handle
+ *   - is_giftcard
  *   - width
  *   - weight
  *   - height
@@ -26,7 +28,6 @@
  *   - material
  *   - collection_id
  *   - type_id
- *   - images
  *   - discountable
  *   - external_id
  *   - deleted_at
@@ -75,7 +76,7 @@
  *     type: array
  *     description: The product's options.
  *     items:
- *       $ref: "#/components/schemas/BaseProductOption"
+ *       $ref: "#/components/schemas/AdminProductOption"
  *   description:
  *     type: string
  *     title: description
@@ -153,7 +154,7 @@
  *     type: array
  *     description: The product's images.
  *     items:
- *       $ref: "#/components/schemas/BaseProductImage"
+ *       $ref: "#/components/schemas/AdminProductImage"
  *   discountable:
  *     type: boolean
  *     title: discountable

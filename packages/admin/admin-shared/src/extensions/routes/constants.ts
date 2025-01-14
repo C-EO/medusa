@@ -1,1 +1,8 @@
-export const ROUTE_IMPORTS = ["routes/pages", "routes/links"] as const
+export const NESTED_ROUTE_POSITIONS = [
+  "/orders",
+  "/products",
+  "/inventory",
+  "/customers",
+  "/promotions",
+  "/price-lists",
+] as const

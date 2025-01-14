@@ -87,16 +87,21 @@ export const useDeleteProductOption = (
 export const useProductVariant = (
   productId: string,
   variantId: string,
-  query?: Record<string, any>,
+  query?: HttpTypes.AdminProductVariantParams,
   options?: Omit<
-    UseQueryOptions<any, FetchError, any, QueryKey>,
+    UseQueryOptions<
+      HttpTypes.AdminProductVariantResponse,
+      FetchError,
+      HttpTypes.AdminProductVariantResponse,
+      QueryKey
+    >,
     "queryFn" | "queryKey"
   >
 ) => {
   const { data, ...rest } = useQuery({
     queryFn: () =>
       sdk.admin.product.retrieveVariant(productId, variantId, query),
-    queryKey: variantsQueryKeys.detail(variantId),
+    queryKey: variantsQueryKeys.detail(variantId, query),
     ...options,
   })
 
@@ -105,9 +110,14 @@ export const useProductVariant = (
 
 export const useProductVariants = (
   productId: string,
-  query?: Record<string, any>,
+  query?: HttpTypes.AdminProductVariantParams,
   options?: Omit<
-    UseQueryOptions<any, FetchError, any, QueryKey>,
+    UseQueryOptions<
+      HttpTypes.AdminProductVariantListResponse,
+      FetchError,
+      HttpTypes.AdminProductVariantListResponse,
+      QueryKey
+    >,
     "queryFn" | "queryKey"
   >
 ) => {
@@ -187,12 +197,15 @@ export const useUpdateProductVariantsBatch = (
 
 export const useProductVariantsInventoryItemsBatch = (
   productId: string,
-  options?: UseMutationOptions<any, FetchError, any>
+  options?: UseMutationOptions<
+    HttpTypes.AdminBatchProductVariantInventoryItemResponse,
+    FetchError,
+    HttpTypes.AdminBatchProductVariantInventoryItemRequest
+  >
 ) => {
   return useMutation({
-    mutationFn: (
-      payload: HttpTypes.AdminBatchProductVariantInventoryItemRequest
-    ) => sdk.admin.product.batchVariantInventoryItems(productId, payload),
+    mutationFn: (payload) =>
+      sdk.admin.product.batchVariantInventoryItems(productId, payload),
     onSuccess: (data: any, variables: any, context: any) => {
       queryClient.invalidateQueries({ queryKey: variantsQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: variantsQueryKeys.details() })
@@ -232,13 +245,18 @@ export const useProduct = (
   id: string,
   query?: Record<string, any>,
   options?: Omit<
-    UseQueryOptions<any, FetchError, any, QueryKey>,
+    UseQueryOptions<
+      HttpTypes.AdminProductResponse,
+      FetchError,
+      HttpTypes.AdminProductResponse,
+      QueryKey
+    >,
     "queryFn" | "queryKey"
   >
 ) => {
   const { data, ...rest } = useQuery({
     queryFn: () => sdk.admin.product.retrieve(id, query),
-    queryKey: productsQueryKeys.detail(id),
+    queryKey: productsQueryKeys.detail(id, query),
     ...options,
   })
 
@@ -297,9 +315,13 @@ export const useUpdateProduct = (
 ) => {
   return useMutation({
     mutationFn: (payload) => sdk.admin.product.update(id, payload),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: productsQueryKeys.detail(id) })
+    onSuccess: async (data, variables, context) => {
+      await queryClient.invalidateQueries({
+        queryKey: productsQueryKeys.lists(),
+      })
+      await queryClient.invalidateQueries({
+        queryKey: productsQueryKeys.detail(id),
+      })
 
       options?.onSuccess?.(data, variables, context)
     },

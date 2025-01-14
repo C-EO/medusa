@@ -5,6 +5,7 @@
  * x-schemaName: AdminCreateProduct
  * required:
  *   - title
+ *   - options
  * properties:
  *   title:
  *     type: string
@@ -147,6 +148,10 @@
  *   metadata:
  *     type: object
  *     description: The product's metadata, used to store custom key-value pairs.
+ *   external_id:
+ *     type: string
+ *     title: external_id
+ *     description: The ID of the product in an external or third-party system.
  * 
 */
 

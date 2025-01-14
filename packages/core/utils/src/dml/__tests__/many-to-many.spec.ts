@@ -17,6 +17,7 @@ describe("ManyToMany relationship", () => {
       type: "manyToMany",
       nullable: false,
       options: {},
+      searchable: false,
       entity: entityRef,
     })
   })

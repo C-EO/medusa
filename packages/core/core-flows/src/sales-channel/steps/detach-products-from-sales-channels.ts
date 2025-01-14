@@ -1,5 +1,5 @@
-import { ContainerRegistrationKeys, Modules } from "@medusajs/utils"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 export interface DetachProductsFromSalesChannelsStepInput {
   links: {
@@ -20,7 +20,7 @@ export const detachProductsFromSalesChannelsStep = createStep(
       return new StepResponse(void 0, [])
     }
 
-    const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK)
+    const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
     const links = input.links.map((link) => {
       return {
         [Modules.PRODUCT]: {
@@ -41,7 +41,7 @@ export const detachProductsFromSalesChannelsStep = createStep(
       return
     }
 
-    const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK)
+    const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
 
     await remoteLink.create(links)
   }

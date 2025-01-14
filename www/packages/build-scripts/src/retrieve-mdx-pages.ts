@@ -1,6 +1,6 @@
 import { readdirSync } from "fs"
 import path from "path"
-import { getFileSlugSyncUtil } from "remark-rehype-plugins"
+import { getFileSlugSync } from "docs-utils"
 
 type Options = {
   basePath: string
@@ -24,7 +24,7 @@ export function retrieveMdxPages({ basePath }: Options): string[] {
         continue
       }
 
-      const slug = getFileSlugSyncUtil(filePath)
+      const slug = getFileSlugSync(filePath)
 
       urls.push(
         slug ||

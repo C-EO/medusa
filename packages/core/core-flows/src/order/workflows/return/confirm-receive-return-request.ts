@@ -6,22 +6,23 @@ import {
   OrderPreviewDTO,
   OrderReturnItemDTO,
   ReturnDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ChangeActionType,
   MathBN,
   OrderChangeStatus,
+  OrderWorkflowEvents,
   ReturnStatus,
   deepFlatMap,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
   createStep,
   createWorkflow,
   parallelize,
   transform,
-} from "@medusajs/workflows-sdk"
-import { useRemoteQueryStep } from "../../../common"
+} from "@medusajs/framework/workflows-sdk"
+import { emitEventStep, useRemoteQueryStep } from "../../../common"
 import { adjustInventoryLevelsStep } from "../../../inventory/steps"
 import {
   previewOrderChangeStep,
@@ -171,6 +172,7 @@ export const confirmReturnReceiveWorkflow = createWorkflow(
       entry_point: "order_change",
       fields: [
         "id",
+        "status",
         "actions.id",
         "actions.action",
         "actions.details",
@@ -298,7 +300,14 @@ export const confirmReturnReceiveWorkflow = createWorkflow(
         orderId: order.id,
         confirmed_by: input.confirmed_by,
       }),
-      adjustInventoryLevelsStep(inventoryAdjustment)
+      adjustInventoryLevelsStep(inventoryAdjustment),
+      emitEventStep({
+        eventName: OrderWorkflowEvents.RETURN_RECEIVED,
+        data: {
+          order_id: order.id,
+          return_id: orderReturn.id,
+        },
+      })
     )
 
     return new WorkflowResponse(previewOrderChangeStep(order.id))

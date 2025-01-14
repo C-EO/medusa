@@ -9,6 +9,7 @@ import { Form } from "../../../../../components/common/form"
 import { SwitchBox } from "../../../../../components/common/switch-box"
 import { PercentageInput } from "../../../../../components/inputs/percentage-input"
 import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateTaxRate } from "../../../../../hooks/api/tax-rates"
 
 type TaxRegionTaxRateEditFormProps = {
@@ -36,7 +37,7 @@ export const TaxRegionTaxRateEditForm = ({
   const form = useForm<z.infer<typeof TaxRegionTaxRateEditSchema>>({
     defaultValues: {
       name: taxRate.name,
-      code: taxRate.code || "",
+      code: taxRate.code,
       rate: {
         value: taxRate.rate?.toString() || "",
       },
@@ -51,7 +52,7 @@ export const TaxRegionTaxRateEditForm = ({
     await mutateAsync(
       {
         name: values.name,
-        code: values.code || null,
+        code: values.code,
         rate: values.rate?.float,
         is_combinable: values.is_combinable,
       },
@@ -69,7 +70,7 @@ export const TaxRegionTaxRateEditForm = ({
 
   return (
     <RouteDrawer.Form form={form}>
-      <form
+      <KeyboundForm
         className="flex flex-1 flex-col overflow-hidden"
         onSubmit={handleSubmit}
       >
@@ -151,7 +152,7 @@ export const TaxRegionTaxRateEditForm = ({
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

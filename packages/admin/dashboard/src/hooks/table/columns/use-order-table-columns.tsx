@@ -1,3 +1,4 @@
+import { HttpTypes } from "@medusajs/types"
 import {
   ColumnDef,
   ColumnDefBase,
@@ -33,7 +34,6 @@ import {
   TotalCell,
   TotalHeader,
 } from "../../../components/table/table-cells/order/total-cell"
-import { HttpTypes } from "@medusajs/types"
 
 // We have to use any here, as the type of Order is so complex that it lags the TS server
 const columnHelper = createColumnHelper<HttpTypes.AdminOrder>()

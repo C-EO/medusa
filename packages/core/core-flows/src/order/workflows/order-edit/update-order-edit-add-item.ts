@@ -4,15 +4,15 @@ import {
   OrderDTO,
   OrderPreviewDTO,
   OrderWorkflow,
-} from "@medusajs/types"
-import { ChangeActionType, OrderChangeStatus } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import { ChangeActionType, OrderChangeStatus } from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createStep,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../../common"
 import {
   previewOrderChangeStep,
@@ -104,6 +104,10 @@ export const updateOrderEditAddItemWorkflow = createWorkflow(
           id: input.action_id,
           details: {
             quantity: data.quantity ?? originalAction.details?.quantity,
+            unit_price: data.unit_price ?? originalAction.details?.unit_price,
+            compare_at_unit_price:
+              data.compare_at_unit_price ??
+              originalAction.details?.compare_at_unit_price,
           },
           internal_note: data.internal_note,
         }

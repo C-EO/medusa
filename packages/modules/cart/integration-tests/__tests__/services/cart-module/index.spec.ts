@@ -1,8 +1,8 @@
-import { ICartModuleService } from "@medusajs/types"
-import { BigNumber, Module, Modules } from "@medusajs/utils"
+import { ICartModuleService } from "@medusajs/framework/types"
+import { BigNumber, Module, Modules } from "@medusajs/framework/utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
 import { CheckConstraintViolationException } from "@mikro-orm/core"
 import { CartModuleService } from "@services"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
 
 jest.setTimeout(50000)
 
@@ -36,7 +36,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "cart_id",
               entity: "Cart",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "cart",
             },
           },
@@ -45,7 +45,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "address_id",
               entity: "Address",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "address",
             },
           },
@@ -54,7 +54,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "line_item_id",
               entity: "LineItem",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "lineItem",
             },
           },
@@ -63,7 +63,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "line_item_adjustment_id",
               entity: "LineItemAdjustment",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "lineItemAdjustment",
             },
           },
@@ -72,7 +72,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "line_item_tax_line_id",
               entity: "LineItemTaxLine",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "lineItemTaxLine",
             },
           },
@@ -81,7 +81,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "shipping_method_id",
               entity: "ShippingMethod",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "shippingMethod",
             },
           },
@@ -90,7 +90,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "shipping_method_adjustment_id",
               entity: "ShippingMethodAdjustment",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "shippingMethodAdjustment",
             },
           },
@@ -99,7 +99,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
               linkable: "shipping_method_tax_line_id",
               entity: "ShippingMethodTaxLine",
               primaryKey: "id",
-              serviceName: "Cart",
+              serviceName: "cart",
               field: "shippingMethodTaxLine",
             },
           },
@@ -1979,7 +1979,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
           const taxLines = await service.setLineItemTaxLines(createdCart.id, [
             {
               item_id: itemOne.id,
-              rate: 20,
+              rate: 20.753,
               code: "TX",
             },
           ])
@@ -1988,7 +1988,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
             expect.arrayContaining([
               expect.objectContaining({
                 item_id: itemOne.id,
-                rate: 20,
+                rate: 20.753,
                 code: "TX",
               }),
             ])
@@ -1997,7 +1997,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
           await service.setLineItemTaxLines(createdCart.id, [
             {
               item_id: itemOne.id,
-              rate: 25,
+              rate: 25.14789,
               code: "TX-2",
             },
           ])
@@ -2013,7 +2013,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
                 tax_lines: expect.arrayContaining([
                   expect.objectContaining({
                     item_id: itemOne.id,
-                    rate: 25,
+                    rate: 25.14789,
                     code: "TX-2",
                   }),
                 ]),
@@ -2502,6 +2502,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
             product_description: null,
             product_subtitle: null,
             product_type: null,
+            product_type_id: null,
             product_collection: null,
             product_handle: null,
             variant_sku: null,
@@ -2511,6 +2512,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
             requires_shipping: true,
             is_discountable: true,
             is_tax_inclusive: false,
+            is_custom_price: false,
             raw_compare_at_unit_price: null,
             raw_unit_price: {
               value: "100",
@@ -2606,6 +2608,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
             product_description: null,
             product_subtitle: null,
             product_type: null,
+            product_type_id: null,
             product_collection: null,
             product_handle: null,
             variant_sku: null,
@@ -2615,6 +2618,7 @@ moduleIntegrationTestRunner<ICartModuleService>({
             requires_shipping: true,
             is_discountable: true,
             is_tax_inclusive: false,
+            is_custom_price: false,
             raw_compare_at_unit_price: null,
             raw_unit_price: {
               value: "200",

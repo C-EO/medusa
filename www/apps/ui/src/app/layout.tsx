@@ -4,9 +4,12 @@ import { Providers } from "@/providers"
 
 import { siteConfig } from "@/config/site"
 import "../styles/globals.css"
-import { TightLayout } from "docs-ui"
+import { BareboneLayout, TightLayout } from "docs-ui"
 import { Inter, Roboto_Mono } from "next/font/google"
 import clsx from "clsx"
+
+const ogImage =
+  "https://res.cloudinary.com/dza7lstvk/image/upload/v1732200992/Medusa%20Resources/opengraph-image_daq6nx.jpg"
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -14,6 +17,26 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   ),
+  openGraph: {
+    images: [
+      {
+        url: ogImage,
+        type: "image/jpeg",
+        height: "1260",
+        width: "2400",
+      },
+    ],
+  },
+  twitter: {
+    images: [
+      {
+        url: ogImage,
+        type: "image/jpeg",
+        height: "1260",
+        width: "2400",
+      },
+    ],
+  },
 }
 
 const inter = Inter({
@@ -33,15 +56,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <TightLayout
-      ProvidersComponent={Providers}
-      sidebarProps={{
-        expandItems: true,
-      }}
-      bodyClassName={clsx(inter.variable, robotoMono.variable)}
-      showBanner={false}
+    <BareboneLayout
+      htmlClassName={clsx(inter.variable, robotoMono.variable)}
+      gaId={process.env.NEXT_PUBLIC_GA_ID}
     >
-      {children}
-    </TightLayout>
+      <TightLayout
+        sidebarProps={{
+          expandItems: true,
+        }}
+        ProvidersComponent={Providers}
+      >
+        {children}
+      </TightLayout>
+    </BareboneLayout>
   )
 }

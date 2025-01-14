@@ -1,14 +1,17 @@
+import { FindConfig } from "../common/common"
+import { RestoreReturn, SoftDeleteReturn } from "../dal"
+import { IModuleService } from "../modules-sdk"
+import { Context } from "../shared-context"
 import {
   CreateStockLocationInput,
+  FilterableStockLocationAddressProps,
   FilterableStockLocationProps,
+  StockLocationAddressDTO,
   StockLocationDTO,
   UpdateStockLocationInput,
+  UpsertStockLocationAddressInput,
   UpsertStockLocationInput,
 } from "./common"
-import { RestoreReturn, SoftDeleteReturn } from "../dal"
-import { Context } from "../shared-context"
-import { FindConfig } from "../common/common"
-import { IModuleService } from "../modules-sdk"
 
 /**
  * The main service interface for the Stock Location Module.
@@ -333,4 +336,50 @@ export interface IStockLocationService extends IModuleService {
     config?: RestoreReturn<TReturnableLinkableKeys>,
     sharedContext?: Context
   ): Promise<Record<string, string[]> | void>
+
+  /**
+   * This method retrieves a paginated list of stock location addresses based on optional filters and configuration.
+   *
+   * @param {FilterableStockLocationAddressProps} selector - The filters to apply on the retrieved stock location address.
+   * @param {FindConfig<StockLocationAddressDTO>} config - The configurations determining how the stock location address is retrieved. Its properties, such as `select` or `relations`, accept the
+   * attributes or relations associated with a stock location address.
+   * @param {Context} context - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<StockLocationAddressDTO[]>} The list of stock location addressess.
+   *
+   */
+  listStockLocationAddresses(
+    selector: FilterableStockLocationAddressProps,
+    config?: FindConfig<StockLocationAddressDTO>,
+    context?: Context
+  ): Promise<StockLocationAddressDTO[]>
+
+  /**
+   * This method updates or creates stock location addresses
+   *
+   * @param {Partial<UpsertStockLocationAddressInput>[]} data - The list of Make all properties in t optional
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<StockLocationAddressDTO[]>} The created or updated stock location address
+   *
+   * @example
+   * {example-code}
+   */
+  upsertStockLocationAddresses(
+    data: UpsertStockLocationAddressInput[],
+    sharedContext?: Context
+  ): Promise<StockLocationAddressDTO[]>
+
+  /**
+   * This method deletes a stock location address by its ID.
+   *
+   * @param {string} id - The ID of the stock location address.
+   * @param {Context} context - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<void>} Resolves when the stock location address is deleted successfully.
+   *
+   * @example
+   * await stockLocationModuleService.deleteStockLocationAddresses("sla_123")
+   */
+  deleteStockLocationAddresses(
+    id: string | string[],
+    context?: Context
+  ): Promise<void>
 }

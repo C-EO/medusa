@@ -1,5 +1,5 @@
-import { OrderDetailDTO } from "@medusajs/types"
-import { isDefined, MathBN } from "@medusajs/utils"
+import { OrderDetailDTO } from "@medusajs/framework/types"
+import { isDefined, MathBN } from "@medusajs/framework/utils"
 
 export const getLastPaymentStatus = (order: OrderDetailDTO) => {
   const PaymentStatus = {
@@ -21,7 +21,11 @@ export const getLastPaymentStatus = (order: OrderDetailDTO) => {
   }
 
   for (const paymentCollection of order.payment_collections) {
-    if (MathBN.gt(paymentCollection.captured_amount ?? 0, 0)) {
+    if (
+      MathBN.gt(paymentCollection.captured_amount ?? 0, 0) ||
+      (isDefined(paymentCollection.amount) &&
+        MathBN.eq(paymentCollection.amount, 0))
+    ) {
       paymentStatus[PaymentStatus.CAPTURED] += MathBN.eq(
         paymentCollection.captured_amount as number,
         paymentCollection.amount
@@ -51,7 +55,10 @@ export const getLastPaymentStatus = (order: OrderDetailDTO) => {
   }
 
   if (paymentStatus[PaymentStatus.REFUNDED] > 0) {
-    if (paymentStatus[PaymentStatus.REFUNDED] === totalPaymentExceptCanceled) {
+    if (
+      paymentStatus[PaymentStatus.REFUNDED] ===
+      paymentStatus[PaymentStatus.CAPTURED]
+    ) {
       return PaymentStatus.REFUNDED
     }
 
@@ -134,11 +141,12 @@ export const getLastFulfillmentStatus = (order: OrderDetailDTO) => {
   // Whenever there are any unfulfilled items in the order, it should be
   // considered partially_[STATUS] where status is picked up from the hierarchy
   // of statuses
-  const hasUnfulfilledItems = (order.items || [])?.filter(
-    (i) =>
-      isDefined(i?.detail?.raw_fulfilled_quantity) &&
-      MathBN.lt(i.detail.raw_fulfilled_quantity, i.raw_quantity)
-  ).length > 0
+  const hasUnfulfilledItems =
+    (order.items || [])?.filter(
+      (i) =>
+        isDefined(i?.detail?.raw_fulfilled_quantity) &&
+        MathBN.lt(i.detail.raw_fulfilled_quantity, i.raw_quantity)
+    ).length > 0
 
   if (fulfillmentStatus[FulfillmentStatus.DELIVERED] > 0) {
     if (

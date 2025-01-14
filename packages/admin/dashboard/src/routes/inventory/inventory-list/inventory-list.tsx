@@ -1,11 +1,18 @@
+import { SingleColumnPage } from "../../../components/layout/pages"
+import { useDashboardExtension } from "../../../extensions"
 import { InventoryListTable } from "./components/inventory-list-table"
-import { Outlet } from "react-router-dom"
 
 export const InventoryItemListTable = () => {
+  const { getWidgets } = useDashboardExtension()
+
   return (
-    <div className="flex flex-col gap-y-2">
+    <SingleColumnPage
+      widgets={{
+        after: getWidgets("inventory_item.list.after"),
+        before: getWidgets("inventory_item.list.before"),
+      }}
+    >
       <InventoryListTable />
-      <Outlet />
-    </div>
+    </SingleColumnPage>
   )
 }

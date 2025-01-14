@@ -36,7 +36,7 @@ const Indicator = React.forwardRef<
     >
       <div
         className={clx(
-          "bg-ui-bg-base shadow-details-contrast-on-bg-interactive group-disabled:bg-ui-fg-disabled h-1.5 w-1.5 rounded-full group-disabled:shadow-none"
+          "bg-ui-bg-base shadow-details-contrast-on-bg-interactive h-1.5 w-1.5 rounded-full"
         )}
       />
     </Primitives.Indicator>
@@ -60,10 +60,10 @@ const Item = React.forwardRef<
       <div
         className={clx(
           "shadow-borders-base bg-ui-bg-base transition-fg flex h-[14px] w-[14px] items-center justify-center rounded-full",
-          "group-hover:bg-ui-bg-base-hover",
+          "group-hover:group-enabled:group-data-[state=unchecked]:bg-ui-bg-base-hover",
           "group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive-with-shadow",
           "group-focus-visible:!shadow-borders-interactive-with-focus",
-          "group-disabled:!bg-ui-bg-disabled group-disabled:!shadow-borders-base"
+          "group-disabled:cursor-not-allowed group-disabled:opacity-50"
         )}
       >
         <Indicator />
@@ -95,7 +95,10 @@ const ChoiceBox = React.forwardRef<
     <Primitives.Item
       ref={ref}
       className={clx(
-        "shadow-borders-base bg-ui-bg-base focus-visible:shadow-borders-interactive-with-focus outline-none transition-fg disabled:bg-ui-bg-disabled group flex items-start gap-x-2 rounded-lg p-3 disabled:cursor-not-allowed data-[state=checked]:shadow-borders-interactive-with-shadow",
+        "shadow-borders-base bg-ui-bg-base focus-visible:shadow-borders-interactive-with-focus transition-fg group flex items-start gap-x-2 rounded-lg p-3 outline-none",
+        "hover:enabled:bg-ui-bg-base-hover",
+        "data-[state=checked]:shadow-borders-interactive-with-shadow",
+        "group-disabled:cursor-not-allowed group-disabled:opacity-50",
         className
       )}
       {...props}
@@ -103,7 +106,12 @@ const ChoiceBox = React.forwardRef<
       aria-describedby={descriptionId}
     >
       <div className="flex h-5 w-5 items-center justify-center">
-        <div className="shadow-borders-base bg-ui-bg-base group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive-with-shadow transition-fg group-disabled:!bg-ui-bg-disabled group-hover:bg-ui-bg-base-hover group-disabled:!shadow-borders-base flex h-3.5 w-3.5 items-center justify-center rounded-full">
+        <div
+          className={clx(
+            "shadow-borders-base bg-ui-bg-base group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive-with-shadow transition-fg flex h-3.5 w-3.5 items-center justify-center rounded-full",
+            "group-hover:group-enabled:group-data-[state=unchecked]:bg-ui-bg-base-hover"
+          )}
+        >
           <Indicator />
         </div>
       </div>
@@ -117,7 +125,7 @@ const ChoiceBox = React.forwardRef<
           {label}
         </Label>
         <Hint
-          className="txt-compact-medium text-ui-fg-subtle group-disabled:text-ui-fg-disabled text-left"
+          className="txt-small text-ui-fg-subtle group-disabled:text-ui-fg-disabled text-left"
           id={descriptionId}
         >
           {description}

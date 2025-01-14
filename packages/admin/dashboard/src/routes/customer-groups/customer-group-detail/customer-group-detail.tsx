@@ -6,9 +6,9 @@ import { CustomerGroupCustomerSection } from "./components/customer-group-custom
 import { CustomerGroupGeneralSection } from "./components/customer-group-general-section"
 import { customerGroupLoader } from "./loader"
 
-import after from "virtual:medusa/widgets/customer_group/details/after"
-import before from "virtual:medusa/widgets/customer_group/details/before"
 import { SingleColumnPageSkeleton } from "../../../components/common/skeleton"
+import { useDashboardExtension } from "../../../extensions"
+import { CUSTOMER_GROUP_DETAIL_FIELDS } from "./constants"
 
 export const CustomerGroupDetail = () => {
   const initialData = useLoaderData() as Awaited<
@@ -19,10 +19,12 @@ export const CustomerGroupDetail = () => {
   const { customer_group, isLoading, isError, error } = useCustomerGroup(
     id!,
     {
-      fields: "+customers.id",
+      fields: CUSTOMER_GROUP_DETAIL_FIELDS,
     },
     { initialData }
   )
+
+  const { getWidgets } = useDashboardExtension()
 
   if (isLoading || !customer_group) {
     return <SingleColumnPageSkeleton sections={2} showJSON showMetadata />
@@ -35,8 +37,8 @@ export const CustomerGroupDetail = () => {
   return (
     <SingleColumnPage
       widgets={{
-        before,
-        after,
+        before: getWidgets("customer_group.details.before"),
+        after: getWidgets("customer_group.details.after"),
       }}
       showJSON
       showMetadata

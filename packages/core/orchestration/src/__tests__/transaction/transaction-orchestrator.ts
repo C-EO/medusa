@@ -1,6 +1,7 @@
 import { TransactionStepState, TransactionStepStatus } from "@medusajs/utils"
 import { setTimeout } from "timers/promises"
 import {
+  DistributedTransaction,
   DistributedTransactionType,
   TransactionHandlerType,
   TransactionOrchestrator,
@@ -10,6 +11,7 @@ import {
   TransactionStepTimeoutError,
   TransactionTimeoutError,
 } from "../../transaction"
+import { BaseInMemoryDistributedTransactionStorage } from "../../transaction/datastore/base-in-memory-storage"
 
 describe("Transaction Orchestrator", () => {
   afterEach(() => {
@@ -149,6 +151,104 @@ describe("Transaction Orchestrator", () => {
 
     await strategy.resume(transaction)
     expect(actionOrder).toEqual(["one", "two", "three", "four", "five", "six"])
+  })
+
+  it("Should gracefully handle non serializable error when an async step fails", async () => {
+    class BaseInMemoryDistributedTransactionStorage_ extends BaseInMemoryDistributedTransactionStorage {
+      scheduleRetry() {
+        return Promise.resolve()
+      }
+    }
+    DistributedTransaction.setStorage(
+      new BaseInMemoryDistributedTransactionStorage_()
+    )
+
+    const actionOrder: string[] = []
+    async function handler(
+      actionId: string,
+      functionHandlerType: TransactionHandlerType,
+      payload: TransactionPayload
+    ) {
+      if (functionHandlerType === TransactionHandlerType.INVOKE) {
+        actionOrder.push(actionId)
+      }
+
+      if (
+        functionHandlerType === TransactionHandlerType.INVOKE &&
+        actionId === "three"
+      ) {
+        const error = new Error("Step 3 failed")
+
+        const obj: any = {}
+        obj.self = obj
+        ;(error as any).metadata = obj
+        throw error
+      }
+    }
+
+    const flow: TransactionStepsDefinition = {
+      next: [
+        {
+          action: "one",
+        },
+        {
+          action: "two",
+          next: {
+            action: "four",
+            next: {
+              action: "six",
+            },
+          },
+        },
+        {
+          action: "three",
+          async: true,
+          maxRetries: 0,
+          next: {
+            action: "five",
+          },
+        },
+      ],
+    }
+
+    const strategy = new TransactionOrchestrator({
+      id: "transaction-name",
+      definition: flow,
+    })
+
+    const transaction = await strategy.beginTransaction(
+      "transaction_id_123",
+      handler
+    )
+
+    await strategy.resume(transaction)
+
+    expect(transaction.getErrors()).toHaveLength(2)
+    expect(transaction.getErrors()).toEqual([
+      {
+        action: "three",
+        error: {
+          message: "Step 3 failed",
+          name: "Error",
+          stack: expect.any(String),
+        },
+        handlerType: "invoke",
+      },
+      {
+        action: "three",
+        error: expect.objectContaining({
+          message: expect.stringContaining(
+            "Converting circular structure to JSON"
+          ),
+          stack: expect.any(String),
+        }),
+        handlerType: "invoke",
+      },
+    ])
+
+    DistributedTransaction.setStorage(
+      new BaseInMemoryDistributedTransactionStorage()
+    )
   })
 
   it("Should not execute next steps when a step fails", async () => {

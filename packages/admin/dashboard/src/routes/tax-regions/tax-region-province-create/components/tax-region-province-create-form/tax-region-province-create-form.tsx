@@ -14,6 +14,7 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCreateTaxRegion } from "../../../../../hooks/api/tax-regions"
 import { getCountryProvinceObjectByIso2 } from "../../../../../lib/data/country-states"
 
@@ -24,7 +25,7 @@ type TaxRegionProvinceCreateFormProps = {
 const CreateTaxRegionProvinceSchema = z.object({
   province_code: z.string().min(1),
   name: z.string().optional(),
-  code: z.string().optional(),
+  code: z.string().min(1),
   rate: z
     .object({
       float: z.number().optional(),
@@ -96,7 +97,7 @@ export const TaxRegionProvinceCreateForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -241,7 +242,7 @@ export const TaxRegionProvinceCreateForm = ({
             </Button>
           </div>
         </RouteFocusModal.Footer>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

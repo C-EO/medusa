@@ -1,5 +1,5 @@
 {
-  "description": "",
+  "description": "This component is used to wrap the header content of the drawer.\nThis component is based on the `div` element and supports all of its props.",
   "methods": [],
   "displayName": "Drawer.Header",
   "props": {}

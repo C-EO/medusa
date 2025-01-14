@@ -1,10 +1,10 @@
-import { AdminExchangeResponse } from "@medusajs/types"
-import { MedusaError } from "@medusajs/utils"
+import { AdminExchangeResponse } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
-import { refetchEntity } from "../../../utils/refetch-entity"
+  refetchEntity,
+} from "@medusajs/framework/http"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -14,7 +14,7 @@ export const GET = async (
     "order_exchange",
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!exchange) {

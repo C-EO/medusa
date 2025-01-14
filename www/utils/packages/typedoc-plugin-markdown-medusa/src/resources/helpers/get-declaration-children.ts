@@ -1,7 +1,7 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { DeclarationReflection } from "typedoc"
 import { getTypeChildren } from "utils"
-import { MarkdownTheme } from "../../theme"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

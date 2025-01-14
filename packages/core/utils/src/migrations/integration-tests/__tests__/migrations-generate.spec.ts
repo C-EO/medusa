@@ -4,8 +4,10 @@ import { MetadataStorage } from "@mikro-orm/core"
 
 import { Migrations } from "../../index"
 import { FileSystem } from "../../../common"
-import { DmlEntity, model } from "../../../dml"
+import { DmlEntity, mikroORMEntityBuilder, model } from "../../../dml"
 import { defineMikroOrmCliConfig } from "../../../modules-sdk"
+
+jest.setTimeout(30000)
 
 const DB_HOST = process.env.DB_HOST ?? "localhost"
 const DB_USERNAME = process.env.DB_USERNAME ?? ""
@@ -29,7 +31,8 @@ describe("Generate migrations", () => {
   afterEach(async () => {
     await fs.cleanup()
     MetadataStorage.clear()
-  }, 300 * 1000)
+    mikroORMEntityBuilder.clear()
+  })
 
   test("generate migrations for a single entity", async () => {
     const User = model.define("User", {

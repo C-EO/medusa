@@ -3,7 +3,13 @@ import { Client } from "../client"
 import { ClientHeaders } from "../types"
 
 export class ShippingOption {
+  /**
+   * @ignore
+   */
   private client: Client
+  /**
+   * @ignore
+   */
   constructor(client: Client) {
     this.client = client
   }
@@ -19,6 +25,21 @@ export class ShippingOption {
         method: "POST",
         headers,
         body,
+        query,
+      }
+    )
+  }
+
+  async retrieve(
+    id: string,
+    query?: HttpTypes.SelectParams,
+    headers?: ClientHeaders
+  ) {
+    return await this.client.fetch<HttpTypes.AdminShippingOptionResponse>(
+      `/admin/shipping-options/${id}`,
+      {
+        method: "GET",
+        headers,
         query,
       }
     )

@@ -26,7 +26,12 @@
  *       schema:
  *         type: object
  *         title: input
- *         description: The input data necessary for authentication. For example, for email-pass authentication, pass `email` and `password` properties.
+ *         description: >
+ *           The input data necessary for authentication. 
+ * 
+ *           For example, for email-pass authentication, pass `email` and `password` properties. 
+ * 
+ *           For the Google and GitHub authentication providers, you can pass `callback_url` to indicate the URL in the frontend that the user should be redirected to after completing their authentication. This will override the provider's `callbackUrl` configurations in `medusa-config.ts`.
  * x-codeSamples:
  *   - lang: Shell
  *     label: EmailPass Provider
@@ -37,14 +42,10 @@
  *         "email": "admin@medusa-test.com",
  *         "password": "supersecret"
  *       }'
- *   - lang: Shell
+ *   - lang: Bash
  *     label: Google Provider
  *     source:  |-
  *       curl -X POST '{backend_url}/auth/user/google'
- *   - lang: Shell
- *     label: GitHub Provider
- *     source:  |-
- *       curl -X POST '{backend_url}/auth/user/github'
  * tags:
  *   - Auth
  * responses:

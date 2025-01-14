@@ -1,3 +1,9 @@
+---
+tags:
+  - cart
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -30,7 +36,7 @@ export const fetchHighlights = [
     method: "POST",
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -49,7 +55,7 @@ export const fetchHighlights = [
 export const highlights = [
   ["8", "region", "Assuming you previously retrieved the chosen region."],
   ["15", "cartId", "Retrieve the cart ID from `localStorage`, if exists."],
-  ["21", "", "Send a request to create the cart."],
+  ["22", "fetch", "Send a request to create the cart."],
   ["26", "process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY", "Pass the Publishable API key to associate the correct sales channel(s)."],
   ["30", "region_id", "Associate the cart with the chosen region for accurate pricing."],
   ["35", "setItem", "Set the cart's ID in the `localStorage`."]
@@ -81,7 +87,7 @@ export const highlights = [
         method: "POST",
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -117,24 +123,6 @@ This is necessary, as only products matching the cart's sales channel(s) can be 
 
 ## Associate Customer with Cart
 
-When creating the cart, you can associate the logged-in customer's ID with the cart by passing a `customer_id` request body parameter.
+When the cart is created for a logged-in customer, it's automatically associated with that customer.
 
-For example:
-
-export const customerHighlights = [
-  ["5", "customer.id", "Assuming you have the customer object."]
-]
-
-```ts highlights={customerHighlights}
-fetch(`http://localhost:9000/store/carts`, {
-  // ...
-  body: JSON.stringify({
-    // ...
-    customer_id: customer.id,
-  }),
-})
-.then((res) => res.json())
-.then(({ cart }) => {
-  localStorage.setItem("cart_id", cart.id)
-})
-```
+However, if the cart is created for a guest customer, then the customer logs in, then you have to set the cart's customer as explained in [this guide](../update/page.mdx#set-carts-customer).

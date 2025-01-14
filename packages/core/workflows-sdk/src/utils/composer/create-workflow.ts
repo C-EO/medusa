@@ -4,9 +4,13 @@ import {
   WorkflowManager,
 } from "@medusajs/orchestration"
 import { LoadedModule, MedusaContainer } from "@medusajs/types"
-import { OrchestrationUtils, isString } from "@medusajs/utils"
+import {
+  getCallerFilePath,
+  isString,
+  OrchestrationUtils,
+} from "@medusajs/utils"
 import { ulid } from "ulid"
-import { exportWorkflow } from "../../helper"
+import { exportWorkflow, WorkflowResult } from "../../helper"
 import { createStep } from "./create-step"
 import { proxify } from "./helpers/proxy"
 import { StepResponse } from "./helpers/step-response"
@@ -34,8 +38,11 @@ global[OrchestrationUtils.SymbolMedusaWorkflowComposerContext] = null
  * @returns The created workflow. You can later execute the workflow by invoking it, then using its `run` method.
  *
  * @example
- * import { createWorkflow } from "@medusajs/workflows-sdk"
- * import { MedusaRequest, MedusaResponse, Product } from "@medusajs/medusa"
+ * import {
+ *   createWorkflow,
+ *   WorkflowResponse
+ * } from "@medusajs/framework/workflows-sdk"
+ * import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
  * import {
  *   createProductStep,
  *   getProductStep,
@@ -46,16 +53,15 @@ global[OrchestrationUtils.SymbolMedusaWorkflowComposerContext] = null
  *  title: string
  * }
  *
- * const myWorkflow = createWorkflow<
- *     WorkflowInput,
- *     Product
- *   >("my-workflow", (input) => {
+ * const myWorkflow = createWorkflow(
+ *   "my-workflow",
+ *   (input: WorkflowInput) => {
  *    // Everything here will be executed and resolved later
  *    // during the execution. Including the data access.
  *
  *     const product = createProductStep(input)
  *     const prices = createPricesStep(product)
- *     return getProductStep(product.id)
+ *     return new WorkflowResponse(getProductStep(product.id))
  *   }
  * )
  *
@@ -90,6 +96,7 @@ export function createWorkflow<TData, TResult, THooks extends any[]>(
     input: WorkflowData<TData>
   ) => void | WorkflowResponse<TResult, THooks>
 ): ReturnWorkflow<TData, TResult, THooks> {
+  const fileSourcePath = getCallerFilePath() as string
   const name = isString(nameOrConfig) ? nameOrConfig : nameOrConfig.name
   const options = isString(nameOrConfig) ? {} : nameOrConfig
 
@@ -145,14 +152,10 @@ export function createWorkflow<TData, TResult, THooks extends any[]>(
     WorkflowManager.register(name, context.flow, handlers, options)
   }
 
-  const workflow = exportWorkflow<TData, TResult>(
-    name,
-    returnedStep,
-    undefined,
-    {
-      wrappedInput: true,
-    }
-  )
+  const workflow = exportWorkflow<TData, TResult>(name, returnedStep, {
+    wrappedInput: true,
+    sourcePath: fileSourcePath,
+  })
 
   const mainFlow = <TDataOverride = undefined, TResultOverride = undefined>(
     container?: LoadedModule[] | MedusaContainer
@@ -192,25 +195,35 @@ export function createWorkflow<TData, TResult, THooks extends any[]>(
           container,
           context: {
             ...sharedContext,
+            transactionId:
+              step.__step__ + "-" + (stepContext.transactionId ?? ulid()),
             parentStepIdempotencyKey: stepContext.idempotencyKey,
-            transactionId: ulid(),
           },
         })
 
-        const { result, transaction: flowTransaction } = transaction
+        const { result } = transaction
 
-        if (!context.isAsync || flowTransaction.hasFinished()) {
-          return new StepResponse(result, transaction)
-        }
-
-        return
+        return new StepResponse(
+          result,
+          context.isAsync ? stepContext.transactionId : transaction
+        )
       },
-      async (transaction, { container }) => {
+      async (transaction, stepContext) => {
         if (!transaction) {
           return
         }
 
-        await workflow(container).cancel(transaction)
+        const { container, ...sharedContext } = stepContext
+
+        await workflow(container).cancel({
+          transaction: (transaction as WorkflowResult<any>).transaction,
+          transactionId: isString(transaction) ? transaction : undefined,
+          container,
+          context: {
+            ...sharedContext,
+            parentStepIdempotencyKey: stepContext.idempotencyKey,
+          },
+        })
       }
     )(input) as ReturnType<StepFunction<TData, TResult>>
 

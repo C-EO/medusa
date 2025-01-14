@@ -1,18 +1,18 @@
-import { resolve } from "path"
 import {
   IFulfillmentModuleService,
   UpdateFulfillmentDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
+import { FulfillmentEvents, Modules } from "@medusajs/framework/utils"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
+import { resolve } from "path"
 import {
   buildExpectedEventMessageShape,
   generateCreateFulfillmentData,
   generateCreateShippingOptionsData,
 } from "../../__fixtures__"
-import { FulfillmentEvents, Modules } from "@medusajs/utils"
 
 jest.setTimeout(100000)
 
@@ -506,6 +506,67 @@ moduleIntegrationTestRunner<IFulfillmentModuleService>({
 
             expect(err.message).toEqual(
               `Fulfillment with id ${fulfillment.id} already delivered`
+            )
+          })
+        })
+
+        describe("on delete", () => {
+          let fulfillment
+
+          beforeEach(async () => {
+            const shippingProfile = await service.createShippingProfiles({
+              name: "test",
+              type: "default",
+            })
+
+            const fulfillmentSet = await service.createFulfillmentSets({
+              name: "test",
+              type: "test-type",
+            })
+
+            const serviceZone = await service.createServiceZones({
+              name: "test",
+              fulfillment_set_id: fulfillmentSet.id,
+            })
+
+            const shippingOption = await service.createShippingOptions(
+              generateCreateShippingOptionsData({
+                provider_id: providerId,
+                service_zone_id: serviceZone.id,
+                shipping_profile_id: shippingProfile.id,
+              })
+            )
+
+            fulfillment = await service.createFulfillment(
+              generateCreateFulfillmentData({
+                provider_id: providerId,
+                shipping_option_id: shippingOption.id,
+              })
+            )
+
+            jest.clearAllMocks()
+          })
+
+          it("should delete a canceled fulfillment successfully", async () => {
+            await service.cancelFulfillment(fulfillment.id)
+            await service.deleteFulfillment(fulfillment.id)
+
+            const retrieveError = await service
+              .retrieveFulfillment(fulfillment.id)
+              .catch((e) => e)
+
+            expect(retrieveError.message).toEqual(
+              `Fulfillment with id: ${fulfillment.id} was not found`
+            )
+          })
+
+          it("should fail to delete an uncanceled fulfillment", async () => {
+            const deleteError = await service
+              .deleteFulfillment(fulfillment.id)
+              .catch((e) => e)
+
+            expect(deleteError.message).toEqual(
+              `Fulfillment with id ${fulfillment.id} needs to be canceled first before deleting`
             )
           })
         })

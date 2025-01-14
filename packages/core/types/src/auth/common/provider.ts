@@ -59,6 +59,10 @@ export type AuthenticationInput = {
 
   /**
    * Body of the incoming authentication request.
+   *
+   * One of the arguments that is suggested to be treated in a standard manner is a `callback_url` field.
+   * The field specifies where the user is redirected to after a successful authentication in the case of Oauth auhentication.
+   * If not passed, the provider will fallback to the callback_url provided in the provider options.
    */
   body?: Record<string, string>
 

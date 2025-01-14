@@ -19,21 +19,22 @@ type NestedItemProps = {
   to: string
 }
 
-export type NavItemProps = {
+export type INavItem = {
   icon?: ReactNode
   label: string
   to: string
   items?: NestedItemProps[]
   type?: ItemType
   from?: string
+  nested?: string
 }
 
 const BASE_NAV_LINK_CLASSES =
-  "text-ui-fg-subtle transition-fg hover:bg-ui-bg-subtle-hover flex items-center gap-x-2 rounded-md py-1 pl-0.5 pr-2 outline-none [&>svg]:text-ui-fg-subtle focus-visible:shadow-borders-focus"
+  "text-ui-fg-subtle transition-fg hover:bg-ui-bg-subtle-hover flex items-center gap-x-2 rounded-md py-0.5 pl-0.5 pr-2 outline-none [&>svg]:text-ui-fg-subtle focus-visible:shadow-borders-focus"
 const ACTIVE_NAV_LINK_CLASSES =
   "bg-ui-bg-base shadow-elevation-card-rest text-ui-fg-base hover:bg-ui-bg-base"
-const NESTED_NAV_LINK_CLASSES = "pl-[34px] pr-2 w-full text-ui-fg-muted"
-const SETTING_NAV_LINK_CLASSES = "pl-2"
+const NESTED_NAV_LINK_CLASSES = "pl-[34px] pr-2 py-1 w-full text-ui-fg-muted"
+const SETTING_NAV_LINK_CLASSES = "pl-2 py-1"
 
 const getIsOpen = (
   to: string,
@@ -89,7 +90,7 @@ export const NavItem = ({
   items,
   type = "core",
   from,
-}: NavItemProps) => {
+}: INavItem) => {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(getIsOpen(to, items, pathname))
 
@@ -99,20 +100,27 @@ export const NavItem = ({
 
   const navLinkClassNames = useCallback(
     ({
+      to,
       isActive,
       isNested = false,
       isSetting = false,
     }: {
+      to: string
       isActive: boolean
       isNested?: boolean
       isSetting?: boolean
-    }) =>
-      clx(BASE_NAV_LINK_CLASSES, {
+    }) => {
+      if (["core", "setting"].includes(type)) {
+        isActive = pathname.startsWith(to)
+      }
+
+      return clx(BASE_NAV_LINK_CLASSES, {
         [NESTED_NAV_LINK_CLASSES]: isNested,
         [ACTIVE_NAV_LINK_CLASSES]: isActive,
         [SETTING_NAV_LINK_CLASSES]: isSetting,
-      }),
-    []
+      })
+    },
+    [type, pathname]
   )
 
   const isSetting = type === "setting"
@@ -122,6 +130,7 @@ export const NavItem = ({
       <NavItemTooltip to={to}>
         <NavLink
           to={to}
+          end
           state={
             from
               ? {
@@ -129,11 +138,11 @@ export const NavItem = ({
                 }
               : undefined
           }
-          className={(props) =>
-            clx(navLinkClassNames({ ...props, isSetting }), {
+          className={({ isActive }) => {
+            return clx(navLinkClassNames({ isActive, isSetting, to }), {
               "max-lg:hidden": !!items?.length,
             })
-          }
+          }}
         >
           {type !== "setting" && (
             <div className="flex size-6 items-center justify-center">
@@ -149,7 +158,7 @@ export const NavItem = ({
         <Collapsible.Root open={open} onOpenChange={setOpen}>
           <Collapsible.Trigger
             className={clx(
-              "text-ui-fg-subtle hover:text-ui-fg-base transition-fg hover:bg-ui-bg-subtle-hover flex w-full items-center gap-x-2 rounded-md py-1 pl-0.5 pr-2 outline-none lg:hidden",
+              "text-ui-fg-subtle hover:text-ui-fg-base transition-fg hover:bg-ui-bg-subtle-hover flex w-full items-center gap-x-2 rounded-md py-0.5 pl-0.5 pr-2 outline-none lg:hidden",
               { "pl-2": isSetting }
             )}
           >
@@ -167,15 +176,17 @@ export const NavItem = ({
                   <NavItemTooltip to={to}>
                     <NavLink
                       to={to}
-                      className={(props) =>
-                        clx(
+                      end
+                      className={({ isActive }) => {
+                        return clx(
                           navLinkClassNames({
-                            ...props,
-                            isNested: true,
+                            to,
+                            isActive,
                             isSetting,
+                            isNested: true,
                           })
                         )
-                      }
+                      }}
                     >
                       <Text size="small" weight="plus" leading="compact">
                         {label}
@@ -189,15 +200,17 @@ export const NavItem = ({
                       <NavItemTooltip to={item.to}>
                         <NavLink
                           to={item.to}
-                          className={(props) =>
-                            clx(
+                          end
+                          className={({ isActive }) => {
+                            return clx(
                               navLinkClassNames({
-                                ...props,
-                                isNested: true,
+                                to: item.to,
+                                isActive,
                                 isSetting,
+                                isNested: true,
                               })
                             )
-                          }
+                          }}
                         >
                           <Text size="small" weight="plus" leading="compact">
                             {item.label}

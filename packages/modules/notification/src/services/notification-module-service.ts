@@ -4,9 +4,10 @@ import {
   InferEntityType,
   INotificationModuleService,
   InternalModuleDeclaration,
+  Logger,
   ModulesSdkTypes,
   NotificationTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   EmitEvents,
   generateEntityId,
@@ -16,12 +17,13 @@ import {
   MedusaService,
   NotificationStatus,
   promiseAll,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { Notification } from "@models"
 import { eventBuilders } from "@utils"
 import NotificationProviderService from "./notification-provider"
 
 type InjectedDependencies = {
+  logger?: Logger
   baseRepository: DAL.RepositoryService
   notificationService: ModulesSdkTypes.IMedusaInternalService<
     typeof Notification
@@ -121,7 +123,7 @@ export default class NotificationModuleService
           {
             idempotency_key: idempotencyKeys,
           },
-          { take: null },
+          {},
           context
         )
 

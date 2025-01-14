@@ -1,23 +1,28 @@
-import { getOrderDetailWorkflow } from "@medusajs/core-flows"
 import {
-  ContainerRegistrationKeys,
-  remoteQueryObjectFromString,
-} from "@medusajs/utils"
+  getOrderDetailWorkflow,
+  updateOrderWorkflow,
+} from "@medusajs/core-flows"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
-import { HttpTypes } from "@medusajs/types"
+} from "@medusajs/framework/http"
+import { AdminOrder, HttpTypes } from "@medusajs/framework/types"
+import {
+  AdminGetOrdersOrderParamsType,
+  AdminUpdateOrderType,
+} from "../validators"
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 export const GET = async (
-  req: AuthenticatedMedusaRequest,
+  req: AuthenticatedMedusaRequest<AdminGetOrdersOrderParamsType>,
   res: MedusaResponse<HttpTypes.AdminOrderResponse>
 ) => {
   const workflow = getOrderDetailWorkflow(req.scope)
   const { result } = await workflow.run({
     input: {
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
       order_id: req.params.id,
+      version: req.validatedQuery.version as number,
     },
   })
 
@@ -25,21 +30,24 @@ export const GET = async (
 }
 
 export const POST = async (
-  req: AuthenticatedMedusaRequest,
+  req: AuthenticatedMedusaRequest<AdminUpdateOrderType>,
   res: MedusaResponse<HttpTypes.AdminOrderResponse>
 ) => {
-  const remoteQuery = req.scope.resolve(ContainerRegistrationKeys.REMOTE_QUERY)
+  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
-  const variables = { id: req.params.id }
-
-  // TODO: update order
-
-  const queryObject = remoteQueryObjectFromString({
-    entryPoint: "order",
-    variables,
-    fields: req.remoteQueryConfig.fields,
+  await updateOrderWorkflow(req.scope).run({
+    input: {
+      ...req.validatedBody,
+      user_id: req.auth_context.actor_id,
+      id: req.params.id,
+    },
   })
 
-  const [order] = await remoteQuery(queryObject)
-  res.status(200).json({ order })
+  const result = await query.graph({
+    entity: "order",
+    filters: { id: req.params.id },
+    fields: req.queryConfig.fields,
+  })
+
+  res.status(200).json({ order: result.data[0] as AdminOrder })
 }

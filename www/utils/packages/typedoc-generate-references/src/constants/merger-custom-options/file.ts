@@ -1,9 +1,10 @@
 import { FormattingOptionsType } from "types"
+import baseSectionsOptions from "../base-section-options.js"
 
 const fileOptions: FormattingOptionsType = {
   "^file/.*AbstractFileProviderService": {
     reflectionGroups: {
-      Properties: false,
+      Constructors: false,
     },
     reflectionDescription: `In this document, you’ll learn how to create a file provider module and the methods you must implement in its main service.`,
     frontmatterData: {
@@ -14,16 +15,22 @@ const fileOptions: FormattingOptionsType = {
     },
     shouldIncrementAfterStartSections: true,
     expandMembers: true,
+    expandProperties: true,
+    sections: {
+      ...baseSectionsOptions,
+      member_declaration_title: false,
+      reflection_typeParameters: false,
+    },
     startSections: [
       `## 1. Create Module Directory
 
 Start by creating a new directory for your module. For example, \`src/modules/my-file\`.`,
       `## 2. Create the File Provider Service
 
-Create the file \`src/modules/my-file/service.ts\` that holds the implementation of the module's main service. It must extend the \`AbstractFileProviderService\` class imported from \`@medusajs/utils\`:
+Create the file \`src/modules/my-file/service.ts\` that holds the implementation of the module's main service. It must extend the \`AbstractFileProviderService\` class imported from \`@medusajs/framework/utils\`:
 
 \`\`\`ts title="src/modules/my-file/service.ts"
-import { AbstractFileProviderService } from "@medusajs/utils"
+import { AbstractFileProviderService } from "@medusajs/framework/utils"
 
 class MyFileProviderService extends AbstractFileProviderService {
   // TODO implement methods
@@ -39,16 +46,20 @@ Create the file \`src/modules/my-file/index.ts\` with the following content:
 
 \`\`\`ts title="src/modules/my-file/index.ts"
 import MyFileProviderService from "./service"
+import { 
+  ModuleProvider, 
+  Modules
+} from "@medusajs/framework/utils"
 
-export default {
+export default ModuleProvider(Modules.FILE, {
   services: [MyFileProviderService],
-}
+})
 \`\`\`
 
 This exports the module's definition, indicating that the \`MyFileProviderService\` is the module's service.`,
       `## 4. Use Module
 
-To use your File Module Provider, add it to the \`providers\` array of the File Module:
+To use your File Module Provider, add it to the \`providers\` array of the File Module in \`medusa-config.ts\`:
 
 <Note>
 
@@ -56,20 +67,21 @@ The File Module accepts one provider only.
 
 </Note>
 
-\`\`\`js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
-
-// ...
-
+\`\`\`ts title="medusa-config.ts"
 module.exports = defineConfig({
   // ...
-  modules: {
-    [Modules.FILE]: {
-      resolve: "@medusajs/file",
+  modules: [
+    {
+      resolve: "@medusajs/medusa/file",
       options: {
         providers: [
+          // default provider
           {
-            resolve: "./modules/my-file",
+            resolve: "@medusajs/medusa/file-local",
+            id: "local",
+          },
+          {
+            resolve: "./src/modules/my-file",
             id: "my-file",
             options: {
               // provider options...
@@ -78,9 +90,13 @@ module.exports = defineConfig({
         ],
       },
     },
-  }
+  ]
 })
 \`\`\`
+`,
+      `## 5. Test it Out
+
+To test out your file provider, use the Medusa Admin or the [Upload API route](https://docs.medusajs.com/v2/api/admin#uploads_postuploads) to upload a file.
 `,
     ],
   },

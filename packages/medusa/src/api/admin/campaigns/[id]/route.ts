@@ -1,7 +1,7 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   deleteCampaignsWorkflow,
   updateCampaignsWorkflow,
@@ -9,8 +9,8 @@ import {
 
 import { refetchCampaign } from "../helpers"
 import { AdminUpdateCampaignType } from "../validators"
-import { MedusaError } from "@medusajs/utils"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
+import { MedusaError } from "@medusajs/framework/utils"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -19,7 +19,7 @@ export const GET = async (
   const campaign = await refetchCampaign(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!campaign) {
@@ -62,7 +62,7 @@ export const POST = async (
   const campaign = await refetchCampaign(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ campaign })
 }

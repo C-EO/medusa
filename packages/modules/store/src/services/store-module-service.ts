@@ -1,11 +1,12 @@
 import {
   Context,
   DAL,
+  InferEntityType,
   InternalModuleDeclaration,
   IStoreModuleService,
   ModulesSdkTypes,
   StoreTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   getDuplicates,
   InjectManager,
@@ -16,7 +17,7 @@ import {
   MedusaService,
   promiseAll,
   removeUndefined,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 import { Store, StoreCurrency } from "@models"
 import { UpdateStoreInput } from "@types"
@@ -34,7 +35,9 @@ export default class StoreModuleService
   implements IStoreModuleService
 {
   protected baseRepository_: DAL.RepositoryService
-  protected readonly storeService_: ModulesSdkTypes.IMedusaInternalService<Store>
+  protected readonly storeService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof Store>
+  >
 
   constructor(
     { baseRepository, storeService }: InjectedDependencies,
@@ -73,7 +76,7 @@ export default class StoreModuleService
   async create_(
     data: StoreTypes.CreateStoreDTO[],
     @MedusaContext() sharedContext: Context = {}
-  ): Promise<Store[]> {
+  ): Promise<InferEntityType<typeof Store>[]> {
     let normalizedInput = StoreModuleService.normalizeInput(data)
     StoreModuleService.validateCreateRequest(normalizedInput)
 
@@ -107,7 +110,7 @@ export default class StoreModuleService
       (store): store is StoreTypes.CreateStoreDTO => !store.id
     )
 
-    const operations: Promise<Store[]>[] = []
+    const operations: Promise<InferEntityType<typeof Store>[]>[] = []
 
     if (forCreate.length) {
       operations.push(this.create_(forCreate, sharedContext))
@@ -168,7 +171,7 @@ export default class StoreModuleService
   protected async update_(
     data: UpdateStoreInput[],
     @MedusaContext() sharedContext: Context = {}
-  ): Promise<Store[]> {
+  ): Promise<InferEntityType<typeof Store>[]> {
     const normalizedInput = StoreModuleService.normalizeInput(data)
     StoreModuleService.validateUpdateRequest(normalizedInput)
 

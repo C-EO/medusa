@@ -4,16 +4,15 @@ import {
   PaymentProviderSessionResponse,
   ProviderWebhookPayload,
   WebhookActionResult,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AbstractPaymentProvider,
   PaymentActions,
   PaymentSessionStatus,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 export class SystemProviderService extends AbstractPaymentProvider {
   static identifier = "system"
-  static PROVIDER = "system"
 
   async getStatus(_): Promise<string> {
     return "authorized"

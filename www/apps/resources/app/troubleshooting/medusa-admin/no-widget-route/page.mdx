@@ -18,7 +18,7 @@ Refer to the [Admin Widget Injection Zones list](../../../admin-widget-injection
 
 Widget and UI routes must be defined as arrow functions. Any other type of declaration isn't accepted.
 
-Refer to the [Admin Development Constraints](!docs!/advanced-development/admin/constraints) documentation for more details.
+Refer to the [Admin Development Constraints](!docs!/learn/fundamentals/admin/constraints) documentation for more details.
 
 ---
 
@@ -34,7 +34,7 @@ export const config = defineWidgetConfig({
 
 Any other usage leads to the widget not being shown.
 
-Refer to the [Admin Development Constraints](!docs!/advanced-development/admin/constraints) documentation for more details.
+Refer to the [Admin Development Constraints](!docs!/learn/fundamentals/admin/constraints) documentation for more details.
 
 ---
 
@@ -42,9 +42,9 @@ Refer to the [Admin Development Constraints](!docs!/advanced-development/admin/c
 
 If you're using a Docker image to host your Medusa application, make sure that the image's root path is different than the Medusa Admin's `path` configuration.
 
-For example, if your Docker image's root path is `/app`, make sure to change the `path` configuration in `medusa-config.js`, as it's `/app` by default:
+For example, if your Docker image's root path is `/app`, make sure to change the `path` configuration in `medusa-config.ts`, as it's `/app` by default:
 
-```js title="medusa-config.js"
+```ts title="medusa-config.ts"
 module.exports = defineConfig({
   admin: {
     path: `/dashboard`,

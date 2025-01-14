@@ -115,8 +115,14 @@ export class StepResponse<TOutput, TCompensateInput = TOutput> {
    *     console.log(result)
    *   })
    */
-  static permanentFailure(message = "Permanent failure"): never {
-    throw new PermanentStepFailureError(message)
+  static permanentFailure(
+    message = "Permanent failure",
+    compensateInput?: unknown
+  ): never {
+    const response = isDefined(compensateInput)
+      ? new StepResponse(compensateInput)
+      : undefined
+    throw new PermanentStepFailureError(message, response)
   }
 
   static skip(): SkipStepResponse {

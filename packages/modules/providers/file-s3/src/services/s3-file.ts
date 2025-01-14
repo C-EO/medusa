@@ -6,8 +6,15 @@ import {
   S3ClientConfigType,
 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { FileTypes, Logger, S3FileServiceOptions } from "@medusajs/types"
-import { AbstractFileProviderService, MedusaError } from "@medusajs/utils"
+import {
+  FileTypes,
+  Logger,
+  S3FileServiceOptions,
+} from "@medusajs/framework/types"
+import {
+  AbstractFileProviderService,
+  MedusaError,
+} from "@medusajs/framework/utils"
 import path from "path"
 import { ulid } from "ulid"
 
@@ -16,10 +23,10 @@ type InjectedDependencies = {
 }
 
 interface S3FileServiceConfig {
-  // TODO: We probably don't need this as either the service should return it or we should be able to calculate it.
   fileUrl: string
-  accessKeyId: string
-  secretAccessKey: string
+  accessKeyId?: string
+  secretAccessKey?: string
+  authenticationMethod?: "access-key" | "s3-iam-role"
   region: string
   bucket: string
   prefix?: string
@@ -29,7 +36,6 @@ interface S3FileServiceConfig {
   additionalClientConfig?: Record<string, any>
 }
 
-// FUTURE: At one point we will probably need to support authenticating with IAM roles instead.
 export class S3FileService extends AbstractFileProviderService {
   static identifier = "s3"
   protected config_: S3FileServiceConfig
@@ -39,10 +45,23 @@ export class S3FileService extends AbstractFileProviderService {
   constructor({ logger }: InjectedDependencies, options: S3FileServiceOptions) {
     super()
 
+    const authenticationMethod = options.authentication_method ?? "access-key"
+
+    if (
+      authenticationMethod === "access-key" &&
+      (!options.access_key_id || !options.secret_access_key)
+    ) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Access key ID and secret access key are required when using access key authentication`
+      )
+    }
+
     this.config_ = {
       fileUrl: options.file_url,
       accessKeyId: options.access_key_id,
       secretAccessKey: options.secret_access_key,
+      authenticationMethod: authenticationMethod,
       region: options.region,
       bucket: options.bucket,
       prefix: options.prefix ?? "",
@@ -56,11 +75,17 @@ export class S3FileService extends AbstractFileProviderService {
   }
 
   protected getClient() {
+    // If none is provided, the SDK will use the default credentials provider chain, see https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
+    const credentials =
+      this.config_.authenticationMethod === "access-key"
+        ? {
+            accessKeyId: this.config_.accessKeyId!,
+            secretAccessKey: this.config_.secretAccessKey!,
+          }
+        : undefined
+
     const config: S3ClientConfigType = {
-      credentials: {
-        accessKeyId: this.config_.accessKeyId,
-        secretAccessKey: this.config_.secretAccessKey,
-      },
+      credentials,
       region: this.config_.region,
       endpoint: this.config_.endpoint,
       ...this.config_.additionalClientConfig,

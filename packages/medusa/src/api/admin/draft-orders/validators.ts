@@ -1,25 +1,29 @@
 import { z } from "zod"
-import { AddressPayload, BigNumberInput } from "../../utils/common-validators"
 import {
-  WithAdditionalData,
+  AddressPayload,
+  applyAndAndOrOperators,
+  BigNumberInput,
+} from "../../utils/common-validators"
+import {
   createFindParams,
   createSelectParams,
+  WithAdditionalData,
 } from "../../utils/validators"
 
 export type AdminGetOrderParamsType = z.infer<typeof AdminGetOrderParams>
 export const AdminGetOrderParams = createSelectParams()
 
+export const AdminGetOrdersParamsFields = z.object({
+  id: z.union([z.string(), z.array(z.string())]).optional(),
+})
+
 export type AdminGetOrdersParamsType = z.infer<typeof AdminGetOrdersParams>
 export const AdminGetOrdersParams = createFindParams({
   limit: 50,
   offset: 0,
-}).merge(
-  z.object({
-    id: z.union([z.string(), z.array(z.string())]).optional(),
-    $and: z.lazy(() => AdminGetOrdersParams.array()).optional(),
-    $or: z.lazy(() => AdminGetOrdersParams.array()).optional(),
-  })
-)
+})
+  .merge(AdminGetOrdersParamsFields)
+  .merge(applyAndAndOrOperators(AdminGetOrdersParamsFields))
 
 enum Status {
   completed = "completed",
@@ -33,23 +37,25 @@ const ShippingMethod = z.object({
   amount: BigNumberInput,
 })
 
-const Item = z
-  .object({
-    title: z.string().nullish(),
-    sku: z.string().nullish(),
-    barcode: z.string().nullish(),
-    variant_id: z.string().nullish(),
-    unit_price: BigNumberInput.nullish(),
-    quantity: z.number(),
-    metadata: z.record(z.unknown()).nullish(),
-  })
-  .refine((data) => {
-    if (!data.variant_id) {
-      return data.title && (data.sku || data.barcode)
-    }
-
-    return true
-  })
+const Item = z.object({
+  title: z.string().nullish(),
+  variant_sku: z.string().nullish(),
+  variant_barcode: z.string().nullish(),
+  /**
+   * Use variant_sku instead
+   * @deprecated
+   */
+  sku: z.string().nullish(),
+  /**
+   * Use variant_barcode instead
+   * @deprecated
+   */
+  barcode: z.string().nullish(),
+  variant_id: z.string().nullish(),
+  unit_price: BigNumberInput.nullish(),
+  quantity: z.number(),
+  metadata: z.record(z.unknown()).nullish(),
+})
 
 export type AdminCreateDraftOrderType = z.infer<typeof CreateDraftOrder>
 const CreateDraftOrder = z

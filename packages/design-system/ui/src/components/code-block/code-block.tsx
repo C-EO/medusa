@@ -73,7 +73,7 @@ const Root = ({
     <CodeBlockContext.Provider value={{ snippets, active, setActive }}>
       <div
         className={clx(
-          "border-ui-code-border flex flex-col overflow-hidden rounded-lg border",
+          "bg-ui-contrast-bg-base shadow-elevation-code-block flex flex-col overflow-hidden rounded-xl",
           className
         )}
         {...props}
@@ -102,31 +102,78 @@ const HeaderComponent = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & HeaderProps) => {
   const { snippets, active, setActive } = useCodeBlockContext()
+
+  const tabRefs = React.useRef<Array<HTMLSpanElement | null>>([])
+  const tabIndicatorRef = React.useRef<HTMLDivElement | null>(null)
+
+  React.useEffect(() => {
+    const activeTabRef = tabRefs.current.find(
+      (ref) => ref?.dataset.label === active.label
+    )
+
+    if (activeTabRef && tabIndicatorRef.current) {
+      const activeTabIndex = tabRefs.current.indexOf(activeTabRef)
+
+      const prevTabRef =
+        activeTabIndex > 0 ? tabRefs.current[activeTabIndex - 1] : null
+
+      tabIndicatorRef.current.style.width = `${activeTabRef.offsetWidth}px`
+      tabIndicatorRef.current.style.left = prevTabRef
+        ? `${
+            tabRefs.current
+              .slice(0, activeTabIndex)
+              .reduce((total, tab) => total + (tab?.offsetWidth || 0) + 12, 0) +
+            15
+          }px`
+        : "15px"
+    }
+  }, [active])
+
   return (
-    <div
-      className={clx(
-        "border-b-ui-code-border bg-ui-code-bg-subtle flex items-center gap-2 border-b px-4 py-3",
-        className
-      )}
-      {...props}
-    >
-      {!hideLabels &&
-        snippets.map((snippet) => (
+    <div>
+      <div
+        className={clx("flex items-start px-4 pt-2.5", className)}
+        {...props}
+      >
+        {!hideLabels &&
+          snippets.map((snippet, idx) => (
+            <div
+              className={clx(
+                "text-ui-contrast-fg-secondary txt-compact-small-plus transition-fg relative cursor-pointer pb-[9px] pr-3",
+                {
+                  "text-ui-contrast-fg-primary cursor-default":
+                    active.label === snippet.label,
+                }
+              )}
+              key={snippet.label}
+              onClick={() => setActive(snippet)}
+            >
+              <span
+                ref={(ref) => {
+                  tabRefs.current[idx] = ref
+                  return undefined
+                }}
+                data-label={snippet.label}
+              >
+                {snippet.label}
+              </span>
+            </div>
+          ))}
+        {children}
+      </div>
+      <div className="w-full px-0.5">
+        <div className="bg-ui-contrast-border-top relative h-px w-full">
           <div
+            ref={tabIndicatorRef}
             className={clx(
-              "text-ui-code-fg-subtle txt-compact-small-plus transition-fg cursor-pointer rounded-full border border-transparent px-3 py-2",
-              {
-                "text-ui-code-fg-base border-ui-code-border bg-ui-code-bg-base cursor-default":
-                  active.label === snippet.label,
-              }
+              "absolute bottom-0 transition-all motion-reduce:transition-none",
+              "duration-150 ease-linear"
             )}
-            key={snippet.label}
-            onClick={() => setActive(snippet)}
           >
-            {snippet.label}
+            <div className="bg-ui-contrast-fg-primary h-px rounded-full" />
           </div>
-        ))}
-      {children}
+        </div>
+      </div>
     </div>
   )
 }
@@ -142,7 +189,7 @@ const Meta = ({
   return (
     <div
       className={clx(
-        "txt-compact-small text-ui-code-fg-subtle ml-auto",
+        "txt-compact-small text-ui-contrast-fg-secondary ml-auto",
         className
       )}
       {...props}
@@ -158,130 +205,153 @@ const Header = Object.assign(HeaderComponent, { Meta })
  */
 const Body = ({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { active } = useCodeBlockContext()
+
+  const showToolbar = children || !active.hideCopy
+
   return (
-    <div
-      className={clx(
-        "bg-ui-code-bg-base relative h-full overflow-y-auto p-4",
-        className
+    <div>
+      {showToolbar && (
+        <div className="border-ui-contrast-border-bot flex min-h-10 items-center gap-x-3 border-t px-4 py-2">
+          <div className="code-body text-ui-contrast-fg-secondary flex-1">
+            {children}
+          </div>
+          {!active.hideCopy && (
+            <Copy
+              content={active.code}
+              className="text-ui-contrast-fg-secondary"
+            />
+          )}
+        </div>
       )}
-      {...props}
-    >
-      {!active.hideCopy && (
-        <Copy
-          content={active.code}
-          className="text-ui-code-fg-muted absolute right-4 top-4"
-        />
-      )}
-      <div className="max-w-[90%]">
-        <Highlight
-          theme={{
-            ...themes.palenight,
-            plain: {
-              color: "rgba(249, 250, 251, 1)",
-              backgroundColor: "rgb(17,24,39)",
-            },
-            styles: [
-              ...themes.palenight.styles,
-              {
-                types: ["keyword"],
-                style: {
-                  fontStyle: "normal",
-                  color: "rgb(187,160,255)",
-                },
-              },
-              {
-                types: ["punctuation", "operator"],
-                style: {
-                  fontStyle: "normal",
-                  color: "rgb(255,255,255)",
-                },
-              },
-              {
-                types: ["constant", "boolean"],
-                style: {
-                  fontStyle: "normal",
-                  color: "rgb(187,77,96)",
-                },
-              },
-              {
-                types: ["function"],
-                style: {
-                  fontStyle: "normal",
-                  color: "rgb(27,198,242)",
-                },
-              },
-              {
-                types: ["number"],
-                style: {
-                  color: "rgb(247,208,25)",
-                },
-              },
-              {
-                types: ["property"],
-                style: {
-                  color: "rgb(247,208,25)",
-                },
-              },
-              {
-                types: ["maybe-class-name"],
-                style: {
-                  color: "rgb(255,203,107)",
-                },
-              },
-              {
-                types: ["string"],
-                style: {
-                  color: "rgb(73,209,110)",
-                },
-              },
-              {
-                types: ["comment"],
-                style: {
-                  color: "var(--code-fg-subtle)",
-                },
-              },
-            ],
-          }}
-          code={active.code}
-          language={active.language}
+      <div className="flex h-full flex-col overflow-hidden px-[5px] pb-[5px]">
+        <div
+          className={clx(
+            "bg-ui-contrast-bg-subtle border-ui-contrast-border-bot relative h-full overflow-y-auto rounded-lg border p-4",
+            className
+          )}
+          {...props}
         >
-          {({ style, tokens, getLineProps, getTokenProps }) => (
-            <pre
-              className={clx("code-body whitespace-pre-wrap bg-transparent", {
-                "grid grid-cols-[auto,1fr] gap-x-4": !active.hideLineNumbers,
-              })}
-              style={{
-                ...style,
-                background: "transparent",
+          <div className="max-w-[90%]">
+            <Highlight
+              theme={{
+                ...themes.palenight,
+                plain: {
+                  color: "rgba(249, 250, 251, 1)",
+                  backgroundColor: "var(--contrast-fg-primary)",
+                },
+                styles: [
+                  ...themes.palenight.styles,
+                  {
+                    types: ["keyword"],
+                    style: {
+                      fontStyle: "normal",
+                      color: "rgb(187,160,255)",
+                    },
+                  },
+                  {
+                    types: ["punctuation", "operator"],
+                    style: {
+                      fontStyle: "normal",
+                      color: "rgb(255,255,255)",
+                    },
+                  },
+                  {
+                    types: ["constant", "boolean"],
+                    style: {
+                      fontStyle: "normal",
+                      color: "rgb(187,77,96)",
+                    },
+                  },
+                  {
+                    types: ["function"],
+                    style: {
+                      fontStyle: "normal",
+                      color: "rgb(27,198,242)",
+                    },
+                  },
+                  {
+                    types: ["number"],
+                    style: {
+                      color: "rgb(247,208,25)",
+                    },
+                  },
+                  {
+                    types: ["property"],
+                    style: {
+                      color: "rgb(247,208,25)",
+                    },
+                  },
+                  {
+                    types: ["maybe-class-name"],
+                    style: {
+                      color: "rgb(255,203,107)",
+                    },
+                  },
+                  {
+                    types: ["string"],
+                    style: {
+                      color: "rgb(73,209,110)",
+                    },
+                  },
+                  {
+                    types: ["comment"],
+                    style: {
+                      color: "var(--contrast-fg-secondary)",
+                      fontStyle: "normal",
+                    },
+                  },
+                ],
               }}
+              code={active.code}
+              language={active.language}
             >
-              {!active.hideLineNumbers && (
-                <div role="presentation" className="flex flex-col text-right">
-                  {tokens.map((_, i) => (
-                    <span
-                      key={i}
-                      className="text-ui-code-fg-subtle tabular-nums"
+              {({ style, tokens, getLineProps, getTokenProps }) => (
+                <pre
+                  className={clx(
+                    "code-body whitespace-pre-wrap bg-transparent",
+                    {
+                      "grid grid-cols-[auto,1fr] gap-x-4":
+                        !active.hideLineNumbers,
+                    }
+                  )}
+                  style={{
+                    ...style,
+                    background: "transparent",
+                  }}
+                >
+                  {!active.hideLineNumbers && (
+                    <div
+                      role="presentation"
+                      className="flex flex-col text-right"
                     >
-                      {i + 1}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div>
-                {tokens.map((line, i) => (
-                  <div key={i} {...getLineProps({ line })}>
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token })} />
+                      {tokens.map((_, i) => (
+                        <span
+                          key={i}
+                          className="text-ui-contrast-fg-secondary tabular-nums"
+                        >
+                          {i + 1}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div>
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
-              </div>
-            </pre>
-          )}
-        </Highlight>
+                </pre>
+              )}
+            </Highlight>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -5,13 +5,13 @@ import {
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminPostReturnsReceiveItemsActionReqSchemaType } from "../../../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<AdminPostReturnsReceiveItemsActionReqSchemaType>,
@@ -39,7 +39,7 @@ export const POST = async (
         ...req.filterableFields,
       },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [orderReturn] = await remoteQuery(queryObject)
@@ -75,7 +75,7 @@ export const DELETE = async (
         ...req.filterableFields,
       },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
   const [orderReturn] = await remoteQuery(queryObject)
 

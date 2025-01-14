@@ -5,6 +5,7 @@ import { Loading } from "@/components"
 export type CommonProps = {
   expandUrl?: string
   sectionTitle?: string
+  openedLevel?: number
 }
 
 export type Type = {
@@ -31,6 +32,7 @@ export const TypeList = ({
   className,
   sectionTitle,
   expandUrl,
+  openedLevel,
   ...props
 }: ParameterTypesType) => {
   return (
@@ -47,6 +49,7 @@ export const TypeList = ({
           types={types}
           expandUrl={expandUrl}
           sectionTitle={sectionTitle}
+          openedLevel={openedLevel}
         />
       </Suspense>
     </div>

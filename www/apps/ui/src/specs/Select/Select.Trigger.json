@@ -1,5 +1,5 @@
 {
-  "description": "The trigger that toggles the select.",
+  "description": "The trigger that toggles the select.\nIt's based on [Radix UI Select Trigger](https://www.radix-ui.com/primitives/docs/components/select#trigger).",
   "methods": [],
   "displayName": "Select.Trigger",
   "props": {}

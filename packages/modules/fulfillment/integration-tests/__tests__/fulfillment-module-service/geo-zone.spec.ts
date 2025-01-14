@@ -2,12 +2,16 @@ import {
   CreateGeoZoneDTO,
   IFulfillmentModuleService,
   UpdateGeoZoneDTO,
-} from "@medusajs/types"
-import { FulfillmentEvents, GeoZoneType, Modules } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  FulfillmentEvents,
+  GeoZoneType,
+  Modules,
+} from "@medusajs/framework/utils"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
 import { buildExpectedEventMessageShape } from "../../__fixtures__"
 
 jest.setTimeout(100000)

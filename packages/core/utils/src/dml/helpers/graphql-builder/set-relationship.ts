@@ -1,36 +1,16 @@
-import {
-  PropertyType,
-  RelationshipMetadata,
-  RelationshipType,
-} from "@medusajs/types"
-import { camelToSnakeCase } from "../../../common"
+import { RelationshipMetadata } from "@medusajs/types"
 import { DmlEntity } from "../../entity"
-import { BelongsTo } from "../../relations/belongs-to"
-import { HasMany } from "../../relations/has-many"
-import { HasOne } from "../../relations/has-one"
+import { HasMany, HasOne } from "../../relations"
 import { ManyToMany as DmlManyToMany } from "../../relations/many-to-many"
-import { parseEntityName } from "../entity-builder/parse-entity-name"
-
-type Context = {
-  MANY_TO_MANY_TRACKED_RELATIONS: Record<string, boolean>
-}
+import { parseEntityName } from "../entity-builder"
 
 function defineRelationships(
   modelName: string,
   relationship: RelationshipMetadata,
-  relatedEntity: DmlEntity<
-    Record<string, PropertyType<any> | RelationshipType<any>>,
-    any
-  >,
   { relatedModelName }: { relatedModelName: string }
 ) {
   let extra: string | undefined
   const fieldName = relationship.name
-
-  const mappedBy = relationship.mappedBy || camelToSnakeCase(modelName)
-  const { schema: relationSchema } = relatedEntity.parse()
-
-  const otherSideRelation = relationSchema[mappedBy]
 
   if (relationship.options?.mappedBy && HasOne.isHasOne(relationship)) {
     const otherSideFieldName = relationship.options.mappedBy
@@ -39,14 +19,9 @@ function defineRelationships(
 
   let isArray = false
 
-  /**
-   * Otherside is a has many. Hence we should defined a ManyToOne
-   */
   if (
-    HasMany.isHasMany(otherSideRelation) ||
-    DmlManyToMany.isManyToMany(relationship) ||
-    (BelongsTo.isBelongsTo(otherSideRelation) &&
-      HasMany.isHasMany(relationship))
+    HasMany.isHasMany(relationship) ||
+    DmlManyToMany.isManyToMany(relationship)
   ) {
     isArray = true
   }
@@ -91,10 +66,5 @@ export function setGraphQLRelationship(
     pgSchema,
   }
 
-  return defineRelationships(
-    entityName,
-    relationship,
-    relatedEntity,
-    relatedEntityInfo
-  )
+  return defineRelationships(entityName, relationship, relatedEntityInfo)
 }

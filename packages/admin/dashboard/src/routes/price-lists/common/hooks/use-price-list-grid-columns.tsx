@@ -41,7 +41,7 @@ export const usePriceListGridColumns = ({
             return (
               <DataGrid.ReadonlyCell context={context}>
                 <div className="flex h-full w-full items-center gap-x-2 overflow-hidden">
-                  <Thumbnail src={entity.thumbnail} />
+                  <Thumbnail src={entity.thumbnail} size="small" />
                   <span className="truncate">{entity.title}</span>
                 </div>
               </DataGrid.ReadonlyCell>
@@ -49,7 +49,7 @@ export const usePriceListGridColumns = ({
           }
 
           return (
-            <DataGrid.ReadonlyCell context={context}>
+            <DataGrid.ReadonlyCell context={context} color="normal">
               <div className="flex h-full w-full items-center gap-x-2 overflow-hidden">
                 <span className="truncate">{entity.title}</span>
               </div>

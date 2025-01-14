@@ -1,4 +1,4 @@
-import { Constructor, Context, DAL } from "@medusajs/types"
+import { Constructor, Context, DAL } from "@medusajs/framework/types"
 import { LoadStrategy } from "@mikro-orm/core"
 import { Order, OrderClaim } from "@models"
 import { mapRepositoryToOrderModel } from "."
@@ -118,7 +118,7 @@ export function setFindMethods<T>(klass: Constructor<T>, entity: any) {
 
   klass.prototype.findAndCount = async function findAndCount(
     this: any,
-    findOptions: DAL.FindOptions<T> = { where: {} },
+    findOptions: DAL.FindOptions<T> = { where: {} } as DAL.FindOptions<T>,
     context: Context = {}
   ): Promise<[T[], number]> {
     const manager = this.getActiveManager(context)

@@ -30,6 +30,7 @@ export const SidebarItem = ({
     case "sub-category":
       return <SidebarItemSubCategory item={item} {...props} />
     case "link":
+    case "ref":
       return <SidebarItemLink item={item} {...props} />
     case "separator":
       return <DottedSeparator />

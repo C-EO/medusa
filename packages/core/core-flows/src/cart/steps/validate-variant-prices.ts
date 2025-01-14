@@ -1,6 +1,6 @@
-import { BigNumberInput } from "@medusajs/types"
-import { MedusaError, isPresent } from "@medusajs/utils"
-import { createStep } from "@medusajs/workflows-sdk"
+import { BigNumberInput } from "@medusajs/framework/types"
+import { MedusaError, isPresent } from "@medusajs/framework/utils"
+import { createStep } from "@medusajs/framework/workflows-sdk"
 
 export interface ValidateVariantPricesStepInput {
   variants: {
@@ -18,6 +18,10 @@ export const validateVariantPricesStepId = "validate-variant-prices"
 export const validateVariantPricesStep = createStep(
   validateVariantPricesStepId,
   async (data: ValidateVariantPricesStepInput, { container }) => {
+    if (!data.variants?.length) {
+      return
+    }
+
     const priceNotFound: string[] = []
     for (const variant of data.variants) {
       if (!isPresent(variant?.calculated_price?.calculated_amount)) {

@@ -13,7 +13,7 @@
  *     type: array
  *     description: The product variants to update.
  *     items:
- *       $ref: "#/components/schemas/AdminUpdateProductVariant"
+ *       $ref: "#/components/schemas/AdminBatchUpdateProductVariant"
  *   delete:
  *     type: array
  *     description: The product variants to delete.

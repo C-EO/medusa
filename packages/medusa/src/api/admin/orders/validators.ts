@@ -5,11 +5,13 @@ import {
   createSelectParams,
   WithAdditionalData,
 } from "../../utils/validators"
+import { AddressPayload } from "../../utils/common-validators"
 
 export const AdminGetOrdersOrderParams = createSelectParams().merge(
   z.object({
     id: z.union([z.string(), z.array(z.string())]).optional(),
     status: z.union([z.string(), z.array(z.string())]).optional(),
+    version: z.number().optional(),
     created_at: createOperatorMap().optional(),
     updated_at: createOperatorMap().optional(),
     deleted_at: createOperatorMap().optional(),
@@ -17,6 +19,18 @@ export const AdminGetOrdersOrderParams = createSelectParams().merge(
 )
 
 export type AdminGetOrdersOrderParamsType = z.infer<
+  typeof AdminGetOrdersOrderParams
+>
+
+export const AdminGetOrdersOrderItemsParams = createSelectParams().merge(
+  z.object({
+    id: z.union([z.string(), z.array(z.string())]).optional(),
+    item_id: z.union([z.string(), z.array(z.string())]).optional(),
+    version: z.number().optional(),
+  })
+)
+
+export type AdminGetOrdersOrderItemsParamsType = z.infer<
   typeof AdminGetOrdersOrderParams
 >
 
@@ -38,7 +52,8 @@ export const AdminGetOrdersParams = createFindParams({
     sales_channel_id: z.array(z.string()).optional(),
     fulfillment_status: z.array(z.string()).optional(),
     payment_status: z.array(z.string()).optional(),
-    region_id: z.array(z.string()).optional(),
+    region_id: z.union([z.string(), z.array(z.string())]).optional(),
+    customer_id: z.union([z.string(), z.array(z.string())]).optional(),
     q: z.string().optional(),
     created_at: createOperatorMap().optional(),
     updated_at: createOperatorMap().optional(),
@@ -92,17 +107,40 @@ export const AdminOrderCancelFulfillment = WithAdditionalData(
   OrderCancelFulfillment
 )
 
-export const AdminOrderChanges = z.object({
-  id: z.union([z.string(), z.array(z.string())]).optional(),
-  status: z.union([z.string(), z.array(z.string())]).optional(),
-  change_type: z.union([z.string(), z.array(z.string())]).optional(),
-  created_at: createOperatorMap().optional(),
-  updated_at: createOperatorMap().optional(),
-  deleted_at: createOperatorMap().optional(),
-})
-export type AdminOrderChangesType = z.infer<typeof AdminOrderChanges>
+export const AdminOrderChangesParams = createSelectParams().merge(
+  z.object({
+    id: z.union([z.string(), z.array(z.string())]).optional(),
+    status: z.union([z.string(), z.array(z.string())]).optional(),
+    change_type: z.union([z.string(), z.array(z.string())]).optional(),
+    created_at: createOperatorMap().optional(),
+    updated_at: createOperatorMap().optional(),
+    deleted_at: createOperatorMap().optional(),
+  })
+)
+
+export type AdminOrderChangesType = z.infer<typeof AdminOrderChangesParams>
 
 export type AdminMarkOrderFulfillmentDeliveredType = z.infer<
   typeof AdminMarkOrderFulfillmentDelivered
 >
+
 export const AdminMarkOrderFulfillmentDelivered = z.object({})
+
+export type AdminTransferOrderType = z.infer<typeof AdminTransferOrder>
+export const AdminTransferOrder = z.object({
+  customer_id: z.string(),
+  description: z.string().optional(),
+  internal_note: z.string().optional(),
+})
+
+export type AdminCancelOrderTransferRequestType = z.infer<
+  typeof AdminCancelOrderTransferRequest
+>
+export const AdminCancelOrderTransferRequest = z.object({})
+
+export type AdminUpdateOrderType = z.infer<typeof AdminUpdateOrder>
+export const AdminUpdateOrder = z.object({
+  email: z.string().optional(),
+  shipping_address: AddressPayload.optional(),
+  billing_address: AddressPayload.optional(),
+})

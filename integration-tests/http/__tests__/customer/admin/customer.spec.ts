@@ -1,7 +1,7 @@
 import { IAuthModuleService } from "@medusajs/types"
 import { Modules } from "@medusajs/utils"
 import jwt from "jsonwebtoken"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   adminHeaders,
   createAdminUser,
@@ -351,6 +351,68 @@ medusaIntegrationTestRunner({
 
         expect(response.status).toEqual(200)
         expect(response.data.customer.groups.length).toEqual(0)
+      })
+    })
+
+    describe("POST /admin/customers/:id/customer-groups", () => {
+      it("should batch add and remove customer to/from customer groups", async () => {
+        const group1 = (
+          await api.post(
+            "/admin/customer-groups",
+            {
+              name: "VIP 1",
+            },
+            adminHeaders
+          )
+        ).data.customer_group
+
+        const group2 = (
+          await api.post(
+            "/admin/customer-groups",
+            {
+              name: "VIP 2",
+            },
+            adminHeaders
+          )
+        ).data.customer_group
+
+        const group3 = (
+          await api.post(
+            "/admin/customer-groups",
+            {
+              name: "VIP 3",
+            },
+            adminHeaders
+          )
+        ).data.customer_group
+
+        // Add with cg endpoint so we can test remove
+        await api.post(
+          `/admin/customer-groups/${group1.id}/customers`,
+          {
+            add: [customer1.id],
+          },
+          adminHeaders
+        )
+
+        const response = await api.post(
+          `/admin/customers/${customer1.id}/customer-groups?fields=groups.id`,
+          {
+            remove: [group1.id],
+            add: [group2.id, group3.id],
+          },
+          adminHeaders
+        )
+
+        expect(response.status).toEqual(200)
+
+        expect(response.data.customer.groups.length).toEqual(2)
+        expect(response.data.customer.groups).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ id: group2.id }),
+            expect.objectContaining({ id: group3.id }),
+          ])
+        )
       })
     })
 

@@ -1,3 +1,10 @@
+---
+tags:
+  - customer
+  - storefront
+  - auth
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -51,7 +58,7 @@ export const fetchHighlights = [
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       }
     )
@@ -116,7 +123,7 @@ export const highlights = [
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
-            "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+            "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
           },
         }
       )
@@ -223,7 +230,7 @@ export const fetchSessionHighlights = [
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       }
     )
@@ -303,7 +310,7 @@ export const sessionHighlights = [
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+            "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
           },
         }
       )

@@ -1,15 +1,15 @@
 import { beginReturnOrderWorkflow } from "@medusajs/core-flows"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   Modules,
   promiseAll,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminPostReturnsReqSchemaType } from "./validators"
 
 export const GET = async (
@@ -24,9 +24,9 @@ export const GET = async (
       filters: {
         ...req.filterableFields,
       },
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: returns, metadata } = await remoteQuery(queryObject)
@@ -64,7 +64,7 @@ export const POST = async (
         ...req.filterableFields,
       },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [order, orderReturn] = await promiseAll([

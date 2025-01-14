@@ -8,17 +8,16 @@ import { accessSync } from "fs"
 import * as path from "path"
 import { dirname, join, normalize } from "path"
 import {
-  MapToConfig,
   camelToSnakeCase,
-  deduplicate,
   getCallerFilePath,
   isObject,
   lowerCaseFirst,
+  MapToConfig,
   pluralize,
   toCamelCase,
   upperCaseFirst,
 } from "../common"
-import { DmlEntity } from "../dml"
+import { DmlEntity, IdProperty } from "../dml"
 import { toGraphQLSchema } from "../dml/helpers/create-graphql"
 import { PrimaryKeyModifier } from "../dml/properties/primary-key"
 import { BaseRelationship } from "../dml/relations/base"
@@ -165,29 +164,40 @@ export function defineJoinerConfig(
   }
   linkableKeys = mergedLinkableKeys
 
-  if (!primaryKeys && modelDefinitions.size) {
+  /**
+   * Merge custom primary keys from the joiner config with the infered primary keys
+   * from the models.
+   *
+   * TODO: Maybe worth looking into the real needs for primary keys.
+   * It can happen that we could just remove that but we need to investigate (looking at the
+   * lookups from the remote joiner to identify which entity a property refers to)
+   */
+  primaryKeys ??= []
+  const finalPrimaryKeys = new Set(primaryKeys)
+  if (modelDefinitions.size) {
     const linkConfig = buildLinkConfigFromModelObjects(
       serviceName,
       Object.fromEntries(modelDefinitions)
     )
 
-    primaryKeys = deduplicate(
-      Object.values(linkConfig).flatMap((entityLinkConfig) => {
-        return (Object.values(entityLinkConfig as any) as any[])
-          .filter((linkableConfig) => isObject(linkableConfig))
-          .map((linkableConfig) => {
-            // @ts-ignore
-            return linkableConfig.primaryKey
-          })
-      })
-    )
+    Object.values(linkConfig).flatMap((entityLinkConfig) => {
+      return Object.values(
+        entityLinkConfig as Record<string, { primaryKey: string }>
+      )
+        .filter((linkableConfig) => isObject(linkableConfig))
+        .forEach((linkableConfig) => {
+          finalPrimaryKeys.add(linkableConfig.primaryKey)
+        })
+    })
   }
+
+  primaryKeys = Array.from(finalPrimaryKeys.add("id"))
 
   // TODO: In the context of DML add a validation on primary keys and linkable keys if the consumer provide them manually. follow up pr
 
   return {
     serviceName,
-    primaryKeys: primaryKeys ?? ["id"],
+    primaryKeys,
     schema,
     linkableKeys: linkableKeys,
     alias: [
@@ -342,33 +352,54 @@ export function buildLinkableKeysFromMikroOrmObjects(
 export function buildLinkConfigFromModelObjects<
   const ServiceName extends string,
   const T extends Record<string, IDmlEntity<any, any>>
->(serviceName: ServiceName, models: T): InfersLinksConfig<ServiceName, T> {
+>(
+  serviceName: ServiceName,
+  models: T,
+  linkableKeys: Record<string, string> = {}
+): InfersLinksConfig<ServiceName, T> {
+  // In case some models have been provided to a custom joiner config, the linkable will be limited
+  // to that set of models. We dont want to expose models that should not be linkable.
+  const linkableModels = Object.values(linkableKeys)
   const linkConfig = {} as InfersLinksConfig<ServiceName, T>
 
   for (const model of Object.values(models) ?? []) {
-    if (!DmlEntity.isDmlEntity(model)) {
+    const classLikeModelName = upperCaseFirst(model.name)
+
+    if (
+      !DmlEntity.isDmlEntity(model) ||
+      (linkableModels.length && !linkableModels.includes(classLikeModelName))
+    ) {
       continue
     }
 
     const schema = model.schema
-    // @ts-ignore
+
+    /**
+     * When using a linkable, if a specific linkable property is not specified, the toJSON
+     * function will be called and return the first linkable available for this model.
+     */
     const modelLinkConfig = (linkConfig[lowerCaseFirst(model.name)] ??= {
       toJSON: function () {
         const linkables = Object.entries(this)
           .filter(([name]) => name !== "toJSON")
           .map(([, object]) => object)
-        const lastIndex = linkables.length - 1
-        return linkables[lastIndex]
+        return linkables[0]
       },
     })
 
+    /**
+     * Build all linkable properties for the model
+     */
     for (const [property, value] of Object.entries(schema)) {
       if (BaseRelationship.isRelationship(value)) {
         continue
       }
 
       const parsedProperty = (value as PropertyType<any>).parse(property)
-      if (PrimaryKeyModifier.isPrimaryKeyModifier(value)) {
+      if (
+        PrimaryKeyModifier.isPrimaryKeyModifier(value) ||
+        IdProperty.isIdProperty(value)
+      ) {
         const linkableKeyName =
           parsedProperty.dataType.options?.linkable ??
           `${camelToSnakeCase(model.name).toLowerCase()}_${property}`
@@ -378,9 +409,45 @@ export function buildLinkConfigFromModelObjects<
           primaryKey: property,
           serviceName,
           field: lowerCaseFirst(model.name),
-          entity: upperCaseFirst(model.name),
+          entity: classLikeModelName,
         }
       }
+    }
+  }
+
+  /**
+   * If the joiner config specify some custom linkable keys, we merge them with the
+   * existing linkable keys infered from the model above.
+   */
+  for (const [linkableKey, modelName] of Object.entries(linkableKeys) ?? []) {
+    const snakeCasedModelName = camelToSnakeCase(toCamelCase(modelName))
+
+    // Linkable keys by default are prepared with snake cased model name _id
+    // So to be able to compare only the property we have to remove the first part
+    const inferredReferenceProperty = linkableKey.replace(
+      `${snakeCasedModelName}_`,
+      ""
+    )
+
+    linkConfig[lowerCaseFirst(modelName)] ??= {
+      toJSON: function () {
+        const linkables = Object.entries(this)
+          .filter(([name]) => name !== "toJSON")
+          .map(([, object]) => object)
+        return linkables[0]
+      },
+    }
+
+    if (linkConfig[lowerCaseFirst(modelName)][inferredReferenceProperty]) {
+      continue
+    }
+
+    linkConfig[lowerCaseFirst(modelName)][inferredReferenceProperty] = {
+      linkable: linkableKey,
+      primaryKey: inferredReferenceProperty,
+      serviceName,
+      field: lowerCaseFirst(modelName),
+      entity: upperCaseFirst(modelName),
     }
   }
 

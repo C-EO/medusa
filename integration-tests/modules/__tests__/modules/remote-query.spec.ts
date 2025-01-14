@@ -1,6 +1,6 @@
 import { IRegionModuleService, RemoteQueryFunction } from "@medusajs/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { createAdminUser } from "../../..//helpers/create-admin-user"
 import { adminHeaders } from "../../../helpers/create-admin-user"
 
@@ -170,7 +170,7 @@ medusaIntegrationTestRunner({
             }
           )
         ).rejects.toThrow(
-          "Payment id not found: pp_system_default_non_existent"
+          "PaymentProvider id not found: pp_system_default_non_existent"
         )
 
         // everything is fine
@@ -205,6 +205,7 @@ medusaIntegrationTestRunner({
         query = appContainer.resolve(ContainerRegistrationKeys.QUERY)
       })
 
+      let product
       beforeEach(async () => {
         await createAdminUser(dbConnection, adminHeaders, appContainer)
 
@@ -224,11 +225,66 @@ medusaIntegrationTestRunner({
           ],
         }
 
-        await api
+        const res = await api
           .post("/admin/products", payload, adminHeaders)
           .catch((err) => {
             console.log(err)
           })
+
+        product = res.data.product
+      })
+
+      it(`should throw if not exists`, async () => {
+        const err = await query
+          .graph(
+            {
+              entity: "product",
+              fields: ["id", "title", "variants.*", "variants.prices.amount"],
+              filters: {
+                id: "non-existing-id",
+                variants: {
+                  prices: {
+                    amount: {
+                      $gt: 100,
+                    },
+                  },
+                },
+              },
+            },
+            {
+              throwIfKeyNotFound: true,
+            }
+          )
+          .catch((err) => {
+            return err
+          })
+
+        expect(err).toEqual(
+          expect.objectContaining({
+            message: expect.stringContaining(
+              "Product id not found: non-existing-id"
+            ),
+          })
+        )
+      })
+
+      it(`should support filtering using operators on a primary column`, async () => {
+        const { data } = await query.graph({
+          entity: "product",
+          fields: ["id", "title"],
+          filters: {
+            id: {
+              $in: [product.id],
+            },
+          },
+        })
+
+        expect(data).toEqual([
+          expect.objectContaining({
+            id: product.id,
+            title: product.title,
+          }),
+        ])
       })
 
       it(`should perform cross module query and apply filters correctly to the correct modules [1]`, async () => {

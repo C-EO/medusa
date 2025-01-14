@@ -1,127 +1,40 @@
-import { BigNumberRawValue, DAL } from "@medusajs/types"
-import {
-  BigNumber,
-  DALUtils,
-  MikroOrmBigNumberProperty,
-  PaymentCollectionStatus,
-  generateEntityId,
-} from "@medusajs/utils"
-import {
-  BeforeCreate,
-  Cascade,
-  Collection,
-  Entity,
-  Enum,
-  Filter,
-  ManyToMany,
-  OnInit,
-  OneToMany,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-  Rel,
-} from "@mikro-orm/core"
+import { model, PaymentCollectionStatus } from "@medusajs/framework/utils"
 import Payment from "./payment"
 import PaymentProvider from "./payment-provider"
 import PaymentSession from "./payment-session"
 
-type OptionalPaymentCollectionProps = "status" | DAL.ModelDateColumns
-
-@Entity({ tableName: "payment_collection" })
-@Filter(DALUtils.mikroOrmSoftDeletableFilterOptions)
-export default class PaymentCollection {
-  [OptionalProps]?: OptionalPaymentCollectionProps
-
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({ columnType: "text" })
-  currency_code: string
-
-  @MikroOrmBigNumberProperty()
-  amount: BigNumber | number
-
-  @Property({ columnType: "jsonb" })
-  raw_amount: BigNumberRawValue
-
-  @MikroOrmBigNumberProperty({ nullable: true })
-  authorized_amount: BigNumber | number | null = null
-
-  @Property({ columnType: "jsonb", nullable: true })
-  raw_authorized_amount: BigNumberRawValue | null = null
-
-  @MikroOrmBigNumberProperty({ nullable: true })
-  captured_amount: BigNumber | number | null = null
-
-  @Property({ columnType: "jsonb", nullable: true })
-  raw_captured_amount: BigNumberRawValue | null = null
-
-  @MikroOrmBigNumberProperty({ nullable: true })
-  refunded_amount: BigNumber | number | null = null
-
-  @Property({ columnType: "jsonb", nullable: true })
-  raw_refunded_amount: BigNumberRawValue | null = null
-
-  @Property({ columnType: "text", index: "IDX_payment_collection_region_id" })
-  region_id: string
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
+const PaymentCollection = model
+  .define("PaymentCollection", {
+    id: model.id({ prefix: "pay_col" }).primaryKey(),
+    currency_code: model.text(),
+    amount: model.bigNumber(),
+    authorized_amount: model.bigNumber().nullable(),
+    captured_amount: model.bigNumber().nullable(),
+    refunded_amount: model.bigNumber().nullable(),
+    region_id: model.text(),
+    completed_at: model.dateTime().nullable(),
+    status: model
+      .enum(PaymentCollectionStatus)
+      .default(PaymentCollectionStatus.NOT_PAID),
+    metadata: model.json().nullable(),
+    payment_providers: model.manyToMany(() => PaymentProvider, {
+      mappedBy: "payment_collections",
+    }),
+    payment_sessions: model.hasMany(() => PaymentSession, {
+      mappedBy: "payment_collection",
+    }),
+    payments: model.hasMany(() => Payment, {
+      mappedBy: "payment_collection",
+    }),
   })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
+  .cascades({
+    delete: ["payment_sessions", "payments"],
   })
-  updated_at: Date
+  .indexes([
+    {
+      name: "IDX_payment_collection_region_id",
+      on: ["region_id"],
+    },
+  ])
 
-  @Property({
-    columnType: "timestamptz",
-    nullable: true,
-    index: "IDX_payment_collection_deleted_at",
-  })
-  deleted_at: Date | null = null
-
-  @Property({
-    columnType: "timestamptz",
-    nullable: true,
-  })
-  completed_at: Date | null = null
-
-  @Enum({
-    items: () => PaymentCollectionStatus,
-    default: PaymentCollectionStatus.NOT_PAID,
-  })
-  status: PaymentCollectionStatus = PaymentCollectionStatus.NOT_PAID
-
-  @ManyToMany(() => PaymentProvider)
-  payment_providers = new Collection<Rel<PaymentProvider>>(this)
-
-  @OneToMany(() => PaymentSession, (ps) => ps.payment_collection, {
-    cascade: [Cascade.PERSIST] as any,
-  })
-  payment_sessions = new Collection<Rel<PaymentSession>>(this)
-
-  @OneToMany(() => Payment, (payment) => payment.payment_collection, {
-    cascade: [Cascade.PERSIST] as any,
-  })
-  payments = new Collection<Rel<Payment>>(this)
-
-  @Property({ columnType: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "pay_col")
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "pay_col")
-  }
-}
+export default PaymentCollection

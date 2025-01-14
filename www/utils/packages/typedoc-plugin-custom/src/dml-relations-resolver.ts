@@ -4,7 +4,10 @@ import {
   Converter,
   DeclarationReflection,
   ParameterType,
+  ProjectReflection,
   ReferenceType,
+  ReflectionKind,
+  UnknownType,
 } from "typedoc"
 import { RELATION_NAMES, getDmlProperties, isDmlEntity } from "utils"
 
@@ -32,32 +35,33 @@ export class DmlRelationsResolver {
     })
 
     this.app.converter.on(
-      Converter.EVENT_CREATE_DECLARATION,
-      this.addReflection.bind(this)
-    )
-
-    this.app.converter.on(
       Converter.EVENT_RESOLVE_BEGIN,
       this.resolveRelationReferences.bind(this),
       1
     )
   }
 
-  addReflection(_context: Context, reflection: DeclarationReflection) {
-    if (!this.app.options.getValue("resolveDmlRelations")) {
-      return
-    }
-    if (isDmlEntity(reflection)) {
-      this.dmlReflectionsAndProperties?.push({
-        reflection,
-        properties: getDmlProperties(reflection.type as ReferenceType),
-      })
-    }
-  }
-
   resolveRelationReferences(context: Context) {
     if (!this.app.options.getValue("resolveDmlRelations")) {
       return
+    }
+
+    for (const reflection of context.project.getReflectionsByKind(
+      ReflectionKind.Variable
+    )) {
+      if (
+        !(reflection instanceof DeclarationReflection) ||
+        !isDmlEntity(reflection) ||
+        reflection.type?.type !== "reference"
+      ) {
+        continue
+      }
+
+      const properties = getDmlProperties(reflection.type)
+      this.dmlReflectionsAndProperties.push({
+        reflection,
+        properties,
+      })
     }
 
     this.dmlReflectionsAndProperties.forEach(({ properties }) => {
@@ -74,14 +78,39 @@ export class DmlRelationsResolver {
         if (
           relatedReflectionType?.type !== "reflection" ||
           !relatedReflectionType.declaration.signatures?.length ||
-          relatedReflectionType.declaration.signatures[0].type?.type !==
-            "reference"
+          !relatedReflectionType.declaration.signatures[0].type
+        ) {
+          return
+        }
+
+        const reflectionType =
+          relatedReflectionType.declaration.signatures[0].type.type ===
+          "unknown"
+            ? this.tryToParseUnknownType(
+                relatedReflectionType.declaration.signatures[0].type,
+                context.project
+              )?.type
+            : relatedReflectionType.declaration.signatures[0].type
+
+        if (
+          reflectionType?.type !== "reference" &&
+          (reflectionType?.type !== "query" ||
+            !(
+              reflectionType.queryType.reflection instanceof
+              DeclarationReflection
+            ) ||
+            reflectionType.queryType.reflection.type?.type !== "reference")
         ) {
           return
         }
 
         const relatedReflection = this.findReflectionMatchingProperties(
-          getDmlProperties(relatedReflectionType.declaration.signatures[0].type)
+          getDmlProperties(
+            reflectionType.type === "reference"
+              ? reflectionType
+              : ((reflectionType.queryType.reflection as DeclarationReflection)
+                  .type as ReferenceType)
+          )
         )
 
         if (!relatedReflection) {
@@ -117,5 +146,23 @@ export class DmlRelationsResolver {
         )
       })
     })?.reflection
+  }
+
+  tryToParseUnknownType(
+    unknownType: UnknownType,
+    project: ProjectReflection
+  ): DeclarationReflection | undefined {
+    const regex =
+      /^DmlEntity<DMLEntitySchemaBuilder.+>, "(?<modelName>[a-zA-Z]+)">$/
+
+    const regexMatches = regex.exec(unknownType.name)
+
+    if (!regexMatches?.groups?.modelName) {
+      return
+    }
+
+    const reflection = project.getChildByName(regexMatches.groups.modelName)
+
+    return reflection instanceof DeclarationReflection ? reflection : undefined
   }
 }

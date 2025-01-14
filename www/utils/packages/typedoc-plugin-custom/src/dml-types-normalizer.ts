@@ -28,7 +28,8 @@ export function load(app: Application) {
 function normalizeNullable(reflection: DeclarationReflection) {
   if (
     reflection.type?.type !== "reference" ||
-    reflection.type.name !== "NullableModifier" ||
+    (reflection.type.name !== "NullableModifier" &&
+      reflection.type.name !== "RelationNullableModifier") ||
     !reflection.type.typeArguments ||
     reflection.type.typeArguments.length < 2
   ) {

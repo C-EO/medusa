@@ -40,11 +40,14 @@ export const useCreateShippingProfile = (
 export const useShippingProfile = (
   id: string,
   query?: Record<string, any>,
-  options?: UseQueryOptions<
-    HttpTypes.AdminShippingProfileResponse,
-    FetchError,
-    HttpTypes.AdminShippingProfileResponse,
-    QueryKey
+  options?: Omit<
+    UseQueryOptions<
+      HttpTypes.AdminShippingProfileResponse,
+      FetchError,
+      HttpTypes.AdminShippingProfileResponse,
+      QueryKey
+    >,
+    "queryFn" | "queryKey"
   >
 ) => {
   const { data, ...rest } = useQuery({
@@ -71,6 +74,32 @@ export const useShippingProfiles = (
   const { data, ...rest } = useQuery({
     queryFn: () => sdk.admin.shippingProfile.list(query),
     queryKey: shippingProfileQueryKeys.list(query),
+    ...options,
+  })
+
+  return { ...data, ...rest }
+}
+
+export const useUpdateShippingProfile = (
+  id: string,
+  options?: UseMutationOptions<
+    HttpTypes.AdminShippingProfileResponse,
+    FetchError,
+    HttpTypes.AdminUpdateShippingProfile
+  >
+) => {
+  const { data, ...rest } = useMutation({
+    mutationFn: (payload) => sdk.admin.shippingProfile.update(id, payload),
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: shippingProfileQueryKeys.detail(id),
+      })
+      queryClient.invalidateQueries({
+        queryKey: shippingProfileQueryKeys.lists(),
+      })
+
+      options?.onSuccess?.(data, variables, context)
+    },
     ...options,
   })
 

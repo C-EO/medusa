@@ -1,15 +1,15 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+  refetchEntity,
+} from "@medusajs/framework/http"
 import {
   deleteProductOptionsWorkflow,
   updateProductOptionsWorkflow,
 } from "@medusajs/core-flows"
 
 import { remapKeysForProduct, remapProductResponse } from "../../../helpers"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
-import { refetchEntity } from "../../../../../utils/refetch-entity"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -21,7 +21,7 @@ export const GET = async (
     "product_option",
     { id: optionId, product_id: productId },
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ product_option: productOption })
@@ -49,7 +49,7 @@ export const POST = async (
     "product",
     productId,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({ product: remapProductResponse(product) })
@@ -71,7 +71,7 @@ export const DELETE = async (
     "product",
     productId,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({

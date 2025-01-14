@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const LocationFulfillmentProvider: ModuleJoinerConfig = {
   serviceName: LINKS.LocationFulfillmentProvider,
@@ -52,6 +52,7 @@ export const LocationFulfillmentProvider: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.FULFILLMENT,
+      entity: "FulfillmentProvider",
       relationship: {
         serviceName: LINKS.LocationFulfillmentProvider,
         primaryKey: "fulfillment_provider_id",

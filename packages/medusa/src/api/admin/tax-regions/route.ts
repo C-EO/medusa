@@ -2,13 +2,13 @@ import { createTaxRegionsWorkflow } from "@medusajs/core-flows"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchTaxRegion } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminCreateTaxRegion>,
@@ -26,7 +26,7 @@ export const POST = async (
   const taxRegion = await refetchTaxRegion(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ tax_region: taxRegion })
 }
@@ -42,9 +42,9 @@ export const GET = async (
       entryPoint: "tax_regions",
       variables: {
         filters: req.filterableFields,
-        ...req.remoteQueryConfig.pagination,
+        ...req.queryConfig.pagination,
       },
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
     })
   )
 

@@ -1,5 +1,8 @@
-import { RemoteLink } from "@medusajs/modules-sdk"
-import { IPaymentModuleService, RemoteQueryFunction } from "@medusajs/types"
+import { Link } from "@medusajs/framework/modules-sdk"
+import {
+  IPaymentModuleService,
+  RemoteQueryFunction,
+} from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   LINKS,
@@ -7,8 +10,8 @@ import {
   Modules,
   arrayDifference,
   promiseAll,
-} from "@medusajs/utils"
-import { StepResponse, createStep } from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/utils"
+import { StepResponse, createStep } from "@medusajs/framework/workflows-sdk"
 
 export interface SetRegionsPaymentProvidersStepInput {
   input: {
@@ -66,7 +69,6 @@ async function getCurrentRegionPaymentProvidersLinks(
     service: LINKS.RegionPaymentProvider,
     variables: {
       filters: { region_id: regionIds },
-      take: null,
     },
     fields: ["region_id", "payment_provider_id"],
   } as any)) as {
@@ -105,9 +107,7 @@ export const setRegionsPaymentProvidersStep = createStep(
     const paymentService = container.resolve<IPaymentModuleService>(
       Modules.PAYMENT
     )
-    const remoteLink = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const remoteLink = container.resolve<Link>(ContainerRegistrationKeys.LINK)
     const remoteQuery = container.resolve<RemoteQueryFunction>(
       ContainerRegistrationKeys.REMOTE_QUERY
     )
@@ -197,9 +197,7 @@ export const setRegionsPaymentProvidersStep = createStep(
       return
     }
 
-    const remoteLink = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const remoteLink = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     const promises: Promise<unknown[]>[] = []
 

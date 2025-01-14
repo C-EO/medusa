@@ -18,11 +18,7 @@ export const usePageScrollManager = () => {
       .map((nav) => (nav as PerformanceNavigationTiming).type)
       .includes("reload")
 
-  useEffect(() => {
-    if (!scrollableElement || !checkedPageReload) {
-      return
-    }
-
+  const tryToScroll = () => {
     if (getScrolledTop(scrollableElement) !== 0 && !location.hash) {
       scrollableElement?.scrollTo({
         top: 0,
@@ -36,7 +32,13 @@ export const usePageScrollManager = () => {
 
       targetElm?.scrollIntoView()
     }
-  }, [pathname, scrollableElement])
+  }
+
+  useEffect(() => {
+    if (checkedPageReload) {
+      setCheckedPageReload(false)
+    }
+  }, [pathname])
 
   useEffect(() => {
     if (!scrollableElement || checkedPageReload) {
@@ -49,8 +51,12 @@ export const usePageScrollManager = () => {
         scrollableElement?.scrollTo({
           top: parseInt(loadedScrollPosition),
         })
+        localStorage.removeItem("scrollPos")
+      } else {
+        tryToScroll()
       }
-      localStorage.removeItem("scrollPos")
+    } else {
+      tryToScroll()
     }
 
     setCheckedPageReload(true)
@@ -71,5 +77,5 @@ export const usePageScrollManager = () => {
         )
       }
     })
-  }, [scrollableElement])
+  }, [scrollableElement, checkedPageReload])
 }

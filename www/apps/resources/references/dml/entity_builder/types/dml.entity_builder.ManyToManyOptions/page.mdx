@@ -23,6 +23,22 @@ created in the database for this relationship.
 
 ___
 
+## joinColumn
+
+ `Optional` **joinColumn**: `string` \| `string`[]
+
+The column name in the pivot table that for the current entity
+
+___
+
+## inverseJoinColumn
+
+ `Optional` **inverseJoinColumn**: `string` \| `string`[]
+
+The column name in the pivot table for the opposite entity
+
+___
+
 ## pivotEntity
 
  `Optional` **pivotEntity**: () => [DmlEntity](../../../entity/classes/dml.entity.DmlEntity/page.mdx)&#60;any, any&#62;
@@ -30,5 +46,3 @@ ___
 A function that returns the data model
 representing the pivot table created in the
 database for this relationship.
-
-### Type declaration

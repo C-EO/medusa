@@ -6,6 +6,7 @@ import { CodeBlockStyle } from ".."
 import { useColorMode } from "@/providers"
 import { Badge, BadgeVariant } from "@/components"
 import { CodeBlockActions, CodeBlockActionsProps } from "../Actions"
+import { CodeBlockHeaderWrapper } from "./Wrapper"
 
 export type CodeBlockHeaderMeta = {
   badgeLabel?: string
@@ -16,6 +17,7 @@ type CodeBlockHeaderProps = {
   title?: string
   blockStyle?: CodeBlockStyle
   actionsProps: CodeBlockActionsProps
+  hideActions?: boolean
 } & CodeBlockHeaderMeta
 
 export const CodeBlockHeader = ({
@@ -24,20 +26,10 @@ export const CodeBlockHeader = ({
   badgeLabel,
   actionsProps,
   badgeColor,
+  hideActions = false,
 }: CodeBlockHeaderProps) => {
   const { colorMode } = useColorMode()
 
-  const bgColor = useMemo(
-    () =>
-      clsx(
-        blockStyle === "loud" && "bg-medusa-contrast-bg-base",
-        blockStyle === "subtle" && [
-          colorMode === "light" && "bg-medusa-bg-component",
-          colorMode === "dark" && "bg-medusa-code-bg-header",
-        ]
-      ),
-    [blockStyle, colorMode]
-  )
   const titleColor = useMemo(
     () =>
       clsx(
@@ -51,18 +43,7 @@ export const CodeBlockHeader = ({
   )
 
   return (
-    <div
-      className={clsx(
-        "py-docs_0.5 px-docs_1 mb-0",
-        "rounded-t-docs_lg relative flex justify-between items-center",
-        blockStyle === "subtle" && [
-          "border border-solid border-b-0",
-          colorMode === "light" && "border-medusa-border-base",
-          colorMode === "dark" && "border-medusa-code-border",
-        ],
-        bgColor
-      )}
-    >
+    <CodeBlockHeaderWrapper blockStyle={blockStyle}>
       <div className={clsx("flex-1", "flex gap-docs_0.75 items-start")}>
         {badgeLabel && (
           <Badge variant={badgeColor || "code"} className="font-base">
@@ -75,7 +56,7 @@ export const CodeBlockHeader = ({
           </div>
         )}
       </div>
-      <CodeBlockActions {...actionsProps} />
-    </div>
+      {!hideActions && <CodeBlockActions {...actionsProps} />}
+    </CodeBlockHeaderWrapper>
   )
 }

@@ -1,7 +1,7 @@
 /**
  * @schema StoreUpdateCustomer
  * type: object
- * description: SUMMARY
+ * description: The details to update in the customer.
  * x-schemaName: StoreUpdateCustomer
  * properties:
  *   company_name:
@@ -20,6 +20,9 @@
  *     type: string
  *     title: phone
  *     description: The customer's phone.
+ *   metadata:
+ *     type: object
+ *     description: The customer's metadata, can hold custom key-value pairs.
  * 
 */
 

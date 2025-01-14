@@ -1,11 +1,11 @@
-import { OrderDTO, OrderDetailDTO } from "@medusajs/types"
-import { deduplicate } from "@medusajs/utils"
+import { OrderDTO, OrderDetailDTO } from "@medusajs/framework/types"
+import { deduplicate } from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../common"
 import {
   getLastFulfillmentStatus,
@@ -20,8 +20,10 @@ export const getOrderDetailWorkflow = createWorkflow(
   getOrderDetailWorkflowId,
   (
     input: WorkflowData<{
+      filters?: { is_draft_order?: boolean; customer_id?: string }
       fields: string[]
       order_id: string
+      version?: number
     }>
   ): WorkflowResponse<OrderDetailDTO> => {
     const fields = transform(input, ({ fields }) => {
@@ -35,10 +37,14 @@ export const getOrderDetailWorkflow = createWorkflow(
       ])
     })
 
+    const variables = transform({ input }, ({ input }) => {
+      return { ...input.filters, id: input.order_id, version: input.version }
+    })
+
     const order: OrderDTO = useRemoteQueryStep({
       entry_point: "orders",
       fields,
-      variables: { id: input.order_id },
+      variables,
       list: false,
       throw_if_key_not_found: true,
     })

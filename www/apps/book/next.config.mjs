@@ -9,11 +9,28 @@ import {
   crossProjectLinksPlugin,
 } from "remark-rehype-plugins"
 import { sidebar } from "./sidebar.mjs"
+import path from "path"
+import redirects from "./utils/redirects.mjs"
 
 const withMDX = mdx({
   extension: /\.mdx?$/,
   options: {
     rehypePlugins: [
+      [
+        brokenLinkCheckerPlugin,
+        {
+          crossProjects: {
+            resources: {
+              projectPath: path.resolve("..", "resources"),
+              hasGeneratedSlugs: true,
+            },
+            ui: {
+              projectPath: path.resolve("..", "ui"),
+              contentPath: "src/content/docs",
+            },
+          },
+        },
+      ],
       [
         crossProjectLinksPlugin,
         {
@@ -21,19 +38,15 @@ const withMDX = mdx({
           projectUrls: {
             resources: {
               url: process.env.NEXT_PUBLIC_RESOURCES_URL,
-              path: "v2/resources",
             },
             "user-guide": {
               url: process.env.NEXT_PUBLIC_RESOURCES_URL,
-              path: "v2/user-guide",
             },
             ui: {
               url: process.env.NEXT_PUBLIC_RESOURCES_URL,
-              path: "ui",
             },
             api: {
               url: process.env.NEXT_PUBLIC_RESOURCES_URL,
-              path: "v2/api",
             },
           },
           useBaseUrl:
@@ -41,7 +54,6 @@ const withMDX = mdx({
             process.env.VERCEL_ENV === "production",
         },
       ],
-      [brokenLinkCheckerPlugin],
       [localLinksRehypePlugin],
       [
         rehypeMdxCodeProps,
@@ -81,29 +93,63 @@ const nextConfig = {
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
 
   transpilePackages: ["docs-ui"],
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/v2",
   async rewrites() {
     return {
       fallback: [
         {
-          source: "/v2/resources",
+          source: "/resources",
           destination: `${
             process.env.NEXT_PUBLIC_RESOURCES_URL || "https://localhost:3001"
-          }/v2/resources`,
+          }/resources`,
           basePath: false,
         },
         {
-          source: "/v2/resources/:path*",
+          source: "/resources/:path*",
           destination: `${
             process.env.NEXT_PUBLIC_RESOURCES_URL || "https://localhost:3001"
-          }/v2/resources/:path*`,
+          }/resources/:path*`,
           basePath: false,
         },
         {
-          source: "/v2/api/:path*",
+          source: "/api",
           destination: `${
             process.env.NEXT_PUBLIC_API_URL || "https://localhost:3001"
-          }/v2/api/:path*`,
+          }/api`,
+          basePath: false,
+        },
+        {
+          source: "/api/:path*",
+          destination: `${
+            process.env.NEXT_PUBLIC_API_URL || "https://localhost:3001"
+          }/api/:path*`,
+          basePath: false,
+        },
+        {
+          source: "/ui",
+          destination: `${
+            process.env.NEXT_PUBLIC_UI_URL || "https://localhost:3001"
+          }/ui`,
+          basePath: false,
+        },
+        {
+          source: "/ui/:path*",
+          destination: `${
+            process.env.NEXT_PUBLIC_UI_URL || "https://localhost:3001"
+          }/ui/:path*`,
+          basePath: false,
+        },
+        {
+          source: "/v1",
+          destination: `${
+            process.env.NEXT_PUBLIC_DOCS_V1_URL || "https://localhost:3001"
+          }/v1`,
+          basePath: false,
+        },
+        {
+          source: "/v1/:path*",
+          destination: `${
+            process.env.NEXT_PUBLIC_DOCS_V1_URL || "https://localhost:3001"
+          }/v1/:path*`,
           basePath: false,
         },
         // TODO comment out once we have the user guide published
@@ -117,29 +163,15 @@ const nextConfig = {
         //   destination: `${process.env.NEXT_PUBLIC_USER_GUIDE_URL}/user-guide/:path*`,
         //   basePath: false,
         // },
-        {
-          source: "/:path((?!v2).*)",
-          destination: `${
-            process.env.NEXT_PUBLIC_API_V1_URL || "https://localhost:3001"
-          }/:path*`,
-          basePath: false,
-        },
       ],
     }
   },
-  async redirects() {
-    return [
-      {
-        source: "/advanced-development/modules/remote-query",
-        destination: "/advanced-development/modules/query",
-        permanent: true,
-      },
-      {
-        source: "/cheatsheet",
-        destination: "/more-resources/cheatsheet",
-        permanent: true,
-      },
-    ]
+  redirects,
+  outputFileTracingExcludes: {
+    "*": ["node_modules/@medusajs/icons"],
+  },
+  experimental: {
+    optimizePackageImports: ["@medusajs/icons", "@medusajs/ui"],
   },
 }
 

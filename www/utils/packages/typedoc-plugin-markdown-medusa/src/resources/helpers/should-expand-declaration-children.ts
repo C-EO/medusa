@@ -1,5 +1,5 @@
-import * as Handlebars from "handlebars"
-import { MarkdownTheme } from "../../theme"
+import Handlebars from "handlebars"
+import { MarkdownTheme } from "../../theme.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper("shouldExpandDeclarationChildren", function () {

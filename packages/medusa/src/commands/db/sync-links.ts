@@ -2,9 +2,14 @@ import boxen from "boxen"
 import chalk from "chalk"
 import { join } from "path"
 import checkbox from "@inquirer/checkbox"
-import { ContainerRegistrationKeys } from "@medusajs/utils"
-import { LinkMigrationsPlannerAction } from "@medusajs/types"
-import { LinkLoader, logger, MedusaAppLoader } from "@medusajs/framework"
+import {
+  ContainerRegistrationKeys,
+  mergePluginModules,
+} from "@medusajs/framework/utils"
+import { LinkMigrationsPlannerAction } from "@medusajs/framework/types"
+import { LinkLoader } from "@medusajs/framework/links"
+import { logger } from "@medusajs/framework/logger"
+import { MedusaAppLoader } from "@medusajs/framework"
 
 import { ensureDbExists } from "../utils"
 import { initializeContainer } from "../../loaders"
@@ -185,7 +190,9 @@ const main = async function ({ directory, executeSafe, executeAll }) {
 
     const medusaAppLoader = new MedusaAppLoader()
 
-    const plugins = getResolvedPlugins(directory, configModule, true) || []
+    const plugins = await getResolvedPlugins(directory, configModule, true)
+    mergePluginModules(configModule, plugins)
+
     const linksSourcePaths = plugins.map((plugin) =>
       join(plugin.resolve, "links")
     )

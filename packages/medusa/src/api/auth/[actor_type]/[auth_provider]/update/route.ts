@@ -1,7 +1,9 @@
-import { AuthenticatedMedusaRequest } from "@medusajs/framework"
-import { IAuthModuleService } from "@medusajs/types"
-import { MedusaError, Modules } from "@medusajs/utils"
-import { MedusaResponse } from "../../../../../types/routing"
+import {
+  AuthenticatedMedusaRequest,
+  MedusaResponse,
+} from "@medusajs/framework/http"
+import { IAuthModuleService } from "@medusajs/framework/types"
+import { MedusaError, Modules } from "@medusajs/framework/utils"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest,
@@ -11,9 +13,14 @@ export const POST = async (
 
   const authService = req.scope.resolve<IAuthModuleService>(Modules.AUTH)
 
+  const updateData = {
+    ...(req.body as Record<string, unknown>),
+    entity_id: req.auth_context.actor_id, // comes from the validated token
+  }
+
   const { authIdentity, success, error } = await authService.updateProvider(
     auth_provider,
-    req.body as Record<string, unknown>
+    updateData
   )
 
   if (success && authIdentity) {

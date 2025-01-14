@@ -1,10 +1,10 @@
-import * as Handlebars from "handlebars"
-import { parseParams } from "../../utils/params-utils"
-import { ReflectionParameterType } from "../../types"
+import Handlebars from "handlebars"
+import { parseParams } from "../../utils/params-utils.js"
+import { ReflectionParameterType } from "../../types.js"
 import {
   getTableHeaders,
   reflectionTableFormatter,
-} from "../../utils/reflection-formatter"
+} from "../../utils/reflection-formatter.js"
 
 export default function () {
   Handlebars.registerHelper(

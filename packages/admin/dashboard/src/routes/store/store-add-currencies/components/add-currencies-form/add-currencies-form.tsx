@@ -17,6 +17,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCurrencies } from "../../../../../hooks/api/currencies"
 import { pricePreferencesQueryKeys } from "../../../../../hooks/api/price-preferences"
 import { useUpdateStore } from "../../../../../hooks/api/store"
@@ -63,13 +64,16 @@ export const AddCurrenciesForm = ({
   const form = useForm<zod.infer<typeof AddCurrenciesSchema>>({
     defaultValues: {
       currencies: [],
-      pricePreferences: pricePreferences?.reduce((acc, curr) => {
-        if (curr.value) {
-          acc[curr.value] = curr.is_tax_inclusive
-        }
+      pricePreferences: pricePreferences?.reduce(
+        (acc, curr) => {
+          if (curr.value) {
+            acc[curr.value] = curr.is_tax_inclusive
+          }
 
-        return acc
-      }, {} as Record<string, boolean>),
+          return acc
+        },
+        {} as Record<string, boolean>
+      ),
     },
     resolver: zodResolver(AddCurrenciesSchema),
   })
@@ -166,7 +170,7 @@ export const AddCurrenciesForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -178,16 +182,6 @@ export const AddCurrenciesForm = ({
                   {form.formState.errors.currencies.message}
                 </Hint>
               )}
-            </div>
-            <div className="flex items-center justify-end gap-x-2">
-              <RouteFocusModal.Close asChild>
-                <Button size="small" variant="secondary">
-                  {t("actions.cancel")}
-                </Button>
-              </RouteFocusModal.Close>
-              <Button size="small" type="submit" isLoading={isPending}>
-                {t("actions.save")}
-              </Button>
             </div>
           </div>
         </RouteFocusModal.Header>
@@ -201,12 +195,27 @@ export const AddCurrenciesForm = ({
             pagination
             search="autofocus"
             prefix={PREFIX}
-            orderBy={["code", "name"]}
+            orderBy={[
+              { key: "name", label: t("fields.name") },
+              { key: "code", label: t("fields.code") },
+            ]}
             isLoading={isLoading}
             queryObject={raw}
           />
         </RouteFocusModal.Body>
-      </form>
+        <RouteFocusModal.Footer>
+          <div className="flex items-center justify-end gap-x-2">
+            <RouteFocusModal.Close asChild>
+              <Button size="small" variant="secondary">
+                {t("actions.cancel")}
+              </Button>
+            </RouteFocusModal.Close>
+            <Button size="small" type="submit" isLoading={isPending}>
+              {t("actions.save")}
+            </Button>
+          </div>
+        </RouteFocusModal.Footer>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

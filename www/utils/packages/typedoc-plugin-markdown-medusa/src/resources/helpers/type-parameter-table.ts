@@ -1,9 +1,9 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { TypeParameterReflection } from "typedoc"
 import {
   getTableHeaders,
   reflectionTableFormatter,
-} from "../../utils/reflection-formatter"
+} from "../../utils/reflection-formatter.js"
 import { hasTypes } from "utils"
 
 export default function () {

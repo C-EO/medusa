@@ -1,3 +1,9 @@
+---
+tags:
+  - region
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -15,7 +21,7 @@ To list regions in your storefront, send a request to the [List Regions API rout
   fetch(`http://localhost:9000/store/regions`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -53,7 +59,7 @@ export const highlights = [
       fetch(`http://localhost:9000/store/regions`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())
@@ -82,6 +88,4 @@ export const highlights = [
   </CodeTab>
 </CodeTabs>
 
-{/* TODO add a link to regions object in API reference (once available). */}
-
-The response has a `regions` field, which is an array of regions.
+The response has a `regions` field, which is an array of [regions](!api!/store#regions_region_schema).

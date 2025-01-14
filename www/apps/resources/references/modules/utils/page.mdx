@@ -2,46 +2,53 @@ import { TypeList } from "docs-ui"
 
 # utils
 
+## Enumerations
+
+- [NotificationStatus](../../utils/enums/utils.NotificationStatus/page.mdx)
+- [PaymentActions](../../utils/enums/utils.PaymentActions/page.mdx)
+- [PaymentCollectionStatus](../../utils/enums/utils.PaymentCollectionStatus/page.mdx)
+- [PaymentSessionStatus](../../utils/enums/utils.PaymentSessionStatus/page.mdx)
+- [PaymentWebhookEvents](../../utils/enums/utils.PaymentWebhookEvents/page.mdx)
+
+## Interfaces
+
+- [Argument](../../utils/interfaces/utils.Argument/page.mdx)
+- [Directive](../../utils/interfaces/utils.Directive/page.mdx)
+- [Entity](../../utils/interfaces/utils.Entity/page.mdx)
+
 ## Namespaces
 
 - [CoreFlowsUitls](../../utils/utils.CoreFlowsUitls/page.mdx)
 - [FulfillmentUtils](../../utils/utils.FulfillmentUtils/page.mdx)
+- [GraphQLUtils](../../utils/utils.GraphQLUtils/page.mdx)
 - [InventoryUtils](../../utils/utils.InventoryUtils/page.mdx)
 - [LinkUtils](../../utils/utils.LinkUtils/page.mdx)
 - [OrderUtils](../../utils/utils.OrderUtils/page.mdx)
+- [PricingUtils](../../utils/utils.PricingUtils/page.mdx)
 - [ProductUtils](../../utils/utils.ProductUtils/page.mdx)
 - [PromotionUtils](../../utils/utils.PromotionUtils/page.mdx)
 - [ShippingProfileUtils](../../utils/utils.ShippingProfileUtils/page.mdx)
 - [UserUtils](../../utils/utils.UserUtils/page.mdx)
 
-## Enumerations
+## Type Aliases
 
-- [NotificationStatus](../../utils/enums/utils.NotificationStatus/page.mdx)
-- [PaymentCollectionStatus](../../utils/enums/utils.PaymentCollectionStatus/page.mdx)
-- [PaymentSessionStatus](../../utils/enums/utils.PaymentSessionStatus/page.mdx)
-- [PaymentWebhookEvents](../../utils/enums/utils.PaymentWebhookEvents/page.mdx)
-- [PaymentActions](../../utils/enums/utils.PaymentActions/page.mdx)
-- [PriceListStatus](../../utils/enums/utils.PriceListStatus/page.mdx)
-- [PriceListType](../../utils/enums/utils.PriceListType/page.mdx)
+- [TotalVariantAvailabilityData](../../utils/types/utils.TotalVariantAvailabilityData/page.mdx)
+- [VariantAvailabilityData](../../utils/types/utils.VariantAvailabilityData/page.mdx)
 
 ## Variables
 
+- [MedusaModuleProviderType](page.mdx#medusamoduleprovidertype)
 - [MedusaModuleType](page.mdx#medusamoduletype)
 - [NotificationEvents](page.mdx#notificationevents)
 - [PaymentEvents](page.mdx#paymentevents)
-- [PricingEvents](page.mdx#pricingevents)
-
-## Functions
-
-- [generateJwtToken](page.mdx#generatejwttoken)
-- [parseConnectionString](page.mdx#parseconnectionstring)
-- [createClient](page.mdx#createclient)
-- [createDb](page.mdx#createdb)
-- [dbExists](page.mdx#dbexists)
 
 ___
 
 ## Variables
+
+### MedusaModuleProviderType
+
+ `Const` **MedusaModuleProviderType**: typeof [MedusaModuleProviderType](page.mdx#medusamoduleprovidertype)
 
 ### MedusaModuleType
 
@@ -57,74 +64,4 @@ ___
 
 #### Properties
 
-<TypeList types={[{"name":"CAPTURED","type":"`string`","description":"","optional":false,"defaultValue":"\"payment.captured\"","expandable":false,"children":[]},{"name":"REFUNDED","type":"`string`","description":"","optional":false,"defaultValue":"\"payment.refunded\"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="PaymentEvents"/>
-
-### PricingEvents
-
- `Const` **PricingEvents**: ReturnType&#60;["priceListRule", "priceList", "priceRule", "priceSet", "price"]&#62;
-
-___
-
-## Functions
-
-### generateJwtToken
-
-#### Parameters
-
-<TypeList types={[{"name":"tokenPayload","type":"`Record<string, unknown>`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"jwtConfig","type":"`object`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[{"name":"secret","type":"`undefined` \\| `string`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"expiresIn","type":"`undefined` \\| `string`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="generateJwtToken"/>
-
-#### Returns
-
-<TypeList types={[{"name":"string","type":"`string`","optional":false,"defaultValue":"","description":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="generateJwtToken"/>
-
-### parseConnectionString
-
-Parsers the database connection string into an object
-of postgreSQL options
-
-#### Parameters
-
-<TypeList types={[{"name":"connectionString","type":"`string`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="parseConnectionString"/>
-
-#### Returns
-
-<TypeList types={[{"name":"ConnectionOptions","type":"`ConnectionOptions`","optional":false,"defaultValue":"","description":"Parsers the database connection string into an object\nof postgreSQL options","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="parseConnectionString"/>
-
-### createClient
-
-Creates a PostgreSQL database client using the connection
-string or database options
-
-#### Parameters
-
-<TypeList types={[{"name":"options","type":"`string` \\| `ClientConfig`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="createClient"/>
-
-#### Returns
-
-<TypeList types={[{"name":"Client","type":"`Client`","optional":false,"defaultValue":"","description":"Creates a PostgreSQL database client using the connection\nstring or database options","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="createClient"/>
-
-### createDb
-
-Creates a database using the client. Make sure to call
-`client.connect` before using this utility.
-
-#### Parameters
-
-<TypeList types={[{"name":"client","type":"`Client`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"databaseName","type":"`string`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="createDb"/>
-
-#### Returns
-
-<TypeList types={[{"name":"Promise","type":"Promise&#60;void&#62;","optional":false,"defaultValue":"","description":"Creates a database using the client. Make sure to call\n`client.connect` before using this utility.","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="createDb"/>
-
-### dbExists
-
-Checks if a database exists using the Client.  Make sure to call
-`client.connect` before using this utility.
-
-#### Parameters
-
-<TypeList types={[{"name":"client","type":"`Client`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]},{"name":"databaseName","type":"`string`","description":"","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="dbExists"/>
-
-#### Returns
-
-<TypeList types={[{"name":"Promise","type":"Promise&#60;boolean&#62;","optional":false,"defaultValue":"","description":"Checks if a database exists using the Client.  Make sure to call\n`client.connect` before using this utility.","expandable":false,"children":[{"name":"boolean","type":"`boolean`","optional":false,"defaultValue":"","description":"","expandable":false,"children":[]}]}]} expandUrl="https://docs.medusajs.com/v2/advanced-development/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="dbExists"/>
+<TypeList types={[{"name":"CAPTURED","type":"`string`","description":"","optional":false,"defaultValue":"\"payment.captured\"","expandable":false,"children":[]},{"name":"REFUNDED","type":"`string`","description":"","optional":false,"defaultValue":"\"payment.refunded\"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="PaymentEvents"/>

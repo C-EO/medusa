@@ -30,6 +30,7 @@ export type SectionKey =
   | "members_group_categories"
   | "members_categories"
   | "member_returns"
+  | "member_force_title"
   | "title_reflectionPath"
   | "reflection_comment"
   | "reflection_typeParameters"
@@ -47,6 +48,14 @@ export type ParameterStyle = "table" | "list" | "component"
 
 export type FormattingOptionsType = {
   [k: string]: FormattingOptionType
+}
+
+export type FrontmatterData = {
+  slug?: string
+  sidebar_label?: string
+  displayed_sidebar?: string
+  tags?: string[]
+  [k: string]: unknown
 }
 
 export type FormattingOptionType = {
@@ -73,7 +82,7 @@ export type FormattingOptionType = {
   showCommentsAsHeader?: boolean
   showCommentsAsDetails?: boolean
   parameterStyle?: ParameterStyle
-  frontmatterData?: Record<string, unknown>
+  frontmatterData?: FrontmatterData
   parameterComponent?: string
   parameterComponentExtraProps?: Record<string, unknown>
   mdxImports?: string[]
@@ -84,6 +93,10 @@ export type FormattingOptionType = {
   shouldIncrementAfterStartSections?: boolean
   hideTocHeaders?: boolean
   workflowDiagramComponent?: string
+}
+
+export type AllowedProjectDocumentsOption = {
+  [k: string]: Record<number, boolean>
 }
 
 export declare module "typedoc" {
@@ -136,10 +149,7 @@ export declare module "typedoc" {
      * @defaultValue false
      */
     namedAnchors: boolean
-    /**
-     * [Markdown Plugin] Specify module names where all reflections are outputted into seperate files.
-     */
-    allReflectionsHaveOwnDocument: string[]
+    allowedProjectDocuments: AllowedProjectDocumentsOption
     /**
      * [Markdown Plugin] Separator used to format filenames.
      * @defaultValue "."

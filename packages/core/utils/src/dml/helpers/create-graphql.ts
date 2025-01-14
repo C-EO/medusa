@@ -1,8 +1,8 @@
 import type { PropertyType } from "@medusajs/types"
 import { DmlEntity } from "../entity"
 import { parseEntityName } from "./entity-builder/parse-entity-name"
-import { getGraphQLAttributeFromDMLPropety } from "./graphql-builder/get-attribute"
 import { setGraphQLRelationship } from "./graphql-builder/set-relationship"
+import { getGraphQLAttributeFromDMLPropety } from "./graphql-builder/get-attribute"
 
 export function generateGraphQLFromEntity<T extends DmlEntity<any, any>>(
   entity: T

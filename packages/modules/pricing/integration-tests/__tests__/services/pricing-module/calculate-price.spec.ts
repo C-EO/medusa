@@ -3,9 +3,14 @@ import {
   CreatePriceSetDTO,
   IPricingModuleService,
   PricingTypes,
-} from "@medusajs/types"
-import { Modules, PriceListStatus, PriceListType } from "@medusajs/utils"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
+} from "@medusajs/framework/types"
+import {
+  Modules,
+  PriceListStatus,
+  PriceListType,
+} from "@medusajs/framework/utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
+import { withOperator } from "../../../__fixtures__/price-rule"
 import { seedPriceData } from "../../../__fixtures__/seed-price-data"
 
 jest.setTimeout(30000)
@@ -1162,6 +1167,129 @@ moduleIntegrationTestRunner<IPricingModuleService>({
             ])
           })
 
+          it("should return default prices when the price list price is higher than the default price when the price list is of type SALE", async () => {
+            await createPriceLists(service, undefined, undefined, [
+              {
+                amount: 2500,
+                currency_code: "PLN",
+                price_set_id: "price-set-PLN",
+              },
+              {
+                amount: 2500,
+                currency_code: "EUR",
+                price_set_id: "price-set-EUR",
+              },
+            ])
+
+            const priceSetsResult = await service.calculatePrices(
+              { id: ["price-set-EUR", "price-set-PLN"] },
+              {
+                context: {
+                  currency_code: "PLN",
+                },
+              }
+            )
+
+            expect(priceSetsResult).toEqual([
+              {
+                id: "price-set-PLN",
+                is_calculated_price_price_list: false,
+                is_calculated_price_tax_inclusive: false,
+                calculated_amount: 1000,
+                raw_calculated_amount: {
+                  value: "1000",
+                  precision: 20,
+                },
+                is_original_price_price_list: false,
+                is_original_price_tax_inclusive: false,
+                original_amount: 1000,
+                raw_original_amount: {
+                  value: "1000",
+                  precision: 20,
+                },
+                currency_code: "PLN",
+                calculated_price: {
+                  id: expect.any(String),
+                  price_list_id: null,
+                  price_list_type: null,
+                  min_quantity: 1,
+                  max_quantity: 10,
+                },
+                original_price: {
+                  id: expect.any(String),
+                  price_list_id: null,
+                  price_list_type: null,
+                  min_quantity: 1,
+                  max_quantity: 10,
+                },
+              },
+            ])
+          })
+
+          it("should return price list prices even if the price list price is higher than the default price when the price list is of type OVERRIDE", async () => {
+            await createPriceLists(
+              service,
+              { type: PriceListType.OVERRIDE },
+              {},
+              [
+                {
+                  amount: 2500,
+                  currency_code: "PLN",
+                  price_set_id: "price-set-PLN",
+                },
+                {
+                  amount: 2500,
+                  currency_code: "EUR",
+                  price_set_id: "price-set-EUR",
+                },
+              ]
+            )
+
+            const priceSetsResult = await service.calculatePrices(
+              { id: ["price-set-EUR", "price-set-PLN"] },
+              {
+                context: {
+                  currency_code: "PLN",
+                },
+              }
+            )
+
+            expect(priceSetsResult).toEqual([
+              {
+                id: "price-set-PLN",
+                is_calculated_price_price_list: true,
+                is_calculated_price_tax_inclusive: false,
+                calculated_amount: 2500,
+                raw_calculated_amount: {
+                  value: "2500",
+                  precision: 20,
+                },
+                is_original_price_price_list: true,
+                is_original_price_tax_inclusive: false,
+                original_amount: 2500,
+                raw_original_amount: {
+                  value: "2500",
+                  precision: 20,
+                },
+                currency_code: "PLN",
+                calculated_price: {
+                  id: expect.any(String),
+                  price_list_id: expect.any(String),
+                  price_list_type: "override",
+                  min_quantity: null,
+                  max_quantity: null,
+                },
+                original_price: {
+                  id: expect.any(String),
+                  price_list_id: expect.any(String),
+                  price_list_type: "override",
+                  min_quantity: null,
+                  max_quantity: null,
+                },
+              },
+            ])
+          })
+
           it("should return price list prices when price list conditions match for override", async () => {
             await createPriceLists(service, { type: PriceListType.OVERRIDE })
 
@@ -1686,6 +1814,74 @@ moduleIntegrationTestRunner<IPricingModuleService>({
               },
             ])
           })
+
+          it("should not return price list prices when price is deleted", async () => {
+            const [priceList] = await createPriceLists(
+              service,
+              {},
+              { region_id: ["DE", "PL"] },
+              [
+                {
+                  amount: 111,
+                  currency_code: "PLN",
+                  price_set_id: "price-set-PLN",
+                  rules: {
+                    region_id: "DE",
+                  },
+                },
+              ]
+            )
+
+            const priceSetsResult1 = await service.calculatePrices(
+              { id: ["price-set-EUR", "price-set-PLN"] },
+              {
+                context: {
+                  currency_code: "PLN",
+                  region_id: "DE",
+                  customer_group_id: "vip-customer-group-id",
+                  company_id: "medusa-company-id",
+                },
+              }
+            )
+
+            expect(priceSetsResult1).toEqual([
+              expect.objectContaining({
+                id: "price-set-PLN",
+                is_calculated_price_price_list: true,
+                calculated_amount: 111,
+                is_original_price_price_list: false,
+                original_amount: 400,
+              }),
+            ])
+
+            const test = await service.softDeletePrices(
+              priceList.prices.map((p) => p.id)
+            )
+
+            console.log("test -- ", JSON.stringify(test, null, 4))
+
+            const priceSetsResult2 = await service.calculatePrices(
+              { id: ["price-set-EUR", "price-set-PLN"] },
+              {
+                context: {
+                  currency_code: "PLN",
+                  region_id: "DE",
+                  customer_group_id: "vip-customer-group-id",
+                  company_id: "medusa-company-id",
+                },
+              }
+            )
+
+            expect(priceSetsResult2).toEqual([
+              expect.objectContaining({
+                id: "price-set-PLN",
+                is_calculated_price_price_list: false,
+                calculated_amount: 400,
+                is_original_price_price_list: false,
+                original_amount: 400,
+              }),
+            ])
+          })
         })
 
         describe("Tax inclusivity", () => {
@@ -1851,6 +2047,180 @@ moduleIntegrationTestRunner<IPricingModuleService>({
               }),
             ])
           })
+        })
+      })
+
+      describe("calculatePrices", () => {
+        let priceSet1
+
+        it("should return accurate prices when using custom price rule operators", async () => {
+          priceSet1 = await service.createPriceSets({
+            prices: [
+              {
+                amount: 50,
+                currency_code: "usd",
+                rules: {
+                  region_id: "de",
+                  total: withOperator("between", 300, 400),
+                },
+              },
+              {
+                amount: 100,
+                currency_code: "usd",
+                rules: {
+                  region_id: "de",
+                  total: withOperator("betweenEquals", 400, 500),
+                },
+              },
+              {
+                amount: 150,
+                currency_code: "usd",
+                rules: {
+                  region_id: "de",
+                  total: withOperator("excludingMin", 500, 600),
+                },
+              },
+              {
+                amount: 200,
+                currency_code: "usd",
+                rules: {
+                  region_id: "de",
+                  total: withOperator("excludingMax", 600, 700),
+                },
+              },
+            ],
+          })
+
+          let priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 350,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([
+            expect.objectContaining({
+              is_calculated_price_price_list: false,
+              is_calculated_price_tax_inclusive: false,
+              calculated_amount: 50,
+              raw_calculated_amount: {
+                value: "50",
+                precision: 20,
+              },
+              is_original_price_price_list: false,
+              is_original_price_tax_inclusive: false,
+              original_amount: 50,
+              raw_original_amount: {
+                value: "50",
+                precision: 20,
+              },
+              currency_code: "usd",
+              calculated_price: expect.objectContaining({
+                id: expect.any(String),
+                price_list_id: null,
+                price_list_type: null,
+                min_quantity: null,
+                max_quantity: null,
+              }),
+              original_price: {
+                id: expect.any(String),
+                price_list_id: null,
+                price_list_type: null,
+                min_quantity: null,
+                max_quantity: null,
+              },
+            }),
+          ])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 300,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 400,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([
+            expect.objectContaining({ calculated_amount: 100 }),
+          ])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 500,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([
+            expect.objectContaining({ calculated_amount: 100 }),
+          ])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 501,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([
+            expect.objectContaining({ calculated_amount: 150 }),
+          ])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 601,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([
+            expect.objectContaining({ calculated_amount: 200 }),
+          ])
+
+          priceSetsResult = await service.calculatePrices(
+            { id: [priceSet1.id] },
+            {
+              context: {
+                currency_code: "usd",
+                region_id: "de",
+                total: 900,
+              },
+            }
+          )
+
+          expect(priceSetsResult).toEqual([])
         })
       })
     })

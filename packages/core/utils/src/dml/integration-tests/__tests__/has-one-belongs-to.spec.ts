@@ -1,6 +1,9 @@
 import { MetadataStorage, MikroORM } from "@mikro-orm/core"
 import { model } from "../../entity-builder"
-import { toMikroOrmEntities } from "../../helpers/create-mikro-orm-entity"
+import {
+  mikroORMEntityBuilder,
+  toMikroOrmEntities,
+} from "../../helpers/create-mikro-orm-entity"
 import { createDatabase, dropDatabase } from "pg-god"
 import { CustomTsMigrationGenerator, mikroOrmSerializer } from "../../../dal"
 import { EntityConstructor } from "@medusajs/types"
@@ -24,11 +27,12 @@ describe("hasOne - belongTo", () => {
 
   beforeEach(async () => {
     MetadataStorage.clear()
+    mikroORMEntityBuilder.clear()
 
     const team = model.define("team", {
       id: model.id().primaryKey(),
       name: model.text(),
-      user: model.belongsTo(() => user, { mappedBy: "team" }),
+      user: model.belongsTo(() => user, { mappedBy: "team" }).nullable(),
     })
 
     const user = model.define("user", {
@@ -92,7 +96,7 @@ describe("hasOne - belongTo", () => {
       }
     )
 
-    expect(mikroOrmSerializer<InstanceType<typeof User>>(user)).toEqual({
+    expect(await mikroOrmSerializer<InstanceType<typeof User>>(user)).toEqual({
       id: user1.id,
       username: "User 1",
       created_at: expect.any(Date),
@@ -137,7 +141,7 @@ describe("hasOne - belongTo", () => {
       }
     )
 
-    expect(mikroOrmSerializer<InstanceType<typeof User>>(user)).toEqual({
+    expect(await mikroOrmSerializer<InstanceType<typeof User>>(user)).toEqual({
       id: user1.id,
       username: "User 1",
       created_at: expect.any(Date),

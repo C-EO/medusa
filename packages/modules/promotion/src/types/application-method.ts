@@ -3,8 +3,9 @@ import {
   ApplicationMethodTargetTypeValues,
   ApplicationMethodTypeValues,
   BigNumberInput,
+  InferEntityType,
   PromotionDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 
 import { Promotion } from "@models"
 
@@ -14,7 +15,7 @@ export interface CreateApplicationMethodDTO {
   allocation?: ApplicationMethodAllocationValues
   value?: BigNumberInput
   currency_code?: string | null
-  promotion: Promotion | string | PromotionDTO
+  promotion: InferEntityType<typeof Promotion> | string | PromotionDTO
   max_quantity?: BigNumberInput | null
   buy_rules_min_quantity?: BigNumberInput | null
   apply_to_quantity?: BigNumberInput | null
@@ -27,7 +28,7 @@ export interface UpdateApplicationMethodDTO {
   allocation?: ApplicationMethodAllocationValues
   value?: BigNumberInput
   currency_code?: string | null
-  promotion?: Promotion | string | PromotionDTO
+  promotion?: InferEntityType<typeof Promotion> | string | PromotionDTO
   max_quantity?: BigNumberInput | null
   buy_rules_min_quantity?: BigNumberInput | null
   apply_to_quantity?: BigNumberInput | null

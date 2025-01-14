@@ -119,34 +119,6 @@ export const useCancelClaim = (
   })
 }
 
-export const useDeleteClaim = (
-  id: string,
-  orderId: string,
-  options?: UseMutationOptions<HttpTypes.AdminClaimDeleteResponse, FetchError>
-) => {
-  return useMutation({
-    mutationFn: () => sdk.admin.claim.delete(id),
-    onSuccess: (data: any, variables: any, context: any) => {
-      queryClient.invalidateQueries({
-        queryKey: ordersQueryKeys.details(),
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: ordersQueryKeys.preview(orderId),
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: claimsQueryKeys.details(),
-      })
-      queryClient.invalidateQueries({
-        queryKey: claimsQueryKeys.lists(),
-      })
-      options?.onSuccess?.(data, variables, context)
-    },
-    ...options,
-  })
-}
-
 export const useAddClaimItems = (
   id: string,
   orderId: string,
@@ -236,14 +208,13 @@ export const useAddClaimInboundItems = (
   id: string,
   orderId: string,
   options?: UseMutationOptions<
-    HttpTypes.AdminClaimResponse,
+    HttpTypes.AdminClaimReturnPreviewResponse,
     FetchError,
     HttpTypes.AdminAddClaimInboundItems
   >
 ) => {
   return useMutation({
-    mutationFn: (payload: HttpTypes.AdminAddClaimInboundItems) =>
-      sdk.admin.claim.addInboundItems(id, payload),
+    mutationFn: (payload) => sdk.admin.claim.addInboundItems(id, payload),
     onSuccess: (data: any, variables: any, context: any) => {
       queryClient.invalidateQueries({
         queryKey: ordersQueryKeys.details(),

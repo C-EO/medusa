@@ -1,6 +1,6 @@
-import { ProductVariantDTO } from "@medusajs/types"
-import { Badge, Container, Heading, usePrompt } from "@medusajs/ui"
 import { Component, PencilSquare, Trash } from "@medusajs/icons"
+import { HttpTypes } from "@medusajs/types"
+import { Badge, Container, Heading, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
@@ -9,7 +9,7 @@ import { SectionRow } from "../../../../../components/common/section"
 import { useDeleteVariant } from "../../../../../hooks/api/products"
 
 type VariantGeneralSectionProps = {
-  variant: ProductVariantDTO
+  variant: HttpTypes.AdminProductVariant
 }
 
 export function VariantGeneralSection({ variant }: VariantGeneralSectionProps) {
@@ -19,7 +19,7 @@ export function VariantGeneralSection({ variant }: VariantGeneralSectionProps) {
 
   const hasInventoryKit = variant.inventory?.length > 1
 
-  const { mutateAsync } = useDeleteVariant(variant.product_id, variant.id)
+  const { mutateAsync } = useDeleteVariant(variant.product_id!, variant.id)
 
   const handleDelete = async () => {
     const res = await prompt({
@@ -85,10 +85,10 @@ export function VariantGeneralSection({ variant }: VariantGeneralSectionProps) {
       </div>
 
       <SectionRow title={t("fields.sku")} value={variant.sku} />
-      {variant.options.map((o) => (
+      {variant.options?.map((o) => (
         <SectionRow
           key={o.id}
-          title={o.option?.title}
+          title={o.option?.title!}
           value={<Badge size="2xsmall">{o.value}</Badge>}
         />
       ))}

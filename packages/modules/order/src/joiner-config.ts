@@ -1,10 +1,11 @@
-import { defineJoinerConfig, Modules } from "@medusajs/utils"
+import { defineJoinerConfig, Modules } from "@medusajs/framework/utils"
 import {
   Order,
   OrderAddress,
   OrderChange,
   OrderClaim,
   OrderExchange,
+  OrderItem,
   OrderLineItem,
   OrderShippingMethod,
   OrderTransaction,
@@ -25,6 +26,7 @@ export const joinerConfig = defineJoinerConfig(Modules.ORDER, {
     OrderChange,
     OrderClaim,
     OrderExchange,
+    OrderItem,
     OrderLineItem,
     OrderShippingMethod,
     OrderTransaction,

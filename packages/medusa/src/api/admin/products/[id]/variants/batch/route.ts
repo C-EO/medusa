@@ -2,9 +2,9 @@ import { batchProductVariantsWorkflow } from "@medusajs/core-flows"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchBatchVariants, remapVariantResponse } from "../../../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminBatchProductVariantRequest>,
@@ -31,7 +31,7 @@ export const POST = async (
   const batchResults = await refetchBatchVariants(
     result,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({

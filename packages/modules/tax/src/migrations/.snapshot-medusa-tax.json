@@ -24,11 +24,51 @@
           "nullable": false,
           "default": "true",
           "mappedType": "boolean"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "tax_provider",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "IDX_tax_provider_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_provider_deleted_at\" ON \"tax_provider\" (deleted_at) WHERE deleted_at IS NULL"
+        },
         {
           "keyName": "tax_provider_pkey",
           "columnNames": [
@@ -53,15 +93,6 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "provider_id": {
-          "name": "provider_id",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "country_code": {
           "name": "country_code",
           "type": "text",
@@ -80,15 +111,6 @@
           "nullable": true,
           "mappedType": "text"
         },
-        "parent_id": {
-          "name": "parent_id",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "metadata": {
           "name": "metadata",
           "type": "jsonb",
@@ -97,6 +119,33 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
         },
         "created_at": {
           "name": "created_at",
@@ -120,15 +169,6 @@
           "default": "now()",
           "mappedType": "datetime"
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "deleted_at": {
           "name": "deleted_at",
           "type": "timestamptz",
@@ -144,23 +184,28 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "parent_id"
-          ],
-          "composite": false,
-          "keyName": "IDX_tax_region_parent_id",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "IDX_tax_region_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "keyName": "IDX_tax_region_provider_id",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_region_deleted_at\" ON \"tax_region\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_region_provider_id\" ON \"tax_region\" (provider_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_tax_region_parent_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_region_parent_id\" ON \"tax_region\" (parent_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_tax_region_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_region_deleted_at\" ON \"tax_region\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_tax_region_unique_country_province",
@@ -190,14 +235,14 @@
       ],
       "checks": [
         {
-          "name": "CK_tax_region_country_top_level",
-          "expression": "parent_id IS NULL OR province_code IS NOT NULL",
-          "definition": "check ((parent_id IS NULL OR province_code IS NOT NULL))"
-        },
-        {
           "name": "CK_tax_region_provider_top_level",
           "expression": "parent_id IS NULL OR provider_id IS NULL",
           "definition": "check ((parent_id IS NULL OR provider_id IS NULL))"
+        },
+        {
+          "name": "CK_tax_region_country_top_level",
+          "expression": "parent_id IS NULL OR province_code IS NOT NULL",
+          "definition": "check ((parent_id IS NULL OR province_code IS NOT NULL))"
         }
       ],
       "foreignKeys": {
@@ -255,7 +300,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "mappedType": "text"
         },
         "name": {
@@ -269,7 +314,7 @@
         },
         "is_default": {
           "name": "is_default",
-          "type": "bool",
+          "type": "boolean",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -279,7 +324,7 @@
         },
         "is_combinable": {
           "name": "is_combinable",
-          "type": "bool",
+          "type": "boolean",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -305,6 +350,15 @@
           "nullable": true,
           "mappedType": "json"
         },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -327,15 +381,6 @@
           "default": "now()",
           "mappedType": "datetime"
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "deleted_at": {
           "name": "deleted_at",
           "type": "timestamptz",
@@ -352,9 +397,7 @@
       "indexes": [
         {
           "keyName": "IDX_tax_rate_tax_region_id",
-          "columnNames": [
-            "tax_region_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -362,13 +405,11 @@
         },
         {
           "keyName": "IDX_tax_rate_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_deleted_at\" ON \"tax_rate\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_deleted_at\" ON \"tax_rate\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_single_default_region",
@@ -416,17 +457,26 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "tax_rate_id": {
-          "name": "tax_rate_id",
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "created_by": {
+          "name": "created_by",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "text"
         },
-        "reference_id": {
-          "name": "reference_id",
+        "tax_rate_id": {
+          "name": "tax_rate_id",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -443,14 +493,14 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
+        "reference_id": {
+          "name": "reference_id",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "mappedType": "json"
+          "nullable": false,
+          "mappedType": "text"
         },
         "created_at": {
           "name": "created_at",
@@ -474,15 +524,6 @@
           "default": "now()",
           "mappedType": "datetime"
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
         "deleted_at": {
           "name": "deleted_at",
           "type": "timestamptz",
@@ -499,33 +540,27 @@
       "indexes": [
         {
           "keyName": "IDX_tax_rate_rule_tax_rate_id",
-          "columnNames": [
-            "tax_rate_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_rule_tax_rate_id\" ON \"tax_rate_rule\" (tax_rate_id) WHERE deleted_at IS NULL"
         },
         {
+          "keyName": "IDX_tax_rate_rule_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_rule_deleted_at\" ON \"tax_rate_rule\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "IDX_tax_rate_rule_reference_id",
-          "columnNames": [
-            "reference_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_rule_reference_id\" ON \"tax_rate_rule\" (reference_id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_tax_rate_rule_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_tax_rate_rule_deleted_at\" ON \"tax_rate_rule\" (deleted_at) WHERE deleted_at IS NOT NULL"
         },
         {
           "keyName": "IDX_tax_rate_rule_unique_rate_reference",

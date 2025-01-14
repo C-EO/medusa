@@ -1,9 +1,9 @@
 import { getOrdersListWorkflow } from "@medusajs/core-flows"
-import { HttpTypes, OrderDTO } from "@medusajs/types"
+import { HttpTypes, OrderDTO } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminOrderFilters>,
@@ -14,13 +14,13 @@ export const GET = async (
       ...req.filterableFields,
       is_draft_order: false,
     },
-    ...req.remoteQueryConfig.pagination,
+    ...req.queryConfig.pagination,
   }
 
   const workflow = getOrdersListWorkflow(req.scope)
   const { result } = await workflow.run({
     input: {
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
       variables,
     },
   })

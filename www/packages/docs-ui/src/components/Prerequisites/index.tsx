@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useRef } from "react"
 import { Button, useCollapsible } from "../.."
 import clsx from "clsx"
 import { TriangleRightMini } from "@medusajs/icons"
@@ -15,9 +15,12 @@ type PrerequisitesProps = {
 }
 
 export const Prerequisites = ({ items }: PrerequisitesProps) => {
+  const itemsRef = useRef<HTMLDivElement>(null)
   const { collapsed, getCollapsibleElms, setCollapsed } = useCollapsible({
     initialValue: false,
     translateEnabled: false,
+    childrenRef: itemsRef,
+    useChild: false,
   })
 
   const getPosition = (index: number): PrerequisiteItemPosition => {
@@ -71,7 +74,7 @@ export const Prerequisites = ({ items }: PrerequisitesProps) => {
         </Button>
       </summary>
       {getCollapsibleElms(
-        <div className="flex gap-[6px] flex-col">
+        <div className="flex gap-[6px] flex-col" ref={itemsRef}>
           {items.map((item, index) => (
             <PrerequisiteItem
               item={{

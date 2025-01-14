@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const CartPaymentCollection: ModuleJoinerConfig = {
   serviceName: LINKS.CartPaymentCollection,
@@ -40,6 +40,7 @@ export const CartPaymentCollection: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.CART,
+      entity: "Cart",
       fieldAlias: {
         payment_collection: "payment_collection_link.payment_collection",
       },
@@ -52,6 +53,7 @@ export const CartPaymentCollection: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.PAYMENT,
+      entity: "PaymentCollection",
       fieldAlias: {
         cart: "cart_link.cart",
       },

@@ -33,15 +33,6 @@
           "nullable": false,
           "mappedType": "decimal"
         },
-        "raw_amount": {
-          "name": "raw_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "authorized_amount": {
           "name": "authorized_amount",
           "type": "numeric",
@@ -50,15 +41,6 @@
           "primary": false,
           "nullable": true,
           "mappedType": "decimal"
-        },
-        "raw_authorized_amount": {
-          "name": "raw_authorized_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
         },
         "captured_amount": {
           "name": "captured_amount",
@@ -69,15 +51,6 @@
           "nullable": true,
           "mappedType": "decimal"
         },
-        "raw_captured_amount": {
-          "name": "raw_captured_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "refunded_amount": {
           "name": "refunded_amount",
           "type": "numeric",
@@ -87,15 +60,6 @@
           "nullable": true,
           "mappedType": "decimal"
         },
-        "raw_refunded_amount": {
-          "name": "raw_refunded_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "region_id": {
           "name": "region_id",
           "type": "text",
@@ -104,38 +68,6 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "now()",
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "now()",
-          "mappedType": "datetime"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
         },
         "completed_at": {
           "name": "completed_at",
@@ -172,28 +104,94 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "raw_authorized_amount": {
+          "name": "raw_authorized_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "raw_captured_amount": {
+          "name": "raw_captured_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "raw_refunded_amount": {
+          "name": "raw_refunded_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "payment_collection",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "region_id"
-          ],
+          "keyName": "IDX_payment_collection_deleted_at",
+          "columnNames": [],
           "composite": false,
-          "keyName": "IDX_payment_collection_region_id",
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_collection_deleted_at\" ON \"payment_collection\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
-          "columnNames": [
-            "deleted_at"
-          ],
+          "keyName": "IDX_payment_collection_region_id",
+          "columnNames": [],
           "composite": false,
-          "keyName": "IDX_payment_collection_deleted_at",
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_collection_region_id\" ON \"payment_collection\" (region_id) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "payment_collection_pkey",
@@ -264,6 +262,15 @@
           "nullable": true,
           "mappedType": "text"
         },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -295,28 +302,18 @@
           "nullable": true,
           "length": 6,
           "mappedType": "datetime"
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
         }
       },
       "name": "payment_method_token",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
           "keyName": "IDX_payment_method_token_deleted_at",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_method_token_deleted_at\" ON \"payment_method_token\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "payment_method_token_pkey",
@@ -351,11 +348,51 @@
           "nullable": false,
           "default": "true",
           "mappedType": "boolean"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "payment_provider",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "IDX_payment_provider_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_provider_deleted_at\" ON \"payment_provider\" (deleted_at) WHERE deleted_at IS NULL"
+        },
         {
           "keyName": "payment_provider_pkey",
           "columnNames": [
@@ -463,15 +500,6 @@
           "nullable": false,
           "mappedType": "decimal"
         },
-        "raw_amount": {
-          "name": "raw_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "provider_id": {
           "name": "provider_id",
           "type": "text",
@@ -488,6 +516,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "'{}'",
           "mappedType": "json"
         },
         "context": {
@@ -545,6 +574,15 @@
           "nullable": true,
           "mappedType": "json"
         },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -582,22 +620,20 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "payment_collection_id"
-          ],
-          "composite": false,
           "keyName": "IDX_payment_session_payment_collection_id",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_session_payment_collection_id\" ON \"payment_session\" (payment_collection_id) WHERE deleted_at IS NULL"
         },
         {
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
           "keyName": "IDX_payment_session_deleted_at",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_session_deleted_at\" ON \"payment_session\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "payment_session_pkey",
@@ -621,6 +657,7 @@
             "id"
           ],
           "referencedTableName": "public.payment_collection",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }
@@ -644,15 +681,6 @@
           "primary": false,
           "nullable": false,
           "mappedType": "decimal"
-        },
-        "raw_amount": {
-          "name": "raw_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
         },
         "currency_code": {
           "name": "currency_code",
@@ -717,38 +745,6 @@
           "nullable": true,
           "mappedType": "json"
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "now()",
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "now()",
-          "mappedType": "datetime"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
-        },
         "captured_at": {
           "name": "captured_at",
           "type": "timestamptz",
@@ -786,38 +782,52 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
+        },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "payment",
       "schema": "public",
       "indexes": [
-        {
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
-          "keyName": "IDX_payment_deleted_at",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "payment_collection_id"
-          ],
-          "composite": false,
-          "keyName": "IDX_payment_payment_collection_id",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "payment_session_id"
-          ],
-          "composite": false,
-          "keyName": "IDX_payment_payment_session_id",
-          "primary": false,
-          "unique": false
-        },
         {
           "columnNames": [
             "payment_session_id"
@@ -828,14 +838,36 @@
           "unique": true
         },
         {
-          "keyName": "IDX_payment_provider_id",
-          "columnNames": [
-            "provider_id"
-          ],
+          "keyName": "IDX_payment_payment_collection_id",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_provider_id\" ON \"payment\" (provider_id)"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_payment_collection_id\" ON \"payment\" (payment_collection_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_payment_payment_session_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_payment_session_id\" ON \"payment\" (payment_session_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_payment_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_deleted_at\" ON \"payment\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_payment_provider_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_payment_provider_id\" ON \"payment\" (provider_id) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "payment_pkey",
@@ -859,6 +891,7 @@
             "id"
           ],
           "referencedTableName": "public.payment_collection",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "payment_payment_session_id_foreign": {
@@ -895,15 +928,6 @@
           "nullable": false,
           "mappedType": "decimal"
         },
-        "raw_amount": {
-          "name": "raw_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "payment_id": {
           "name": "payment_id",
           "type": "text",
@@ -920,6 +944,24 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "mappedType": "json"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
           "mappedType": "json"
         },
         "created_at": {
@@ -953,37 +995,26 @@
           "nullable": true,
           "length": 6,
           "mappedType": "datetime"
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
         }
       },
       "name": "capture",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "payment_id"
-          ],
-          "composite": false,
           "keyName": "IDX_capture_payment_id",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_capture_payment_id\" ON \"capture\" (payment_id) WHERE deleted_at IS NULL"
         },
         {
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
           "keyName": "IDX_capture_deleted_at",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_capture_deleted_at\" ON \"capture\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "capture_pkey",
@@ -1087,6 +1118,14 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "IDX_refund_reason_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_refund_reason_deleted_at\" ON \"refund_reason\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "refund_reason_pkey",
           "columnNames": [
             "id"
@@ -1119,15 +1158,6 @@
           "nullable": false,
           "mappedType": "decimal"
         },
-        "raw_amount": {
-          "name": "raw_amount",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "payment_id": {
           "name": "payment_id",
           "type": "text",
@@ -1154,6 +1184,33 @@
           "primary": false,
           "nullable": true,
           "mappedType": "text"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -1186,46 +1243,34 @@
           "nullable": true,
           "length": 6,
           "mappedType": "datetime"
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
         }
       },
       "name": "refund",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "payment_id"
-          ],
-          "composite": false,
           "keyName": "IDX_refund_payment_id",
+          "columnNames": [],
+          "composite": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_refund_payment_id\" ON \"refund\" (payment_id) WHERE deleted_at IS NULL"
         },
         {
-          "columnNames": [
-            "deleted_at"
-          ],
+          "keyName": "IDX_refund_refund_reason_id",
+          "columnNames": [],
           "composite": false,
-          "keyName": "IDX_refund_deleted_at",
           "primary": false,
-          "unique": false
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_refund_refund_reason_id\" ON \"refund\" (refund_reason_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_refund_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_refund_deleted_at\" ON \"refund\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "refund_pkey",

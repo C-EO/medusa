@@ -2,7 +2,7 @@
 
 // @refresh reset
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { SidebarItemCategory as SidebarItemCategoryType } from "types"
 import { Loading, SidebarItem, useSidebar } from "../../../.."
 import clsx from "clsx"
@@ -22,28 +22,31 @@ export const SidebarItemCategory = ({
   const [open, setOpen] = useState(
     item.initialOpen !== undefined ? item.initialOpen : expandItems
   )
-  const childrenRef = useRef<HTMLUListElement>(null)
   const {
     isChildrenActive,
     updatePersistedCategoryState,
     getPersistedCategoryState,
     persistState,
   } = useSidebar()
-
-  useEffect(() => {
-    if (open && !item.loaded) {
-      setShowLoading(true)
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (item.loaded && showLoading) {
-      setShowLoading(false)
-    }
+  const itemShowLoading = useMemo(() => {
+    return !item.loaded || (item.showLoadingIfEmpty && !item.children?.length)
   }, [item])
 
   useEffect(() => {
+    if (open && itemShowLoading) {
+      setShowLoading(true)
+    }
+  }, [open, itemShowLoading])
+
+  useEffect(() => {
+    if (!itemShowLoading && showLoading) {
+      setShowLoading(false)
+    }
+  }, [itemShowLoading, showLoading])
+
+  useEffect(() => {
     const isActive = isChildrenActive(item)
+
     if (isActive && !open) {
       setOpen(true)
     }
@@ -110,26 +113,31 @@ export const SidebarItemCategory = ({
           )}
         </div>
       </div>
-      <ul
-        className={clsx(
-          "ease-ease",
-          "flex flex-col gap-docs_0.125",
-          "z-[1] relative",
-          !open && "overflow-hidden m-0 h-0"
-        )}
-        ref={childrenRef}
-      >
-        {showLoading && (
-          <Loading
-            count={3}
-            className="!mb-0 !px-docs_0.5"
-            barClassName="h-[20px]"
-          />
-        )}
-        {item.children?.map((childItem, index) => (
-          <SidebarItem item={childItem} key={index} expandItems={expandItems} />
-        ))}
-      </ul>
+      {!item.hideChildren && (
+        <ul
+          className={clsx(
+            "ease-ease",
+            "flex flex-col gap-docs_0.125",
+            "z-[1] relative",
+            !open && "overflow-hidden m-0 h-0"
+          )}
+        >
+          {showLoading && (
+            <Loading
+              count={3}
+              className="!mb-0 !px-docs_0.5"
+              barClassName="h-[20px]"
+            />
+          )}
+          {item.children?.map((childItem, index) => (
+            <SidebarItem
+              item={childItem}
+              key={index}
+              expandItems={expandItems}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

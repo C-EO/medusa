@@ -1,5 +1,5 @@
 const { Modules } = require("@medusajs/utils")
-const { FulfillmentModuleOptions } = require("@medusajs/fulfillment")
+
 const DB_HOST = process.env.DB_HOST
 const DB_USERNAME = process.env.DB_USERNAME
 const DB_PASSWORD = process.env.DB_PASSWORD
@@ -39,6 +39,9 @@ module.exports = {
     medusa_v2: enableMedusaV2,
   },
   modules: {
+    testingModule: {
+      resolve: "__tests__/__fixtures__/testing-module",
+    },
     [Modules.AUTH]: {
       resolve: "@medusajs/auth",
       options: {
@@ -52,7 +55,6 @@ module.exports = {
     },
     [Modules.USER]: {
       scope: "internal",
-      resources: "shared",
       resolve: "@medusajs/user",
       options: {
         jwt_secret: "test",
@@ -62,12 +64,13 @@ module.exports = {
       resolve: "@medusajs/cache-inmemory",
       options: { ttl: 0 }, // Cache disabled
     },
+    [Modules.LOCKING]: true,
     [Modules.STOCK_LOCATION]: {
-      resolve: "@medusajs/stock-location-next",
+      resolve: "@medusajs/stock-location",
       options: {},
     },
     [Modules.INVENTORY]: {
-      resolve: "@medusajs/inventory-next",
+      resolve: "@medusajs/inventory",
       options: {},
     },
     [Modules.PRODUCT]: true,
@@ -78,7 +81,6 @@ module.exports = {
     [Modules.SALES_CHANNEL]: true,
     [Modules.CART]: true,
     [Modules.WORKFLOW_ENGINE]: true,
-    [Modules.REGION]: true,
     [Modules.API_KEY]: true,
     [Modules.STORE]: true,
     [Modules.TAX]: true,

@@ -1,28 +1,6 @@
-import { Searchable, generateEntityId } from "@medusajs/utils"
-import {
-  BeforeCreate,
-  Entity,
-  OnInit,
-  PrimaryKey,
-  Property,
-} from "@mikro-orm/core"
+import { model } from "@medusajs/framework/utils"
 
-@Entity()
-export default class FulfillmentProvider {
-  @Searchable()
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({ columnType: "boolean", defaultRaw: "true" })
-  is_enabled: boolean = true
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "serpro")
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "serpro")
-  }
-}
+export const FulfillmentProvider = model.define("fulfillment_provider", {
+  id: model.id({ prefix: "serpro" }).primaryKey(),
+  is_enabled: model.boolean().default(true),
+})

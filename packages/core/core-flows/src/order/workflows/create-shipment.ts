@@ -3,17 +3,16 @@ import {
   FulfillmentDTO,
   OrderDTO,
   OrderWorkflow,
-} from "@medusajs/types"
-import { FulfillmentEvents, Modules } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import { FulfillmentEvents, Modules } from "@medusajs/framework/utils"
 import {
-  WorkflowData,
   WorkflowResponse,
   createHook,
   createStep,
   createWorkflow,
   parallelize,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep, useRemoteQueryStep } from "../../common"
 import { createShipmentWorkflow } from "../../fulfillment"
 import { registerOrderShipmentStep } from "../steps"
@@ -76,16 +75,48 @@ function prepareRegisterShipmentData({
   }
 }
 
+/**
+ * The data to create a shipment for an order, along with custom data that's passed to the workflow's hooks.
+ */
+export type CreateOrderShipmentWorkflowInput = OrderWorkflow.CreateOrderShipmentWorkflowInput & AdditionalData
+
 export const createOrderShipmentWorkflowId = "create-order-shipment"
 /**
- * This workflow creates a shipment for an order.
+ * This workflow creates a shipment for an order. It's used by the [Create Order Shipment Admin API Route](https://docs.medusajs.com/api/admin#orders_postordersidfulfillmentsfulfillment_idshipments).
+ * 
+ * This workflow has a hook that allows you to perform custom actions on the created shipment. For example, you can pass under `additional_data` custom data that 
+ * allows you to create custom data models linked to the shipment.
+ * 
+ * You can also use this workflow within your own custom workflows, allowing you to wrap custom logic around creating a shipment.
+ * 
+ * @example
+ * const { result } = await createOrderShipmentWorkflow(container)
+ * .run({
+ *   input: {
+ *     order_id: "order_123",
+ *     fulfillment_id: "fulfillment_123",
+ *     items: [
+ *       {
+ *         id: "orli_123",
+ *         quantity: 1
+ *       }
+ *     ],
+ *     additional_data: {
+ *       oms_id: "123"
+ *     }
+ *   }
+ * })
+ * 
+ * @summary
+ * 
+ * Creates a shipment for an order.
+ * 
+ * @property hooks.shipmentCreated - This hook is executed after the shipment is created. You can consume this hook to perform custom actions on the created shipment.
  */
 export const createOrderShipmentWorkflow = createWorkflow(
   createOrderShipmentWorkflowId,
   (
-    input: WorkflowData<
-      OrderWorkflow.CreateOrderShipmentWorkflowInput & AdditionalData
-    >
+    input: CreateOrderShipmentWorkflowInput
   ) => {
     const order: OrderDTO = useRemoteQueryStep({
       entry_point: "orders",

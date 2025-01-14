@@ -1,12 +1,12 @@
-import { OrderChangeDTO, OrderDTO } from "@medusajs/types"
-import { ChangeActionType, OrderChangeStatus } from "@medusajs/utils"
+import { OrderChangeDTO, OrderDTO } from "@medusajs/framework/types"
+import { ChangeActionType, OrderChangeStatus } from "@medusajs/framework/utils"
 import {
   WorkflowData,
   createStep,
   createWorkflow,
   parallelize,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../../common"
 import { deleteOrderChangesStep, deleteOrderShippingMethods } from "../../steps"
 import {
@@ -41,7 +41,9 @@ export const cancelBeginOrderEditWorkflowId = "cancel-begin-order-edit"
  */
 export const cancelBeginOrderEditWorkflow = createWorkflow(
   cancelBeginOrderEditWorkflowId,
-  function (input: CancelBeginOrderEditWorkflowInput): WorkflowData<void> {
+  function (
+    input: WorkflowData<CancelBeginOrderEditWorkflowInput>
+  ): WorkflowData<void> {
     const order: OrderDTO = useRemoteQueryStep({
       entry_point: "orders",
       fields: ["id", "version", "canceled_at"],

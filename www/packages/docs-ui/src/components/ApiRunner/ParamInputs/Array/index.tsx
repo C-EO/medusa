@@ -85,8 +85,8 @@ export const ApiRunnerParamArrayInput = ({
             Array.isArray(prev[0])
               ? [...prev[0]]
               : typeof prev[0] === "object"
-              ? Object.assign({}, prev[0])
-              : prev[0],
+                ? Object.assign({}, prev[0])
+                : prev[0],
           ])
         }}
         className="mt-0.5"

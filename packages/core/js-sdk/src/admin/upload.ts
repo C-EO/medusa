@@ -3,7 +3,13 @@ import { Client } from "../client"
 import { ClientHeaders } from "../types"
 
 export class Upload {
+  /**
+   * @ignore
+   */
   private client: Client
+  /**
+   * @ignore
+   */
   constructor(client: Client) {
     this.client = client
   }
@@ -59,9 +65,12 @@ export class Upload {
   }
 
   async delete(id: string, headers?: ClientHeaders) {
-    return this.client.fetch<HttpTypes.AdminFileDeleteResponse>(`/admin/uploads/${id}`, {
-      method: "DELETE",
-      headers,
-    })
+    return this.client.fetch<HttpTypes.AdminFileDeleteResponse>(
+      `/admin/uploads/${id}`,
+      {
+        method: "DELETE",
+        headers,
+      }
+    )
   }
 }

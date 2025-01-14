@@ -13,6 +13,7 @@ describe("Number property", () => {
         options: {},
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
     })

@@ -67,8 +67,23 @@ export function getCoreFlowNamespaces(): NamespaceGenerateDetails[] {
   return namespaces
 }
 
-export function getNamespaceNames(
-  namespaces: NamespaceGenerateDetails[]
-): string[] {
-  return namespaces.map((namespace) => namespace.name)
+export function getNamespaceNames(namespaces: NamespaceGenerateDetails[]): {
+  mainNamespaces: string[]
+  childNamespaces: string[]
+} {
+  const mainNamespaces: string[] = []
+  const childNamespaces: string[] = []
+
+  namespaces.map((namespace) => {
+    mainNamespaces.push(namespace.name)
+    childNamespaces.push(
+      ...(namespace.children?.map((childNamespace) => childNamespace.name) ||
+        [])
+    )
+  })
+
+  return {
+    mainNamespaces,
+    childNamespaces,
+  }
 }

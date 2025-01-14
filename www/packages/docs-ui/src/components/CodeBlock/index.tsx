@@ -8,6 +8,7 @@ import { useColorMode } from "@/providers"
 import { CodeBlockHeader, CodeBlockHeaderMeta } from "./Header"
 import { CodeBlockLine } from "./Line"
 import { ApiAuthType, ApiDataOptions, ApiMethod } from "types"
+// @ts-expect-error can't install the types package because it doesn't support React v19
 import { CSSTransition } from "react-transition-group"
 import { useCollapsibleCodeLines } from "../.."
 import { HighlightProps as CollapsibleHighlightProps } from "@/hooks"
@@ -47,10 +48,23 @@ export type CodeBlockStyle = "loud" | "subtle" | "inline"
 export type CodeBlockProps = {
   source: string
   lang?: string
+  wrapperClassName?: string
+  innerClassName?: string
   className?: string
   collapsed?: boolean
   blockStyle?: CodeBlockStyle
   children?: React.ReactNode
+  style?: React.HTMLAttributes<HTMLDivElement>["style"]
+  forceNoTitle?: boolean
+  animateTokenHighlights?: boolean
+  overrideColors?: {
+    bg?: string
+    innerBg?: string
+    lineNumbersBg?: string
+    border?: string
+    innerBorder?: string
+    boxShadow?: string
+  }
 } & CodeBlockMetaFields &
   Omit<HighlightProps, "code" | "language" | "children">
 
@@ -58,7 +72,10 @@ export const CodeBlock = ({
   source,
   hasTabs = false,
   lang = "",
+  wrapperClassName,
+  innerClassName,
   className,
+  overrideColors = {},
   collapsed = false,
   title = "",
   highlights = [],
@@ -71,6 +88,9 @@ export const CodeBlock = ({
   collapsibleLines,
   expandButtonLabel,
   isTerminal,
+  style,
+  forceNoTitle = false,
+  animateTokenHighlights,
   ...rest
 }: CodeBlockProps) => {
   if (!source && typeof children === "string") {
@@ -92,8 +112,16 @@ export const CodeBlock = ({
       : isTerminal
   }, [isTerminal, lang])
   const codeTitle = useMemo(() => {
-    if (title || hasTabs) {
+    if (forceNoTitle) {
+      return ""
+    }
+
+    if (title) {
       return title
+    }
+
+    if (hasTabs) {
+      return ""
     }
 
     if (isTerminalCode) {
@@ -101,7 +129,7 @@ export const CodeBlock = ({
     }
 
     return "Code"
-  }, [title, isTerminalCode, hasTabs])
+  }, [title, isTerminalCode, hasTabs, forceNoTitle])
   const hasInnerCodeBlock = useMemo(
     () => hasTabs || codeTitle.length > 0,
     [hasTabs, codeTitle]
@@ -117,72 +145,90 @@ export const CodeBlock = ({
   const bgColor = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" && "bg-medusa-contrast-bg-base",
-        blockStyle === "subtle" && [
-          colorMode === "light" && "bg-medusa-bg-subtle",
-          colorMode === "dark" && "bg-medusa-code-bg-base",
+        overrideColors.bg,
+        !overrideColors.bg && [
+          blockStyle === "loud" && "bg-medusa-contrast-bg-base",
+          blockStyle === "subtle" && [
+            colorMode === "light" && "bg-medusa-bg-subtle",
+            colorMode === "dark" && "bg-medusa-code-bg-base",
+          ],
         ]
       ),
-    [blockStyle, colorMode]
+    [blockStyle, colorMode, overrideColors]
   )
 
   const lineNumbersColor = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" && "text-medusa-contrast-fg-secondary",
-        blockStyle === "subtle" && [
-          colorMode === "light" && "text-medusa-fg-muted",
-          colorMode === "dark" && "text-medusa-contrast-fg-secondary",
+        overrideColors.lineNumbersBg,
+        !overrideColors.lineNumbersBg && [
+          blockStyle === "loud" && "text-medusa-contrast-fg-secondary",
+          blockStyle === "subtle" && [
+            colorMode === "light" && "text-medusa-fg-muted",
+            colorMode === "dark" && "text-medusa-contrast-fg-secondary",
+          ],
         ]
       ),
-    [blockStyle, colorMode]
+    [blockStyle, colorMode, overrideColors]
   )
 
   const borderColor = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" && "border-0",
-        blockStyle === "subtle" && [
-          colorMode === "light" && "border-medusa-border-base",
-          colorMode === "dark" && "border-medusa-code-border",
+        overrideColors.border,
+        !overrideColors.border && [
+          blockStyle === "loud" && "border-0",
+          blockStyle === "subtle" && [
+            colorMode === "light" && "border-medusa-border-base",
+            colorMode === "dark" && "border-medusa-code-border",
+          ],
         ]
       ),
-    [blockStyle, colorMode]
+    [blockStyle, colorMode, overrideColors]
   )
 
   const boxShadow = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" &&
-          "shadow-elevation-code-block dark:shadow-elevation-code-block-dark",
-        blockStyle === "subtle" && "shadow-none"
+        overrideColors.boxShadow,
+        !overrideColors.boxShadow && [
+          blockStyle === "loud" &&
+            "shadow-elevation-code-block dark:shadow-elevation-code-block-dark",
+          blockStyle === "subtle" && "shadow-none",
+        ]
       ),
-    [blockStyle]
+    [blockStyle, overrideColors]
   )
 
   const innerBgColor = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" && [
-          hasInnerCodeBlock && "bg-medusa-contrast-bg-subtle",
-          !hasInnerCodeBlock && "bg-medusa-contrast-bg-base",
-        ],
-        blockStyle === "subtle" && bgColor
+        overrideColors.innerBg,
+        !overrideColors.innerBg && [
+          blockStyle === "loud" && [
+            hasInnerCodeBlock && "bg-medusa-contrast-bg-subtle",
+            !hasInnerCodeBlock && "bg-medusa-contrast-bg-base",
+          ],
+          blockStyle === "subtle" && bgColor,
+        ]
       ),
-    [blockStyle, bgColor, hasInnerCodeBlock]
+    [blockStyle, bgColor, hasInnerCodeBlock, overrideColors]
   )
 
   const innerBorderClasses = useMemo(
     () =>
       clsx(
-        blockStyle === "loud" && [
-          hasInnerCodeBlock &&
-            "border border-solid border-medusa-contrast-border-bot rounded-docs_DEFAULT",
-          !hasInnerCodeBlock && "border-transparent rounded-docs_DEFAULT",
-        ],
-        blockStyle === "subtle" && "border-transparent rounded-docs_DEFAULT"
+        overrideColors.innerBorder,
+        !overrideColors.innerBorder && [
+          blockStyle === "loud" && [
+            hasInnerCodeBlock &&
+              "border border-solid border-medusa-contrast-border-bot rounded-docs_DEFAULT",
+            !hasInnerCodeBlock && "border-transparent rounded-docs_DEFAULT",
+          ],
+          blockStyle === "subtle" && "border-transparent rounded-docs_DEFAULT",
+        ]
       ),
-    [blockStyle, hasInnerCodeBlock]
+    [blockStyle, hasInnerCodeBlock, overrideColors]
   )
 
   const language = useMemo(() => {
@@ -221,6 +267,7 @@ export const CodeBlock = ({
           lineNumberColorClassName={lineNumbersColor}
           lineNumberBgClassName={innerBgColor}
           isTerminal={isTerminalCode}
+          animateTokenHighlights={animateTokenHighlights}
           {...highlightProps}
         />
       )
@@ -303,7 +350,8 @@ export const CodeBlock = ({
           blockStyle === "loud" && "code-block-highlight",
           blockStyle === "subtle" &&
             colorMode === "light" &&
-            "code-block-highlight-light"
+            "code-block-highlight-light",
+          wrapperClassName
         )}
       >
         {codeTitle && (
@@ -316,12 +364,13 @@ export const CodeBlock = ({
               ...actionsProps,
               inHeader: true,
             }}
+            hideActions={hasTabs}
           />
         )}
         <div
           className={clsx(
             "relative mb-docs_1",
-            "w-full max-w-full border",
+            "w-full max-w-full border code-block-elm",
             bgColor,
             borderColor,
             collapsed && "max-h-[400px] overflow-auto",
@@ -329,6 +378,7 @@ export const CodeBlock = ({
             !hasInnerCodeBlock && "rounded-docs_DEFAULT",
             className
           )}
+          style={style}
         >
           <Highlight
             theme={codeTheme}
@@ -343,7 +393,12 @@ export const CodeBlock = ({
               ...rest
             }) => (
               <div
-                className={clsx(innerBorderClasses, innerBgColor, "relative")}
+                className={clsx(
+                  innerBorderClasses,
+                  innerBgColor,
+                  "relative",
+                  innerClassName
+                )}
                 ref={codeContainerRef}
               >
                 {collapsibleType === "start" && (
@@ -370,9 +425,6 @@ export const CodeBlock = ({
                     !hasInnerCodeBlock &&
                       tokens.length <= 1 &&
                       "px-docs_1 py-[6px]",
-                    !codeTitle.length &&
-                      (!noCopy || !noReport) &&
-                      "xs:max-w-[83%]",
                     (noLineNumbers ||
                       (tokens.length <= 1 && !isTerminalCode)) &&
                       "pl-docs_1",
@@ -402,13 +454,14 @@ export const CodeBlock = ({
                       })}
                   </code>
                 </pre>
-                {!hasInnerCodeBlock && (
-                  <CodeBlockActions
-                    {...actionsProps}
-                    inHeader={false}
-                    isSingleLine={tokens.length <= 1}
-                  />
-                )}
+                {!hasInnerCodeBlock &&
+                  (!noCopy || !noReport || canShowApiTesting) && (
+                    <CodeBlockActions
+                      {...actionsProps}
+                      inHeader={false}
+                      isSingleLine={tokens.length <= 1}
+                    />
+                  )}
                 {collapsibleType === "end" && (
                   <>
                     <CodeBlockCollapsibleFade

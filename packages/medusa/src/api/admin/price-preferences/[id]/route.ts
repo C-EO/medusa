@@ -3,12 +3,12 @@ import {
   updatePricePreferencesWorkflow,
 } from "@medusajs/core-flows"
 
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
-import { refetchEntity } from "../../../utils/refetch-entity"
+  refetchEntity,
+} from "@medusajs/framework/http"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -18,7 +18,7 @@ export const GET = async (
     "price_preference",
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ price_preference })
@@ -39,7 +39,7 @@ export const POST = async (
     "price_preference",
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ price_preference })

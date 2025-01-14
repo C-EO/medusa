@@ -1,9 +1,9 @@
 import { dropDatabase } from "pg-god"
 import {
   createClient,
-  parseConnectionString,
-  dbExists,
   createDb,
+  dbExists,
+  parseConnectionString,
 } from "../../index"
 
 const DB_HOST = process.env.DB_HOST ?? "localhost"

@@ -1,7 +1,7 @@
-import { RemoteLink } from "@medusajs/modules-sdk"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+import { Link } from "@medusajs/framework/modules-sdk"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
-import { ContainerRegistrationKeys, Modules } from "@medusajs/utils"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 
 export interface DetachLocationsFromSalesChannelsStepInput {
   links: {
@@ -22,9 +22,7 @@ export const detachLocationsFromSalesChannelsStep = createStep(
       return new StepResponse([], [])
     }
 
-    const remoteLink = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const remoteLink = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     const links = data.links.map((link) => {
       return {
@@ -45,7 +43,7 @@ export const detachLocationsFromSalesChannelsStep = createStep(
       return
     }
 
-    const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK)
+    const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
     await remoteLink.create(links)
   }
 )

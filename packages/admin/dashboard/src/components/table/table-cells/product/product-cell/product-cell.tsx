@@ -4,16 +4,18 @@ import { Thumbnail } from "../../../../common/thumbnail"
 import { HttpTypes } from "@medusajs/types"
 
 type ProductCellProps = {
-  product: HttpTypes.AdminProduct
+  product: Pick<HttpTypes.AdminProduct, "thumbnail" | "title">
 }
 
 export const ProductCell = ({ product }: ProductCellProps) => {
   return (
-    <div className="flex h-full w-full items-center gap-x-3 overflow-hidden">
+    <div className="flex h-full w-full max-w-[250px] items-center gap-x-3 overflow-hidden">
       <div className="w-fit flex-shrink-0">
         <Thumbnail src={product.thumbnail} />
       </div>
-      <span className="truncate">{product.title}</span>
+      <span title={product.title} className="truncate">
+        {product.title}
+      </span>
     </div>
   )
 }

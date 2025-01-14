@@ -17,12 +17,17 @@ import {
   TransactionStepStatus,
 } from "./types"
 
-import { MedusaError, promiseAll, TransactionStepState } from "@medusajs/utils"
+import {
+  isDefined,
+  isErrorLike,
+  MedusaError,
+  promiseAll,
+  serializeError,
+  TransactionStepState,
+} from "@medusajs/utils"
 import { EventEmitter } from "events"
 import {
-  isErrorLike,
   PermanentStepFailureError,
-  serializeError,
   SkipStepResponse,
   TransactionStepTimeoutError,
   TransactionTimeoutError,
@@ -549,6 +554,16 @@ export class TransactionOrchestrator extends EventEmitter {
 
     step.changeState(TransactionStepState.TIMEOUT)
 
+    if (error?.stack) {
+      const workflowId = transaction.modelId
+      const stepAction = step.definition.action
+      const sourcePath = transaction.getFlow().metadata?.sourcePath
+      const sourceStack = sourcePath
+        ? `\n⮑ \sat ${sourcePath}: [${workflowId} -> ${stepAction} (${TransactionHandlerType.INVOKE})]`
+        : `\n⮑ \sat [${workflowId} -> ${stepAction} (${TransactionHandlerType.INVOKE})]`
+      error.stack += sourceStack
+    }
+
     transaction.addError(
       step.definition.action!,
       TransactionHandlerType.INVOKE,
@@ -602,13 +617,21 @@ export class TransactionOrchestrator extends EventEmitter {
       step.changeStatus(TransactionStepStatus.PERMANENT_FAILURE)
 
       if (!isTimeout) {
-        transaction.addError(
-          step.definition.action!,
-          step.isCompensating()
-            ? TransactionHandlerType.COMPENSATE
-            : TransactionHandlerType.INVOKE,
-          error
-        )
+        const handlerType = step.isCompensating()
+          ? TransactionHandlerType.COMPENSATE
+          : TransactionHandlerType.INVOKE
+
+        if (error?.stack) {
+          const workflowId = transaction.modelId
+          const stepAction = step.definition.action
+          const sourcePath = transaction.getFlow().metadata?.sourcePath
+          const sourceStack = sourcePath
+            ? `\n⮑ \sat ${sourcePath}: [${workflowId} -> ${stepAction} (${TransactionHandlerType.INVOKE})]`
+            : `\n⮑ \sat [${workflowId} -> ${stepAction} (${TransactionHandlerType.INVOKE})]`
+          error.stack += sourceStack
+        }
+
+        transaction.addError(step.definition.action!, handlerType, error)
       }
 
       if (!step.isCompensating()) {
@@ -742,8 +765,24 @@ export class TransactionOrchestrator extends EventEmitter {
 
         const setStepFailure = async (
           error: Error | any,
-          { endRetry }: { endRetry?: boolean } = {}
+          {
+            endRetry,
+            response,
+          }: {
+            endRetry?: boolean
+            response?: unknown
+          } = {}
         ) => {
+          if (isDefined(response) && step.saveResponse) {
+            transaction.addResponse(
+              step.definition.action!,
+              step.isCompensating()
+                ? TransactionHandlerType.COMPENSATE
+                : TransactionHandlerType.INVOKE,
+              response
+            )
+          }
+
           await TransactionOrchestrator.setStepFailure(
             transaction,
             step,
@@ -819,6 +858,8 @@ export class TransactionOrchestrator extends EventEmitter {
                 )
               })
               .catch(async (error) => {
+                const response = error?.getStepResponse?.()
+
                 if (this.hasExpired({ transaction, step }, Date.now())) {
                   await this.checkStepTimeout(transaction, step)
                   await this.checkTransactionTimeout(
@@ -830,11 +871,14 @@ export class TransactionOrchestrator extends EventEmitter {
                 if (
                   PermanentStepFailureError.isPermanentStepFailureError(error)
                 ) {
-                  await setStepFailure(error, { endRetry: true })
+                  await setStepFailure(error, {
+                    endRetry: true,
+                    response,
+                  })
                   return
                 }
 
-                await setStepFailure(error)
+                await setStepFailure(error, { response })
               })
           )
         } else {
@@ -855,36 +899,32 @@ export class TransactionOrchestrator extends EventEmitter {
                 promise = stepHandler()
               }
 
-              // TODO discussion why do we not await here, adding an await I wouldnt expect the test to fail but it does, maybe we should split the test to also test after everything is executed?
-              // cc test from engine redis
               promise
                 .then(async (response: any) => {
-                  if (
-                    !step.definition.backgroundExecution ||
-                    step.definition.nested
-                  ) {
-                    const eventName = DistributedTransactionEvent.STEP_AWAITING
-                    transaction.emit(eventName, { step, transaction })
-
-                    return
-                  }
-
-                  if (this.hasExpired({ transaction, step }, Date.now())) {
-                    await this.checkStepTimeout(transaction, step)
-                    await this.checkTransactionTimeout(
-                      transaction,
-                      nextSteps.next.includes(step) ? nextSteps.next : [step]
-                    )
-                  }
-
-                  let setResponse = true
                   const output = response?.__type ? response.output : response
+
                   if (SkipStepResponse.isSkipStepResponse(output)) {
                     await TransactionOrchestrator.skipStep(transaction, step)
-                    setResponse = false
-                  }
+                  } else {
+                    if (
+                      !step.definition.backgroundExecution ||
+                      step.definition.nested
+                    ) {
+                      const eventName =
+                        DistributedTransactionEvent.STEP_AWAITING
+                      transaction.emit(eventName, { step, transaction })
 
-                  if (setResponse) {
+                      return
+                    }
+
+                    if (this.hasExpired({ transaction, step }, Date.now())) {
+                      await this.checkStepTimeout(transaction, step)
+                      await this.checkTransactionTimeout(
+                        transaction,
+                        nextSteps.next.includes(step) ? nextSteps.next : [step]
+                      )
+                    }
+
                     await TransactionOrchestrator.setStepSuccess(
                       transaction,
                       step,
@@ -899,14 +939,19 @@ export class TransactionOrchestrator extends EventEmitter {
                   )
                 })
                 .catch(async (error) => {
+                  const response = error?.getStepResponse?.()
+
                   if (
                     PermanentStepFailureError.isPermanentStepFailureError(error)
                   ) {
-                    await setStepFailure(error, { endRetry: true })
+                    await setStepFailure(error, {
+                      endRetry: true,
+                      response,
+                    })
                     return
                   }
 
-                  await setStepFailure(error)
+                  await setStepFailure(error, { response })
                 })
             })
           )
@@ -1130,7 +1175,9 @@ export class TransactionOrchestrator extends EventEmitter {
           queue.push({ obj: obj[key], level: [...level] })
         } else if (key === "action") {
           if (actionNames.has(obj.action)) {
-            throw new Error(`Action "${obj.action}" is already defined.`)
+            throw new Error(
+              `Step ${obj.action} is already defined in workflow.`
+            )
           }
 
           actionNames.add(obj.action)

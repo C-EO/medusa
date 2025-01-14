@@ -13,27 +13,27 @@ This documentation provides a reference to the data models in the Product Module
 
 ```mermaid
 erDiagram
-	Product ||--|| ProductOption : options
 	Product ||--|| ProductVariant : variants
-	Product }|--|{ ProductCollection : collection
-	Product }|--|{ ProductType : type
 	Product }|--|{ ProductTag : tags
-	Product }|--|{ Image : images
+	Product ||--|| ProductOption : options
+	Product ||--|| ProductImage : images
 	Product }|--|{ ProductCategory : categories
-	ProductCategory }|--|{ ProductCategory : parent_category
-	ProductVariant }|--|{ ProductOptionValue : options
+	ProductCategory ||--|| ProductCategory : category_children
+	ProductCollection ||--|| Product : products
 	ProductOption ||--|| ProductOptionValue : values
+	ProductOptionValue }|--|{ ProductVariant : variants
+	ProductType ||--|| Product : product
 
 ```
 
-## Classes
+## Data Models
 
-- [ProductCategory](../../product_models/classes/product_models.ProductCategory/page.mdx)
-- [ProductCollection](../../product_models/classes/product_models.ProductCollection/page.mdx)
-- [Image](../../product_models/classes/product_models.Image/page.mdx)
-- [ProductOptionValue](../../product_models/classes/product_models.ProductOptionValue/page.mdx)
-- [ProductOption](../../product_models/classes/product_models.ProductOption/page.mdx)
-- [ProductTag](../../product_models/classes/product_models.ProductTag/page.mdx)
-- [ProductType](../../product_models/classes/product_models.ProductType/page.mdx)
-- [ProductVariant](../../product_models/classes/product_models.ProductVariant/page.mdx)
-- [Product](../../product_models/classes/product_models.Product/page.mdx)
+- [Product](../../product_models/variables/product_models.Product/page.mdx)
+- [ProductCategory](../../product_models/variables/product_models.ProductCategory/page.mdx)
+- [ProductCollection](../../product_models/variables/product_models.ProductCollection/page.mdx)
+- [ProductImage](../../product_models/variables/product_models.ProductImage/page.mdx)
+- [ProductOption](../../product_models/variables/product_models.ProductOption/page.mdx)
+- [ProductOptionValue](../../product_models/variables/product_models.ProductOptionValue/page.mdx)
+- [ProductTag](../../product_models/variables/product_models.ProductTag/page.mdx)
+- [ProductType](../../product_models/variables/product_models.ProductType/page.mdx)
+- [ProductVariant](../../product_models/variables/product_models.ProductVariant/page.mdx)

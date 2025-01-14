@@ -2,12 +2,12 @@ import { batchLinkProductsToCategoryWorkflow } from "@medusajs/core-flows"
 import {
   AdminProductCategoryResponse,
   LinkMethodRequest,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
-import { refetchEntity } from "../../../../utils/refetch-entity"
+  refetchEntity,
+} from "@medusajs/framework/http"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<LinkMethodRequest>,
@@ -23,7 +23,7 @@ export const POST = async (
     "product_category",
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ product_category: category })

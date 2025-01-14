@@ -1,13 +1,25 @@
 import { ColumnDef, Row } from "@tanstack/react-table"
 import { FieldValues } from "react-hook-form"
-import { DataGridColumnType, DataGridCoordinates, Grid, GridCell, InternalColumnMeta } from "../types"
+import {
+  DataGridColumnType,
+  DataGridCoordinates,
+  Grid,
+  GridCell,
+  InternalColumnMeta,
+} from "../types"
 
 export class DataGridMatrix<TData, TFieldValues extends FieldValues> {
+  private multiColumnSelection: boolean
   private cells: Grid<TFieldValues>
   public rowAccessors: (string | null)[] = []
   public columnAccessors: (string | null)[] = []
 
-  constructor(data: Row<TData>[], columns: ColumnDef<TData>[]) {
+  constructor(
+    data: Row<TData>[],
+    columns: ColumnDef<TData>[],
+    multiColumnSelection: boolean = false
+  ) {
+    this.multiColumnSelection = multiColumnSelection
     this.cells = this._populateCells(data, columns)
 
     this.rowAccessors = this._computeRowAccessors()
@@ -64,17 +76,26 @@ export class DataGridMatrix<TData, TFieldValues extends FieldValues> {
       return keys
     }
 
-    if (start.col !== end.col) {
-      throw new Error("Selection must be in the same column")
+    if (!this.multiColumnSelection && start.col !== end.col) {
+      throw new Error(
+        "Selection must be in the same column when multiColumnSelection is disabled"
+      )
     }
 
     const startRow = Math.min(start.row, end.row)
     const endRow = Math.max(start.row, end.row)
-    const col = start.col
+    const startCol = this.multiColumnSelection
+      ? Math.min(start.col, end.col)
+      : start.col
+    const endCol = this.multiColumnSelection
+      ? Math.max(start.col, end.col)
+      : start.col
 
     for (let row = startRow; row <= endRow; row++) {
-      if (this._isValidPosition(row, col) && this.cells[row][col] !== null) {
-        keys.push(this.cells[row][col]?.field as string)
+      for (let col = startCol; col <= endCol; col++) {
+        if (this._isValidPosition(row, col) && this.cells[row][col] !== null) {
+          keys.push(this.cells[row][col]?.field as string)
+        }
       }
     }
 
@@ -106,15 +127,27 @@ export class DataGridMatrix<TData, TFieldValues extends FieldValues> {
       return false
     }
 
-    if (start.col !== end.col) {
-      throw new Error("Selection must be in the same column")
+    if (!this.multiColumnSelection && start.col !== end.col) {
+      throw new Error(
+        "Selection must be in the same column when multiColumnSelection is disabled"
+      )
     }
 
     const startRow = Math.min(start.row, end.row)
     const endRow = Math.max(start.row, end.row)
-    const col = start.col
+    const startCol = this.multiColumnSelection
+      ? Math.min(start.col, end.col)
+      : start.col
+    const endCol = this.multiColumnSelection
+      ? Math.max(start.col, end.col)
+      : start.col
 
-    return cell.col === col && cell.row >= startRow && cell.row <= endRow
+    return (
+      cell.row >= startRow &&
+      cell.row <= endRow &&
+      cell.col >= startCol &&
+      cell.col <= endCol
+    )
   }
 
   toggleColumn(col: number, enabled: boolean) {

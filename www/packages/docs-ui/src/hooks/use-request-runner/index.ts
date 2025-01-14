@@ -45,7 +45,11 @@ export const useRequestRunner = ({
       })
       .then((data) => {
         const stringifiedData = JSON.stringify(data, undefined, 2)
-        replaceLog ? replaceLog(stringifiedData) : pushLog(stringifiedData)
+        if (replaceLog) {
+          replaceLog(stringifiedData)
+        } else {
+          pushLog(stringifiedData)
+        }
       })
       .catch((error) => {
         pushLog(`\nAn error ocurred: ${JSON.stringify(error, undefined, 2)}`)

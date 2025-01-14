@@ -16,6 +16,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateProductCategoryProducts } from "../../../../../hooks/api/categories"
 import { useProducts } from "../../../../../hooks/api/products"
 import { useProductTableColumns } from "../../../../../hooks/table/columns/use-product-table-columns"
@@ -25,7 +26,7 @@ import { useDataTable } from "../../../../../hooks/use-data-table"
 
 type EditCategoryProductsFormProps = {
   categoryId: string
-  products?: HttpTypes.AdminProduct[]
+  products?: Pick<HttpTypes.AdminProduct, "id">[]
 }
 
 const EditCategoryProductsSchema = z.object({
@@ -83,7 +84,6 @@ export const EditCategoryProductsForm = ({
     error,
   } = useProducts({
     ...searchParams,
-    category_id: [categoryId],
   })
 
   const columns = useColumns()
@@ -117,8 +117,8 @@ export const EditCategoryProductsForm = ({
       {
         onSuccess: () => {
           toast.success(
-            t("categories.products.add.disabledTooltip", {
-              count: data.product_ids.length,
+            t("categories.products.add.successToast", {
+              count: data.product_ids.length - products.length,
             })
           )
 
@@ -137,7 +137,7 @@ export const EditCategoryProductsForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex h-full flex-col overflow-hidden"
       >
@@ -166,7 +166,11 @@ export const EditCategoryProductsForm = ({
             count={count}
             queryObject={raw}
             filters={filters}
-            orderBy={["title", "created_at", "updated_at"]}
+            orderBy={[
+              { key: "title", label: t("fields.title") },
+              { key: "created_at", label: t("fields.createdAt") },
+              { key: "updated_at", label: t("fields.updatedAt") },
+            ]}
             prefix={PREFIX}
             isLoading={isPending}
             layout="fill"
@@ -174,7 +178,7 @@ export const EditCategoryProductsForm = ({
             search="autofocus"
           />
         </RouteFocusModal.Body>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

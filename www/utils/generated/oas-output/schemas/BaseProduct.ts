@@ -1,7 +1,7 @@
 /**
  * @schema BaseProduct
  * type: object
- * description: The parent's product.
+ * description: The product's details.
  * x-schemaName: BaseProduct
  * required:
  *   - id
@@ -31,30 +31,33 @@
  *   - updated_at
  *   - deleted_at
  * properties:
- *   id:
- *     type: string
- *     title: id
- *     description: The product's ID.
+ *   collection:
+ *     $ref: "#/components/schemas/BaseCollection"
+ *   categories:
+ *     type: array
+ *     description: The product's categories.
+ *     items:
+ *       $ref: "#/components/schemas/BaseProductCategory"
+ *   variants:
+ *     type: array
+ *     description: The product's variants.
+ *     items:
+ *       $ref: "#/components/schemas/BaseProductVariant"
+ *   type:
+ *     $ref: "#/components/schemas/BaseProductType"
+ *   tags:
+ *     type: array
+ *     description: The product's tags.
+ *     items:
+ *       $ref: "#/components/schemas/BaseProductTag"
+ *   length:
+ *     type: number
+ *     title: length
+ *     description: The product's length.
  *   title:
  *     type: string
  *     title: title
  *     description: The product's title.
- *   handle:
- *     type: string
- *     title: handle
- *     description: The product's handle.
- *   subtitle:
- *     type: string
- *     title: subtitle
- *     description: The product's subtitle.
- *   description:
- *     type: string
- *     title: description
- *     description: The product's description.
- *   is_giftcard:
- *     type: boolean
- *     title: is_giftcard
- *     description: The product's is giftcard.
  *   status:
  *     type: string
  *     description: The product's status.
@@ -63,6 +66,44 @@
  *       - proposed
  *       - published
  *       - rejected
+ *   options:
+ *     type: array
+ *     description: The product's options.
+ *     items:
+ *       $ref: "#/components/schemas/BaseProductOption"
+ *   description:
+ *     type: string
+ *     title: description
+ *     description: The product's description.
+ *   id:
+ *     type: string
+ *     title: id
+ *     description: The product's ID.
+ *   metadata:
+ *     type: object
+ *     description: The product's metadata, can hold custom key-value pairs.
+ *   created_at:
+ *     type: string
+ *     format: date-time
+ *     title: created_at
+ *     description: The date the product was created.
+ *   updated_at:
+ *     type: string
+ *     format: date-time
+ *     title: updated_at
+ *     description: The date the product was updated.
+ *   handle:
+ *     type: string
+ *     title: handle
+ *     description: The product's unique handle.
+ *   subtitle:
+ *     type: string
+ *     title: subtitle
+ *     description: The product's subtitle.
+ *   is_giftcard:
+ *     type: boolean
+ *     title: is_giftcard
+ *     description: Whether the product is a gift card.
  *   thumbnail:
  *     type: string
  *     title: thumbnail
@@ -75,10 +116,6 @@
  *     type: number
  *     title: weight
  *     description: The product's weight.
- *   length:
- *     type: number
- *     title: length
- *     description: The product's length.
  *   height:
  *     type: number
  *     title: height
@@ -90,47 +127,23 @@
  *   hs_code:
  *     type: string
  *     title: hs_code
- *     description: The product's hs code.
+ *     description: The product's HS code.
  *   mid_code:
  *     type: string
  *     title: mid_code
- *     description: The product's mid code.
+ *     description: The product's MID code.
  *   material:
  *     type: string
  *     title: material
  *     description: The product's material.
- *   collection:
- *     $ref: "#/components/schemas/BaseCollection"
  *   collection_id:
  *     type: string
  *     title: collection_id
- *     description: The product's collection id.
- *   categories:
- *     type: array
- *     description: The product's categories.
- *     items:
- *       $ref: "#/components/schemas/BaseProductCategory"
- *   type:
- *     $ref: "#/components/schemas/BaseProduct"
+ *     description: The ID of the collection that the product belongs to.
  *   type_id:
  *     type: string
  *     title: type_id
- *     description: The product's type id.
- *   tags:
- *     type: array
- *     description: The product's tags.
- *     items:
- *       $ref: "#/components/schemas/BaseProductTag"
- *   variants:
- *     type: array
- *     description: The product's variants.
- *     items:
- *       $ref: "#/components/schemas/BaseProductVariant"
- *   options:
- *     type: array
- *     description: The product's options.
- *     items:
- *       $ref: "#/components/schemas/BaseProductOption"
+ *     description: The ID of the product's type.
  *   images:
  *     type: array
  *     description: The product's images.
@@ -139,29 +152,16 @@
  *   discountable:
  *     type: boolean
  *     title: discountable
- *     description: The product's discountable.
+ *     description: Whether discounts can be applied on the product.
  *   external_id:
  *     type: string
  *     title: external_id
- *     description: The product's external id.
- *   created_at:
- *     type: string
- *     format: date-time
- *     title: created_at
- *     description: The product's created at.
- *   updated_at:
- *     type: string
- *     format: date-time
- *     title: updated_at
- *     description: The product's updated at.
+ *     description: The ID of a product in an external system, such as an ERP or CMS.
  *   deleted_at:
  *     type: string
  *     format: date-time
  *     title: deleted_at
- *     description: The product's deleted at.
- *   metadata:
- *     type: object
- *     description: The product's metadata.
+ *     description: The date the product was deleted.
  * 
 */
 

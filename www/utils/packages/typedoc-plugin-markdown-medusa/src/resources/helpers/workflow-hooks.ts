@@ -1,7 +1,8 @@
-import { MarkdownTheme } from "../../theme"
-import * as Handlebars from "handlebars"
+import { MarkdownTheme } from "../../theme.js"
+import Handlebars from "handlebars"
 import { SignatureReflection } from "typedoc"
 import { cleanUpHookInput, getProjectChild } from "utils"
+import beautifyCode from "../../utils/beautify-code.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(
@@ -19,7 +20,7 @@ export default function (theme: MarkdownTheme) {
         return ""
       }
 
-      let str = `${Handlebars.helpers.titleLevel()} Hooks`
+      let str = `${Handlebars.helpers.titleLevel()} Hooks\n\nHooks allow you to inject custom functionalities into the workflow. You'll receive data from the workflow, as well as additional data sent through an HTTP request.\n\nLearn more about [Hooks](https://docs.medusajs.com/learn/fundamentals/workflows/workflow-hooks) and [Additional Data](https://docs.medusajs.com/learn/fundamentals/api-routes/additional-data).\n\n`
 
       Handlebars.helpers.incrementCurrentTitleLevel()
 
@@ -39,14 +40,20 @@ export default function (theme: MarkdownTheme) {
 
         str += `\n\n${hooksTitleLevel} ${hook.name}\n\n`
 
+        if (hookReflection.comment?.summary) {
+          str += `${Handlebars.helpers.comment(
+            hookReflection.comment.summary
+          )}\n\n`
+        }
+
         const hookExample = hookReflection.comment?.getTag(`@example`)
 
         if (hookExample) {
           Handlebars.helpers.incrementCurrentTitleLevel()
           const innerTitleLevel = Handlebars.helpers.titleLevel()
 
-          str += `${innerTitleLevel} Example\n\n\`\`\`ts\n${Handlebars.helpers.comment(
-            hookExample.content
+          str += `${innerTitleLevel} Example\n\n\`\`\`ts\n${beautifyCode(
+            Handlebars.helpers.comment(hookExample.content)
           )}\n\`\`\`\n\n${innerTitleLevel} Input\n\n`
 
           Handlebars.helpers.decrementCurrentTitleLevel()
@@ -60,6 +67,9 @@ export default function (theme: MarkdownTheme) {
             hash: {
               sectionTitle: hook.name,
             },
+          },
+          {
+            openedLevel: 1,
           }
         )
       })

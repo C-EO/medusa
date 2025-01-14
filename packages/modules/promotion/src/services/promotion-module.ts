@@ -2,11 +2,12 @@ import {
   CampaignBudgetTypeValues,
   Context,
   DAL,
+  InferEntityType,
   InternalModuleDeclaration,
   ModuleJoinerConfig,
   ModulesSdkTypes,
   PromotionTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ApplicationMethodAllocation,
   ApplicationMethodTargetType,
@@ -24,8 +25,9 @@ import {
   MedusaError,
   MedusaService,
   PromotionType,
+  toMikroORMEntity,
   transformPropertiesToBigNumber,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   ApplicationMethod,
   Campaign,
@@ -53,7 +55,6 @@ import {
   validateApplicationMethodAttributes,
   validatePromotionRuleAttributes,
 } from "@utils"
-import { EligibleItem } from "src/utils/compute-actions"
 import { joinerConfig } from "../joiner-config"
 import { CreatePromotionRuleValueDTO } from "../types/promotion-rule-value"
 
@@ -86,12 +87,24 @@ export default class PromotionModuleService
   implements PromotionTypes.IPromotionModuleService
 {
   protected baseRepository_: DAL.RepositoryService
-  protected promotionService_: ModulesSdkTypes.IMedusaInternalService<Promotion>
-  protected applicationMethodService_: ModulesSdkTypes.IMedusaInternalService<ApplicationMethod>
-  protected promotionRuleService_: ModulesSdkTypes.IMedusaInternalService<PromotionRule>
-  protected promotionRuleValueService_: ModulesSdkTypes.IMedusaInternalService<PromotionRuleValue>
-  protected campaignService_: ModulesSdkTypes.IMedusaInternalService<Campaign>
-  protected campaignBudgetService_: ModulesSdkTypes.IMedusaInternalService<CampaignBudget>
+  protected promotionService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof Promotion>
+  >
+  protected applicationMethodService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof ApplicationMethod>
+  >
+  protected promotionRuleService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof PromotionRule>
+  >
+  protected promotionRuleValueService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof PromotionRuleValue>
+  >
+  protected campaignService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof Campaign>
+  >
+  protected campaignBudgetService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof CampaignBudget>
+  >
 
   constructor(
     {
@@ -139,7 +152,6 @@ export default class PromotionModuleService
       { code: promotionCodes },
       {
         relations: ["campaign", "campaign.budget"],
-        take: null,
       },
       sharedContext
     )
@@ -246,7 +258,6 @@ export default class PromotionModuleService
       },
       {
         relations: ["campaign", "campaign.budget"],
-        take: null,
       },
       sharedContext
     )
@@ -340,14 +351,20 @@ export default class PromotionModuleService
     >()
     const methodIdPromoValueMap = new Map<string, number>()
     // Keeps a map of all elgible items in the buy section and its eligible quantity
-    const eligibleBuyItemMap = new Map<string, EligibleItem[]>()
+    const eligibleBuyItemMap = new Map<
+      string,
+      ComputeActionUtils.EligibleItem[]
+    >()
     // Keeps a map of all elgible items in the target section and its eligible quantity
-    const eligibleTargetItemMap = new Map<string, EligibleItem[]>()
+    const eligibleTargetItemMap = new Map<
+      string,
+      ComputeActionUtils.EligibleItem[]
+    >()
     const automaticPromotions = preventAutoPromotions
       ? []
       : await this.listPromotions(
           { is_automatic: true },
-          { select: ["code"], take: null },
+          { select: ["code"] },
           sharedContext
         )
 
@@ -394,6 +411,7 @@ export default class PromotionModuleService
         ],
       },
       {
+        take: null,
         relations: [
           "application_method",
           "application_method.target_rules",
@@ -405,7 +423,6 @@ export default class PromotionModuleService
           "campaign",
           "campaign.budget",
         ],
-        take: null,
       }
     )
 
@@ -419,18 +436,10 @@ export default class PromotionModuleService
     const appliedCodes = [...appliedShippingCodes, ...appliedItemCodes]
 
     for (const appliedCode of appliedCodes) {
-      const promotion = existingPromotionsMap.get(appliedCode)
       const adjustments = codeAdjustmentMap.get(appliedCode) || []
       const action = appliedShippingCodes.includes(appliedCode)
         ? ComputedActions.REMOVE_SHIPPING_METHOD_ADJUSTMENT
         : ComputedActions.REMOVE_ITEM_ADJUSTMENT
-
-      if (!promotion) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          `Applied Promotion for code (${appliedCode}) not found`
-        )
-      }
 
       adjustments.forEach((adjustment) =>
         computedActions.push({
@@ -559,7 +568,6 @@ export default class PromotionModuleService
           "campaign",
           "campaign.budget",
         ],
-        take: null,
       },
       sharedContext
     )
@@ -825,7 +833,6 @@ export default class PromotionModuleService
           "campaign",
           "campaign.budget",
         ],
-        take: null,
       },
       sharedContext
     )
@@ -848,9 +855,10 @@ export default class PromotionModuleService
       { relations: ["budget"] }
     )
 
-    const existingPromotionsMap = new Map<string, Promotion>(
-      existingPromotions.map((promotion) => [promotion.id, promotion])
-    )
+    const existingPromotionsMap = new Map<
+      string,
+      InferEntityType<typeof Promotion>
+    >(existingPromotions.map((promotion) => [promotion.id, promotion]))
 
     const promotionsData: UpdatePromotionDTO[] = []
     const applicationMethodsData: UpdateApplicationMethodDTO[] = []
@@ -1106,12 +1114,17 @@ export default class PromotionModuleService
   protected async createPromotionRulesAndValues_(
     rulesData: PromotionTypes.CreatePromotionRuleDTO[],
     relationName: "promotions" | "method_target_rules" | "method_buy_rules",
-    relation: Promotion | ApplicationMethod,
+    relation:
+      | InferEntityType<typeof Promotion>
+      | InferEntityType<typeof ApplicationMethod>,
     @MedusaContext() sharedContext: Context = {}
-  ): Promise<PromotionRule[]> {
-    const createdPromotionRules: PromotionRule[] = []
+  ): Promise<InferEntityType<typeof PromotionRule>[]> {
+    const MikroORMApplicationMethod = toMikroORMEntity(ApplicationMethod)
+    const createdPromotionRules: InferEntityType<typeof PromotionRule>[] = []
     const promotion =
-      relation instanceof ApplicationMethod ? relation.promotion : relation
+      relation instanceof MikroORMApplicationMethod
+        ? relation.promotion
+        : relation
 
     if (!rulesData.length) {
       return []
@@ -1270,7 +1283,6 @@ export default class PromotionModuleService
       { id: createdCampaigns.map((p) => p!.id) },
       {
         relations: ["budget", "promotions"],
-        take: null,
       },
       sharedContext
     )
@@ -1380,7 +1392,6 @@ export default class PromotionModuleService
       { id: updatedCampaigns.map((p) => p!.id) },
       {
         relations: ["budget", "promotions"],
-        take: null,
       },
       sharedContext
     )
@@ -1400,7 +1411,7 @@ export default class PromotionModuleService
 
     const existingCampaigns = await this.listCampaigns(
       { id: campaignIds },
-      { relations: ["budget"], take: null },
+      { relations: ["budget"] },
       sharedContext
     )
 
@@ -1484,7 +1495,7 @@ export default class PromotionModuleService
     const campaign = await this.campaignService_.retrieve(id, {}, sharedContext)
     const promotionsToAdd = await this.promotionService_.list(
       { id: promotionIds, campaign_id: null },
-      { take: null, relations: ["application_method"] },
+      { relations: ["application_method"] },
       sharedContext
     )
 
@@ -1547,7 +1558,7 @@ export default class PromotionModuleService
     await this.campaignService_.retrieve(id, {}, sharedContext)
     const promotionsToRemove = await this.promotionService_.list(
       { id: promotionIds },
-      { take: null },
+      {},
       sharedContext
     )
 

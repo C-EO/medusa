@@ -1,9 +1,12 @@
-import { MarkdownTheme } from "../../theme"
-import * as Handlebars from "handlebars"
-import { DocumentReflection, SignatureReflection } from "typedoc"
-import { formatWorkflowDiagramComponent } from "../../utils/format-workflow-diagram-component"
-import { getProjectChild } from "utils"
-import { getWorkflowReflectionFromNamespace } from "../../utils/workflow-utils"
+import { MarkdownTheme } from "../../theme.js"
+import Handlebars from "handlebars"
+import {
+  DocumentReflection,
+  ReflectionKind,
+  SignatureReflection,
+} from "typedoc"
+import { formatWorkflowDiagramComponent } from "../../utils/format-workflow-diagram-component.js"
+import { findReflectionInNamespaces, getProjectChild } from "utils"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(
@@ -81,7 +84,13 @@ function getStep({
       : "step"
 
   const namespaceRefl = theme.project
-    ? getWorkflowReflectionFromNamespace(theme.project, document.name)
+    ? findReflectionInNamespaces(
+        theme.project
+          .getChildrenByKind(ReflectionKind.Module)
+          .find((moduleRef) => moduleRef.name === "core-flows") ||
+          theme.project,
+        document.name
+      )
     : undefined
 
   const associatedReflection =
@@ -92,9 +101,11 @@ function getStep({
   return {
     type,
     name: document.name,
-    description: associatedReflection?.comment
-      ? Handlebars.helpers.comments(associatedReflection.comment, true)
-      : "",
+    description: associatedReflection?.comment?.summary
+      ? Handlebars.helpers.comment(associatedReflection.comment.summary)
+      : associatedReflection?.comment
+        ? Handlebars.helpers.comments(associatedReflection.comment, true)
+        : "",
     link:
       type === "hook" || !associatedReflection?.url
         ? `#${document.name}`

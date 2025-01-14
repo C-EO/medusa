@@ -1,8 +1,14 @@
+import get from "lodash/get"
+import set from "lodash/set"
 import { useCallback } from "react"
 import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 
 import { DataGridMatrix } from "../models"
-import { DataGridColumnType, DataGridCoordinates } from "../types"
+import {
+  DataGridColumnType,
+  DataGridCoordinates,
+  DataGridToggleableNumber,
+} from "../types"
 
 type UseDataGridFormHandlersOptions<TData, TFieldValues extends FieldValues> = {
   matrix: DataGridMatrix<TData, TFieldValues>
@@ -18,7 +24,7 @@ export const useDataGridFormHandlers = <
   form,
   anchor,
 }: UseDataGridFormHandlersOptions<TData, TFieldValues>) => {
-  const { getValues, setValue } = form
+  const { getValues, reset } = form
 
   const getSelectionValues = useCallback(
     (fields: string[]): PathValue<TFieldValues, Path<TFieldValues>>[] => {
@@ -26,26 +32,28 @@ export const useDataGridFormHandlers = <
         return []
       }
 
+      const allValues = getValues()
+
       return fields.map((field) => {
-        return getValues(field as Path<TFieldValues>)
-      })
+        return field.split(".").reduce((obj, key) => obj?.[key], allValues)
+      }) as PathValue<TFieldValues, Path<TFieldValues>>[]
     },
     [getValues]
   )
 
   const setSelectionValues = useCallback(
-    async (fields: string[], values: string[]) => {
+    async (fields: string[], values: string[], isHistory?: boolean) => {
       if (!fields.length || !anchor) {
         return
       }
 
       const type = matrix.getCellType(anchor)
-
       if (!type) {
         return
       }
 
       const convertedValues = convertArrayToPrimitive(values, type)
+      const currentValues = getValues()
 
       fields.forEach((field, index) => {
         if (!field) {
@@ -53,18 +61,18 @@ export const useDataGridFormHandlers = <
         }
 
         const valueIndex = index % values.length
-        const value = convertedValues[valueIndex] as PathValue<
-          TFieldValues,
-          Path<TFieldValues>
-        >
+        const newValue = convertedValues[valueIndex]
 
-        setValue(field as Path<TFieldValues>, value, {
-          shouldDirty: true,
-          shouldTouch: true,
-        })
+        setValue(currentValues, field, newValue, type, isHistory)
+      })
+
+      reset(currentValues, {
+        keepDirty: true,
+        keepTouched: true,
+        keepDefaultValues: true,
       })
     },
-    [matrix, anchor, setValue]
+    [matrix, anchor, getValues, reset]
   )
 
   return {
@@ -113,13 +121,97 @@ function covertToString(value: any): string {
   return String(value)
 }
 
+function convertToggleableNumber(value: any): {
+  quantity: number
+  checked: boolean
+  disabledToggle: boolean
+} {
+  let obj = value
+
+  if (typeof obj === "string") {
+    try {
+      obj = JSON.parse(obj)
+    } catch (error) {
+      throw new Error(`String "${value}" cannot be converted to object.`)
+    }
+  }
+
+  return obj
+}
+
+function setValue<
+  T extends DataGridToggleableNumber = DataGridToggleableNumber
+>(
+  currentValues: any,
+  field: string,
+  newValue: T,
+  type: string,
+  isHistory?: boolean
+) {
+  if (type !== "togglable-number") {
+    set(currentValues, field, newValue)
+    return
+  }
+
+  setValueToggleableNumber(currentValues, field, newValue, isHistory)
+}
+
+function setValueToggleableNumber(
+  currentValues: any,
+  field: string,
+  newValue: DataGridToggleableNumber,
+  isHistory?: boolean
+) {
+  const currentValue = get(currentValues, field)
+  const { disabledToggle } = currentValue
+
+  const normalizeQuantity = (value: number | string | null | undefined) => {
+    if (disabledToggle && value === "") {
+      return 0
+    }
+    return value
+  }
+
+  const determineChecked = (quantity: number | string | null | undefined) => {
+    if (disabledToggle) {
+      return true
+    }
+    return quantity !== "" && quantity != null
+  }
+
+  const quantity = normalizeQuantity(newValue.quantity)
+  const checked = isHistory
+    ? disabledToggle
+      ? true
+      : newValue.checked
+    : determineChecked(quantity)
+
+  set(currentValues, field, {
+    ...currentValue,
+    quantity,
+    checked,
+  })
+}
+
 export function convertArrayToPrimitive(
   values: any[],
   type: DataGridColumnType
 ): any[] {
   switch (type) {
     case "number":
-      return values.map(convertToNumber)
+      return values.map((v) => {
+        if (v === "") {
+          return v
+        }
+
+        if (v == null) {
+          return ""
+        }
+
+        return convertToNumber(v)
+      })
+    case "togglable-number":
+      return values.map(convertToggleableNumber)
     case "boolean":
       return values.map(convertToBoolean)
     case "text":

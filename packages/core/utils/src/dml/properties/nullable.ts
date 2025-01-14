@@ -1,4 +1,5 @@
 import { PropertyType } from "@medusajs/types"
+import { ComputedProperty } from "./computed"
 
 const IsNullableModifier = Symbol.for("isNullableModifier")
 /**
@@ -26,6 +27,13 @@ export class NullableModifier<T, Schema extends PropertyType<T>>
 
   constructor(schema: Schema) {
     this.#schema = schema
+  }
+
+  /**
+   * This method indicated that the property is a computed property.
+   */
+  computed() {
+    return new ComputedProperty<T | null, this>(this)
   }
 
   /**

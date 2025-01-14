@@ -1,3 +1,9 @@
+---
+tags:
+  - cart
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -10,9 +16,13 @@ In this document, you'll learn how to manage a cart's line items, including addi
 
 ## Add Product Variant to Cart
 
-{/* TODO add section on checking variant quantity once it's fixed in v2. */}
-
 To add a product variant to a cart, use the [Add Line Item API route](!api!/store#carts_postcartsidlineitems).
+
+<Note title="Tip">
+
+To retrieve a variant's available quantity and check if it's in stock, refer to [this guide](../../products/inventory/page.mdx).
+
+</Note>
 
 For example:
 
@@ -36,7 +46,7 @@ const addToCart = (variant_id: string) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
     body: JSON.stringify({
       variant_id,
@@ -93,7 +103,7 @@ const updateQuantity = (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
     body: JSON.stringify({
       quantity,
@@ -143,7 +153,7 @@ const removeItem = (itemId: string) => {
   }`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
     method: "DELETE",
   })

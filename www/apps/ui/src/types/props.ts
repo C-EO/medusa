@@ -20,6 +20,12 @@ export type FunctionType = {
   signature: string
 }
 
+export type PartialType = {
+  type: "partial"
+  elements: unknown[]
+  raw: string
+}
+
 // Keeping this as it's still used by hooks
 export type PropType =
   | "string"

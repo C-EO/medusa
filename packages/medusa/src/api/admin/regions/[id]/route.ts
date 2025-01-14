@@ -2,14 +2,14 @@ import {
   deleteRegionsWorkflow,
   updateRegionsWorkflow,
 } from "@medusajs/core-flows"
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchRegion } from "../helpers"
 import { AdminGetRegionParamsType, AdminUpdateRegionType } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetRegionParamsType>,
@@ -18,7 +18,7 @@ export const GET = async (
   const region = await refetchRegion(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!region) {
@@ -35,7 +35,7 @@ export const POST = async (
   req: AuthenticatedMedusaRequest<AdminUpdateRegionType>,
   res: MedusaResponse<HttpTypes.AdminRegionResponse>
 ) => {
-  const existingRegion = refetchRegion(req.params.id, req.scope, ["id"])
+  const existingRegion = await refetchRegion(req.params.id, req.scope, ["id"])
   if (!existingRegion) {
     throw new MedusaError(
       MedusaError.Types.NOT_FOUND,
@@ -53,7 +53,7 @@ export const POST = async (
   const region = await refetchRegion(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ region })

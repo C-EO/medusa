@@ -1,5 +1,56 @@
 # @medusajs/cart
 
+## 2.2.0
+
+## 2.1.3
+
+### Patch Changes
+
+- [#10408](https://github.com/medusajs/medusa/pull/10408) [`c9b8db04c1b35f1cf129bb9ad74789fbc2881815`](https://github.com/medusajs/medusa/commit/c9b8db04c1b35f1cf129bb9ad74789fbc2881815) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Support custom line items
+
+## 2.1.2
+
+### Patch Changes
+
+- [#10626](https://github.com/medusajs/medusa/pull/10626) [`95baacfd00f54de028226731b016917caacde5af`](https://github.com/medusajs/medusa/commit/95baacfd00f54de028226731b016917caacde5af) Thanks [@carlos-r-l-rodrigues](https://github.com/carlos-r-l-rodrigues)! - fix: Cart tax rate data type
+
+## 2.1.1
+
+### Patch Changes
+
+- [#10385](https://github.com/medusajs/medusa/pull/10385) [`0a16efa4266f93302b31589349e777bc8d24dc07`](https://github.com/medusajs/medusa/commit/0a16efa4266f93302b31589349e777bc8d24dc07) Thanks [@thetutlage](https://github.com/thetutlage)! - refactor: migrate cart module to DML
+
+## 2.1.0
+
+## 2.0.7
+
+## 2.0.6
+
+## 2.0.5
+
+### Patch Changes
+
+- [#10119](https://github.com/medusajs/medusa/pull/10119) [`2822972e04f12d2ca9378dd09529ab6ca308a286`](https://github.com/medusajs/medusa/commit/2822972e04f12d2ca9378dd09529ab6ca308a286) Thanks [@adrien2p](https://github.com/adrien2p)! - Fix/mikro orm cli wrapper
+
+## 2.0.4
+
+## 2.0.3
+
+## 2.0.2
+
+## 2.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- [#7341](https://github.com/medusajs/medusa/pull/7341) [`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Medusa 2.0
+
+### Patch Changes
+
+- Updated dependencies [[`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e)]:
+  - @medusajs/framework@2.0.0
+
 ## 0.0.3
 
 ### Patch Changes

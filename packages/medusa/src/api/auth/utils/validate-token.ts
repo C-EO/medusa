@@ -3,10 +3,14 @@ import {
   MedusaNextFunction,
   MedusaRequest,
   MedusaResponse,
-} from "@medusajs/framework"
-import { ConfigModule, IAuthModuleService } from "@medusajs/types"
-import { ContainerRegistrationKeys, Modules } from "@medusajs/utils"
-import { JwtPayload, decode, verify } from "jsonwebtoken"
+} from "@medusajs/framework/http"
+import { ConfigModule, IAuthModuleService } from "@medusajs/framework/types"
+import {
+  ContainerRegistrationKeys,
+  MedusaError,
+  Modules,
+} from "@medusajs/framework/utils"
+import { decode, JwtPayload, verify } from "jsonwebtoken"
 
 // Middleware to validate that a token is valid
 export const validateToken = () => {
@@ -20,8 +24,13 @@ export const validateToken = () => {
 
     const req_ = req as AuthenticatedMedusaRequest
 
+    const errorObject = new MedusaError(
+      MedusaError.Types.UNAUTHORIZED,
+      `Invalid token`
+    )
+
     if (!token) {
-      return next()
+      return next(errorObject)
     }
 
     // @ts-ignore
@@ -31,7 +40,16 @@ export const validateToken = () => {
 
     const authModule = req.scope.resolve<IAuthModuleService>(Modules.AUTH)
 
-    let decoded = decode(token as string) as JwtPayload
+    const decoded = decode(token as string) as JwtPayload
+
+    if (!decoded?.entity_id) {
+      return next(errorObject)
+    }
+
+    // E.g. token was requested for a customer, but attempted used for a user
+    if (decoded?.actor_type !== actor_type) {
+      return next(errorObject)
+    }
 
     const [providerIdentity] = await authModule.listProviderIdentities(
       {
@@ -44,20 +62,18 @@ export const validateToken = () => {
     )
 
     if (!providerIdentity) {
-      return res.status(401).json({ message: "Invalid token" })
+      return next(errorObject)
     }
 
-    let verified: JwtPayload | null = null
-
     try {
-      verified = verify(token as string, http.jwtSecret as string) as JwtPayload
+      verify(token as string, http.jwtSecret as string) as JwtPayload
     } catch (error) {
-      return res.status(401).json({ message: "Invalid token" })
+      return next(errorObject)
     }
 
     req_.auth_context = {
       actor_type,
-      auth_identity_id: verified.auth_identity_id!,
+      auth_identity_id: providerIdentity.auth_identity_id!,
       actor_id: providerIdentity.entity_id,
       app_metadata: {},
     }

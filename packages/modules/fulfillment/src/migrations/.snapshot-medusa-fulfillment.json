@@ -152,13 +152,11 @@
       "indexes": [
         {
           "keyName": "IDX_fulfillment_address_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_address_deleted_at\" ON \"fulfillment_address\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_address_deleted_at\" ON \"fulfillment_address\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "fulfillment_address_pkey",
@@ -193,11 +191,51 @@
           "nullable": false,
           "default": "true",
           "mappedType": "boolean"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "fulfillment_provider",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "IDX_fulfillment_provider_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_provider_deleted_at\" ON \"fulfillment_provider\" (deleted_at) WHERE deleted_at IS NULL"
+        },
         {
           "keyName": "fulfillment_provider_pkey",
           "columnNames": [
@@ -286,24 +324,20 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "IDX_fulfillment_set_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_set_deleted_at\" ON \"fulfillment_set\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "IDX_fulfillment_set_name_unique",
-          "columnNames": [
-            "name"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_fulfillment_set_name_unique\" ON \"fulfillment_set\" (name) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_fulfillment_set_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_set_deleted_at\" ON \"fulfillment_set\" (deleted_at) WHERE deleted_at IS NOT NULL"
         },
         {
           "keyName": "fulfillment_set_pkey",
@@ -338,15 +372,6 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "fulfillment_set_id": {
           "name": "fulfillment_set_id",
           "type": "text",
@@ -355,6 +380,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -393,20 +427,8 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_service_zone_name_unique",
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_service_zone_name_unique\" ON \"service_zone\" (name) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_service_zone_fulfillment_set_id",
-          "columnNames": [
-            "fulfillment_set_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -414,13 +436,19 @@
         },
         {
           "keyName": "IDX_service_zone_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_service_zone_deleted_at\" ON \"service_zone\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_service_zone_deleted_at\" ON \"service_zone\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_service_zone_name_unique",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_service_zone_name_unique\" ON \"service_zone\" (name) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "service_zone_pkey",
@@ -503,15 +531,6 @@
           "nullable": true,
           "mappedType": "text"
         },
-        "service_zone_id": {
-          "name": "service_zone_id",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "text"
-        },
         "postal_expression": {
           "name": "postal_expression",
           "type": "jsonb",
@@ -520,6 +539,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "service_zone_id": {
+          "name": "service_zone_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
         },
         "metadata": {
           "name": "metadata",
@@ -567,40 +595,8 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_geo_zone_country_code",
-          "columnNames": [
-            "country_code"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_country_code\" ON \"geo_zone\" (country_code) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_geo_zone_province_code",
-          "columnNames": [
-            "province_code"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_province_code\" ON \"geo_zone\" (province_code) WHERE deleted_at IS NULL AND province_code IS NOT NULL"
-        },
-        {
-          "keyName": "IDX_geo_zone_city",
-          "columnNames": [
-            "city"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_city\" ON \"geo_zone\" (city) WHERE deleted_at IS NULL AND city IS NOT NULL"
-        },
-        {
           "keyName": "IDX_geo_zone_service_zone_id",
-          "columnNames": [
-            "service_zone_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -608,13 +604,35 @@
         },
         {
           "keyName": "IDX_geo_zone_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_deleted_at\" ON \"geo_zone\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_deleted_at\" ON \"geo_zone\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_geo_zone_country_code",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_country_code\" ON \"geo_zone\" (country_code) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_geo_zone_province_code",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_province_code\" ON \"geo_zone\" (province_code) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_geo_zone_city",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_geo_zone_city\" ON \"geo_zone\" (city) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "geo_zone_pkey",
@@ -719,13 +737,11 @@
       "indexes": [
         {
           "keyName": "IDX_shipping_option_type_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_type_deleted_at\" ON \"shipping_option_type\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_type_deleted_at\" ON \"shipping_option_type\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "shipping_option_type_pkey",
@@ -815,24 +831,20 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "IDX_shipping_profile_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_profile_deleted_at\" ON \"shipping_profile\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "IDX_shipping_profile_name_unique",
-          "columnNames": [
-            "name"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_shipping_profile_name_unique\" ON \"shipping_profile\" (name) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_shipping_profile_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_profile_deleted_at\" ON \"shipping_profile\" (deleted_at) WHERE deleted_at IS NOT NULL"
         },
         {
           "keyName": "shipping_profile_pkey",
@@ -881,6 +893,24 @@
           ],
           "mappedType": "enum"
         },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "service_zone_id": {
           "name": "service_zone_id",
           "type": "text",
@@ -907,24 +937,6 @@
           "primary": false,
           "nullable": true,
           "mappedType": "text"
-        },
-        "data": {
-          "name": "data",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
         },
         "shipping_option_type_id": {
           "name": "shipping_option_type_id",
@@ -972,19 +984,8 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "shipping_option_type_id"
-          ],
-          "composite": false,
-          "keyName": "shipping_option_shipping_option_type_id_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "IDX_shipping_option_service_zone_id",
-          "columnNames": [
-            "service_zone_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -992,43 +993,19 @@
         },
         {
           "keyName": "IDX_shipping_option_shipping_profile_id",
-          "columnNames": [
-            "shipping_profile_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_shipping_profile_id\" ON \"shipping_option\" (shipping_profile_id) WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "IDX_shipping_option_provider_id",
-          "columnNames": [
-            "provider_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_provider_id\" ON \"shipping_option\" (provider_id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_shipping_option_shipping_option_type_id",
-          "columnNames": [
-            "shipping_option_type_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_shipping_option_type_id\" ON \"shipping_option\" (shipping_option_type_id) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_shipping_option_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_deleted_at\" ON \"shipping_option\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_deleted_at\" ON \"shipping_option\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "shipping_option_pkey",
@@ -1066,32 +1043,6 @@
           ],
           "referencedTableName": "public.shipping_profile",
           "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "shipping_option_provider_id_foreign": {
-          "constraintName": "shipping_option_provider_id_foreign",
-          "columnNames": [
-            "provider_id"
-          ],
-          "localTableName": "public.shipping_option",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.fulfillment_provider",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "shipping_option_shipping_option_type_id_foreign": {
-          "constraintName": "shipping_option_shipping_option_type_id_foreign",
-          "columnNames": [
-            "shipping_option_type_id"
-          ],
-          "localTableName": "public.shipping_option",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.shipping_option_type",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }
@@ -1191,9 +1142,7 @@
       "indexes": [
         {
           "keyName": "IDX_shipping_option_rule_shipping_option_id",
-          "columnNames": [
-            "shipping_option_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -1201,13 +1150,11 @@
         },
         {
           "keyName": "IDX_shipping_option_rule_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_rule_deleted_at\" ON \"shipping_option_rule\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_shipping_option_rule_deleted_at\" ON \"shipping_option_rule\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "shipping_option_rule_pkey",
@@ -1323,6 +1270,16 @@
           "nullable": true,
           "mappedType": "json"
         },
+        "requires_shipping": {
+          "name": "requires_shipping",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "true",
+          "mappedType": "boolean"
+        },
         "provider_id": {
           "name": "provider_id",
           "type": "text",
@@ -1341,15 +1298,6 @@
           "nullable": true,
           "mappedType": "text"
         },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "json"
-        },
         "delivery_address_id": {
           "name": "delivery_address_id",
           "type": "text",
@@ -1358,6 +1306,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -1396,39 +1353,8 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "delivery_address_id"
-          ],
-          "composite": false,
-          "keyName": "fulfillment_delivery_address_id_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "IDX_fulfillment_location_id",
-          "columnNames": [
-            "location_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_location_id\" ON \"fulfillment\" (location_id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_fulfillment_provider_id",
-          "columnNames": [
-            "provider_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_provider_id\" ON \"fulfillment\" (provider_id) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_fulfillment_shipping_option_id",
-          "columnNames": [
-            "shipping_option_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -1436,13 +1362,19 @@
         },
         {
           "keyName": "IDX_fulfillment_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_deleted_at\" ON \"fulfillment\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_deleted_at\" ON \"fulfillment\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_fulfillment_location_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_location_id\" ON \"fulfillment\" (location_id) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "fulfillment_pkey",
@@ -1456,19 +1388,6 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "fulfillment_provider_id_foreign": {
-          "constraintName": "fulfillment_provider_id_foreign",
-          "columnNames": [
-            "provider_id"
-          ],
-          "localTableName": "public.fulfillment",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.fulfillment_provider",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
         "fulfillment_shipping_option_id_foreign": {
           "constraintName": "fulfillment_shipping_option_id_foreign",
           "columnNames": [
@@ -1480,19 +1399,6 @@
           ],
           "referencedTableName": "public.shipping_option",
           "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "fulfillment_delivery_address_id_foreign": {
-          "constraintName": "fulfillment_delivery_address_id_foreign",
-          "columnNames": [
-            "delivery_address_id"
-          ],
-          "localTableName": "public.fulfillment",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.fulfillment_address",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }
@@ -1582,9 +1488,7 @@
       "indexes": [
         {
           "keyName": "IDX_fulfillment_label_fulfillment_id",
-          "columnNames": [
-            "fulfillment_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -1592,13 +1496,11 @@
         },
         {
           "keyName": "IDX_fulfillment_label_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_label_deleted_at\" ON \"fulfillment_label\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_label_deleted_at\" ON \"fulfillment_label\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "fulfillment_label_pkey",
@@ -1674,15 +1576,6 @@
           "nullable": false,
           "mappedType": "decimal"
         },
-        "raw_quantity": {
-          "name": "raw_quantity",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
         "line_item_id": {
           "name": "line_item_id",
           "type": "text",
@@ -1709,6 +1602,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
+        },
+        "raw_quantity": {
+          "name": "raw_quantity",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -1747,30 +1649,8 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_fulfillment_item_line_item_id",
-          "columnNames": [
-            "line_item_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_line_item_id\" ON \"fulfillment_item\" (line_item_id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_fulfillment_item_inventory_item_id",
-          "columnNames": [
-            "inventory_item_id"
-          ],
-          "composite": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_inventory_item_id\" ON \"fulfillment_item\" (inventory_item_id) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_fulfillment_item_fulfillment_id",
-          "columnNames": [
-            "fulfillment_id"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
@@ -1778,13 +1658,27 @@
         },
         {
           "keyName": "IDX_fulfillment_item_deleted_at",
-          "columnNames": [
-            "deleted_at"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_deleted_at\" ON \"fulfillment_item\" (deleted_at) WHERE deleted_at IS NOT NULL"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_deleted_at\" ON \"fulfillment_item\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_fulfillment_item_inventory_item_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_inventory_item_id\" ON \"fulfillment_item\" (inventory_item_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_fulfillment_item_line_item_id",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_fulfillment_item_line_item_id\" ON \"fulfillment_item\" (line_item_id) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "fulfillment_item_pkey",

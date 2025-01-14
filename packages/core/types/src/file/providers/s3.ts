@@ -1,7 +1,8 @@
 export interface S3FileServiceOptions {
   file_url: string
-  access_key_id: string
-  secret_access_key: string
+  access_key_id?: string
+  secret_access_key?: string
+  authentication_method?: "access-key" | "s3-iam-role"
   region: string
   bucket: string
   prefix?: string

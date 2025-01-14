@@ -1,28 +1,30 @@
 import {
-  MedusaAppLoader,
   configLoader,
   container,
   logger,
+  MedusaAppLoader,
 } from "@medusajs/framework"
-import { MedusaAppOutput, MedusaModule } from "@medusajs/modules-sdk"
-import { IndexTypes } from "@medusajs/types"
+import { MedusaAppOutput, MedusaModule } from "@medusajs/framework/modules-sdk"
+import { IndexTypes } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   ModuleRegistrationName,
   Modules,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { EntityManager } from "@mikro-orm/postgresql"
 import { IndexData, IndexRelation } from "@models"
 import { asValue } from "awilix"
-import { dbTestUtilFactory } from "medusa-test-utils"
-import { initDb } from "medusa-test-utils/dist/medusa-test-runner-utils/use-db"
+import { initDb, TestDatabaseUtils } from "@medusajs/test-utils"
 import path from "path"
 import { EventBusServiceMock } from "../__fixtures__"
 import { dbName } from "../__fixtures__/medusa-config"
 
 const eventBusMock = new EventBusServiceMock()
-const remoteQueryMock = jest.fn()
-const dbUtils = dbTestUtilFactory()
+const queryMock = jest.fn().mockReturnValue({
+  graph: jest.fn(),
+})
+
+const dbUtils = TestDatabaseUtils.dbTestUtilFactory()
 
 jest.setTimeout(300000)
 
@@ -31,7 +33,10 @@ let medusaAppLoader!: MedusaAppLoader
 
 const beforeAll_ = async () => {
   try {
-    configLoader(path.join(__dirname, "./../__fixtures__"), "medusa-config.js")
+    await configLoader(
+      path.join(__dirname, "./../__fixtures__"),
+      "medusa-config"
+    )
 
     console.log(`Creating database ${dbName}`)
     await dbUtils.create(dbName)
@@ -39,7 +44,7 @@ const beforeAll_ = async () => {
 
     container.register({
       [ContainerRegistrationKeys.LOGGER]: asValue(logger),
-      [ContainerRegistrationKeys.REMOTE_QUERY]: asValue(null),
+      [ContainerRegistrationKeys.QUERY]: asValue(null),
       [ContainerRegistrationKeys.PG_CONNECTION]: asValue(dbUtils.pgConnection_),
     })
 
@@ -63,10 +68,7 @@ const beforeAll_ = async () => {
     ;(index as any).eventBusModuleService_ = eventBusMock
 
     await globalApp.onApplicationStart()
-
-    jest
-      .spyOn((index as any).storageProvider_, "remoteQuery_")
-      .mockImplementation(remoteQueryMock)
+    ;(index as any).storageProvider_.query_ = queryMock
 
     return globalApp
   } catch (error) {
@@ -287,23 +289,20 @@ describe("IndexModuleService query", function () {
   afterEach(afterEach_)
 
   it("should query all products ordered by sku DESC", async () => {
-    const [result, count] = await module.queryAndCount(
-      {
-        select: {
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
+      pagination: {
+        order: {
           product: {
             variants: {
-              prices: true,
+              sku: "DESC",
             },
           },
         },
       },
-      {
-        orderBy: [{ "product.variants.sku": "DESC" }],
-      }
-    )
+    })
 
-    expect(count).toEqual(2)
-    expect(result).toEqual([
+    expect(data).toEqual([
       {
         id: "prod_2",
         title: "Product 2 title",
@@ -345,20 +344,18 @@ describe("IndexModuleService query", function () {
   })
 
   it("should query products filtering by variant sku", async () => {
-    const result = await module.query({
-      select: {
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
+      filters: {
         product: {
           variants: {
-            prices: true,
+            sku: { $like: "aaa%" },
           },
         },
       },
-      where: {
-        "product.variants.sku": { $like: "aaa%" },
-      },
     })
 
-    expect(result).toEqual([
+    expect(data).toEqual([
       {
         id: "prod_1",
         variants: [
@@ -378,24 +375,21 @@ describe("IndexModuleService query", function () {
   })
 
   it("should query products filtering by price and returning the complete entity", async () => {
-    const [result] = await module.queryAndCount(
-      {
-        select: {
-          product: {
-            variants: {
-              prices: true,
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
+      filters: {
+        product: {
+          variants: {
+            prices: {
+              amount: { $gt: 50 },
             },
           },
         },
-        where: {
-          "product.variants.prices.amount": { $gt: "50" },
-        },
       },
-      {
-        keepFilteredEntities: true,
-      }
-    )
-    expect(result).toEqual([
+      keepFilteredEntities: true,
+    })
+
+    expect(data).toEqual([
       {
         id: "prod_1",
         variants: [
@@ -425,18 +419,11 @@ describe("IndexModuleService query", function () {
   })
 
   it("should query all products", async () => {
-    const [result, count] = await module.queryAndCount({
-      select: {
-        product: {
-          variants: {
-            prices: true,
-          },
-        },
-      },
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
     })
 
-    expect(count).toEqual(2)
-    expect(result).toEqual([
+    expect(data).toEqual([
       {
         id: "prod_1",
         variants: [
@@ -477,23 +464,15 @@ describe("IndexModuleService query", function () {
   })
 
   it("should paginate products", async () => {
-    const result = await module.query(
-      {
-        select: {
-          product: {
-            variants: {
-              prices: true,
-            },
-          },
-        },
-      },
-      {
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
+      pagination: {
         take: 1,
         skip: 1,
-      }
-    )
+      },
+    })
 
-    expect(result).toEqual([
+    expect(data).toEqual([
       {
         id: "prod_2",
         title: "Product 2 title",
@@ -509,20 +488,18 @@ describe("IndexModuleService query", function () {
   })
 
   it("should handle null values on where clause", async () => {
-    const result = await module.query({
-      select: {
+    const { data } = await module.query({
+      fields: ["product.*", "product.variants.*", "product.variants.prices.*"],
+      filters: {
         product: {
           variants: {
-            prices: true,
+            sku: null,
           },
         },
       },
-      where: {
-        "product.variants.sku": null,
-      },
     })
 
-    expect(result).toEqual([
+    expect(data).toEqual([
       {
         id: "prod_2",
         title: "Product 2 title",
@@ -538,15 +515,20 @@ describe("IndexModuleService query", function () {
   })
 
   it("should query products filtering by deep nested levels", async () => {
-    const [result] = await module.queryAndCount({
-      select: {
-        product: true,
-      },
-      where: {
-        "product.deep.obj.b": 15,
+    const { data } = await module.query({
+      fields: ["product.*"],
+      filters: {
+        product: {
+          deep: {
+            obj: {
+              b: 15,
+            },
+          },
+        },
       },
     })
-    expect(result).toEqual([
+
+    expect(data).toEqual([
       {
         id: "prod_2",
         title: "Product 2 title",

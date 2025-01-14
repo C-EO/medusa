@@ -1,3 +1,9 @@
+---
+tags:
+  - product
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -23,7 +29,7 @@ export const fetchHighlights = [
   fetch(`http://localhost:9000/store/products`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -62,7 +68,7 @@ export const highlights = [
       fetch(`http://localhost:9000/store/products`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())
@@ -146,7 +152,7 @@ export default function Products() {
     fetch(`http://localhost:9000/store/products?${searchParams.toString()}`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())
@@ -212,7 +218,7 @@ const searchParams = new URLSearchParams({
 fetch(`http://localhost:9000/store/products?${searchParams.toString()}`, {
   credentials: "include",
   headers: {
-    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
   },
 })
 .then((res) => res.json())

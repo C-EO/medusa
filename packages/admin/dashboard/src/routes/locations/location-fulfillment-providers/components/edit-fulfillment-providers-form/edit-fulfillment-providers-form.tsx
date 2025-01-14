@@ -1,8 +1,12 @@
 import { HttpTypes } from "@medusajs/types"
 import { Button, Checkbox, toast } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
-import { RowSelectionState, createColumnHelper } from "@tanstack/react-table"
-import { useEffect, useMemo, useState } from "react"
+import {
+  RowSelectionState,
+  Updater,
+  createColumnHelper,
+} from "@tanstack/react-table"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
 
@@ -13,6 +17,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useFulfillmentProviders } from "../../../../../hooks/api/fulfillment-providers"
 import { useUpdateStockLocationFulfillmentProviders } from "../../../../../hooks/api/stock-locations"
 import { useFulfillmentProviderTableColumns } from "../../../../../hooks/table/columns/use-fulfillment-provider-table-columns"
@@ -55,13 +60,16 @@ export const LocationEditFulfillmentProvidersForm = ({
   const [rowSelection, setRowSelection] =
     useState<RowSelectionState>(initialState)
 
-  useEffect(() => {
-    const ids = Object.keys(rowSelection)
-    setValue("fulfillment_providers", ids, {
+  const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
+    const ids = typeof updater === "function" ? updater(rowSelection) : updater
+
+    setValue("fulfillment_providers", Object.keys(ids), {
       shouldDirty: true,
       shouldTouch: true,
     })
-  }, [rowSelection, setValue])
+
+    setRowSelection(ids)
+  }
 
   const { searchParams, raw } = useFulfillmentProvidersTableQuery({
     pageSize: PAGE_SIZE,
@@ -69,7 +77,7 @@ export const LocationEditFulfillmentProvidersForm = ({
 
   const { fulfillment_providers, count, isLoading, isError, error } =
     useFulfillmentProviders(
-      { ...searchParams },
+      { ...searchParams, is_enabled: true },
       { placeholderData: keepPreviousData }
     )
 
@@ -84,7 +92,7 @@ export const LocationEditFulfillmentProvidersForm = ({
     enableRowSelection: true,
     rowSelection: {
       state: rowSelection,
-      updater: setRowSelection,
+      updater: handleRowSelectionChange,
     },
     getRowId: (row) => row.id,
     pageSize: PAGE_SIZE,
@@ -104,9 +112,9 @@ export const LocationEditFulfillmentProvidersForm = ({
         remove: originalIds?.filter((i) => !arr.includes(i)),
       },
       {
-        onSuccess: () => {
+        onSuccess: ({ stock_location }) => {
           toast.success(t("stockLocations.fulfillmentProviders.successToast"))
-          handleSuccess(`/settings/locations/${location.id}`)
+          handleSuccess(`/settings/locations/${stock_location.id}`)
         },
         onError: (e) => {
           toast.error(e.message)
@@ -121,8 +129,9 @@ export const LocationEditFulfillmentProvidersForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <div className="flex h-full flex-col overflow-hidden">
-        <RouteFocusModal.Body>
+      <KeyboundForm onSubmit={handleSubmit} className="flex size-full flex-col">
+        <RouteFocusModal.Header />
+        <RouteFocusModal.Body className="flex flex-1 flex-col overflow-auto">
           <DataTable
             table={table}
             columns={columns}
@@ -132,7 +141,7 @@ export const LocationEditFulfillmentProvidersForm = ({
             filters={filters}
             search="autofocus"
             pagination
-            orderBy={["id", "created_at", "updated_at"]}
+            orderBy={[{ key: "id", label: t("fields.id") }]}
             queryObject={raw}
             layout="fill"
           />
@@ -141,17 +150,17 @@ export const LocationEditFulfillmentProvidersForm = ({
         <RouteFocusModal.Footer>
           <div className="flex items-center justify-end gap-x-2">
             <RouteFocusModal.Close asChild>
-              <Button size="small" variant="secondary">
+              <Button size="small" variant="secondary" type="button">
                 {t("actions.cancel")}
               </Button>
             </RouteFocusModal.Close>
 
-            <Button size="small" isLoading={isMutating} onClick={handleSubmit}>
+            <Button size="small" isLoading={isMutating} type="submit">
               {t("actions.save")}
             </Button>
           </div>
         </RouteFocusModal.Footer>
-      </div>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

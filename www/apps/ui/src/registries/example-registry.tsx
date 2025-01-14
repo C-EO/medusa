@@ -25,12 +25,12 @@ export const ExampleRegistry: Record<string, ExampleType> = {
   "alert-success": {
     name: "alert-success",
     component: React.lazy(async () => import("@/examples/alert-success")),
-    file: "src/examples/alert-demo.tsx",
+    file: "src/examples/alert-success.tsx",
   },
   "alert-warning": {
     name: "alert-warning",
     component: React.lazy(async () => import("@/examples/alert-warning")),
-    file: "src/examples/alert-demo.tsx",
+    file: "src/examples/alert-warning.tsx",
   },
   "avatar-demo": {
     name: "avatar-demo",
@@ -147,11 +147,6 @@ export const ExampleRegistry: Record<string, ExampleType> = {
     component: React.lazy(async () => import("@/examples/calendar-demo")),
     file: "src/examples/calendar-demo.tsx",
   },
-  "calendar-locale": {
-    name: "calendar-locale",
-    component: React.lazy(async () => import("@/examples/calendar-locale")),
-    file: "src/examples/calendar-locale.tsx",
-  },
   "checkbox-demo": {
     name: "checkbox-demo",
     component: React.lazy(async () => import("@/examples/checkbox-demo")),
@@ -191,63 +186,6 @@ export const ExampleRegistry: Record<string, ExampleType> = {
     name: "date-picker-demo",
     component: React.lazy(async () => import("@/examples/date-picker-demo")),
     file: "src/examples/date-picker-demo.tsx",
-  },
-  "date-picker-single": {
-    name: "date-picker-single",
-    component: React.lazy(async () => import("@/examples/date-picker-single")),
-    file: "src/examples/date-picker-single.tsx",
-  },
-  "date-picker-single-time": {
-    name: "date-picker-single-time",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-single-time")
-    ),
-    file: "src/examples/date-picker-single-time.tsx",
-  },
-  "date-picker-single-presets": {
-    name: "date-picker-single-presets",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-single-presets")
-    ),
-    file: "src/examples/date-picker-single-presets.tsx",
-  },
-  "date-picker-single-presets-time": {
-    name: "date-picker-single-presets-time",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-single-presets-time")
-    ),
-    file: "src/examples/date-picker-single-presets-time.tsx",
-  },
-  "date-picker-range": {
-    name: "date-picker-range",
-    component: React.lazy(async () => import("@/examples/date-picker-range")),
-    file: "src/examples/date-picker-range.tsx",
-  },
-  "date-picker-range-time": {
-    name: "date-picker-range-time",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-range-time")
-    ),
-    file: "src/examples/date-picker-range-time.tsx",
-  },
-  "date-picker-range-presets": {
-    name: "date-picker-range-presets",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-range-presets")
-    ),
-    file: "src/examples/date-picker-range-presets.tsx",
-  },
-  "date-picker-range-presets-time": {
-    name: "date-picker-range-presets-time",
-    component: React.lazy(
-      async () => import("@/examples/date-picker-range-presets-time")
-    ),
-    file: "src/examples/date-picker-range-presets-time.tsx",
-  },
-  "date-picker-locale": {
-    name: "date-picker-locale",
-    component: React.lazy(async () => import("@/examples/date-picker-locale")),
-    file: "src/examples/date-picker-locale.tsx",
   },
   "drawer-demo": {
     name: "drawer-demo",
@@ -607,6 +545,11 @@ export const ExampleRegistry: Record<string, ExampleType> = {
     component: React.lazy(async () => import("@/examples/button-loading")),
     file: "src/examples/button-loading.tsx",
   },
+  "select-item-aligned": {
+    name: "select-item-aligned",
+    component: React.lazy(async () => import("@/examples/select-item-aligned")),
+    file: "src/examples/select-item-aligned.tsx",
+  },
   "select-small": {
     name: "select-small",
     component: React.lazy(async () => import("@/examples/select-small")),
@@ -670,16 +613,6 @@ export const ExampleRegistry: Record<string, ExampleType> = {
     name: "label-xsmall-regular",
     component: React.lazy(async () => import("@/examples/label-xsmall-plus")),
     file: "src/examples/label-xsmall-plus.tsx",
-  },
-  "calendar-single": {
-    name: "calendar-single",
-    component: React.lazy(async () => import("@/examples/calendar-single")),
-    file: "src/examples/calendar-single.tsx",
-  },
-  "calendar-range": {
-    name: "calendar-range",
-    component: React.lazy(async () => import("@/examples/calendar-range")),
-    file: "src/examples/calendar-range.tsx",
   },
   "checkbox-default": {
     name: "checkbox-default",

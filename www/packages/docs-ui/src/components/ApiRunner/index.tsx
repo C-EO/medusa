@@ -163,8 +163,8 @@ export const ApiRunner = React.forwardRef<HTMLDivElement, ApiRunnerProps>(
               !responseCode
                 ? "red"
                 : responseCode.startsWith("2")
-                ? "green"
-                : "red"
+                  ? "green"
+                  : "red"
             }
           />
         )}

@@ -14,13 +14,22 @@ import {
 } from "typedoc"
 import ts, { SyntaxKind, VariableStatement } from "typescript"
 import { WorkflowManager, WorkflowDefinition } from "@medusajs/orchestration"
-import Helper from "./utils/helper"
-import { isWorkflow, isWorkflowStep } from "utils"
-import { StepType } from "./types"
+import Helper, { WORKFLOW_AS_STEP_SUFFIX } from "./utils/helper.js"
+import {
+  findReflectionInNamespaces,
+  isWorkflow,
+  isWorkflowStep,
+  addTagsToReflection,
+  getResolvedResourcesOfStep,
+  getUniqueStrArray,
+} from "utils"
+import { StepType } from "./types.js"
+import Examples from "./utils/examples.js"
 
 type ParsedStep = {
   stepReflection: DeclarationReflection
   stepType: StepType
+  resources: string[]
 }
 
 /**
@@ -30,10 +39,21 @@ type ParsedStep = {
 class WorkflowsPlugin {
   protected app: Application
   protected helper: Helper
+  protected examplesHelper: Examples
+  protected workflowsTagsMap: Map<string, string[]>
+  protected addTagsAfterParsing: {
+    [k: string]: {
+      id: string
+      workflowIds: string[]
+    }
+  }
 
   constructor(app: Application) {
     this.app = app
     this.helper = new Helper()
+    this.examplesHelper = new Examples()
+    this.workflowsTagsMap = new Map()
+    this.addTagsAfterParsing = {}
 
     this.registerOptions()
     this.registerEventHandlers()
@@ -68,6 +88,10 @@ class WorkflowsPlugin {
    * @param context - The project's context.
    */
   handleResolve(context: Context) {
+    const isEnabled = this.app.options.getValue("enableWorkflowsPlugins")
+    if (!isEnabled) {
+      return
+    }
     for (const reflection of context.project.getReflectionsByKind(
       ReflectionKind.All
     )) {
@@ -84,6 +108,7 @@ class WorkflowsPlugin {
 
         if (
           !initializer ||
+          !initializer.arguments ||
           (!ts.isArrowFunction(initializer.arguments[1]) &&
             !ts.isFunctionExpression(initializer.arguments[1]))
         ) {
@@ -92,7 +117,8 @@ class WorkflowsPlugin {
 
         const workflowId = this.helper.getStepOrWorkflowId(
           initializer,
-          context.project
+          context.project,
+          "workflow"
         )
 
         if (!workflowId) {
@@ -104,6 +130,7 @@ class WorkflowsPlugin {
           constructorFn: initializer.arguments[1],
           context,
           parentReflection: reflection.parent,
+          workflowReflection: reflection,
         })
 
         if (!reflection.comment && reflection.parent.comment) {
@@ -115,6 +142,8 @@ class WorkflowsPlugin {
         }
       }
     }
+
+    this.handleAddTagsAfterParsing(context)
   }
 
   /**
@@ -127,15 +156,18 @@ class WorkflowsPlugin {
     constructorFn,
     context,
     parentReflection,
+    workflowReflection,
   }: {
     workflowId: string
     constructorFn: ts.ArrowFunction | ts.FunctionExpression
     context: Context
     parentReflection: DeclarationReflection
+    workflowReflection: SignatureReflection
   }) {
     // use the workflow manager to check whether something in the constructor
     // body is a step/hook
     const workflow = WorkflowManager.getWorkflow(workflowId)
+    const resources: string[] = []
 
     if (!ts.isBlock(constructorFn.body)) {
       return
@@ -159,19 +191,23 @@ class WorkflowsPlugin {
       )
 
       if (initializerName === "when") {
-        this.parseWhenStep({
+        const { resources: whenResources } = this.parseWhenStep({
           initializer,
           parentReflection,
           context,
           workflow,
           stepDepth,
+          workflowReflection,
         })
+        resources.push(...whenResources)
       } else {
         const steps = this.parseSteps({
           initializer,
           context,
           workflow,
           workflowVarName: parentReflection.name,
+          workflowReflection,
+          workflowComments: parentReflection.comment?.blockTags,
         })
 
         if (!steps.length) {
@@ -184,11 +220,19 @@ class WorkflowsPlugin {
             depth: stepDepth,
             parentReflection,
           })
+          resources.push(...step.resources)
         })
       }
 
       stepDepth++
     })
+
+    const uniqueResources = addTagsToReflection(parentReflection, [
+      ...resources,
+      "workflow",
+    ])
+
+    this.updateWorkflowsTagsMap(workflowId, uniqueResources)
   }
 
   /**
@@ -202,11 +246,15 @@ class WorkflowsPlugin {
     context,
     workflow,
     workflowVarName,
+    workflowReflection,
+    workflowComments = [],
   }: {
     initializer: ts.CallExpression
     context: Context
     workflow?: WorkflowDefinition
     workflowVarName: string
+    workflowReflection: SignatureReflection
+    workflowComments?: CommentTag[]
   }): ParsedStep[] {
     const steps: ParsedStep[] = []
     const initializerName = this.helper.normalizeName(
@@ -229,6 +277,7 @@ class WorkflowsPlugin {
             context,
             workflow,
             workflowVarName,
+            workflowReflection,
           })
         )
       })
@@ -236,6 +285,7 @@ class WorkflowsPlugin {
       let stepId: string | undefined
       let stepReflection: DeclarationReflection | undefined
       let stepType = this.helper.getStepType(initializer)
+      const resources: string[] = []
 
       if (stepType === "hook" && "symbol" in initializer.arguments[1]) {
         // get the hook's name from the first argument
@@ -245,10 +295,13 @@ class WorkflowsPlugin {
           context,
           inputSymbol: initializer.arguments[1].symbol as ts.Symbol,
           workflowName: workflowVarName,
+          workflowComments,
         })
       } else {
-        const initializerReflection =
-          context.project.getChildByName(initializerName)
+        const initializerReflection = findReflectionInNamespaces(
+          context.project,
+          initializerName
+        )
 
         if (
           !initializerReflection ||
@@ -270,8 +323,15 @@ class WorkflowsPlugin {
         stepId = this.helper.getStepOrWorkflowId(
           originalInitializer,
           context.project,
+          "step",
           true
         )
+        const stepResources = getResolvedResourcesOfStep(
+          originalInitializer,
+          stepId
+        )
+
+        resources.push(...stepResources)
         stepType = this.helper.getStepType(originalInitializer)
         stepReflection = initializerReflection
       }
@@ -286,7 +346,14 @@ class WorkflowsPlugin {
         steps.push({
           stepReflection,
           stepType,
+          resources,
         })
+        if (stepId?.endsWith(WORKFLOW_AS_STEP_SUFFIX)) {
+          this.updateAddTagsAfterParsingMap(workflowReflection, {
+            id: workflow.id,
+            workflowId: stepId,
+          })
+        }
       }
     }
 
@@ -304,29 +371,43 @@ class WorkflowsPlugin {
     context,
     workflow,
     stepDepth,
+    workflowReflection,
   }: {
     initializer: ts.CallExpression
     parentReflection: DeclarationReflection
     context: Context
     workflow?: WorkflowDefinition
     stepDepth: number
-  }) {
+    workflowReflection: SignatureReflection
+  }): {
+    resources: string[]
+  } {
+    const resources: string[] = []
     const whenInitializer = (initializer.expression as ts.CallExpression)
       .expression as ts.CallExpression
     const thenInitializer = initializer
 
+    const validArgumentsLength =
+      whenInitializer.arguments.length === 2 ||
+      whenInitializer.arguments.length === 3
+
+    const conditionIndex = whenInitializer.arguments.length - 1
+
     if (
-      whenInitializer.arguments.length < 2 ||
-      (!ts.isFunctionExpression(whenInitializer.arguments[1]) &&
-        !ts.isArrowFunction(whenInitializer.arguments[1])) ||
+      !validArgumentsLength ||
+      (!ts.isFunctionExpression(whenInitializer.arguments[conditionIndex]) &&
+        !ts.isArrowFunction(whenInitializer.arguments[conditionIndex])) ||
       thenInitializer.arguments.length < 1 ||
       (!ts.isFunctionExpression(thenInitializer.arguments[0]) &&
         !ts.isArrowFunction(thenInitializer.arguments[0]))
     ) {
-      return
+      return {
+        resources,
+      }
     }
 
-    const whenCondition = whenInitializer.arguments[1].body.getText()
+    const whenCondition =
+      whenInitializer.arguments[conditionIndex].body.getText()
 
     const thenStatements = (thenInitializer.arguments[0].body as ts.Block)
       .statements
@@ -369,17 +450,24 @@ class WorkflowsPlugin {
         context,
         workflow,
         workflowVarName: parentReflection.name,
+        workflowReflection,
       }).forEach((step) => {
         this.createStepDocumentReflection({
           ...step,
           depth: stepDepth,
           parentReflection: documentReflection,
         })
+
+        resources.push(...step.resources)
       })
     })
 
     if (documentReflection.children?.length) {
       parentReflection.documents?.push(documentReflection)
+    }
+
+    return {
+      resources: getUniqueStrArray(resources),
     }
   }
 
@@ -394,11 +482,13 @@ class WorkflowsPlugin {
     context,
     inputSymbol,
     workflowName,
+    workflowComments,
   }: {
     stepId: string
     context: Context
     inputSymbol: ts.Symbol
     workflowName: string
+    workflowComments?: CommentTag[]
   }): DeclarationReflection {
     const declarationReflection = context.createDeclarationReflection(
       ReflectionKind.Function,
@@ -408,7 +498,12 @@ class WorkflowsPlugin {
     )
 
     declarationReflection.comment = new Comment()
-    declarationReflection.comment.summary = [
+
+    const hookComment = workflowComments?.find(
+      (tag) => tag.tag === `@property` && tag.name === `hooks.${stepId}`
+    )
+
+    declarationReflection.comment.summary = hookComment?.content || [
       {
         kind: "text",
         text: "This step is a hook that you can inject custom functionality into.",
@@ -430,6 +525,34 @@ class WorkflowsPlugin {
 
     if (parameter.type.name === "__object") {
       parameter.type.name = "object"
+      parameter.type.qualifiedName = "object"
+
+      if (!parameter.comment?.summary) {
+        parameter.comment = new Comment()
+        parameter.comment.summary = [
+          {
+            kind: "text",
+            text: "The input data for the hook.",
+          },
+        ]
+      }
+    }
+
+    if (parameter.type.reflection instanceof DeclarationReflection) {
+      const additionalDataChild = parameter.type.reflection.children?.find(
+        (child) => child.name === "additional_data"
+      )
+
+      if (additionalDataChild) {
+        additionalDataChild.comment =
+          additionalDataChild.comment || new Comment()
+        additionalDataChild.comment.summary = [
+          {
+            kind: "text",
+            text: "Additional data that can be passed through the `additional_data` property in HTTP requests.\nLearn more in [this documentation](https://docs.medusajs.com/learn/fundamentals/api-routes/additional-data).",
+          },
+        ]
+      }
     }
 
     signatureReflection.parameters = []
@@ -444,7 +567,7 @@ class WorkflowsPlugin {
       new CommentTag(`@example`, [
         {
           kind: "code",
-          text: this.helper.generateHookExample({
+          text: this.examplesHelper.generateHookExample({
             hookName: stepId,
             workflowName,
             parameter,
@@ -464,6 +587,7 @@ class WorkflowsPlugin {
   createStepDocumentReflection({
     stepType,
     stepReflection,
+    resources,
     depth,
     parentReflection,
   }: ParsedStep & {
@@ -489,6 +613,9 @@ class WorkflowsPlugin {
         },
       ])
     )
+    const resourcesForType =
+      stepType === "step" || stepType === "hook" ? [stepType] : []
+    addTagsToReflection(stepReflection, [...resources, ...resourcesForType])
 
     if (parentReflection.isDocument()) {
       parentReflection.addChild(documentReflection)
@@ -595,6 +722,71 @@ class WorkflowsPlugin {
     }
 
     return initializer
+  }
+
+  updateAddTagsAfterParsingMap(
+    reflection: SignatureReflection,
+    {
+      id,
+      workflowId,
+    }: {
+      id: string
+      workflowId: string
+    }
+  ) {
+    const existingItem = this.addTagsAfterParsing[`${reflection.id}`] || {
+      id,
+      workflowIds: [],
+    }
+    existingItem.workflowIds.push(
+      workflowId.replace(WORKFLOW_AS_STEP_SUFFIX, "")
+    )
+    this.addTagsAfterParsing[`${reflection.id}`] = existingItem
+  }
+
+  updateWorkflowsTagsMap(workflowId: string, tags: string[]) {
+    const existingItems = this.workflowsTagsMap.get(workflowId) || []
+    existingItems.push(...tags)
+    this.workflowsTagsMap.set(workflowId, existingItems)
+  }
+
+  handleAddTagsAfterParsing(context: Context) {
+    let keys = Object.keys(this.addTagsAfterParsing)
+
+    const handleForWorkflow = (
+      key: string,
+      {
+        id,
+        workflowIds,
+      }: {
+        id: string
+        workflowIds: string[]
+      }
+    ) => {
+      const resources: string[] = []
+      workflowIds.forEach((workflowId) => {
+        // check if it exists in keys
+        const existingKey = keys.find(
+          (k) => this.addTagsAfterParsing[k].id === workflowId
+        )
+        if (existingKey) {
+          handleForWorkflow(existingKey, this.addTagsAfterParsing[existingKey])
+        }
+        resources.push(...(this.workflowsTagsMap.get(workflowId) || []))
+      })
+
+      const reflection = context.project.getReflectionById(parseInt(key))
+      if (reflection) {
+        const uniqueTags = addTagsToReflection(reflection, resources)
+        this.updateWorkflowsTagsMap(id, uniqueTags)
+      }
+      delete this.addTagsAfterParsing[key]
+      keys = Object.keys(this.addTagsAfterParsing)
+    }
+
+    do {
+      handleForWorkflow(keys[0], this.addTagsAfterParsing[keys[0]])
+    } while (keys.length > 0)
   }
 }
 

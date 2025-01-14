@@ -452,3 +452,19 @@ export type UpsertStockLocationInput = Partial<UpdateStockLocationInput> & {
    */
   id?: string
 }
+
+export type UpdateStockLocationAddressInput = StockLocationAddressInput & {
+  id: string
+}
+
+export type UpsertStockLocationAddressInput = StockLocationAddressInput & {
+  id?: string
+}
+
+export interface FilterableStockLocationAddressProps
+  extends BaseFilterable<FilterableStockLocationAddressProps> {
+  /**
+   * The IDs to filter stock location's address by.
+   */
+  id?: string | string[]
+}

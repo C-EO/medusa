@@ -14,20 +14,21 @@ describe("RemoteQuery", () => {
     it("should return the correct type for fields when using a string entry point", () => {
       type Result = RemoteQueryObjectConfig<"simple_product">["fields"]
       expectTypeOf<Result>().toEqualTypeOf<
-        (
-          | "*"
-          | "id"
-          | "handle"
-          | "title"
-          | "variants.id"
-          | "variants.*"
-          | "sales_channels.id"
-          | "sales_channels.*"
-          | "sales_channels.name"
-          | "sales_channels_link.*"
-          | "sales_channels_link.product_id"
-          | "sales_channels_link.sales_channel_id"
-        )[]
+        | (
+            | "*"
+            | "id"
+            | "handle"
+            | "title"
+            | "variants.id"
+            | "variants.*"
+            | "sales_channels.id"
+            | "sales_channels.*"
+            | "sales_channels.name"
+            | "sales_channels_link.*"
+            | "sales_channels_link.product_id"
+            | "sales_channels_link.sales_channel_id"
+          )[]
+        | string[]
       >()
     })
 

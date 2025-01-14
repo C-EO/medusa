@@ -1,3 +1,10 @@
+---
+tags:
+  - product
+  - product category
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -19,7 +26,7 @@ To retrieve the list of product categories, send a request to the [List Product 
   fetch(`http://localhost:9000/store/product-categories`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -58,7 +65,7 @@ export const highlights = [
       fetch(`http://localhost:9000/store/product-categories`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())
@@ -144,7 +151,7 @@ export default function Categories() {
     }`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())
@@ -214,7 +221,7 @@ fetch(`http://localhost:9000/store/product-categories?${
 }`, {
   credentials: "include",
   headers: {
-    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
   },
 })
 .then((res) => res.json())

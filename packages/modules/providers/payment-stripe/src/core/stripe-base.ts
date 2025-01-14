@@ -4,13 +4,12 @@ import Stripe from "stripe"
 
 import {
   CreatePaymentProviderSession,
-  MedusaContainer,
   PaymentProviderError,
   PaymentProviderSessionResponse,
   ProviderWebhookPayload,
   UpdatePaymentProviderSession,
   WebhookActionResult,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AbstractPaymentProvider,
   isDefined,
@@ -19,7 +18,7 @@ import {
   MedusaError,
   PaymentActions,
   PaymentSessionStatus,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   ErrorCodes,
   ErrorIntentStatus,
@@ -34,7 +33,7 @@ import {
 abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
   protected readonly options_: StripeOptions
   protected stripe_: Stripe
-  protected container_: MedusaContainer
+  protected container_: Record<string, unknown>
 
   static validateOptions(options: StripeOptions): void {
     if (!isDefined(options.apiKey)) {
@@ -42,11 +41,14 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
     }
   }
 
-  protected constructor(container: MedusaContainer, options: StripeOptions) {
+  protected constructor(
+    cradle: Record<string, unknown>,
+    options: StripeOptions
+  ) {
     // @ts-ignore
     super(...arguments)
 
-    this.container_ = container
+    this.container_ = cradle
     this.options_ = options
 
     this.stripe_ = new Stripe(options.apiKey)
@@ -186,6 +188,11 @@ abstract class StripeBase extends AbstractPaymentProvider<StripeOptions> {
   ): Promise<PaymentProviderError | PaymentProviderSessionResponse["data"]> {
     try {
       const id = paymentSessionData.id as string
+
+      if (!id) {
+        return paymentSessionData
+      }
+
       return (await this.stripe_.paymentIntents.cancel(
         id
       )) as unknown as PaymentProviderSessionResponse["data"]

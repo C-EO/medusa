@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const OrderExchangePaymentCollection: ModuleJoinerConfig = {
   serviceName: LINKS.OrderExchangePaymentCollection,
@@ -43,6 +43,7 @@ export const OrderExchangePaymentCollection: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.ORDER,
+      entity: "OrderExchange",
       fieldAlias: {
         exchange_payment_collections: {
           path: "exchange_payment_collections_link.payment_collection",
@@ -58,6 +59,7 @@ export const OrderExchangePaymentCollection: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.PAYMENT,
+      entity: "PaymentCollection",
       fieldAlias: {
         exchange: "order_exchange_link.order",
       },

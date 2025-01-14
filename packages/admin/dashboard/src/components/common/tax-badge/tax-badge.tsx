@@ -1,5 +1,5 @@
-import { BuildingTax } from "@medusajs/icons"
-import { Tooltip, clx } from "@medusajs/ui"
+import { TaxExclusive, TaxInclusive } from "@medusajs/icons"
+import { Tooltip } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 type IncludesTaxTooltipProps = {
@@ -20,7 +20,11 @@ export const IncludesTaxTooltip = ({
           : t("general.excludesTaxTooltip")
       }
     >
-      <BuildingTax className={clx({ "text-ui-fg-muted": !includesTax })} />
+      {includesTax ? (
+        <TaxInclusive className="text-ui-fg-muted shrink-0" />
+      ) : (
+        <TaxExclusive className="text-ui-fg-muted shrink-0" />
+      )}
     </Tooltip>
   )
 }

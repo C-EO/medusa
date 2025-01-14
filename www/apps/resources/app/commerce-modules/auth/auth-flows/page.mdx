@@ -8,7 +8,7 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you'll learn how to use the Auth Module's main service's methods to implement an authentication flow.
+In this document, you'll learn how to use the Auth Module's main service's methods to implement authentication flows and reset a user's password.
 
 ## Authentication Methods
 
@@ -53,13 +53,19 @@ This method calls the `authenticate` method of the provider specified in the fir
 The basic authentication flow requires first using the `register` method, then the `authenticate` method:
 
 ```ts
-const { success, authIdentity } = await authModuleService.register(
+const { success, authIdentity, error } = await authModuleService.register(
   "emailpass",
   // passed to auth provider
   {
     // ...
   }
 )
+
+if (error) {
+  // registration failed
+  // TODO return an error
+  return
+}
 
 // later (can be another route for log-in)
 const { success, authIdentity, location } = await authModuleService.authenticate(
@@ -87,6 +93,15 @@ Check out the [AuthIdentity](/references/auth/models/AuthIdentity) reference for
 
 ![Diagram showcasing the basic authentication flow](https://res.cloudinary.com/dza7lstvk/image/upload/v1711373749/Medusa%20Resources/basic-auth_lgpqsj.jpg)
 
+### Auth Identity with Same Identifier
+
+If an auth identity, such as a `customer`, tries to register with an email of another auth identity, the `register` method returns an error. This can happen either if another customer is using the same email, or an admin user has the same email.
+
+There are two ways to handle this:
+
+- Consider the customer authenticated if the `authenticate` method validates that the email and password are correct. This allows admin users, for example, to authenticate as customers.
+- Return an error message to the customer, informing them that the email is already in use.
+
 ---
 
 ## Auth Flow 2: Third-Party Service Authentication
@@ -95,7 +110,7 @@ The third-party service authentication method requires using the `authenticate` 
 
 ```ts
 const { success, authIdentity, location } = await authModuleService.authenticate(
-  "emailpass",
+  "google",
   // passed to auth provider
   {
     // ...
@@ -118,6 +133,21 @@ If the `authenticate` method returns a `location` property, the authentication p
 For example, when using the `google` provider, the `location` is the URL that the user is navigated to login.
 
 ![Diagram showcasing the first part of the third-party authentication flow](https://res.cloudinary.com/dza7lstvk/image/upload/v1711374847/Medusa%20Resources/third-party-auth-1_enyedy.jpg)
+
+### Overriding Callback URL
+
+The Google and GitHub providers allow you to override their `callbackUrl` option during authentication. This is useful when you redirect the user after authentication to a URL based on its actor type. For example, you redirect admin users and customers to different pages.
+
+```ts
+const { success, authIdentity, location } = await authModuleService.authenticate(
+  "google",
+  // passed to auth provider
+  {
+    // ...
+    callback_url: "example.com",
+  }
+)
+```
 
 ### validateCallback
 
@@ -146,6 +176,41 @@ if (success) {
 }
 ```
 
+<Note title="Tip">
+
+For providers like Google, the `query` object contains the query parameters from the original callback URL, such as the `code` and `state` parameters.
+
+</Note>
+
 If the returned `success` property is `true`, the authentication with the third-party provider was successful.
 
 ![Diagram showcasing the second part of the third-party authentication flow](https://res.cloudinary.com/dza7lstvk/image/upload/v1711375123/Medusa%20Resources/third-party-auth-2_kmjxju.jpg)
+
+---
+
+## Reset Password
+
+To update a user's password or other authentication details, use the `updateProvider` method of the Auth Module's main service. It calls the `update` method of the specified authentication provider.
+
+For example:
+
+```ts
+const { success } = await authModuleService.updateProvider(
+  "emailpass",
+  // passed to the auth provider
+  {
+    entity_id: "user@example.com",
+    password: "supersecret",
+  }
+)
+
+if (success) {
+  // password reset successfully
+}
+```
+
+The method accepts as a first parameter the ID of the provider, and as a second parameter the data necessary to reset the password.
+
+In the example above, you use the `emailpass` provider, so you have to pass an object having an `email` and `password` properties.
+
+If the returned `success` property is `true`, the password has reset successfully.

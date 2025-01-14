@@ -8,7 +8,7 @@ import {
   DeclarationReflection,
   ReferenceType,
 } from "typedoc"
-import { getDmlProperties, isDmlEntity } from "utils"
+import { getDirname, getDmlProperties, isDmlEntity } from "utils"
 import { DmlFile } from "types"
 
 const FILE_NAME_REGEX = /packages\/modules\/(?<module>[a-z-]+)/
@@ -50,6 +50,8 @@ function getDescriptionsFromJson(
   if (!moduleName?.groups?.module) {
     return
   }
+
+  const __dirname = getDirname(import.meta.url)
 
   const jsonFilePath = path.resolve(
     __dirname,

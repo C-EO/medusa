@@ -104,7 +104,9 @@ export const WorkflowDiagramCanvas = ({
       >
         <div className="relative size-full overflow-hidden object-contain rounded-docs_DEFAULT shadow-elevation-card-rest">
           <div>
+            {/* @ts-expect-error React v19 doesn't see this type as a React element */}
             <motion.div
+              // @ts-expect-error React v19 isn't recognizing accepted props
               onMouseDown={() => setIsDragging(true)}
               onMouseUp={() => setIsDragging(false)}
               drag

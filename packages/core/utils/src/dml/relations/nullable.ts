@@ -6,15 +6,18 @@ const IsNullableModifier = Symbol.for("isNullableModifier")
 /**
  * Nullable modifier marks a schema node as nullable
  */
-export class NullableModifier<T, Relation extends RelationshipType<T>>
-  implements RelationshipType<T | null>
+export class RelationNullableModifier<
+  T,
+  Relation extends RelationshipType<T>,
+  ForeignKey extends boolean
+> implements RelationshipType<T | null>
 {
   [IsNullableModifier]: true = true;
   [IsRelationship]: true = true
 
   static isNullableModifier<T>(
     modifier: any
-  ): modifier is NullableModifier<T, any> {
+  ): modifier is RelationNullableModifier<T, any, any> {
     return !!modifier?.[IsNullableModifier]
   }
 
@@ -25,6 +28,7 @@ export class NullableModifier<T, Relation extends RelationshipType<T>>
    * of the schema property
    */
   declare $dataType: T | null
+  declare $foreignKey: ForeignKey
 
   /**
    * The parent schema on which the nullable modifier is

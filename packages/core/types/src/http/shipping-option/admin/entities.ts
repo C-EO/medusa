@@ -1,3 +1,4 @@
+import { RuleOperatorType } from "../../../common"
 import { ShippingOptionPriceType } from "../../../fulfillment"
 import { AdminFulfillmentProvider } from "../../fulfillment-provider"
 import { AdminServiceZone } from "../../fulfillment-set"
@@ -18,7 +19,7 @@ export interface AdminShippingOptionType {
 export interface AdminShippingOptionRule {
   id: string
   attribute: string
-  operator: string
+  operator: RuleOperatorType
   value: string | string[] | null
   shipping_option_id: string
   created_at: string
@@ -29,7 +30,14 @@ export interface AdminShippingOptionRule {
 // TODO: This type is complete, but it's not clear what the `rules` field is supposed to return in all cases.
 export interface AdminShippingOptionPriceRule {
   id: string
-  value: string
+  value: string | number
+  operator: RuleOperatorType
+  attribute: string
+  price_id: string
+  priority: number
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
 }
 
 export interface AdminShippingOptionPrice extends AdminPrice {

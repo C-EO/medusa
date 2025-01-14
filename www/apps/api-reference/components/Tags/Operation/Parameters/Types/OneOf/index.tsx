@@ -66,19 +66,21 @@ const TagOperationParamatersOneOf = ({
     return (
       <>
         <div className={clsx("flex items-center gap-1 pl-1")}>
-          <span className="inline-block">One of</span>
-          <ul className="mb-0 flex list-none gap-1">
+          <span className="inline-block text-compact-x-small">One of</span>
+          <ul className="mb-0 flex list-none gap-0.5 flex-wrap">
             {schema.oneOf?.map((item, index) => (
               <li
                 key={index}
                 className={clsx(
-                  "rounded-xs cursor-pointer p-0.5",
-                  "border border-solid",
+                  "rounded-full cursor-pointer px-[10px]",
+                  "flex justify-center items-center text-compact-small-plus",
+                  "focus:shadow-borders-interactive-with-focus transition-colors",
                   activeTab === index && [
-                    "bg-medusa-bg-subtle border-medusa-border-strong",
+                    "text-medusa-fg-base bg-medusa-bg-base",
+                    "shadow-elevation-card-rest dark:shadow-elevation-card-rest-dark",
                   ],
                   activeTab !== index && [
-                    "bg-medusa-bg-base border-medusa-border-base",
+                    "text-medusa-fg-muted hover:text-medusa-fg-base",
                   ]
                 )}
                 onClick={() => setActiveTab(index)}

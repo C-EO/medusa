@@ -1,10 +1,17 @@
-import { IProductModuleService } from "@medusajs/types"
-import { CommonEvents, Modules, ProductStatus } from "@medusajs/utils"
-import { Product, ProductCollection } from "@models"
+import { IProductModuleService } from "@medusajs/framework/types"
+import {
+  CommonEvents,
+  composeMessage,
+  Modules,
+  ProductEvents,
+  ProductStatus,
+  toMikroORMEntity,
+} from "@medusajs/framework/utils"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
+import { Product, ProductCollection } from "@models"
 import { createCollections } from "../../__fixtures__/product"
 
 jest.setTimeout(30000)
@@ -25,15 +32,17 @@ moduleIntegrationTestRunner<IProductModuleService>({
       beforeEach(async () => {
         const testManager = await MikroOrmWrapper.forkManager()
 
-        productOne = testManager.create(Product, {
+        productOne = testManager.create(toMikroORMEntity(Product), {
           id: "product-1",
           title: "product 1",
+          handle: "product-1",
           status: ProductStatus.PUBLISHED,
         })
 
-        productTwo = testManager.create(Product, {
+        productTwo = testManager.create(toMikroORMEntity(Product), {
           id: "product-2",
           title: "product 2",
+          handle: "product-2",
           status: ProductStatus.PUBLISHED,
         })
 
@@ -41,11 +50,13 @@ moduleIntegrationTestRunner<IProductModuleService>({
           {
             id: "test-1",
             title: "collection 1",
+            handle: "collection-1",
             products: [productOne],
           },
           {
             id: "test-2",
             title: "collection",
+            handle: "collection",
             products: [productTwo],
           },
         ]
@@ -281,7 +292,7 @@ moduleIntegrationTestRunner<IProductModuleService>({
           expect(eventBusSpy).toHaveBeenCalledWith(
             [
               {
-                name: "Product.product-collection.deleted",
+                name: "product.product-collection.deleted",
                 data: { id: collectionId },
                 metadata: {
                   action: CommonEvents.DELETED,
@@ -307,16 +318,19 @@ moduleIntegrationTestRunner<IProductModuleService>({
             {
               id: collectionId,
               title: "New Collection",
+              product_ids: ["product_id"],
             },
           ])
 
           expect(eventBusSpy).toHaveBeenCalledTimes(1)
           expect(eventBusSpy).toHaveBeenCalledWith(
             [
-              {
+              composeMessage(ProductEvents.PRODUCT_COLLECTION_UPDATED, {
                 data: { id: collectionId },
-                name: "product-collection.updated",
-              },
+                object: "product_collection",
+                source: Modules.PRODUCT,
+                action: CommonEvents.UPDATED,
+              }),
             ],
             {
               internal: true,
@@ -514,10 +528,12 @@ moduleIntegrationTestRunner<IProductModuleService>({
           expect(eventBusSpy).toHaveBeenCalledTimes(1)
           expect(eventBusSpy).toHaveBeenCalledWith(
             [
-              {
+              composeMessage(ProductEvents.PRODUCT_COLLECTION_CREATED, {
                 data: { id: collections[0].id },
-                name: "product-collection.created",
-              },
+                object: "product_collection",
+                source: Modules.PRODUCT,
+                action: CommonEvents.CREATED,
+              }),
             ],
             {
               internal: true,

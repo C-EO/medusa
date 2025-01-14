@@ -1,8 +1,8 @@
-import { Button, Container, Heading } from "@medusajs/ui"
-import { ItemLocationListTable } from "./location-levels-table/location-list-table"
-import { Link } from "react-router-dom"
-import { useTranslation } from "react-i18next"
 import { HttpTypes } from "@medusajs/types"
+import { Button, Container, Heading } from "@medusajs/ui"
+import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
+import { ItemLocationListTable } from "./location-levels-table/location-list-table"
 
 type InventoryItemLocationLevelsSectionProps = {
   inventoryItem: HttpTypes.AdminInventoryItemResponse["inventory_item"]
@@ -13,7 +13,7 @@ export const InventoryItemLocationLevelsSection = ({
   const { t } = useTranslation()
 
   return (
-    <Container className="p-0">
+    <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading>{t("inventory.locationLevels")}</Heading>
         <Button size="small" variant="secondary" asChild>

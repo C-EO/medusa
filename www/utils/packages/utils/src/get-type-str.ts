@@ -20,8 +20,8 @@ import {
   UnionType,
   UnknownType,
 } from "typedoc"
-import { escapeChars, getHTMLChar } from "./str-utils"
-import { getProjectChild } from "./get-project-child"
+import { escapeChars, getHTMLChar } from "./str-utils.js"
+import { getProjectChild } from "./get-project-child.js"
 
 export type ReflectionParameterType =
   | ParameterReflection
@@ -146,7 +146,9 @@ export function getType({ reflectionType, ...options }: TypeOptions): string {
     })
   }
 
-  return reflectionType ? escapeChars(reflectionType.toString()) : ""
+  return reflectionType
+    ? escapeChars(normalizeTypeName(reflectionType.toString()))
+    : ""
 }
 
 export function getReflectionType({
@@ -324,20 +326,26 @@ export function getReferenceType({
     const reflection: string[] = [wrappedInBackticks ? "`" : ""]
 
     if (modelReflection?.url) {
+      const reflectionName = normalizeTypeName(modelReflection.name || "")
+      const reflectionUrl =
+        modelReflection.name === "__type" ? undefined : modelReflection.url
       reflection.push(
-        shouldShowLink
-          ? `[${modelReflection.name}](${
+        shouldShowLink && reflectionUrl
+          ? `[${reflectionName}](${
               getRelativeUrlMethod?.(modelReflection.url) || modelReflection.url
             })`
-          : getFormattedStr(modelReflection.name, false, escape)
+          : getFormattedStr(reflectionName, false, escape)
       )
     } else {
+      const reflectionName = normalizeTypeName(model.name)
+      const reflectionUrl =
+        model.name === "__type" ? undefined : model.externalUrl
       reflection.push(
-        shouldShowLink
+        shouldShowLink && reflectionUrl
           ? model.externalUrl
-            ? `[${model.name}]( ${model.externalUrl} )`
-            : model.name
-          : getFormattedStr(model.name, false, escape)
+            ? `[${reflectionName}](${model.externalUrl})`
+            : reflectionName
+          : getFormattedStr(reflectionName, false, escape)
       )
     }
     if (model.typeArguments && model.typeArguments.length > 0) {
@@ -577,4 +585,12 @@ function getFormattedStr(
   escape?: boolean
 ) {
   return wrapBackticks ? `\`${str}\`` : escape ? escapeChars(str) : str
+}
+
+function normalizeTypeName(name: string) {
+  if (name !== "__type") {
+    return name
+  }
+
+  return "object"
 }

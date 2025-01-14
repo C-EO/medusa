@@ -297,7 +297,7 @@ export const AiAssistant = () => {
     }
   }, [loading, answer, thread, lastAnswerIndex, inputRef.current])
 
-  useResizeObserver(contentRef, () => {
+  useResizeObserver(contentRef as React.RefObject<HTMLDivElement>, () => {
     if (!loading) {
       return
     }
@@ -327,6 +327,7 @@ export const AiAssistant = () => {
               apply
             </>
           }
+          clickable={true}
         >
           <Badge variant="neutral">AI Assistant</Badge>
         </Tooltip>

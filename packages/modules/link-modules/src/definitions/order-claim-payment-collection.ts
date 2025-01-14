@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const OrderClaimPaymentCollection: ModuleJoinerConfig = {
   serviceName: LINKS.OrderClaimPaymentCollection,
@@ -43,6 +43,7 @@ export const OrderClaimPaymentCollection: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.ORDER,
+      entity: "OrderClaim",
       fieldAlias: {
         claim_payment_collections: {
           path: "claim_payment_collections_link.payment_collection",
@@ -58,6 +59,7 @@ export const OrderClaimPaymentCollection: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.PAYMENT,
+      entity: "PaymentCollection",
       fieldAlias: {
         claim: "order_claim_link.order",
       },

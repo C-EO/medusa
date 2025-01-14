@@ -1,6 +1,8 @@
 name: Trigger Release and Publish
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -61,3 +63,32 @@ jobs:
 
       - name: Publish packages under next tag
         run: yarn changeset publish --no-git-tags --snapshot --tag ${{ github.event.inputs.version || 'preview' }}
+
+      - name: Post failure to Slack channel
+        if: failure()
+        id: slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: "releases"
+          payload: |
+            {
+              "blocks":[
+                {
+                  "type": "header",
+                  "text":  {
+                    "type": "plain_text",
+                    "text": "Failed to release! ⛔"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Triggering a release for preview environments failed for ${{ github.run_id }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_RELEASE }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

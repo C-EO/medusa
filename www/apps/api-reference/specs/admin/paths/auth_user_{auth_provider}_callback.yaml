@@ -3,11 +3,11 @@ post:
   summary: Validate Authentication Callback
   description: >
     This API route is used by your dashboard or frontend application when a
-    third-party provider redirects to it after authentication. 
-
-
-    It validates the authentication with the third-party provider and, if
-    successful, returns an authentication token.
+    third-party provider redirects to it after authentication. It validates the
+    authentication with the third-party provider and, if successful, returns an
+    authentication token. All query parameters received from the third-party
+    provider, such as `code`, `state`, and `error`, must be passed as query
+    parameters to this route.
 
 
     You can decode the JWT token using libraries like
@@ -33,10 +33,10 @@ post:
       label: Google Provider
       source:
         $ref: ../code_samples/Shell/auth_user_{auth_provider}_callback/post.sh
-    - lang: Shell
+    - lang: Bash
       label: GitHub Provider
       source:
-        $ref: ../code_samples/Shell/auth_user_{auth_provider}_callback/post.sh
+        $ref: ../code_samples/Bash/auth_user_{auth_provider}_callback/post.sh
   tags:
     - Auth
   responses:

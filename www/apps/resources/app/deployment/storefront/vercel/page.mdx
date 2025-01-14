@@ -5,20 +5,12 @@ sidebar_label: "Vercel"
 import { Prerequisites } from "docs-ui"
 
 export const metadata = {
-  title: `Deploy Medusa Admin to Vercel`,
+  title: `Deploy Medusa Next.js to Vercel`,
 }
 
 # {metadata.title}
 
 In this document, you’ll learn how to deploy the Next.js storefront to [Vercel](https://vercel.com).
-
-<Note title="Important">
-
-As Medusa v2 is still in active development, it's highly recommended not to deploy it for production purposes. The deployment process may also change.
-
-</Note>
-
----
 
 <Prerequisites items={[
   {
@@ -66,17 +58,17 @@ npm install
 Then, expand the Environment Variables section and add the following variables:
 
 ```bash
-NEXT_PUBLIC_MEDUSA_BACKEND_URL= # URL of Medusa application
+MEDUSA_BACKEND_URL= # URL of Medusa application
 NEXT_PUBLIC_DEFAULT_REGION=us # or a different region that you prefer
-NEXT_PUBLIC_PUBLISHABLE_KEY= # publishable API key of the storefront's sales channel
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY= # publishable API key of the storefront's sales channel
 REVALIDATE_SECRET=supersecret # TODO generate random string
 ```
 
 Where:
 
-1. `NEXT_PUBLIC_MEDUSA_BACKEND_URL` is the URL of your deployed Medusa application
+1. `MEDUSA_BACKEND_URL` is the URL of your deployed Medusa application
 2. `NEXT_PUBLIC_DEFAULT_REGION` is the country code of a region to be used by default, if the customer hasn’t selected a region.
-3. `NEXT_PUBLIC_PUBLISHABLE_KEY` is the publishable API key of the storefront. You can create one or find the default one in the Medusa Admin dashboard.
+3. `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` is the publishable API key of the storefront. You can create one or find the default one in the Medusa Admin dashboard.
 4. `REVALIDATE_SECRET` is a random string for [Next.js revalidation](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#on-demand-revalidation).
 
 Make sure to add other relevant environment variables. For example, if you’re using the Stripe Payment Module Provider in the Medusa application, add the `NEXT_PUBLIC_STRIPE_KEY` environment variable.

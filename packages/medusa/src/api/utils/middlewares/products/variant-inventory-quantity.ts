@@ -1,89 +1,55 @@
 import {
   ContainerRegistrationKeys,
-  LINKS,
-  remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { MedusaRequest } from "../../../../types/routing"
+  getTotalVariantAvailability,
+  getVariantAvailability,
+  MedusaError,
+} from "@medusajs/framework/utils"
+import { MedusaRequest, MedusaStoreRequest } from "@medusajs/framework/http"
 
-export async function getVariantInventoryItems({
-  req,
-  variantIds,
-  additionalFilters = {},
-  asMap = true,
-}) {
-  const remoteQuery = req.scope.resolve(ContainerRegistrationKeys.REMOTE_QUERY)
+export const wrapVariantsWithTotalInventoryQuantity = async (
+  req: MedusaRequest,
+  variants: VariantInput[]
+) => {
+  const variantIds = (variants ?? []).map((variant) => variant.id).flat(1)
 
-  const linkQuery = remoteQueryObjectFromString({
-    service: LINKS.ProductVariantInventoryItem,
-    variables: {
-      filters: {
-        variant_id: variantIds,
-      },
-      ...additionalFilters,
-    },
-    fields: [
-      "variant_id",
-      "variant.manage_inventory",
-      "variant.allow_backorder",
-      "required_quantity",
-      "inventory.*",
-      "inventory.location_levels.*",
-    ],
-  } as any)
-
-  const links = await remoteQuery(linkQuery)
-
-  if (!asMap) {
-    return links
+  if (!variantIds.length) {
+    return
   }
 
-  const variantInventoriesMap = new Map()
-
-  links.forEach((link) => {
-    const array = variantInventoriesMap.get(link.variant_id) || []
-
-    array.push(link)
-
-    variantInventoriesMap.set(link.variant_id, array)
+  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+  const availability = await getTotalVariantAvailability(query, {
+    variant_ids: variantIds,
   })
 
-  return variantInventoriesMap
+  wrapVariants(variants, availability)
 }
 
-export async function computeVariantInventoryQuantity({
-  variantInventoryItems,
-}) {
-  const links = variantInventoryItems
-  const inventoryQuantities: number[] = []
+export const wrapVariantsWithInventoryQuantityForSalesChannel = async (
+  req: MedusaStoreRequest<unknown>,
+  variants: VariantInput[]
+) => {
+  const salesChannelId = req.filterableFields.sales_channel_id as
+    | string
+    | string[]
+  const { sales_channel_ids: idsFromPublishableKey = [] } =
+    req.publishable_key_context
 
-  for (const link of links) {
-    const requiredQuantity = link.required_quantity
-    const availableQuantity = (link.inventory?.location_levels || []).reduce(
-      (sum, level) => sum + (level?.available_quantity || 0),
-      0
-    )
-
-    // This will give us the maximum deliverable quantities for each inventory item
-    const maxInventoryQuantity = Math.floor(
-      availableQuantity / requiredQuantity
-    )
-
-    inventoryQuantities.push(maxInventoryQuantity)
+  let channelToUse: string | undefined
+  if (salesChannelId && !Array.isArray(salesChannelId)) {
+    channelToUse = salesChannelId
   }
 
-  // Since each of these inventory items need to be available to perform an order,
-  // we pick the smallest of the deliverable quantities as the total inventory quantity.
-  return inventoryQuantities.length ? Math.min(...inventoryQuantities) : 0
-}
+  if (idsFromPublishableKey.length === 1) {
+    channelToUse = idsFromPublishableKey[0]
+  }
 
-export const wrapVariantsWithInventoryQuantity = async (
-  req: MedusaRequest,
-  variants: {
-    id: string
-    inventory_quantity?: number
-    manage_inventory?: boolean
-  }[]
-) => {
+  if (!channelToUse) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      `Inventory availability cannot be calculated in the given context. Either provide a sales channel id or configure a single sales channel in the publishable key`
+    )
+  }
+
   variants ??= []
   const variantIds = variants.map((variant) => variant.id).flat(1)
 
@@ -91,19 +57,34 @@ export const wrapVariantsWithInventoryQuantity = async (
     return
   }
 
-  const variantInventoriesMap = await getVariantInventoryItems({
-    req,
-    variantIds,
+  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+  const availability = await getVariantAvailability(query, {
+    variant_ids: variantIds,
+    sales_channel_id: channelToUse,
   })
 
+  wrapVariants(variants, availability)
+}
+
+type VariantInput = {
+  id: string
+  inventory_quantity?: number
+  manage_inventory?: boolean
+}
+
+type VariantAvailability = Awaited<
+  ReturnType<typeof getTotalVariantAvailability>
+>
+
+const wrapVariants = (
+  variants: VariantInput[],
+  availability: VariantAvailability
+) => {
   for (const variant of variants) {
     if (!variant.manage_inventory) {
       continue
     }
 
-    const links = variantInventoriesMap.get(variant.id) || []
-    variant.inventory_quantity = await computeVariantInventoryQuantity({
-      variantInventoryItems: links,
-    })
+    variant.inventory_quantity = availability[variant.id].availability
   }
 }

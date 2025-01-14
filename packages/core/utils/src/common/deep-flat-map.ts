@@ -68,7 +68,7 @@ export function deepFlatMap(
     const currentKey = path[0]
     const remainingPath = path.slice(1)
 
-    if (!isDefined(element[currentKey])) {
+    if (!isDefined(element?.[currentKey])) {
       callback({ ...context })
       continue
     }

@@ -20,8 +20,10 @@ import {
   upperCaseFirst,
 } from "../common"
 import { DmlEntity } from "../dml"
+import { CommonEvents } from "../event-bus"
 import { EmitEvents, InjectManager, MedusaContext } from "./decorators"
 import { Modules } from "./definition"
+import { moduleEventBuilderFactory } from "./event-builder-factory"
 import { buildModelsNameToLinkableKeysMap } from "./joiner-config-builder"
 import {
   BaseMethods,
@@ -31,8 +33,6 @@ import {
   ModelEntries,
   ModelsConfigTemplate,
 } from "./types/medusa-service"
-import { CommonEvents } from "../event-bus"
-import { moduleEventBuilderFactory } from "./event-builder-factory"
 
 const readMethods = ["retrieve", "list", "listAndCount"] as BaseMethods[]
 const writeMethods = [
@@ -215,7 +215,11 @@ export function MedusaService<
           const serviceData = Array.isArray(data) ? data : [data]
           const service = this.__container__[serviceRegistrationName]
           const models = await service.update(serviceData, sharedContext)
-          const response = Array.isArray(data) ? models : models[0]
+          const response = models.length
+            ? Array.isArray(data)
+              ? models
+              : models[0]
+            : []
 
           klassPrototype.aggregatedEvents.bind(this)({
             action: CommonEvents.UPDATED,
@@ -525,7 +529,7 @@ export function MedusaService<
     buildMethodNamesFromModel(name, config as TModels[keyof TModels]),
   ])
 
-  for (let [modelName, model, modelMethods] of modelsMethods) {
+  for (let [modelName, , modelMethods] of modelsMethods) {
     Object.entries(modelMethods).forEach(([method, methodName]) => {
       buildAndAssignMethodImpl(
         AbstractModuleService_.prototype,

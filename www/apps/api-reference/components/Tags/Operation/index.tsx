@@ -6,14 +6,21 @@ import type { OpenAPIV3 } from "openapi-types"
 import getSectionId from "@/utils/get-section-id"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
-import { useInView } from "react-intersection-observer"
-import { isElmWindow, useScrollController, useSidebar } from "docs-ui"
+import { InView } from "react-intersection-observer"
+import {
+  isElmWindow,
+  useIsBrowser,
+  useScrollController,
+  useSidebar,
+} from "docs-ui"
 import type { TagOperationCodeSectionProps } from "./CodeSection"
 import TagsOperationDescriptionSection from "./DescriptionSection"
 import DividedLayout from "@/layouts/Divided"
 import { useLoading } from "@/providers/loading"
-import SectionDivider from "../../Section/Divider"
+import { useRouter } from "next/navigation"
 import checkElementInViewport from "../../../utils/check-element-in-viewport"
+import DividedLoading from "../../DividedLoading"
+import SectionContainer from "../../Section/Container"
 
 const TagOperationCodeSection = dynamic<TagOperationCodeSectionProps>(
   async () => import("./CodeSection")
@@ -33,51 +40,31 @@ const TagOperation = ({
   endpointPath,
   className,
 }: TagOperationProps) => {
-  const { setActivePath } = useSidebar()
+  const { activePath, setActivePath } = useSidebar()
+  const router = useRouter()
   const [show, setShow] = useState(false)
   const path = useMemo(
     () => getSectionId([...(operation.tags || []), operation.operationId]),
     [operation]
   )
-  const nodeRef = useRef<Element | null>(null)
+  const nodeRef = useRef(null)
   const { loading, removeLoading } = useLoading()
   const { scrollableElement, scrollToTop } = useScrollController()
+  const { isBrowser } = useIsBrowser()
   const root = useMemo(() => {
-    return isElmWindow(scrollableElement) ? document.body : scrollableElement
-  }, [scrollableElement])
-  const { ref } = useInView({
-    threshold: 0.3,
-    rootMargin: `112px 0px 112px 0px`,
-    root,
-    onChange: (changedInView) => {
-      if (changedInView) {
-        if (!show) {
-          if (loading) {
-            removeLoading()
-          }
-          setShow(true)
-        }
-        // can't use next router as it doesn't support
-        // changing url without scrolling
-        history.replaceState({}, "", `#${path}`)
-        setActivePath(path)
-      }
-    },
-  })
+    if (!isBrowser) {
+      return
+    }
 
-  // Use `useCallback` so we don't recreate the function on each render
-  const setRefs = useCallback(
-    (node: Element | null) => {
-      // Ref's from useRef needs to have the node assigned to `current`
-      nodeRef.current = node
-      // Callback refs, like the one from `useInView`, is a function that takes the node as an argument
-      ref(node)
-    },
-    [ref]
-  )
+    return isElmWindow(scrollableElement) ? document.body : scrollableElement
+  }, [isBrowser, scrollableElement])
 
   const scrollIntoView = useCallback(() => {
-    if (nodeRef.current && !checkElementInViewport(nodeRef.current, 10)) {
+    if (!isBrowser) {
+      return
+    }
+
+    if (nodeRef.current && !checkElementInViewport(nodeRef.current, 0)) {
       const elm = nodeRef.current as HTMLElement
       scrollToTop(
         elm.offsetTop + (elm.offsetParent as HTMLElement)?.offsetTop,
@@ -85,14 +72,14 @@ const TagOperation = ({
       )
     }
     setShow(true)
-  }, [scrollToTop, nodeRef])
+  }, [nodeRef, isBrowser, scrollToTop])
 
   useEffect(() => {
     if (nodeRef && nodeRef.current) {
       removeLoading()
       const currentHash = location.hash.replace("#", "")
       if (currentHash === path) {
-        setTimeout(scrollIntoView, 100)
+        setTimeout(scrollIntoView, 200)
       } else if (currentHash.split("_")[0] === path.split("_")[0]) {
         setShow(true)
       }
@@ -100,36 +87,65 @@ const TagOperation = ({
   }, [nodeRef, path, scrollIntoView])
 
   return (
-    <div
-      className={clsx("relative min-h-screen w-full pb-7", className)}
+    <InView
       id={path}
-      ref={setRefs}
+      threshold={0.3}
+      rootMargin={`112px 0px 112px 0px`}
+      root={root}
+      onChange={(changedInView) => {
+        if (changedInView) {
+          if (!show) {
+            if (loading) {
+              removeLoading()
+            }
+            setShow(true)
+          }
+          if (location.hash !== path) {
+            router.push(`#${path}`, {
+              scroll: false,
+            })
+          }
+          if (activePath !== path) {
+            setActivePath(path)
+          }
+        } else if (
+          nodeRef.current &&
+          !checkElementInViewport(nodeRef.current, 0)
+        ) {
+          setShow(false)
+        }
+      }}
     >
-      <div
-        className={clsx(
-          "flex w-full justify-between gap-1 opacity-0",
-          !show && "invisible",
-          show && "animate-fadeIn"
-        )}
-        style={{
-          animationFillMode: "forwards",
-        }}
+      <SectionContainer
+        ref={nodeRef}
+        className={clsx("relative min-h-screen w-full pb-7", className)}
       >
-        <DividedLayout
-          mainContent={
-            <TagsOperationDescriptionSection operation={operation} />
-          }
-          codeContent={
-            <TagOperationCodeSection
-              method={method || ""}
-              operation={operation}
-              endpointPath={endpointPath}
+        {!show && <DividedLoading className="mt-7" />}
+        {show && (
+          <div
+            className={clsx(
+              "flex w-full justify-between gap-1 opacity-0 animate-fadeIn"
+            )}
+            style={{
+              animationFillMode: "forwards",
+            }}
+          >
+            <DividedLayout
+              mainContent={
+                <TagsOperationDescriptionSection operation={operation} />
+              }
+              codeContent={
+                <TagOperationCodeSection
+                  method={method || ""}
+                  operation={operation}
+                  endpointPath={endpointPath}
+                />
+              }
             />
-          }
-        />
-      </div>
-      <SectionDivider />
-    </div>
+          </div>
+        )}
+      </SectionContainer>
+    </InView>
   )
 }
 

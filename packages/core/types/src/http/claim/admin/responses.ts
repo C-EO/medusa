@@ -1,29 +1,54 @@
-import { OrderDTO, OrderPreviewDTO } from "../../../order"
+import { OrderDTO } from "../../../order"
 import { DeleteResponse, PaginatedResponse } from "../../common"
+import { AdminOrderPreview } from "../../order"
 import { AdminReturn } from "../../return"
 import { AdminClaim } from "./entities"
 
 export interface AdminClaimResponse {
+  /**
+   * The claim's details.
+   */
   claim: AdminClaim
 }
 
 export interface AdminClaimListResponse
   extends PaginatedResponse<{
+    /**
+     * The list of claims.
+     */
     claims: AdminClaim[]
   }> {}
 
 export interface AdminClaimOrderResponse {
+  /**
+   * The order's details.
+   */
   order: OrderDTO
+  /**
+   * The claim's details.
+   */
   claim: AdminClaim
 }
 
 export interface AdminClaimPreviewResponse {
-  order_preview: OrderPreviewDTO
+  /**
+   * Preview of the order when the claim is applied.
+   */
+  order_preview: AdminOrderPreview
+  /**
+   * The claim's details.
+   */
   claim: AdminClaim
 }
 
 export interface AdminClaimReturnPreviewResponse {
-  order_preview: OrderPreviewDTO
+  /**
+   * Preview of the order when the claim is applied.
+   */
+  order_preview: AdminOrderPreview
+  /**
+   * The return's details.
+   */
   return: AdminReturn
 }
 

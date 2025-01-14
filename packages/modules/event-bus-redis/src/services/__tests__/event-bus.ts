@@ -1,4 +1,4 @@
-import { Logger } from "@medusajs/types"
+import { Logger } from "@medusajs/framework/types"
 import { Queue, Worker } from "bullmq"
 import { Redis } from "ioredis"
 import RedisEventBusService from "../event-bus-redis"
@@ -16,9 +16,9 @@ jest.mock("bullmq")
 jest.mock("ioredis")
 
 const loggerMock = {
-  info: jest.fn().mockReturnValue(console.log),
-  warn: jest.fn().mockReturnValue(console.log),
-  error: jest.fn().mockReturnValue(console.log),
+  info: jest.fn().mockImplementation(console.log),
+  warn: jest.fn().mockImplementation(console.warn),
+  error: jest.fn().mockImplementation(console.error),
 } as unknown as Logger
 
 const redisMock = {
@@ -46,7 +46,6 @@ describe("RedisEventBusService", () => {
 
       eventBus = new RedisEventBusService(moduleDeps, simpleModuleOptions, {
         scope: "internal",
-        resources: "shared",
       })
     })
 
@@ -64,6 +63,7 @@ describe("RedisEventBusService", () => {
         {
           connection: expect.any(Object),
           prefix: "RedisEventBusService",
+          autorun: false
         }
       )
     })
@@ -71,7 +71,6 @@ describe("RedisEventBusService", () => {
     it("Throws on isolated module declaration", () => {
       try {
         eventBus = new RedisEventBusService(moduleDeps, simpleModuleOptions, {
-          resources: "isolated",
           scope: "internal",
         })
       } catch (error) {
@@ -89,7 +88,6 @@ describe("RedisEventBusService", () => {
 
         eventBus = new RedisEventBusService(moduleDeps, simpleModuleOptions, {
           scope: "internal",
-          resources: "shared",
         })
 
         queue = (eventBus as any).queue_
@@ -154,7 +152,6 @@ describe("RedisEventBusService", () => {
             },
           },
           {
-            resources: "shared",
             scope: "internal",
           }
         )
@@ -199,7 +196,6 @@ describe("RedisEventBusService", () => {
             },
           },
           {
-            resources: "shared",
             scope: "internal",
           }
         )
@@ -339,14 +335,11 @@ describe("RedisEventBusService", () => {
   })
 
   describe("worker_", () => {
-    let result!: any
-
     describe("Successfully processes the jobs", () => {
       beforeEach(async () => {
         jest.clearAllMocks()
 
         eventBus = new RedisEventBusService(moduleDeps, simpleModuleOptions, {
-          resources: "shared",
           scope: "internal",
         })
       })
@@ -384,7 +377,7 @@ describe("RedisEventBusService", () => {
         })
         eventBus.subscribe("eventName", () => {
           test.push("fail1")
-          return Promise.reject("fail1")
+          throw new Error("fail1")
         })
         eventBus.subscribe("eventName", () => {
           test.push("hi2")
@@ -395,7 +388,7 @@ describe("RedisEventBusService", () => {
           return Promise.reject("fail2")
         })
 
-        result = await eventBus.worker_({
+        await eventBus.worker_({
           name: "eventName",
           data: { data: { test: 1 } },
           opts: { attempts: 1 },
@@ -407,15 +400,21 @@ describe("RedisEventBusService", () => {
           "Processing eventName which has 4 subscribers"
         )
 
-        expect(loggerMock.warn).toHaveBeenCalledTimes(3)
-        expect(loggerMock.warn).toHaveBeenCalledWith(
-          "An error occurred while processing eventName: fail1"
+        expect(loggerMock.warn).toHaveBeenCalledTimes(5)
+        expect(loggerMock.warn).toHaveBeenNthCalledWith(
+          1,
+          "An error occurred while processing eventName:"
         )
-        expect(loggerMock.warn).toHaveBeenCalledWith(
-          "An error occurred while processing eventName: fail2"
-        )
+        expect(loggerMock.warn).toHaveBeenNthCalledWith(2, new Error("fail1"))
 
-        expect(loggerMock.warn).toHaveBeenCalledWith(
+        expect(loggerMock.warn).toHaveBeenNthCalledWith(
+          3,
+          "An error occurred while processing eventName:"
+        )
+        expect(loggerMock.warn).toHaveBeenNthCalledWith(4, "fail2")
+
+        expect(loggerMock.warn).toHaveBeenNthCalledWith(
+          5,
           "One or more subscribers of eventName failed. Retrying is not configured. Use 'attempts' option when emitting events."
         )
 
@@ -434,7 +433,7 @@ describe("RedisEventBusService", () => {
           }
         )
 
-        result = await eventBus
+        await eventBus
           .worker_({
             name: "eventName",
             data: {
@@ -447,10 +446,11 @@ describe("RedisEventBusService", () => {
           } as any)
           .catch((error) => void 0)
 
-        expect(loggerMock.warn).toHaveBeenCalledTimes(1)
+        expect(loggerMock.warn).toHaveBeenCalledTimes(2)
         expect(loggerMock.warn).toHaveBeenCalledWith(
-          "An error occurred while processing eventName: fail1"
+          "An error occurred while processing eventName:"
         )
+        expect(loggerMock.warn).toHaveBeenCalledWith("fail1")
 
         expect(loggerMock.info).toHaveBeenCalledTimes(2)
         expect(loggerMock.info).toHaveBeenCalledWith(
@@ -473,7 +473,7 @@ describe("RedisEventBusService", () => {
           }
         )
 
-        result = await eventBus
+        await eventBus
           .worker_({
             name: "eventName",
             data: {
@@ -486,10 +486,12 @@ describe("RedisEventBusService", () => {
           } as any)
           .catch((err) => void 0)
 
-        expect(loggerMock.warn).toHaveBeenCalledTimes(2)
+        expect(loggerMock.warn).toHaveBeenCalledTimes(3)
         expect(loggerMock.warn).toHaveBeenCalledWith(
-          "An error occurred while processing eventName: fail1"
+          "An error occurred while processing eventName:"
         )
+        expect(loggerMock.warn).toHaveBeenCalledWith("fail1")
+
         expect(loggerMock.warn).toHaveBeenCalledWith(
           "One or more subscribers of eventName failed. Retrying..."
         )

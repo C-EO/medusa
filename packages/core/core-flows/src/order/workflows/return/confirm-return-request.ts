@@ -5,14 +5,15 @@ import {
   OrderPreviewDTO,
   OrderReturnItemDTO,
   ReturnDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ChangeActionType,
   MedusaError,
   Modules,
   OrderChangeStatus,
+  OrderWorkflowEvents,
   ReturnStatus,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
   createStep,
@@ -20,8 +21,12 @@ import {
   parallelize,
   transform,
   when,
-} from "@medusajs/workflows-sdk"
-import { createRemoteLinkStep, useRemoteQueryStep } from "../../../common"
+} from "@medusajs/framework/workflows-sdk"
+import {
+  createRemoteLinkStep,
+  emitEventStep,
+  useRemoteQueryStep,
+} from "../../../common"
 import { createReturnFulfillmentWorkflow } from "../../../fulfillment/workflows/create-return-fulfillment"
 import { previewOrderChangeStep, updateReturnsStep } from "../../steps"
 import { confirmOrderChanges } from "../../steps/confirm-order-changes"
@@ -153,6 +158,18 @@ function extractReturnShippingOptionId({ orderPreview, orderReturn }) {
   return returnShippingMethod.shipping_option_id
 }
 
+function getUpdateReturnData({ orderReturn }: { orderReturn: { id: string } }) {
+  return transform({ orderReturn }, ({ orderReturn }) => {
+    return [
+      {
+        id: orderReturn.id,
+        status: ReturnStatus.REQUESTED,
+        requested_at: new Date(),
+      },
+    ]
+  })
+}
+
 export const confirmReturnRequestWorkflowId = "confirm-return-request"
 /**
  * This workflow confirms a return request.
@@ -191,6 +208,7 @@ export const confirmReturnRequestWorkflow = createWorkflow(
       entry_point: "order_change",
       fields: [
         "id",
+        "status",
         "actions.id",
         "actions.action",
         "actions.details",
@@ -271,18 +289,21 @@ export const confirmReturnRequestWorkflow = createWorkflow(
       createRemoteLinkStep(link)
     })
 
+    const updateReturnData = getUpdateReturnData({ orderReturn })
+
     parallelize(
-      updateReturnsStep([
-        {
-          id: orderReturn.id,
-          status: ReturnStatus.REQUESTED,
-          requested_at: new Date(),
-        },
-      ]),
+      updateReturnsStep(updateReturnData),
       confirmOrderChanges({
         changes: [orderChange],
         orderId: order.id,
         confirmed_by: input.confirmed_by,
+      }),
+      emitEventStep({
+        eventName: OrderWorkflowEvents.RETURN_REQUESTED,
+        data: {
+          order_id: order.id,
+          return_id: orderReturn.id,
+        },
       })
     )
 

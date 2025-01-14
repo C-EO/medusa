@@ -1,14 +1,14 @@
-import {
-  AuthenticatedMedusaRequest,
-  MedusaResponse,
-} from "../../../types/routing"
 import { createRegionsWorkflow } from "@medusajs/core-flows"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
+import {
+  AuthenticatedMedusaRequest,
+  MedusaResponse,
+} from "@medusajs/framework/http"
 import { refetchRegion } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminRegionFilters>,
@@ -20,9 +20,9 @@ export const GET = async (
     entryPoint: "region",
     variables: {
       filters: req.filterableFields,
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: regions, metadata } = await remoteQuery(queryObject)
@@ -48,7 +48,7 @@ export const POST = async (
   const region = await refetchRegion(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ region })

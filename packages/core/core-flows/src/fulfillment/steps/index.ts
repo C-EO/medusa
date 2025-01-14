@@ -15,4 +15,4 @@ export * from "./update-fulfillment"
 export * from "./update-shipping-profiles"
 export * from "./upsert-shipping-options"
 export * from "./validate-shipment"
-
+export * from "./calculate-shipping-options-prices"

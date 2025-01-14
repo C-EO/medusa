@@ -130,7 +130,9 @@ export const PromotionGeneralSection = ({
         </Text>
 
         <Text size="small" leading="compact" className="text-pretty">
-          {promotion.is_automatic ? "Promotion code" : "Automatic"}
+          {promotion.is_automatic
+            ? t("promotions.form.method.automatic.title")
+            : t("promotions.form.method.code.title")}
         </Text>
       </div>
 
@@ -139,7 +141,11 @@ export const PromotionGeneralSection = ({
           {t("fields.code")}
         </Text>
 
-        <Copy content={promotion.code!} asChild>
+        <Copy
+          content={promotion.code!}
+          className="text-ui-tag-neutral-text"
+          asChild
+        >
           <Badge
             size="2xsmall"
             rounded="full"

@@ -13,8 +13,12 @@ import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
-import { ActionMenu } from "../../../../components/common/action-menu"
+import {
+  ActionGroup,
+  ActionMenu,
+} from "../../../../components/common/action-menu"
 import { DataTable } from "../../../../components/table/data-table"
+import { useStore } from "../../../../hooks/api"
 import {
   useDeleteSalesChannel,
   useSalesChannels,
@@ -29,9 +33,12 @@ const PAGE_SIZE = 20
 export const SalesChannelListTable = () => {
   const { t } = useTranslation()
 
+  const { store } = useStore()
+
   const { raw, searchParams } = useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
   })
+
   const {
     sales_channels,
     count,
@@ -40,13 +47,22 @@ export const SalesChannelListTable = () => {
     error,
   } = useSalesChannels(searchParams, {
     placeholderData: keepPreviousData,
-  })
+  }) as Omit<ReturnType<typeof useSalesChannels>, "sales_channels"> & {
+    sales_channels: (HttpTypes.AdminSalesChannel & { is_default?: boolean })[]
+  }
 
   const columns = useColumns()
   const filters = useSalesChannelTableFilters()
 
+  const sales_channels_data =
+    sales_channels?.map((sales_channel) => {
+      sales_channel.is_default =
+        store?.default_sales_channel_id === sales_channel.id
+      return sales_channel
+    }) ?? []
+
   const { table } = useDataTable({
-    data: sales_channels ?? [],
+    data: sales_channels_data,
     columns,
     count,
     enablePagination: true,
@@ -84,7 +100,11 @@ export const SalesChannelListTable = () => {
         navigateTo={(row) => row.id}
         isLoading={isLoading}
         queryObject={raw}
-        orderBy={["name", "created_at", "updated_at"]}
+        orderBy={[
+          { key: "name", label: t("fields.name") },
+          { key: "created_at", label: t("fields.createdAt") },
+          { key: "updated_at", label: t("fields.updatedAt") },
+        ]}
       />
     </Container>
   )
@@ -93,7 +113,7 @@ export const SalesChannelListTable = () => {
 const SalesChannelActions = ({
   salesChannel,
 }: {
-  salesChannel: HttpTypes.AdminSalesChannel
+  salesChannel: HttpTypes.AdminSalesChannel & { is_default?: boolean }
 }) => {
   const { t } = useTranslation()
   const prompt = usePrompt()
@@ -125,30 +145,30 @@ const SalesChannelActions = ({
     })
   }
 
-  return (
-    <ActionMenu
-      groups={[
+  const disabledTooltip = salesChannel.is_default
+    ? t("salesChannels.tooltip.cannotDeleteDefault")
+    : undefined
+
+  const groups: ActionGroup[] = [
+    {
+      actions: [
         {
-          actions: [
-            {
-              icon: <PencilSquare />,
-              label: t("actions.edit"),
-              to: `/settings/sales-channels/${salesChannel.id}/edit`,
-            },
-          ],
+          icon: <PencilSquare />,
+          label: t("actions.edit"),
+          to: `/settings/sales-channels/${salesChannel.id}/edit`,
         },
         {
-          actions: [
-            {
-              icon: <Trash />,
-              label: t("actions.delete"),
-              onClick: handleDelete,
-            },
-          ],
+          icon: <Trash />,
+          label: t("actions.delete"),
+          onClick: handleDelete,
+          disabled: salesChannel.is_default,
+          disabledTooltip,
         },
-      ]}
-    />
-  )
+      ],
+    },
+  ]
+
+  return <ActionMenu groups={groups} />
 }
 
 const columnHelper = createColumnHelper<HttpTypes.AdminSalesChannel>()

@@ -2,7 +2,6 @@ import { VIRTUAL_MODULES } from "@medusajs/admin-shared"
 import path from "path"
 import { Config } from "tailwindcss"
 import type { InlineConfig } from "vite"
-
 import { BundlerOptions } from "../types"
 
 export async function getViteConfig(
@@ -28,8 +27,15 @@ export async function getViteConfig(
       outDir: path.resolve(process.cwd(), options.outDir),
     },
     optimizeDeps: {
-      include: ["@medusajs/dashboard", "react-dom/client"],
-      exclude: VIRTUAL_MODULES,
+      include: [
+        "react",
+        "react/jsx-runtime",
+        "react-dom/client",
+        "react-router-dom",
+        "@medusajs/ui",
+        "@medusajs/dashboard",
+      ],
+      exclude: [...VIRTUAL_MODULES],
     },
     define: {
       __BASE__: JSON.stringify(options.path),
@@ -43,7 +49,6 @@ export async function getViteConfig(
       hmr: {
         port: hmrPort,
       },
-      middlewareMode: true,
     },
     css: {
       postcss: {
@@ -64,7 +69,6 @@ export async function getViteConfig(
 
   if (options.vite) {
     const customConfig = options.vite(baseConfig)
-
     return mergeConfig(baseConfig, customConfig)
   }
 

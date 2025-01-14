@@ -1,8 +1,5 @@
-import { getFrontMatterUtil } from "remark-rehype-plugins"
+import { getFrontMatter, findPageTitle } from "docs-utils"
 import { ItemsToAdd, sidebarAttachHrefCommonOptions } from "../index.js"
-import { readFileSync } from "fs"
-import findMetadataTitle from "./find-metadata-title.js"
-import findPageHeading from "./find-page-heading.js"
 import { InteractiveSidebarItem } from "types"
 
 export async function getSidebarItemLink({
@@ -14,14 +11,10 @@ export async function getSidebarItemLink({
   basePath: string
   fileBasename: string
 }): Promise<ItemsToAdd | undefined> {
-  const frontmatter = await getFrontMatterUtil(filePath)
+  const frontmatter = await getFrontMatter(filePath)
   if (frontmatter.sidebar_autogenerate_exclude) {
     return
   }
-
-  const fileContent = frontmatter.sidebar_label
-    ? ""
-    : readFileSync(filePath, "utf-8")
 
   const newItem = sidebarAttachHrefCommonOptions([
     {
@@ -29,11 +22,7 @@ export async function getSidebarItemLink({
       path:
         frontmatter.slug ||
         filePath.replace(basePath, "").replace(`/${fileBasename}`, ""),
-      title:
-        frontmatter.sidebar_label ||
-        findMetadataTitle(fileContent) ||
-        findPageHeading(fileContent) ||
-        "",
+      title: frontmatter.sidebar_label || findPageTitle(filePath) || "",
     },
   ])[0] as InteractiveSidebarItem
 

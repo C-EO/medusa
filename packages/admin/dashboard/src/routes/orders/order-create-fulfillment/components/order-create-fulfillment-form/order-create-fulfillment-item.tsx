@@ -16,6 +16,7 @@ type OrderEditItemProps = {
   currencyCode: string
   locationId?: string
   onItemRemove: (itemId: string) => void
+  itemReservedQuantitiesMap: Map<string, number>
   form: UseFormReturn<zod.infer<typeof CreateFulfillmentSchema>>
 }
 
@@ -23,14 +24,18 @@ export function OrderCreateFulfillmentItem({
   item,
   form,
   locationId,
+  itemReservedQuantitiesMap,
 }: OrderEditItemProps) {
   const { t } = useTranslation()
 
   const { variant } = useProductVariant(
-    item.variant!.product_id!,
-    item.variant_id!,
+    item.product_id,
+    item.variant_id,
     {
       fields: "*inventory,*inventory.location_levels",
+    },
+    {
+      enabled: !!item.variant,
     }
   )
 
@@ -49,11 +54,14 @@ export function OrderCreateFulfillmentItem({
       return {}
     }
 
+    const reservedQuantityForItem = itemReservedQuantitiesMap.get(item.id) ?? 0
+
     return {
-      availableQuantity: locationInventory.available_quantity,
+      availableQuantity:
+        locationInventory.available_quantity + reservedQuantityForItem,
       inStockQuantity: locationInventory.stocked_quantity,
     }
-  }, [variant, locationId])
+  }, [variant, locationId, itemReservedQuantitiesMap])
 
   const minValue = 0
   const maxValue = Math.min(
@@ -71,10 +79,10 @@ export function OrderCreateFulfillmentItem({
               <Text className="txt-small" as="span" weight="plus">
                 {item.title}
               </Text>
-              {item.variant?.sku && <span>({item.variant.sku})</span>}
+              {item.variant_sku && <span>({item.variant_sku})</span>}
             </div>
             <Text as="div" className="text-ui-fg-subtle txt-small">
-              {item.variant?.title ?? ""}
+              {item.variant_title}
             </Text>
           </div>
         </div>

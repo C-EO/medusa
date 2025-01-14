@@ -66,7 +66,10 @@ const ComponentReference = ({
                         <PropTable props={componentSpec.props!} />
                       </Suspense>
                     </Container>
-                    <Feedback title={`props of ${component}`} />
+                    <Feedback
+                      title={`props of ${component}`}
+                      question="Was this helpful?"
+                    />
                   </>
                 )}
               </>

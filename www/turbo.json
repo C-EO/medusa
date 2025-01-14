@@ -8,9 +8,14 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**",
-        ".docusaurus/**",
         "build/**",
         "dist/**"
+      ]
+    },
+    "prep": {
+      "dependsOn": [
+        "^tags#build",
+        "^build-scripts#build"
       ]
     },
     "start:monorepo": {
@@ -23,6 +28,7 @@
     },
     "lint": { },
     "lint:content": { },
+    "watch": { },
     "dev:monorepo": {
       "dependsOn": [
         "^build-scripts#build",

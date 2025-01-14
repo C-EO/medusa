@@ -2,13 +2,13 @@ import { createTaxRatesWorkflow } from "@medusajs/core-flows"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchTaxRate } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminCreateTaxRate>,
@@ -26,7 +26,7 @@ export const POST = async (
   const taxRate = await refetchTaxRate(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ tax_rate: taxRate })
 }
@@ -41,9 +41,9 @@ export const GET = async (
       entryPoint: "tax_rate",
       variables: {
         filters: req.filterableFields,
-        ...req.remoteQueryConfig.pagination,
+        ...req.queryConfig.pagination,
       },
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
     })
   )
 

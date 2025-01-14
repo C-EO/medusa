@@ -1,8 +1,9 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   adminHeaders,
   createAdminUser,
 } from "../../../../helpers/create-admin-user"
+import { Modules } from "@medusajs/framework/utils"
 
 jest.setTimeout(60000)
 
@@ -10,9 +11,10 @@ medusaIntegrationTestRunner({
   testSuite: ({ dbConnection, getContainer, api }) => {
     let salesChannel1
     let salesChannel2
+    let container
 
     beforeEach(async () => {
-      const container = getContainer()
+      container = getContainer()
       await createAdminUser(dbConnection, adminHeaders, container)
 
       salesChannel1 = (
@@ -245,6 +247,34 @@ medusaIntegrationTestRunner({
     })
 
     describe("DELETE /admin/sales-channels/:id", () => {
+      it("should fail to delete the requested sales channel if it is used as a default sales channel", async () => {
+        const salesChannel = (
+          await api.post(
+            "/admin/sales-channels",
+            { name: "Test channel", description: "Test" },
+            adminHeaders
+          )
+        ).data.sales_channel
+
+        const storeModule = container.resolve(Modules.STORE)
+        await storeModule.createStores({
+          name: "New store",
+          supported_currencies: [
+            { currency_code: "usd", is_default: true },
+            { currency_code: "dkk" },
+          ],
+          default_sales_channel_id: salesChannel.id,
+        })
+
+        const errorResponse = await api
+          .delete(`/admin/sales-channels/${salesChannel.id}`, adminHeaders)
+          .catch((err) => err)
+
+        expect(errorResponse.response.data.message).toEqual(
+          `Cannot delete default sales channels: ${salesChannel.id}`
+        )
+      })
+
       it("should delete the requested sales channel", async () => {
         const toDelete = (
           await api.get(
@@ -268,17 +298,19 @@ medusaIntegrationTestRunner({
           object: "sales-channel",
         })
 
-        await api
+        const err = await api
           .get(
             `/admin/sales-channels/${salesChannel1.id}?fields=id,deleted_at`,
             adminHeaders
           )
           .catch((err) => {
-            expect(err.response.data.type).toEqual("not_found")
-            expect(err.response.data.message).toEqual(
-              `Sales channel with id: ${salesChannel1.id} not found`
-            )
+            return err
           })
+
+        expect(err.response.data.type).toEqual("not_found")
+        expect(err.response.data.message).toEqual(
+          `Sales channel with id: ${salesChannel1.id} not found`
+        )
       })
 
       it("should successfully delete channel associations", async () => {
@@ -327,6 +359,7 @@ medusaIntegrationTestRunner({
             "/admin/products",
             {
               title: "test name",
+              options: [{ title: "size", values: ["large"] }],
             },
             adminHeaders
           )

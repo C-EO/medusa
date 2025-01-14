@@ -3,11 +3,9 @@
  * operationId: GetPromotionsIdRule_type
  * summary: List Rules of a Promotion
  * x-sidebar-summary: List Rules
- * description: >
+ * description: |
  *   Retrieve a list of rules in a promotion. The type of rules retrieved depend on the value of the `rule_type` path parameter:
- * 
  *   - If `rule_type` is `rules`, the promotion's rules are retrivied. - If `rule_type` is `target-rules`, the target rules of the promotion's application method are retrieved.
- * 
  * 
  *   - If `rule_type` is `buy-rules`, the buy rules of the promotion's application method are retrieved.
  * x-authenticated: true
@@ -28,14 +26,6 @@
  *         - rules
  *         - target-rules
  *         - buy-rules
- *   - name: expand
- *     in: query
- *     description: Comma-separated relations that should be expanded in the returned data.
- *     required: false
- *     schema:
- *       type: string
- *       title: expand
- *       description: Comma-separated relations that should be expanded in the returned data.
  *   - name: fields
  *     in: query
  *     description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
@@ -46,6 +36,8 @@
  *       title: fields
  *       description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
  *         fields. without prefix it will replace the entire default fields.
+ *       externalDocs:
+ *         url: "#select-fields-and-relations"
  * security:
  *   - api_token: []
  *   - cookie_auth: []

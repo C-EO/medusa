@@ -32,20 +32,12 @@ export const useDeleteTaxRegionAction = ({
 
     await mutateAsync(undefined, {
       onSuccess: () => {
-        toast.success(t("general.success"), {
-          description: t("taxRegions.delete.successToast"),
-          dismissable: true,
-          dismissLabel: t("actions.close"),
-        })
+        toast.success(t("taxRegions.delete.successToast"))
 
         navigate(to, { replace: true })
       },
       onError: (e) => {
-        toast.error(t("general.error"), {
-          description: e.message,
-          dismissable: true,
-          dismissLabel: t("actions.close"),
-        })
+        toast.error(e.message)
       },
     })
   }

@@ -5,12 +5,12 @@ import {
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import { refetchApiKey } from "../helpers"
 import { AdminUpdateApiKeyType } from "../validators"
-import { MedusaError } from "@medusajs/utils"
-import { HttpTypes } from "@medusajs/types"
+import { MedusaError } from "@medusajs/framework/utils"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -19,7 +19,7 @@ export const GET = async (
   const apiKey = await refetchApiKey(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!apiKey) {
@@ -46,7 +46,7 @@ export const POST = async (
   const apiKey = await refetchApiKey(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ api_key: apiKey })

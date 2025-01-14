@@ -1,6 +1,6 @@
 # Medusa API Reference
 
-The Medusa API Reference website is built with Next.js 13. You can learn more about contributing [here](https://docs.medusajs.com/contribution-guidelines).
+The Medusa API Reference website is built with Next.js 13. You can learn more about contributing [here](https://docs.medusajs.com/resources/contribution-guidelines/docs).
 
 ## Note About OpenAPI Specs
 

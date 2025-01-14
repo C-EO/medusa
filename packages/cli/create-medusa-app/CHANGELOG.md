@@ -1,5 +1,106 @@
 # Change Log
 
+## 2.2.0
+
+### Patch Changes
+
+- [#10853](https://github.com/medusajs/medusa/pull/10853) [`632600ee11426448076fe2e3f5156998f24b6907`](https://github.com/medusajs/medusa/commit/632600ee11426448076fe2e3f5156998f24b6907) Thanks [@shahednasser](https://github.com/shahednasser)! - fix(create-medusa-app): add default storefront url to auth CORS
+
+- [#10755](https://github.com/medusajs/medusa/pull/10755) [`1e6d56bc18b55d0b8e526116b37123c2079fec09`](https://github.com/medusajs/medusa/commit/1e6d56bc18b55d0b8e526116b37123c2079fec09) Thanks [@shahednasser](https://github.com/shahednasser)! - feat(create-medusa-app): allow passing project name on command line
+
+- [#10812](https://github.com/medusajs/medusa/pull/10812) [`152a94e1e1f245e0dc5594174db41d37e68789d6`](https://github.com/medusajs/medusa/commit/152a94e1e1f245e0dc5594174db41d37e68789d6) Thanks [@shahednasser](https://github.com/shahednasser)! - feat(create-medusa-app): improve by adding depth to clone commands
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.2.0
+
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.1.3
+
+## 2.1.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.1.2
+
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.1.1
+
+## 2.1.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.1.0
+
+## 2.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.7
+
+## 2.0.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.6
+
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.5
+
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.4
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.3
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`de228d209f30dfbb5b500d5cb49932b63e06f52a`](https://github.com/medusajs/medusa/commit/de228d209f30dfbb5b500d5cb49932b63e06f52a)]:
+  - @medusajs/telemetry@2.0.2
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- [#7341](https://github.com/medusajs/medusa/pull/7341) [`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Medusa 2.0
+
+### Patch Changes
+
+- Updated dependencies [[`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e)]:
+  - @medusajs/telemetry@2.0.0
+
 ## 1.2.8
 
 ### Patch Changes

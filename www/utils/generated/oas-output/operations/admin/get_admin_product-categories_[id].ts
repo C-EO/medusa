@@ -11,40 +11,40 @@
  *     required: true
  *     schema:
  *       type: string
- *   - name: expand
- *     in: query
- *     description: Comma-separated relations that should be expanded in the returned data.
- *     required: false
- *     schema:
- *       type: string
- *       title: expand
- *       description: Comma-separated relations that should be expanded in the returned data.
  *   - name: fields
  *     in: query
- *     description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
- *       fields. without prefix it will replace the entire default fields.
+ *     description: "Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
+ *       fields. without prefix it will replace the entire default fields. NOTE: This route doesn't allow expanding custom relations."
  *     required: false
  *     schema:
  *       type: string
  *       title: fields
- *       description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
- *         fields. without prefix it will replace the entire default fields.
+ *       description: "Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
+ *         fields. without prefix it will replace the entire default fields. NOTE: This route doesn't allow expanding custom relations."
+ *       externalDocs:
+ *         url: "#select-fields-and-relations"
  *   - name: include_ancestors_tree
  *     in: query
- *     description: Whether to retrieve the category's parent. When enabled, the parent category is set in the `parent_category` property.
+ *     description: Whether to retrieve the category's parent. If you enable this, add to the `fields` query parameter `parent_category` to set the parent of a category in this field. You can either pass
+ *       `*parent_category` to retreieve the fields of all parent categories, or select specific fields to make the response size smaller. For example, `fields=parent_category.id,parent_category.name`.
  *     required: false
  *     schema:
  *       type: boolean
  *       title: include_ancestors_tree
- *       description: Whether to retrieve the category's parent. When enabled, the parent category is set in the `parent_category` property.
+ *       description: Whether to retrieve the category's parent. If you enable this, add to the `fields` query parameter `parent_category` to set the parent of a category in this field. You can either pass
+ *         `*parent_category` to retreieve the fields of all parent categories, or select specific fields to make the response size smaller. For example, `fields=parent_category.id,parent_category.name`.
  *   - name: include_descendants_tree
  *     in: query
- *     description: Whether to retrieve a list of child categories. When enabled, the parent categories are added to the `category_children` property.
+ *     description: Whether to retrieve a list of child categories. If you enable this, add to the `fields` query parameter `category_children` to set the children of a category in this field. You can either
+ *       pass `*category_children` to retreieve the fields of all child categories, or select specific fields to make the response size smaller. For example,
+ *       `fields=category_children.id,category_children.name`.
  *     required: false
  *     schema:
  *       type: boolean
  *       title: include_descendants_tree
- *       description: Whether to retrieve a list of child categories. When enabled, the parent categories are added to the `category_children` property.
+ *       description: Whether to retrieve a list of child categories. If you enable this, add to the `fields` query parameter `category_children` to set the children of a category in this field. You can either
+ *         pass `*category_children` to retreieve the fields of all child categories, or select specific fields to make the response size smaller. For example,
+ *         `fields=category_children.id,category_children.name`.
  * security:
  *   - api_token: []
  *   - cookie_auth: []

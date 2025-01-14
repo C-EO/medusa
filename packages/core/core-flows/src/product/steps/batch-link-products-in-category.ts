@@ -1,6 +1,9 @@
-import { IProductModuleService, ProductCategoryWorkflow } from "@medusajs/types"
-import { Modules } from "@medusajs/utils"
-import { StepResponse, createStep } from "@medusajs/workflows-sdk"
+import {
+  IProductModuleService,
+  ProductCategoryWorkflow,
+} from "@medusajs/framework/types"
+import { Modules } from "@medusajs/framework/utils"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 export const batchLinkProductsToCategoryStepId =
   "batch-link-products-to-category"
@@ -23,8 +26,8 @@ export const batchLinkProductsToCategoryStep = createStep(
     const dbProducts = await service.listProducts(
       { id: [...(data.add ?? []), ...(data.remove ?? [])] },
       {
-        take: null,
-        select: ["id", "categories"],
+        select: ["id"],
+        relations: ["categories"],
       }
     )
 
@@ -63,8 +66,8 @@ export const batchLinkProductsToCategoryStep = createStep(
     const dbProducts = await service.listProducts(
       { id: prevData.productIds },
       {
-        take: null,
-        select: ["id", "categories"],
+        select: ["id"],
+        relations: ["categories"],
       }
     )
 

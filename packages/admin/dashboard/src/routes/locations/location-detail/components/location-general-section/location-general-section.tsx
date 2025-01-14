@@ -47,7 +47,10 @@ import {
   isOptionEnabledInStore,
   isReturnOption,
 } from "../../../../../lib/shipping-options"
-import { FulfillmentSetType } from "../../../common/constants"
+import {
+  FulfillmentSetType,
+  ShippingOptionPriceType,
+} from "../../../common/constants"
 
 type LocationGeneralSectionProps = {
   location: HttpTypes.AdminStockLocation
@@ -167,6 +170,8 @@ function ShippingOption({
               {
                 label: t("stockLocations.shippingOptions.pricing.action"),
                 icon: <CurrencyDollar />,
+                disabled:
+                  option.price_type === ShippingOptionPriceType.Calculated,
                 to: `/settings/locations/${locationId}/fulfillment-set/${fulfillmentSetId}/service-zone/${option.service_zone_id}/shipping-option/${option.id}/pricing`,
               },
             ],

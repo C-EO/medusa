@@ -1,4 +1,3 @@
-import { HttpTypes } from "@medusajs/types"
 import { LoaderFunctionArgs } from "react-router-dom"
 
 import { collectionsQueryKeys } from "../../../hooks/api/collections"
@@ -14,9 +13,5 @@ export const collectionLoader = async ({ params }: LoaderFunctionArgs) => {
   const id = params.id
   const query = collectionDetailQuery(id!)
 
-  return (
-    queryClient.getQueryData<{ collection: HttpTypes.AdminCollection }>(
-      query.queryKey
-    ) ?? (await queryClient.fetchQuery(query))
-  )
+  return queryClient.ensureQueryData(query)
 }

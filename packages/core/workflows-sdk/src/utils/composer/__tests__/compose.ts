@@ -4,20 +4,22 @@ import {
   WorkflowManager,
   WorkflowScheduler,
 } from "@medusajs/orchestration"
+import { IEventBusModuleService } from "@medusajs/types"
 import {
-  Modules,
   composeMessage,
   createMedusaContainer,
+  Modules,
   promiseAll,
 } from "@medusajs/utils"
 import { asValue } from "awilix"
 import {
-  StepResponse,
-  WorkflowResponse,
   createStep,
   createWorkflow,
   parallelize,
+  StepFunction,
+  StepResponse,
   transform,
+  WorkflowResponse,
 } from ".."
 import { MedusaWorkflow } from "../../../medusa-workflow"
 import { createHook } from "../create-hook"
@@ -138,14 +140,14 @@ describe("Workflow composer", function () {
         return { inputs: [input], obj: "return from 1" }
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
@@ -223,14 +225,14 @@ describe("Workflow composer", function () {
         return { inputs: [input], obj: "return from 1" }
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
@@ -331,14 +333,14 @@ describe("Workflow composer", function () {
         return { inputs: [input], obj: "return from 1" }
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
@@ -441,14 +443,14 @@ describe("Workflow composer", function () {
         return { inputs: [input], obj: "return from 1" }
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
@@ -557,14 +559,14 @@ describe("Workflow composer", function () {
           return { inputs: [input], obj: "return from 1" }
         })
       const mockStep2Fn = jest.fn().mockImplementation(function (...inputs) {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation(function (...inputs) {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
@@ -651,21 +653,21 @@ describe("Workflow composer", function () {
         return { inputs: [input], obj: "return from 1" }
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 2",
         }
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 3",
         }
       })
       const mockStep4Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 4",
@@ -738,6 +740,153 @@ describe("Workflow composer", function () {
         ],
         obj: "return from 4",
       })
+    })
+
+    it("should compose a new workflow with parallelize steps and rollback them all in case of error", async () => {
+      const step1CompensationFn = jest.fn().mockImplementation(() => {
+        return "step1 compensation"
+      })
+      const step2CompensationFn = jest.fn().mockImplementation(() => {
+        return "step2 compensation"
+      })
+      const step3CompensationFn = jest.fn().mockImplementation(() => {
+        return "step3 compensation"
+      })
+      const step4CompensationFn = jest.fn().mockImplementation(() => {
+        return "step4 compensation"
+      })
+      const mockStep1Fn = jest.fn().mockImplementation(() => {
+        return "step1"
+      })
+      const mockStep2Fn = jest.fn().mockImplementation(() => {
+        return "step2"
+      })
+      const mockStep3Fn = jest.fn().mockImplementation(() => {
+        return "step3"
+      })
+      const mockStep4Fn = jest.fn().mockImplementation(() => {
+        throw new Error("An error occured in step 4.")
+      })
+
+      const step1 = createStep(
+        "step1",
+        mockStep1Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step1CompensationFn
+      )
+      const step2 = createStep(
+        "step2",
+        mockStep2Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step2CompensationFn
+      )
+      const step3 = createStep(
+        "step3",
+        mockStep3Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step3CompensationFn
+      )
+      const step4 = createStep(
+        "step4",
+        mockStep4Fn as unknown as StepFunction<never, never>,
+        step4CompensationFn
+      )
+
+      const workflow = createWorkflow("workflow1", function (input) {
+        const [step1Res] = parallelize(step1(), step2(), step3(), step4())
+        return new WorkflowResponse(step1Res)
+      })
+
+      await workflow.run({
+        throwOnError: false,
+      })
+
+      expect(mockStep1Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep2Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep3Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep4Fn).toHaveBeenCalledTimes(1)
+
+      expect(step1CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step1CompensationFn.mock.calls[0][0]).toBe("step1")
+      expect(step2CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step2CompensationFn.mock.calls[0][0]).toBe("step2")
+      expect(step3CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step3CompensationFn.mock.calls[0][0]).toBe("step3")
+      expect(step4CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step4CompensationFn.mock.calls[0][0]).not.toBeDefined()
+    })
+
+    it("should compose a new workflow with parallelize steps with config and rollback them all in case of error", async () => {
+      const step1CompensationFn = jest.fn().mockImplementation(() => {
+        return "step1 compensation"
+      })
+      const step2CompensationFn = jest.fn().mockImplementation(() => {
+        return "step2 compensation"
+      })
+      const step3CompensationFn = jest.fn().mockImplementation(() => {
+        return "step3 compensation"
+      })
+      const step4CompensationFn = jest.fn().mockImplementation(() => {
+        return "step4 compensation"
+      })
+      const mockStep1Fn = jest.fn().mockImplementation(() => {
+        return "step1"
+      })
+      const mockStep2Fn = jest.fn().mockImplementation(() => {
+        return "step2"
+      })
+      const mockStep3Fn = jest.fn().mockImplementation(() => {
+        return "step3"
+      })
+      const mockStep4Fn = jest.fn().mockImplementation(() => {
+        throw new Error("An error occured in step 4.")
+      })
+
+      const step1 = createStep(
+        "step1",
+        mockStep1Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step1CompensationFn
+      )
+      const step2 = createStep(
+        "step2",
+        mockStep2Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step2CompensationFn
+      )
+      const step3 = createStep(
+        "step3",
+        mockStep3Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step3CompensationFn
+      )
+      const step4 = createStep(
+        "step4",
+        mockStep4Fn as unknown as StepFunction<never, never>,
+        step4CompensationFn
+      )
+
+      const workflow = createWorkflow("workflow1", function (input) {
+        const [step1Res] = parallelize(
+          step1().config({ name: "newStep1Name" }),
+          step2(),
+          step3(),
+          step4()
+        )
+        return new WorkflowResponse(step1Res)
+      })
+
+      await workflow.run({
+        throwOnError: false,
+      })
+
+      expect(mockStep1Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep2Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep3Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep4Fn).toHaveBeenCalledTimes(1)
+
+      expect(step1CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step1CompensationFn.mock.calls[0][0]).toBe("step1")
+      expect(step2CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step2CompensationFn.mock.calls[0][0]).toBe("step2")
+      expect(step3CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step3CompensationFn.mock.calls[0][0]).toBe("step3")
+      expect(step4CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step4CompensationFn.mock.calls[0][0]).not.toBeDefined()
     })
 
     it("should transform the values before forward them to the next step", async () => {
@@ -1001,14 +1150,14 @@ describe("Workflow composer", function () {
         return new StepResponse({ inputs: [input], obj: "return from 1" })
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
@@ -1093,6 +1242,7 @@ describe("Workflow composer", function () {
         if (!input) {
           return StepResponse.skip()
         }
+        return new StepResponse({ obj: "return from 2" })
       })
       const mockStep3Fn = jest.fn().mockImplementation((inputs) => {
         return new StepResponse({
@@ -1140,7 +1290,7 @@ describe("Workflow composer", function () {
           obj: "return from 1",
         },
         two: {
-          __type: "Symbol(WorkflowWorkflowData)",
+          obj: "return from 2",
         },
         input: "none",
       })
@@ -1151,7 +1301,7 @@ describe("Workflow composer", function () {
             obj: "return from 1",
           },
           two: {
-            __type: "Symbol(WorkflowWorkflowData)",
+            obj: "return from 2",
           },
           input: "none",
         },
@@ -1164,14 +1314,14 @@ describe("Workflow composer", function () {
         return new StepResponse({ inputs: [input], obj: "return from 1" })
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
@@ -1272,14 +1422,14 @@ describe("Workflow composer", function () {
         return new StepResponse({ inputs: [input], obj: "return from 1" })
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
@@ -1382,14 +1532,14 @@ describe("Workflow composer", function () {
         return new StepResponse({ inputs: [input], obj: "return from 1" })
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
@@ -1498,14 +1648,14 @@ describe("Workflow composer", function () {
           return new StepResponse({ inputs: [input], obj: "return from 1" })
         })
       const mockStep2Fn = jest.fn().mockImplementation(function (...inputs) {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation(function (...inputs) {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
@@ -1592,21 +1742,21 @@ describe("Workflow composer", function () {
         return new StepResponse({ inputs: [input], obj: "return from 1" })
       })
       const mockStep2Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 2",
         })
       })
       const mockStep3Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return new StepResponse({
           inputs,
           obj: "return from 3",
         })
       })
       const mockStep4Fn = jest.fn().mockImplementation((...inputs) => {
-        const context = inputs.pop()
+        inputs.pop()
         return {
           inputs,
           obj: "return from 4",
@@ -1679,6 +1829,153 @@ describe("Workflow composer", function () {
         ],
         obj: "return from 4",
       })
+    })
+
+    it("should compose a new workflow with parallelize steps and rollback them all in case of error", async () => {
+      const step1CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step1 compensation")
+      })
+      const step2CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step2 compensation")
+      })
+      const step3CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step3 compensation")
+      })
+      const step4CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step4 compensation")
+      })
+      const mockStep1Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step1")
+      })
+      const mockStep2Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step2")
+      })
+      const mockStep3Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step3")
+      })
+      const mockStep4Fn = jest.fn().mockImplementation(() => {
+        throw new Error("An error occured in step 4.")
+      })
+
+      const step1 = createStep(
+        "step1",
+        mockStep1Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step1CompensationFn
+      )
+      const step2 = createStep(
+        "step2",
+        mockStep2Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step2CompensationFn
+      )
+      const step3 = createStep(
+        "step3",
+        mockStep3Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step3CompensationFn
+      )
+      const step4 = createStep(
+        "step4",
+        mockStep4Fn as unknown as StepFunction<never, never>,
+        step4CompensationFn
+      )
+
+      const workflow = createWorkflow("workflow1", function (input) {
+        const [step1Res] = parallelize(step1(), step2(), step3(), step4())
+        return new WorkflowResponse(step1Res)
+      })
+
+      await workflow.run({
+        throwOnError: false,
+      })
+
+      expect(mockStep1Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep2Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep3Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep4Fn).toHaveBeenCalledTimes(1)
+
+      expect(step1CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step1CompensationFn.mock.calls[0][0]).toBe("step1")
+      expect(step2CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step2CompensationFn.mock.calls[0][0]).toBe("step2")
+      expect(step3CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step3CompensationFn.mock.calls[0][0]).toBe("step3")
+      expect(step4CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step4CompensationFn.mock.calls[0][0]).not.toBeDefined()
+    })
+
+    it("should compose a new workflow with parallelize steps with config and rollback them all in case of error", async () => {
+      const step1CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step1 compensation")
+      })
+      const step2CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step2 compensation")
+      })
+      const step3CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step3 compensation")
+      })
+      const step4CompensationFn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step4 compensation")
+      })
+      const mockStep1Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step1")
+      })
+      const mockStep2Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step2")
+      })
+      const mockStep3Fn = jest.fn().mockImplementation(() => {
+        return new StepResponse("step3")
+      })
+      const mockStep4Fn = jest.fn().mockImplementation(() => {
+        throw new Error("An error occured in step 4.")
+      })
+
+      const step1 = createStep(
+        "step1",
+        mockStep1Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step1CompensationFn
+      )
+      const step2 = createStep(
+        "step2",
+        mockStep2Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step2CompensationFn
+      )
+      const step3 = createStep(
+        "step3",
+        mockStep3Fn as unknown as StepFunction<never, StepResponse<string>>,
+        step3CompensationFn
+      )
+      const step4 = createStep(
+        "step4",
+        mockStep4Fn as unknown as StepFunction<never, never>,
+        step4CompensationFn
+      )
+
+      const workflow = createWorkflow("workflow1", function (input) {
+        const [step1Res] = parallelize(
+          step1().config({ name: "newStep1Name" }),
+          step2(),
+          step3(),
+          step4()
+        )
+        return new WorkflowResponse(step1Res)
+      })
+
+      await workflow.run({
+        throwOnError: false,
+      })
+
+      expect(mockStep1Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep2Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep3Fn).toHaveBeenCalledTimes(1)
+      expect(mockStep4Fn).toHaveBeenCalledTimes(1)
+
+      expect(step1CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step1CompensationFn.mock.calls[0][0]).toBe("step1")
+      expect(step2CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step2CompensationFn.mock.calls[0][0]).toBe("step2")
+      expect(step3CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step3CompensationFn.mock.calls[0][0]).toBe("step3")
+      expect(step4CompensationFn).toHaveBeenCalledTimes(1)
+      expect(step4CompensationFn.mock.calls[0][0]).not.toBeDefined()
     })
 
     it("should transform the values before forward them to the next step", async () => {
@@ -2147,7 +2444,12 @@ describe("Workflow composer", function () {
     expect(mockStep1Fn).toHaveBeenCalledTimes(1)
     expect(mockStep1Fn.mock.calls[0]).toHaveLength(2)
 
-    const eventBusMock = container.resolve(Modules.EVENT_BUS)
+    const eventBusMock = container.resolve<
+      IEventBusModuleService & {
+        emit: jest.Mock<any, any, any>
+        releaseGroupedEvents: jest.Mock<any, any, any>
+      }
+    >(Modules.EVENT_BUS)
     expect(eventBusMock.emit).toHaveBeenCalledTimes(1)
     expect(eventBusMock.emit.mock.calls[0][0]).toEqual("event1")
 
@@ -2209,7 +2511,9 @@ describe("Workflow composer", function () {
       throwOnError: false,
     })
 
-    const eventBusMock = container.resolve(Modules.EVENT_BUS)
+    const eventBusMock = container.resolve<IEventBusModuleService>(
+      Modules.EVENT_BUS
+    )
 
     expect(eventBusMock.emit).toHaveBeenCalledTimes(1)
     expect(eventBusMock.releaseGroupedEvents).toHaveBeenCalledTimes(0)
@@ -2217,5 +2521,117 @@ describe("Workflow composer", function () {
     expect(eventBusMock.clearGroupedEvents).toHaveBeenCalledWith(
       "event-group-id"
     )
+  })
+
+  it("should fail step and return response to compensate partial data", async () => {
+    const maxRetries = 3
+
+    const mockStep1Fn = jest.fn().mockImplementation(async (input, context) => {
+      const ok: number[] = []
+      const errors: number[] = []
+      const toInsert = [1, 2, 3, 4, 5, 6, 7, 8]
+
+      await promiseAll(
+        toInsert.map(async (i) => {
+          // fail on odd numbers
+          if (i % 2 === 0) {
+            ok.push(i)
+            return i
+          }
+
+          errors.push(i)
+          throw new Error("failed")
+        })
+      ).catch((e) => {})
+
+      if (errors.length > 0) {
+        return StepResponse.permanentFailure(
+          "Error inserting " + errors.join(", "),
+          ok
+        )
+      }
+
+      return new StepResponse(ok)
+    })
+
+    const mockStep1CompensateFn = jest
+      .fn()
+      .mockImplementation((input, context) => {
+        return input
+      })
+
+    const step1 = createStep(
+      { name: "step1", maxRetries },
+      mockStep1Fn,
+      mockStep1CompensateFn
+    )
+
+    const step2 = createStep("step2", () => {
+      throw new Error("failed")
+    })
+
+    const workflow = createWorkflow("workflow1", function (input) {
+      step1(input)
+      step2()
+    })
+
+    const workflowInput = { test: "payload1" }
+    const { errors } = await workflow().run({
+      input: workflowInput,
+      throwOnError: false,
+    })
+
+    expect(mockStep1Fn).toHaveBeenCalledTimes(1)
+    expect(mockStep1Fn.mock.calls[0]).toHaveLength(2)
+    expect(mockStep1Fn.mock.calls[0][0]).toEqual(workflowInput)
+
+    expect(mockStep1CompensateFn.mock.calls[0][0]).toEqual([2, 4, 6, 8])
+
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toEqual({
+      action: "step1",
+      handlerType: "invoke",
+      error: expect.objectContaining({
+        message: "Error inserting 1, 3, 5, 7",
+      }),
+    })
+  })
+
+  it("should compose the workflow passing nested references to objects", async () => {
+    const mockStep1Fn = jest.fn().mockImplementation(() => {
+      return [1, 2, 3, 4, { obj: "return from 1" }]
+    })
+    const mockStep2Fn = jest.fn().mockImplementation((inp) => {
+      return {
+        a: {
+          b: {
+            c: [
+              0,
+              [
+                {
+                  inp,
+                },
+              ],
+            ],
+          },
+        },
+      }
+    })
+
+    const step1 = createStep("step1", mockStep1Fn) as any
+    const step2 = createStep("step2", mockStep2Fn) as any
+
+    const workflow = createWorkflow("workflow1", function () {
+      const returnStep1 = step1()
+      const ret2 = step2(returnStep1[4])
+      return new WorkflowResponse(ret2.a.b.c[1][0].inp.obj)
+    })
+
+    const workflowInput = { test: "payload1" }
+    const { result: workflowResult } = await workflow().run({
+      input: workflowInput,
+    })
+
+    expect(workflowResult).toEqual("return from 1")
   })
 })

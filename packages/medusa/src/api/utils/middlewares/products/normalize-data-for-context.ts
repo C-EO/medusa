@@ -1,19 +1,22 @@
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import { NextFunction } from "express"
-import { AuthenticatedMedusaRequest } from "../../../../types/routing"
-import { refetchEntities, refetchEntity } from "../../refetch-entity"
+import {
+  AuthenticatedMedusaRequest,
+  refetchEntities,
+  refetchEntity,
+} from "@medusajs/framework/http"
 
 export function normalizeDataForContext() {
   return async (req: AuthenticatedMedusaRequest, _, next: NextFunction) => {
     // If the product pricing is not requested, we don't need region information
-    let withCalculatedPrice = req.remoteQueryConfig.fields.some((field) =>
+    let withCalculatedPrice = req.queryConfig.fields.some((field) =>
       field.startsWith("variants.calculated_price")
     )
 
     // If the region is passed, we calculate the prices without requesting them.
     // TODO: This seems a bit messy, reconsider if we want to keep this logic.
     if (!withCalculatedPrice && req.filterableFields.region_id) {
-      req.remoteQueryConfig.fields.push("variants.calculated_price.*")
+      req.queryConfig.fields.push("variants.calculated_price.*")
       withCalculatedPrice = true
     }
 

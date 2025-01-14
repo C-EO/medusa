@@ -6,17 +6,17 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchTaxRate } from "../helpers"
 import {
   AdminGetTaxRateParamsType,
   AdminUpdateTaxRateType,
 } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<AdminUpdateTaxRateType>,
@@ -41,7 +41,7 @@ export const POST = async (
   const taxRate = await refetchTaxRate(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ tax_rate: taxRate })
 }
@@ -56,7 +56,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "tax_rate",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [taxRate] = await remoteQuery(queryObject)

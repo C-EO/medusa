@@ -15,6 +15,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import * as zod from "zod"
 import { Form } from "../../../../../components/common/form"
 import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useRefundPayment } from "../../../../../hooks/api"
 import { getCurrencySymbol } from "../../../../../lib/data/currencies"
 import { formatCurrency } from "../../../../../lib/format-currency"
@@ -43,8 +44,7 @@ export const CreateRefundForm = ({
   const paymentId = searchParams.get("paymentId")
   const payments = getPaymentsFromOrder(order)
   const payment = payments.find((p) => p.id === paymentId)!
-  const paymentAmount = (payment?.amount || 0) as number
-
+  const paymentAmount = payment.amount || 0
   const form = useForm<zod.infer<typeof CreateRefundSchema>>({
     defaultValues: {
       amount: paymentAmount,
@@ -95,8 +95,11 @@ export const CreateRefundForm = ({
 
   return (
     <RouteDrawer.Form form={form}>
-      <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
-        <RouteDrawer.Body>
+      <KeyboundForm
+        onSubmit={handleSubmit}
+        className="flex size-full flex-col overflow-hidden"
+      >
+        <RouteDrawer.Body className="flex-1 overflow-auto">
           <div className="flex flex-col gap-y-4">
             <Select
               value={payment?.id}
@@ -106,7 +109,7 @@ export const CreateRefundForm = ({
                 })
               }}
             >
-              <Label className="font-sans txt-compact-small font-medium mb-[-6px]">
+              <Label className="txt-compact-small mb-[-6px] font-sans font-medium">
                 {t("orders.payment.selectPaymentToRefund")}
               </Label>
 
@@ -117,19 +120,32 @@ export const CreateRefundForm = ({
               </Select.Trigger>
 
               <Select.Content>
-                {payments.map((payment) => (
-                  <Select.Item value={payment!.id} key={payment.id}>
-                    <span>
-                      {getLocaleAmount(
-                        payment.amount as number,
-                        payment.currency_code
-                      )}
-                      {" - "}
-                    </span>
-                    <span>{payment.provider_id}</span>
-                    <span> - ({payment.id.replace("pay_", "")})</span>
-                  </Select.Item>
-                ))}
+                {payments.map((payment) => {
+                  const totalRefunded = payment.refunds.reduce(
+                    (acc, next) => next.amount + acc,
+                    0
+                  )
+
+                  return (
+                    <Select.Item
+                      value={payment!.id}
+                      key={payment.id}
+                      disabled={
+                        !!payment.canceled_at || totalRefunded >= payment.amount
+                      }
+                    >
+                      <span>
+                        {getLocaleAmount(
+                          payment.amount as number,
+                          payment.currency_code
+                        )}
+                        {" - "}
+                      </span>
+                      <span>{payment.provider_id}</span>
+                      <span> - ({payment.id.replace("pay_", "")})</span>
+                    </Select.Item>
+                  )
+                })}
               </Select.Content>
             </Select>
 
@@ -150,16 +166,11 @@ export const CreateRefundForm = ({
                       <CurrencyInput
                         {...field}
                         min={0}
-                        onChange={(e) => {
-                          const val =
-                            e.target.value === ""
-                              ? null
-                              : Number(e.target.value)
+                        onValueChange={(value) => {
+                          const fieldValue = value ? parseInt(value) : ""
 
-                          onChange(val)
-
-                          if (val && !isNaN(val)) {
-                            if (val < 0 || val > paymentAmount) {
+                          if (fieldValue && !isNaN(fieldValue)) {
+                            if (fieldValue < 0 || fieldValue > paymentAmount) {
                               form.setError(`amount`, {
                                 type: "manual",
                                 message: t(
@@ -171,6 +182,8 @@ export const CreateRefundForm = ({
                               form.clearErrors(`amount`)
                             }
                           }
+
+                          onChange(fieldValue)
                         }}
                         code={order.currency_code}
                         symbol={getCurrencySymbol(order.currency_code)}
@@ -247,7 +260,7 @@ export const CreateRefundForm = ({
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

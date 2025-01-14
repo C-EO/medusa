@@ -3,8 +3,8 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   Modules,
-} from "@medusajs/utils"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/utils"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 export type GetVariantPricingLinkStepInput = {
   ids: string[]
@@ -21,7 +21,7 @@ export const getVariantPricingLinkStep = createStep(
       return new StepResponse([])
     }
 
-    const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK)
+    const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
 
     const linkService = remoteLink.getLinkModule(
       Modules.PRODUCT,

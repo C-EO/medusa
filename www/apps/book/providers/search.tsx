@@ -4,7 +4,7 @@ import {
   AiAssistantIcon,
   AiAssistantProvider,
   SearchProvider as UiSearchProvider,
-  searchFiltersV2,
+  searchFilters,
 } from "docs-ui"
 import { config } from "../config"
 
@@ -21,8 +21,8 @@ const SearchProvider = ({ children }: SearchProviderProps) => {
         mainIndexName:
           process.env.NEXT_PUBLIC_DOCS_ALGOLIA_INDEX_NAME || "temp",
         indices: [
-          process.env.NEXT_PUBLIC_API_ALGOLIA_INDEX_NAME || "temp",
           process.env.NEXT_PUBLIC_DOCS_ALGOLIA_INDEX_NAME || "temp",
+          process.env.NEXT_PUBLIC_API_ALGOLIA_INDEX_NAME || "temp",
         ],
       }}
       searchProps={{
@@ -48,9 +48,9 @@ const SearchProvider = ({ children }: SearchProviderProps) => {
           },
         ],
         checkInternalPattern: new RegExp(
-          `^${config.baseUrl}/v2/([^(resources)])*`
+          `^${config.baseUrl}/([^(resources)])*`
         ),
-        filterOptions: searchFiltersV2,
+        filterOptions: searchFilters,
       }}
       commands={[
         {

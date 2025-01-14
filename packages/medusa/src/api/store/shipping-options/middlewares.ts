@@ -1,7 +1,15 @@
-import { MiddlewareRoute } from "@medusajs/framework"
-import { validateAndTransformQuery } from "../../utils/validate-query"
+import {
+  MiddlewareRoute,
+  validateAndTransformBody,
+} from "@medusajs/framework/http"
+import { validateAndTransformQuery } from "@medusajs/framework"
 import { listTransformQueryConfig } from "./query-config"
-import { StoreGetShippingOptions } from "./validators"
+import {
+  StoreCalculateShippingOptionPrice,
+  StoreGetShippingOptions,
+  StoreGetShippingOptionsParams,
+} from "./validators"
+import * as QueryConfig from "./query-config"
 
 export const storeShippingOptionRoutesMiddlewares: MiddlewareRoute[] = [
   {
@@ -12,6 +20,17 @@ export const storeShippingOptionRoutesMiddlewares: MiddlewareRoute[] = [
         StoreGetShippingOptions,
         listTransformQueryConfig
       ),
+    ],
+  },
+  {
+    method: ["POST"],
+    matcher: "/store/shipping-options/:id/calculate",
+    middlewares: [
+      validateAndTransformQuery(
+        StoreGetShippingOptionsParams,
+        QueryConfig.retrieveTransformQueryConfig
+      ),
+      validateAndTransformBody(StoreCalculateShippingOptionPrice),
     ],
   },
 ]

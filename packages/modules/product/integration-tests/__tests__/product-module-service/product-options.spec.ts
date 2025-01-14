@@ -1,7 +1,11 @@
-import { IProductModuleService } from "@medusajs/types"
-import { Modules, ProductStatus } from "@medusajs/utils"
+import { IProductModuleService } from "@medusajs/framework/types"
+import {
+  Modules,
+  ProductStatus,
+  toMikroORMEntity,
+} from "@medusajs/framework/utils"
 import { Product, ProductOption } from "@models"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
 
 jest.setTimeout(30000)
 
@@ -16,25 +20,27 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
       beforeEach(async () => {
         const testManager = await MikroOrmWrapper.forkManager()
-        productOne = testManager.create(Product, {
+        productOne = testManager.create(toMikroORMEntity(Product), {
           id: "product-1",
           title: "product 1",
+          handle: "product-1",
           status: ProductStatus.PUBLISHED,
         })
 
-        productTwo = testManager.create(Product, {
+        productTwo = testManager.create(toMikroORMEntity(Product), {
           id: "product-2",
           title: "product 2",
+          handle: "product-2",
           status: ProductStatus.PUBLISHED,
         })
 
-        optionOne = testManager.create(ProductOption, {
+        optionOne = testManager.create(toMikroORMEntity(ProductOption), {
           id: "option-1",
           title: "option 1",
           product: productOne,
         })
 
-        optionTwo = testManager.create(ProductOption, {
+        optionTwo = testManager.create(toMikroORMEntity(ProductOption), {
           id: "option-2",
           title: "option 1",
           product: productTwo,
@@ -100,8 +106,6 @@ moduleIntegrationTestRunner<IProductModuleService>({
               product_id: productOne.id,
               product: {
                 id: productOne.id,
-                type_id: null,
-                collection_id: null,
               },
             },
           ])
@@ -177,8 +181,6 @@ moduleIntegrationTestRunner<IProductModuleService>({
               product_id: productOne.id,
               product: {
                 id: productOne.id,
-                type_id: null,
-                collection_id: null,
               },
             },
           ])
@@ -198,7 +200,7 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
         it("should return requested attributes when requested through config", async () => {
           const option = await service.retrieveProductOption(optionOne.id, {
-            select: ["id", "product.title"],
+            select: ["id", "product.handle", "product.title"],
             relations: ["product"],
           })
 
@@ -209,8 +211,6 @@ moduleIntegrationTestRunner<IProductModuleService>({
                 id: "product-1",
                 handle: "product-1",
                 title: "product 1",
-                type_id: null,
-                collection_id: null,
               },
               product_id: "product-1",
             })

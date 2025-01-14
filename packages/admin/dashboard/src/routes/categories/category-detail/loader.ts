@@ -1,4 +1,3 @@
-import { AdminProductCategoryResponse } from "@medusajs/types"
 import { LoaderFunctionArgs } from "react-router-dom"
 
 import { categoriesQueryKeys } from "../../../hooks/api/categories"
@@ -14,8 +13,5 @@ export const categoryLoader = async ({ params }: LoaderFunctionArgs) => {
   const id = params.id
   const query = categoryDetailQuery(id!)
 
-  return (
-    queryClient.getQueryData<AdminProductCategoryResponse>(query.queryKey) ??
-    (await queryClient.fetchQuery(query))
-  )
+  return queryClient.ensureQueryData(query)
 }

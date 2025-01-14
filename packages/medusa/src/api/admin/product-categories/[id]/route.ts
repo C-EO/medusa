@@ -2,17 +2,20 @@ import {
   deleteProductCategoriesWorkflow,
   updateProductCategoriesWorkflow,
 } from "@medusajs/core-flows"
-import { AdminProductCategoryResponse, HttpTypes } from "@medusajs/types"
+import {
+  AdminProductCategoryResponse,
+  HttpTypes,
+} from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
-import { refetchEntities } from "../../../utils/refetch-entity"
+  refetchEntities,
+} from "@medusajs/framework/http"
 import {
   AdminProductCategoryParamsType,
   AdminUpdateProductCategoryType,
 } from "../validators"
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminProductCategoryParamsType>,
@@ -22,7 +25,7 @@ export const GET = async (
     "product_category",
     { id: req.params.id, ...req.filterableFields },
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!category) {
@@ -49,7 +52,7 @@ export const POST = async (
     "product_category",
     { id, ...req.filterableFields },
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ product_category: category })

@@ -31,6 +31,7 @@ import {
   UpdateRefundReasonDTO,
   UpsertPaymentCollectionDTO,
 } from "./mutations"
+import { WebhookActionResult } from "./provider"
 
 /**
  * The main service interface for the Payment Module.
@@ -512,7 +513,7 @@ export interface IPaymentModuleService extends IModuleService {
   /**
    * This method authorizes a payment session using its associated payment provider. This creates a payment that can later be captured.
    *
-   * Learn more about the payment flow in [this guide](https://docs.medusajs.com/experimental/payment/payment-flow/)
+   * Learn more about the payment flow in [this guide](https://docs.medusajs.com/resources/commerce-modules/payment/payment-flow)
    *
    * @param {string} id - The payment session's ID.
    * @param {Record<string, unknown>} context - Context data to pass to the associated payment provider.
@@ -662,7 +663,7 @@ export interface IPaymentModuleService extends IModuleService {
   /**
    * This method captures a payment using its associated payment provider.
    *
-   * Learn more about the payment flow in [this guide](https://docs.medusajs.com/experimental/payment/payment-flow/)
+   * Learn more about the payment flow in [this guide](https://docs.medusajs.com/resources/commerce-modules/payment/payment-flow)
    *
    * @param {CreateCaptureDTO} data - The payment capture to be created.
    * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
@@ -1055,9 +1056,9 @@ export interface IPaymentModuleService extends IModuleService {
   /* ********** HOOKS ********** */
 
   /**
-   * This method handles a webhook event with the associated payment provider.
+   * This method retrieves webhook event data with the associated payment provider.
    *
-   * Learn more about handling webhook events in [this guide](https://docs.medusajs.com/experimental/payment/webhook-events/)
+   * Learn more about handling webhook events in [this guide](https://docs.medusajs.com/resources/commerce-modules/payment/webhook-events)
    *
    * @param {ProviderWebhookPayload} data - The webhook event's details.
    * @returns {Promise<void>} Resolves when the webhook event is handled successfully.
@@ -1066,7 +1067,7 @@ export interface IPaymentModuleService extends IModuleService {
    * In the following example, `req` is an instance of `MedusaRequest`:
    *
    * ```ts
-   * await paymentModuleService.processEvent({
+   * const dataAndAction = await paymentModuleService.getWebhookActionAndData({
    *   provider: "stripe",
    *   payload: {
    *     data: req.body,
@@ -1076,7 +1077,7 @@ export interface IPaymentModuleService extends IModuleService {
    * })
    * ```
    */
-  processEvent(data: ProviderWebhookPayload): Promise<void>
+  getWebhookActionAndData(data: ProviderWebhookPayload): Promise<WebhookActionResult>
 }
 
 /**

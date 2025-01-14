@@ -1,5 +1,5 @@
 import { clx } from "@medusajs/ui"
-import { Transition, motion } from "framer-motion"
+import { Transition, motion } from "motion/react"
 
 type LogoBoxProps = {
   className?: string

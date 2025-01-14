@@ -4,6 +4,7 @@ import {
 } from "../modules-sdk"
 
 import type { RedisOptions } from "ioredis"
+// @ts-ignore
 import type { InlineConfig } from "vite"
 
 /**
@@ -11,7 +12,7 @@ import type { InlineConfig } from "vite"
  *
  * Admin dashboard configurations.
  */
-export type AdminOptions = {
+export interface AdminOptions {
   /**
    * Whether to disable the admin dashboard. If set to `true`, the admin dashboard is disabled,
    * in both development and production environments. The default value is `false`.
@@ -47,24 +48,9 @@ export type AdminOptions = {
    * })
    * ```
    */
-  path?: `/${string}`
+  path: `/${string}`
   /**
-   * The directory where the admin build is outputted when you run the `build` command.
-   * The default value is `./build`.
-   *
-   * @example
-   * ```js title="medusa-config.js"
-   * module.exports = defineConfig({
-   *   admin: {
-   *     outDir: process.env.ADMIN_BUILD_DIR || `./build`,
-   *   },
-   *   // ...
-   * })
-   * ```
-   */
-  outDir?: string
-  /**
-   * The URL of your Medusa application. This is useful to set when you deploy the Medusa application.
+   * The URL of your Medusa application. Defaults to the browser origin. This is useful to set when running the admin on a separate domain.
    *
    * @example
    * ```js title="medusa-config.js"
@@ -265,15 +251,6 @@ export type ProjectConfigOptions = {
   databaseLogging?: boolean
 
   /**
-   * @ignore
-   * @deprecated
-   *
-   * @privateRemarks
-   * only postgres is supported, so this config has no effect
-   */
-  databaseType?: string
-
-  /**
    * This configuration is used to pass additional options to the database connection. You can pass any configuration. For example, pass the
    * `ssl` property that enables support for TLS/SSL connections.
    *
@@ -291,7 +268,7 @@ export type ProjectConfigOptions = {
    * module.exports = defineConfig({
    *   projectConfig: {
    *     databaseDriverOptions: process.env.NODE_ENV !== "development" ?
-   *       { ssl: { rejectUnauthorized: false } } : {}
+   *       { connection: { ssl: { rejectUnauthorized: false } } } : {}
    *     // ...
    *   },
    *   // ...
@@ -398,19 +375,6 @@ export type ProjectConfigOptions = {
    * ```
    */
   sessionOptions?: SessionOptions
-
-  /**
-   * This property configures the HTTP compression from the application layer. If you have access to the HTTP server, the recommended approach would be to enable it there.
-   * However, some platforms don't offer access to the HTTP layer and in those cases, this is a good alternative.
-   *
-   * If you enable HTTP compression and you want to disable it for specific API Routes, you can pass in the request header `"x-no-compression": true`.
-   *
-   * @ignore
-   *
-   * @deprecated use {@link http }'s `compression` property instead.
-   *
-   */
-  httpCompression?: HttpCompressionOptions
 
   /**
    * Configure the number of staged jobs that are polled from the database. Default is `1000`.
@@ -604,7 +568,7 @@ export type ProjectConfigOptions = {
      * However, some platforms don't offer access to the HTTP layer and in those cases, this is a good alternative.
      *
      * If you enable HTTP compression and you want to disable it for specific API Routes, you can pass in the request header `"x-no-compression": true`.
-     * Learn more in the [API Reference](https://docs.medusajs.com/v2/api/store#http-compression).
+     * Learn more in the [API Reference](https://docs.medusajs.com/api/store#http-compression).
      *
      * @example
      * ```js title="medusa-config.js"
@@ -760,6 +724,27 @@ export type ProjectConfigOptions = {
      * ```
      */
     authMethodsPerActor?: Record<string, string[]>
+
+    /**
+     * Specifies the fields that can't be selected in the response unless specified in the allowed query config.
+     * This is useful to restrict sensitive fields from being exposed in the API.
+     *
+     * @example
+     *
+     * ```js title="medusa-config.js"
+     * module.exports = defineConfig({
+     *   projectConfig: {
+     *     http: {
+     *       restrictedFields: {
+     *         store: ["order", "orders"],
+     *       }
+     *     }
+     * ```
+     */
+    restrictedFields?: {
+      store?: string[]
+      /*admin?: string[]*/
+    }
   }
 }
 
@@ -827,7 +812,7 @@ export type ConfigModule = {
    * })
    * ```
    */
-  admin?: AdminOptions
+  admin: AdminOptions
 
   /**
    * On your Medusa backend, you can use [Plugins](https://docs.medusajs.com/development/plugins/overview) to add custom features or integrate third-party services.
@@ -937,10 +922,55 @@ export type ConfigModule = {
   featureFlags: Record<string, boolean | string | Record<string, boolean>>
 }
 
+type InternalModuleDeclarationOverride = InternalModuleDeclaration & {
+  /**
+   * Optional key to be used to identify the module, if not provided, it will be inferred from the module joiner config service name.
+   */
+  key?: string
+  /**
+   * By default, modules are enabled, if provided as true, this will disable the module entirely.
+   */
+  disable?: boolean
+}
+
+type ExternalModuleDeclarationOverride = ExternalModuleDeclaration & {
+  /**
+   * key to be used to identify the module, if not provided, it will be inferred from the module joiner config service name.
+   */
+  key: string
+  /**
+   * By default, modules are enabled, if provided as true, this will disable the module entirely.
+   */
+  disable?: boolean
+}
+
+/**
+ * Modules accepted by the defineConfig function
+ */
+export type InputConfigModules = Partial<
+  InternalModuleDeclarationOverride | ExternalModuleDeclarationOverride
+>[]
+
+/**
+ * The configuration accepted by the "defineConfig" helper
+ */
+export type InputConfig = Partial<
+  Omit<ConfigModule, "admin" | "modules"> & {
+    admin: Partial<ConfigModule["admin"]>
+    modules:
+      | InputConfigModules
+      /**
+       * @deprecated use the array instead
+       */
+      | ConfigModule["modules"]
+  }
+>
+
 export type PluginDetails = {
   resolve: string
   name: string
   id: string
   options: Record<string, unknown>
   version: string
+  modules?: InputConfigModules
 }

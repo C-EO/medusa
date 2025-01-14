@@ -20,6 +20,7 @@ import {
   CreateTaxRateRuleDTO,
   CreateTaxRegionDTO,
   UpdateTaxRateDTO,
+  UpdateTaxRegionDTO,
   UpsertTaxRateDTO,
 } from "./mutations"
 
@@ -408,6 +409,47 @@ export interface ITaxModuleService extends IModuleService {
   ): Promise<TaxRegionDTO[]>
 
   /**
+   * This method updates a tax region.
+   *
+   * @param {UpdateTaxRegionDTO} data - The tax region to be updated.
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<TaxRegionDTO>} The updated tax region.
+   *
+   * @example
+   * const taxRegion = await taxModule.updateTaxRegions({
+   *   province_code: "be",
+   * })
+   */
+  updateTaxRegions(
+    data: UpdateTaxRegionDTO,
+    sharedContext?: Context
+  ): Promise<TaxRegionDTO>
+
+  /**
+   * This method updates tax regions.
+   *
+   * @param {UpdateTaxRegionDTO[]} data - The tax regions to be updated.
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<TaxRegionDTO[]>} The updated tax regions.
+   *
+   * @example
+   * const taxRegions = await taxModule.updateTaxRegions([
+   *   {
+   *     id: "tx-1",
+   *     province_code: "be",
+   *   },
+   *   {
+   *     id: "tx-2",
+   *     province_code: "ca",
+   *   },
+   * ])
+   */
+  updateTaxRegions(
+    data: UpdateTaxRegionDTO[],
+    sharedContext?: Context
+  ): Promise<TaxRegionDTO[]>
+
+  /**
    * This method deletes tax regions by their IDs.
    *
    * @param {string[]} taxRegionIds - The IDs of the tax regions.
@@ -625,7 +667,7 @@ export interface ITaxModuleService extends IModuleService {
   /**
    * This method retrieves tax lines for taxable items and shipping methods in a cart.
    *
-   * Learn more in [this guide](https://docs.medusajs.com/experimental/tax/tax-calculation-with-provider/).
+   * Learn more in [this guide](https://docs.medusajs.com/resources/commerce-modules/tax/tax-calculation-with-provider).
    *
    * @param {(TaxableItemDTO | TaxableShippingDTO)[]} items - The items and shipping methods to retrieve their tax lines.
    * @param {TaxCalculationContext} calculationContext - The context to pass to the underlying tax provider. It provides more

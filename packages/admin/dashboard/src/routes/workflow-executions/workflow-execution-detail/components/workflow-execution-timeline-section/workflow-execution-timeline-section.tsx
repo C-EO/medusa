@@ -5,11 +5,12 @@ import {
   useAnimationControls,
   useDragControls,
   useMotionValue,
-} from "framer-motion"
+} from "motion/react"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 
+import { HttpTypes } from "@medusajs/types"
 import {
   STEP_ERROR_STATES,
   STEP_INACTIVE_STATES,
@@ -17,7 +18,6 @@ import {
   STEP_OK_STATES,
   STEP_SKIPPED_STATES,
 } from "../../../constants"
-import { HttpTypes } from "@medusajs/types"
 
 type WorkflowExecutionTimelineSectionProps = {
   execution: HttpTypes.AdminWorkflowExecutionResponse["workflow_execution"]

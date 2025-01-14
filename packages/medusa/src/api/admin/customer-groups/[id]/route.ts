@@ -5,12 +5,12 @@ import {
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import { refetchCustomerGroup } from "../helpers"
 import { AdminUpdateCustomerGroupType } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -19,7 +19,7 @@ export const GET = async (
   const customerGroup = await refetchCustomerGroup(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!customerGroup) {
@@ -58,7 +58,7 @@ export const POST = async (
   const customerGroup = await refetchCustomerGroup(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ customer_group: customerGroup })
 }

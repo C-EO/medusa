@@ -1,37 +1,35 @@
-import { isPresent, ProductStatus } from "@medusajs/utils"
-import { MiddlewareRoute } from "@medusajs/framework"
-import { maybeApplyLinkFilter } from "../../utils/maybe-apply-link-filter"
+import { validateAndTransformQuery } from "@medusajs/framework"
 import {
   applyDefaultFilters,
+  applyParamsAsFilters,
+  authenticate,
   clearFiltersByKey,
+  maybeApplyLinkFilter,
+  MiddlewareRoute,
+} from "@medusajs/framework/http"
+import { isPresent, ProductStatus } from "@medusajs/framework/utils"
+import {
   filterByValidSalesChannels,
   normalizeDataForContext,
   setPricingContext,
   setTaxContext,
 } from "../../utils/middlewares"
-import { setContext } from "../../utils/middlewares/common/set-context"
-import { validateAndTransformQuery } from "../../utils/validate-query"
-import { maybeApplyStockLocationId } from "./helpers"
 import * as QueryConfig from "./query-config"
-import {
-  StoreGetProductsParams,
-  StoreGetProductsParamsType,
-} from "./validators"
-import { applyParamsAsFilters } from "../../utils/middlewares/common/apply-params-as-filters"
+import { StoreGetProductsParams } from "./validators"
 
 export const storeProductRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["GET"],
     matcher: "/store/products",
     middlewares: [
+      authenticate("customer", ["session", "bearer"], {
+        allowUnauthenticated: true,
+      }),
       validateAndTransformQuery(
         StoreGetProductsParams,
         QueryConfig.listProductQueryConfig
       ),
       filterByValidSalesChannels(),
-      setContext({
-        stock_location_id: maybeApplyStockLocationId,
-      }),
       maybeApplyLinkFilter({
         entryPoint: "product_sales_channel",
         resourceId: "product_id",
@@ -39,7 +37,8 @@ export const storeProductRoutesMiddlewares: MiddlewareRoute[] = [
       }),
       applyDefaultFilters({
         status: ProductStatus.PUBLISHED,
-        categories: (filters: StoreGetProductsParamsType, fields: string[]) => {
+        // TODO: the type here seems off and the implementation does not take into account $and and $or possible filters. Might be worth re working (original type used here was StoreGetProductsParamsType)
+        categories: (filters: any, fields: string[]) => {
           const categoryIds = filters.category_id
           delete filters.category_id
 
@@ -60,15 +59,15 @@ export const storeProductRoutesMiddlewares: MiddlewareRoute[] = [
     method: ["GET"],
     matcher: "/store/products/:id",
     middlewares: [
+      authenticate("customer", ["session", "bearer"], {
+        allowUnauthenticated: true,
+      }),
       validateAndTransformQuery(
         StoreGetProductsParams,
         QueryConfig.retrieveProductQueryConfig
       ),
       applyParamsAsFilters({ id: "id" }),
       filterByValidSalesChannels(),
-      setContext({
-        stock_location_id: maybeApplyStockLocationId,
-      }),
       maybeApplyLinkFilter({
         entryPoint: "product_sales_channel",
         resourceId: "product_id",

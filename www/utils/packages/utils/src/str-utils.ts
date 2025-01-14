@@ -21,3 +21,7 @@ export function stripLineBreaks(str: string) {
         .trim()
     : ""
 }
+
+export function getUniqueStrArray(str: string[]): string[] {
+  return Array.from(new Set(str))
+}

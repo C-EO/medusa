@@ -16,6 +16,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useAddCustomersToGroup } from "../../../../../hooks/api/customer-groups"
 import { useCustomers } from "../../../../../hooks/api/customers"
 import { useCustomerTableColumns } from "../../../../../hooks/table/columns/use-customer-table-columns"
@@ -125,7 +126,7 @@ export const AddCustomersForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         className="flex h-full flex-col overflow-hidden"
         onSubmit={handleSubmit}
       >
@@ -159,12 +160,12 @@ export const AddCustomersForm = ({
             count={count}
             filters={filters}
             orderBy={[
-              "email",
-              "first_name",
-              "last_name",
-              "has_account",
-              "created_at",
-              "updated_at",
+              { key: "email", label: t("fields.email") },
+              { key: "first_name", label: t("fields.firstName") },
+              { key: "last_name", label: t("fields.lastName") },
+              { key: "has_account", label: t("customers.hasAccount") },
+              { key: "created_at", label: t("fields.createdAt") },
+              { key: "updated_at", label: t("fields.updatedAt") },
             ]}
             isLoading={isLoading}
             layout="fill"
@@ -175,7 +176,7 @@ export const AddCustomersForm = ({
             }}
           />
         </RouteFocusModal.Body>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

@@ -1,7 +1,7 @@
-import * as Handlebars from "handlebars"
-import { MarkdownTheme } from "../../theme"
+import Handlebars from "handlebars"
+import { MarkdownTheme } from "../../theme.js"
 import { Reflection } from "typedoc"
-import { replaceTemplateVariables } from "../../utils/reflection-template-strings"
+import { replaceTemplateVariables } from "../../utils/reflection-template-strings.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

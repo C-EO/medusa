@@ -2,20 +2,28 @@ import {
   IProductModuleService,
   ProductCategoryDTO,
   ProductTagDTO,
-} from "@medusajs/types"
-import { Modules, ProductStatus, kebabCase } from "@medusajs/utils"
+} from "@medusajs/framework/types"
 import {
+  CommonEvents,
+  composeMessage,
+  kebabCase,
+  Modules,
+  ProductEvents,
+  ProductStatus,
+} from "@medusajs/framework/utils"
+import {
+  ProductImage,
   Product,
   ProductCategory,
   ProductCollection,
   ProductType,
 } from "@models"
 
-import { UpdateProductInput } from "@types"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
+import { UpdateProductInput } from "@types"
 import {
   buildProductAndRelationsData,
   createCollections,
@@ -117,24 +125,28 @@ moduleIntegrationTestRunner<IProductModuleService>({
           productCategoryTwo = categories[1]
 
           productOne = service.createProducts({
-            id: "product-1",
             title: "product 1",
             status: ProductStatus.PUBLISHED,
+            options: [
+              {
+                title: "opt-title",
+                values: ["val-1", "val-2"],
+              },
+            ],
             variants: [
               {
-                id: "variant-1",
                 title: "variant 1",
+                options: { "opt-title": "val-1" },
               },
             ],
           })
 
           productTwo = service.createProducts({
-            id: "product-2",
             title: "product 2",
             status: ProductStatus.PUBLISHED,
-            categories: [{ id: productCategoryOne.id }],
             collection_id: productCollectionOne.id,
-            tags: [{ id: tags[0].id }],
+            category_ids: [productCategoryOne.id],
+            tag_ids: [tags[0].id],
             options: [
               {
                 title: "size",
@@ -147,11 +159,13 @@ moduleIntegrationTestRunner<IProductModuleService>({
             ],
             variants: [
               {
-                id: "variant-2",
                 title: "variant 2",
+                options: {
+                  size: "large",
+                  color: "blue",
+                },
               },
               {
-                id: "variant-3",
                 title: "variant 3",
                 options: {
                   size: "small",
@@ -170,6 +184,12 @@ moduleIntegrationTestRunner<IProductModuleService>({
           const data = buildProductAndRelationsData({
             images,
             thumbnail: images[0].url,
+            options: [
+              {
+                title: "opt-title",
+                values: ["val-1", "val-2"],
+              },
+            ],
           })
 
           const variantTitle = data.variants[0].title
@@ -188,7 +208,10 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
           productBefore.title = "updated title"
           productBefore.variants = [
-            ...productBefore.variants!,
+            {
+              ...productBefore.variants[0]!,
+              options: { "opt-title": "val-2" },
+            },
             ...data.variants,
           ]
           productBefore.options = data.options
@@ -270,6 +293,169 @@ moduleIntegrationTestRunner<IProductModuleService>({
                 }),
               ]),
             })
+          )
+        })
+
+        it("should upsert variants (update one and create one)", async () => {
+          let [product] = await service.createProducts([
+            {
+              title: "New product",
+              description: "New description",
+              options: [
+                { title: "size", values: ["x", "l"] },
+                { title: "color", values: ["red", "green"] },
+              ],
+              variants: [
+                {
+                  title: "new variant 1",
+                  options: { size: "l", color: "red" },
+                },
+                {
+                  title: "new variant 2",
+                  options: { size: "l", color: "green" },
+                },
+              ],
+            },
+          ])
+
+          product = await service.retrieveProduct(product.id, {
+            relations: [
+              "options",
+              "options.values",
+              "variants",
+              "variants.options",
+            ],
+          })
+
+          expect(product).toEqual(
+            expect.objectContaining({
+              title: "New product",
+              description: "New description",
+              options: expect.arrayContaining([
+                expect.objectContaining({
+                  title: "size",
+                  values: expect.arrayContaining([
+                    expect.objectContaining({
+                      value: "x",
+                    }),
+                    expect.objectContaining({
+                      value: "l",
+                    }),
+                  ]),
+                }),
+                expect.objectContaining({
+                  title: "color",
+                  values: expect.arrayContaining([
+                    expect.objectContaining({
+                      value: "red",
+                    }),
+                    expect.objectContaining({
+                      value: "green",
+                    }),
+                  ]),
+                }),
+              ]),
+              variants: expect.arrayContaining([
+                expect.objectContaining({
+                  title: "new variant 1",
+                  options: expect.arrayContaining([
+                    expect.objectContaining({
+                      value: "l",
+                    }),
+                    expect.objectContaining({
+                      value: "red",
+                    }),
+                  ]),
+                }),
+                expect.objectContaining({
+                  title: "new variant 2",
+                  options: expect.arrayContaining([
+                    expect.objectContaining({
+                      value: "l",
+                    }),
+                    expect.objectContaining({
+                      value: "green",
+                    }),
+                  ]),
+                }),
+              ]),
+            })
+          )
+
+          const existingVariant1 = product.variants.find(
+            (v) => v.title === "new variant 1"
+          )!
+
+          const existingVariant2 = product.variants.find(
+            (v) => v.title === "new variant 2"
+          )!
+
+          await service.upsertProductVariants([
+            {
+              id: existingVariant1.id,
+              product_id: product.id,
+              title: "updated variant 1",
+              options: { size: "x", color: "red" }, // update options
+            },
+            {
+              id: existingVariant2.id,
+              title: "new variant 2",
+              options: { size: "l", color: "green" }, // just preserve old one
+            },
+            {
+              product_id: product.id,
+              title: "created variant 3",
+              options: { size: "x", color: "green" }, // create a new variant
+            },
+          ])
+
+          product = await service.retrieveProduct(product.id, {
+            relations: [
+              "options",
+              "options.values",
+              "variants",
+              "variants.options",
+            ],
+          })
+
+          expect(product.variants).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: existingVariant1.id,
+                title: "updated variant 1",
+                options: expect.arrayContaining([
+                  expect.objectContaining({
+                    value: "x",
+                  }),
+                  expect.objectContaining({
+                    value: "red",
+                  }),
+                ]),
+              }),
+              expect.objectContaining({
+                id: existingVariant2.id,
+                title: "new variant 2",
+                options: expect.arrayContaining([
+                  expect.objectContaining({
+                    value: "l",
+                  }),
+                  expect.objectContaining({
+                    value: "green",
+                  }),
+                ]),
+              }),
+              expect.objectContaining({
+                title: "created variant 3",
+                options: expect.arrayContaining([
+                  expect.objectContaining({
+                    value: "x",
+                  }),
+                  expect.objectContaining({
+                    value: "green",
+                  }),
+                ]),
+              }),
+            ])
           )
         })
 
@@ -376,10 +562,12 @@ moduleIntegrationTestRunner<IProductModuleService>({
           expect(eventBusSpy).toHaveBeenCalledTimes(1)
           expect(eventBusSpy).toHaveBeenCalledWith(
             [
-              {
-                name: "product.updated",
+              composeMessage(ProductEvents.PRODUCT_UPDATED, {
                 data: { id: productOne.id },
-              },
+                object: "product",
+                source: Modules.PRODUCT,
+                action: CommonEvents.UPDATED,
+              }),
             ],
             {
               internal: true,
@@ -532,6 +720,34 @@ moduleIntegrationTestRunner<IProductModuleService>({
           expect(error).toEqual(`Product with id: does-not-exist was not found`)
         })
 
+        it("should throw because variant doesn't have all options set", async () => {
+          let error
+
+          try {
+            await service.createProducts([
+              {
+                title: "Product with variants and options",
+                options: [
+                  { title: "opt1", values: ["1", "2"] },
+                  { title: "opt2", values: ["3", "4"] },
+                ],
+                variants: [
+                  {
+                    title: "missing option",
+                    options: { opt1: "1" },
+                  },
+                ],
+              },
+            ])
+          } catch (e) {
+            error = e
+          }
+
+          expect(error.message).toEqual(
+            `Product "Product with variants and options" has variants with missing options: [missing option]`
+          )
+        })
+
         it("should update, create and delete variants", async () => {
           const updateData = {
             id: productTwo.id,
@@ -572,10 +788,14 @@ moduleIntegrationTestRunner<IProductModuleService>({
         })
 
         it("should do a partial update on the options of a variant successfully", async () => {
+          const variantToUpdate = productTwo.variants.find(
+            (variant) => variant.title === "variant 3"
+          )!
+
           await service.updateProducts(productTwo.id, {
             variants: [
               {
-                id: "variant-3",
+                id: variantToUpdate.id,
                 options: { size: "small", color: "blue" },
               },
             ],
@@ -597,7 +817,7 @@ moduleIntegrationTestRunner<IProductModuleService>({
           )
         })
 
-        it("should createa variant with id that was passed if it does not exist", async () => {
+        it("should create a variant with id that was passed if it does not exist", async () => {
           const updateData = {
             id: productTwo.id,
             // Note: VariantThree is already assigned to productTwo, that should be deleted
@@ -731,10 +951,12 @@ moduleIntegrationTestRunner<IProductModuleService>({
           expect(eventBusSpy).toHaveBeenCalledTimes(1)
           expect(eventBusSpy).toHaveBeenCalledWith(
             [
-              {
-                name: "product.created",
+              composeMessage(ProductEvents.PRODUCT_CREATED, {
                 data: { id: products[0].id },
-              },
+                object: "product",
+                source: Modules.PRODUCT,
+                action: CommonEvents.CREATED,
+              }),
             ],
             {
               internal: true,
@@ -824,12 +1046,30 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
           await service.softDeleteProducts([products[0].id])
 
-          expect(eventBusSpy).toHaveBeenCalledWith(
+          expect(eventBusSpy).toHaveBeenNthCalledWith(
+            1,
             [
-              {
-                name: "product.created",
+              composeMessage(ProductEvents.PRODUCT_CREATED, {
                 data: { id: products[0].id },
-              },
+                object: "product",
+                source: Modules.PRODUCT,
+                action: CommonEvents.CREATED,
+              }),
+            ],
+            {
+              internal: true,
+            }
+          )
+
+          expect(eventBusSpy).toHaveBeenNthCalledWith(
+            2,
+            [
+              composeMessage(ProductEvents.PRODUCT_DELETED, {
+                data: { id: [products[0].id] },
+                object: "product",
+                source: Modules.PRODUCT,
+                action: CommonEvents.DELETED,
+              }),
             ],
             {
               internal: true,
@@ -950,7 +1190,7 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
           expect(productsWithCollectionOne).toHaveLength(1)
 
-          expect([
+          expect(productsWithCollectionOne).toEqual([
             expect.objectContaining({
               collection: expect.objectContaining({
                 id: productCollectionOne.id,
@@ -994,6 +1234,154 @@ moduleIntegrationTestRunner<IProductModuleService>({
           )
 
           expect(products).toEqual([])
+        })
+      })
+
+      describe("images", function () {
+        it("should create images with correct rank", async () => {
+          const images = [
+            { url: "image-1" },
+            { url: "image-2" },
+            { url: "image-3" },
+          ]
+
+          const [product] = await service.createProducts([
+            buildProductAndRelationsData({ images }),
+          ])
+
+          expect(product.images).toHaveLength(3)
+          expect(product.images).toEqual([
+            expect.objectContaining({
+              url: "image-1",
+              rank: 0,
+            }),
+            expect.objectContaining({
+              url: "image-2",
+              rank: 1,
+            }),
+            expect.objectContaining({
+              url: "image-3",
+              rank: 2,
+            }),
+          ])
+        })
+
+        it("should update images with correct rank", async () => {
+          const images = [
+            { url: "image-1" },
+            { url: "image-2" },
+            { url: "image-3" },
+          ]
+
+          const [product] = await service.createProducts([
+            buildProductAndRelationsData({ images }),
+          ])
+
+          const reversedImages = [...product.images].reverse()
+
+          const updatedProduct = await service.updateProducts(product.id, {
+            images: reversedImages,
+          })
+
+          expect(updatedProduct.images).toEqual([
+            expect.objectContaining({
+              url: "image-3",
+              rank: 0,
+            }),
+            expect.objectContaining({
+              url: "image-2",
+              rank: 1,
+            }),
+            expect.objectContaining({
+              url: "image-1",
+              rank: 2,
+            }),
+          ])
+        })
+
+        it("should retrieve images in the correct order consistently", async () => {
+          const images = Array.from({ length: 1000 }, (_, i) => ({
+            url: `image-${i + 1}`,
+          }))
+
+          const [product] = await service.createProducts([
+            buildProductAndRelationsData({ images }),
+          ])
+
+          const retrievedProduct = await service.retrieveProduct(product.id, {
+            relations: ["images"],
+          })
+
+          const retrievedProductAgain = await service.retrieveProduct(product.id, {
+            relations: ["images"],
+          })
+
+          expect(retrievedProduct.images).toEqual(retrievedProductAgain.images)
+          
+          expect(retrievedProduct.images).toEqual(
+            Array.from({ length: 1000 }, (_, i) =>
+              expect.objectContaining({
+                url: `image-${i + 1}`,
+                rank: i,
+              })
+            )
+          )
+
+          service.listAndCountProducts
+
+          // Explicitly verify sequential order
+          retrievedProduct.images.forEach((img, idx) => {
+            if (idx > 0) {
+              expect(img.rank).toBeGreaterThan(retrievedProduct.images[idx - 1].rank)
+            }
+          })
+        })
+
+        it("should retrieve images ordered by rank", async () => {
+          const [product] = await service.createProducts([
+            buildProductAndRelationsData({}),
+          ])
+
+          const manager = MikroOrmWrapper.forkManager()
+
+          const images = [
+            manager.create(ProductImage, {
+              product_id: product.id,
+              url: "image-one",
+              rank: 1,
+            }),
+            manager.create(ProductImage, {
+              product_id: product.id,
+              url: "image-two",
+              rank: 0,
+            }),
+            manager.create(ProductImage, {
+              product_id: product.id,
+              url: "image-three",
+              rank: 2,
+            }),
+          ]
+
+          await manager.persistAndFlush(images)
+
+          const retrievedProduct = await service.retrieveProduct(product.id, {
+            relations: ["images"],
+          })
+
+          expect(retrievedProduct.images).toEqual([
+            expect.objectContaining({
+              url: "image-two",
+              rank: 0,
+            }),
+            expect.objectContaining({
+              url: "image-one",
+              rank: 1,
+            }),
+            expect.objectContaining({
+              url: "image-three",
+              rank: 2,
+            }),
+          ])
         })
       })
     })

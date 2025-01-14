@@ -1,3 +1,5 @@
+"use client"
+
 import {
   NotificationContextType,
   NotificationItemType,
@@ -5,7 +7,8 @@ import {
 } from "@/providers"
 import React from "react"
 import { NotificationItem } from "./Item"
-import { CSSTransition, TransitionGroup } from "react-transition-group"
+// @ts-expect-error can't install the types package because it doesn't support React v19
+import { TransitionGroup } from "react-transition-group"
 import clsx from "clsx"
 
 export const NotificationContainer = () => {
@@ -34,23 +37,15 @@ export const NotificationContainer = () => {
         )}
       >
         {notifications.filter(condition).map((notification) => (
-          <CSSTransition
+          <NotificationItem
+            {...notification}
+            onClose={() => handleClose(notification)}
+            className={clsx(
+              notification.className,
+              "!relative !top-0 !bottom-0 !right-0"
+            )}
             key={notification.id}
-            timeout={200}
-            classNames={{
-              enter: "animate-slideInRight animate-fast",
-              exit: "animate-slideOutRight animate-fast",
-            }}
-          >
-            <NotificationItem
-              {...notification}
-              onClose={() => handleClose(notification)}
-              className={clsx(
-                notification.className,
-                "!relative !top-0 !bottom-0 !right-0"
-              )}
-            />
-          </CSSTransition>
+          />
         ))}
       </TransitionGroup>
     )

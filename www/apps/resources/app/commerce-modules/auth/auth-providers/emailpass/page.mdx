@@ -12,35 +12,38 @@ Using the Emailpass auth module provider, you allow users to register and login 
 
 ---
 
-## Install the Emailpass Auth Module Provider
+## Register the Emailpass Auth Module Provider
 
 The Emailpass auth provider is registered by default with the Auth Module.
 
 If you want to pass options to the provider, add the provider to the `providers` option of the Auth Module:
 
-```js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
+```ts title="medusa-config.ts"
+import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 // ...
 
-const modules = {
+module.exports = defineConfig({
   // ...
-  [Modules.AUTH]: {
-    resolve: "@medusajs/auth",
-    options: {
-      providers: [
-        // other providers...
-        {
-          resolve: "@medusajs/auth-emailpass",
-          id: "emailpass",
-          options: {
-            // options...
+  modules: [
+    {
+      resolve: "@medusajs/medusa/auth",
+      dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
+      options: {
+        providers: [
+          // other providers...
+          {
+            resolve: "@medusajs/medusa/auth-emailpass",
+            id: "emailpass",
+            options: {
+              // options...
+            },
           },
-        },
-      ],
+        ],
+      },
     },
-  },
-}
+  ],
+})
 ```
 
 ### Module Options
@@ -87,6 +90,8 @@ const modules = {
     </Table.Row>
   </Table.Body>
 </Table>
+
+---
 
 ## Related Guides
 

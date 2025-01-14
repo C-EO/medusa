@@ -7,9 +7,13 @@ import {
   TransactionCheckpoint,
   TransactionOptions,
   TransactionStep,
-} from "@medusajs/orchestration"
-import { Logger, ModulesSdkTypes } from "@medusajs/types"
-import { MedusaError, TransactionState, promiseAll } from "@medusajs/utils"
+} from "@medusajs/framework/orchestration"
+import { Logger, ModulesSdkTypes } from "@medusajs/framework/types"
+import {
+  MedusaError,
+  promiseAll,
+  TransactionState,
+} from "@medusajs/framework/utils"
 import { WorkflowOrchestratorService } from "@services"
 import { Queue, Worker } from "bullmq"
 import Redis from "ioredis"
@@ -90,7 +94,10 @@ export class RedisDistributedTransactionStorage
           )
         }
       },
-      { connection: this.redisWorkerConnection }
+      {
+        connection:
+          this.redisWorkerConnection /*, runRetryDelay: 100000 for tests */,
+      }
     )
   }
 
@@ -232,7 +239,6 @@ export class RedisDistributedTransactionStorage
     }
 
     const stringifiedData = JSON.stringify(data)
-    const parsedData = JSON.parse(stringifiedData)
 
     if (!hasFinished) {
       if (ttl) {
@@ -243,9 +249,9 @@ export class RedisDistributedTransactionStorage
     }
 
     if (hasFinished && !retentionTime && !idempotent) {
-      await this.deleteFromDb(parsedData)
+      await this.deleteFromDb(data)
     } else {
-      await this.saveToDb(parsedData)
+      await this.saveToDb(data)
     }
 
     if (hasFinished) {
@@ -288,7 +294,7 @@ export class RedisDistributedTransactionStorage
 
   async scheduleTransactionTimeout(
     transaction: DistributedTransactionType,
-    timestamp: number,
+    _: number,
     interval: number
   ): Promise<void> {
     await this.queue.add(

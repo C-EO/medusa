@@ -1,7 +1,10 @@
-import { RemoteLink } from "@medusajs/modules-sdk"
-import { LinkDefinition } from "@medusajs/types"
-import { ContainerRegistrationKeys, MedusaError } from "@medusajs/utils"
-import { StepResponse, createStep } from "@medusajs/workflows-sdk"
+import { Link } from "@medusajs/framework/modules-sdk"
+import { LinkDefinition } from "@medusajs/framework/types"
+import {
+  ContainerRegistrationKeys,
+  MedusaError,
+} from "@medusajs/framework/utils"
+import { StepResponse, createStep } from "@medusajs/framework/workflows-sdk"
 
 export const updateRemoteLinksStepId = "update-remote-links-step"
 export const updateRemoteLinksStep = createStep(
@@ -11,9 +14,7 @@ export const updateRemoteLinksStep = createStep(
       return new StepResponse([], [])
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     // Fetch all existing links and throw an error if any weren't found
     const dataBeforeUpdate = (await link.list(data, {
@@ -40,9 +41,7 @@ export const updateRemoteLinksStep = createStep(
       return
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     await link.create(dataBeforeUpdate)
   }

@@ -33,7 +33,7 @@ const Header = () => {
             actions: [
               {
                 label: t("transferOwnership.label"),
-                to: `transfer-ownership`,
+                to: `transfer`,
                 icon: <ArrowPath />,
               },
             ],

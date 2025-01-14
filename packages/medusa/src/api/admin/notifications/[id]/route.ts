@@ -1,10 +1,10 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+  refetchEntity,
+} from "@medusajs/framework/http"
 import { AdminGetNotificationParamsType } from "../validators"
-import { refetchEntity } from "../../../utils/refetch-entity"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetNotificationParamsType>,
@@ -14,7 +14,7 @@ export const GET = async (
     "notification",
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ notification })
 }

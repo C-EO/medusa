@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react"
-import { useSidebar } from "../Sidebar"
+import { isSidebarItemLink, useSidebar } from "../Sidebar"
 import { usePrevious } from "@uidotdev/usehooks"
 import { InteractiveSidebarItem, SidebarItem } from "types"
 
@@ -56,7 +56,7 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
       return undefined
     }
 
-    return children[0].type === "link"
+    return isSidebarItemLink(children[0])
       ? {
           ...children[0],
           parent: item,
@@ -69,7 +69,7 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
   ): SidebarItemWithParent[] | undefined => {
     return item.children?.filter(
       (childItem) =>
-        childItem.type === "link" ||
+        isSidebarItemLink(childItem) ||
         (childItem.type !== "separator" &&
           getChildrenWithPages(childItem)?.length)
     ) as SidebarItemWithParent[]
@@ -95,7 +95,7 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
               parent: item,
             }
           }
-        } else if (item.type === "link") {
+        } else if (isSidebarItemLink(item)) {
           foundItem = item
         }
 
@@ -115,7 +115,7 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
         return false
       }
 
-      if (item.type === "link") {
+      if (isSidebarItemLink(item)) {
         foundItem = item
       } else if (item.children?.length) {
         const childItem = getNextItem(item.children, -1)
@@ -139,7 +139,7 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
     }
 
     result.foundActive = currentItems.some((item, index) => {
-      if (item.type === "link" && item.path === activePath) {
+      if (isSidebarItemLink(item) && item.path === activePath) {
         if (index !== 0) {
           result.prevItem = getPrevItem(currentItems, index)
         }
@@ -161,8 +161,9 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
           result.prevItem = childrenResult.prevItem
           result.nextItem = childrenResult.nextItem
           if (!result.prevItem) {
-            result.prevItem =
-              item.type === "link" ? item : getPrevItem(currentItems, index)
+            result.prevItem = isSidebarItemLink(item)
+              ? item
+              : getPrevItem(currentItems, index)
           }
 
           if (!result.nextItem && index !== currentItems.length - 1) {
@@ -186,7 +187,9 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
         result.prevItem
           ? {
               title: result.prevItem.title,
-              link: result.prevItem.type === "link" ? result.prevItem.path : "",
+              link: isSidebarItemLink(result.prevItem)
+                ? result.prevItem.path
+                : "",
               parentTitle:
                 result.prevItem.parent?.type !== "separator"
                   ? result.prevItem.parent?.title
@@ -198,7 +201,9 @@ export const PaginationProvider = ({ children }: PaginationProviderProps) => {
         result.nextItem
           ? {
               title: result.nextItem.title,
-              link: result.nextItem.type === "link" ? result.nextItem.path : "",
+              link: isSidebarItemLink(result.nextItem)
+                ? result.nextItem.path
+                : "",
               parentTitle:
                 result.nextItem.parent?.type !== "separator"
                   ? result.nextItem.parent?.title

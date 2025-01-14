@@ -2,17 +2,17 @@ import {
   deleteSalesChannelsWorkflow,
   updateSalesChannelsWorkflow,
 } from "@medusajs/core-flows"
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchSalesChannel } from "../helpers"
 import {
   AdminGetSalesChannelParamsType,
   AdminUpdateSalesChannelType,
 } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetSalesChannelParamsType>,
@@ -21,7 +21,7 @@ export const GET = async (
   const salesChannel = await refetchSalesChannel(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!salesChannel) {
@@ -61,7 +61,7 @@ export const POST = async (
   const salesChannel = await refetchSalesChannel(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ sales_channel: salesChannel })
 }

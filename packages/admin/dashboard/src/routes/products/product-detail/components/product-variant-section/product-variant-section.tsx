@@ -1,16 +1,20 @@
-import { PencilSquare, Plus } from "@medusajs/icons"
-import { Container, Heading } from "@medusajs/ui"
-import { useTranslation } from "react-i18next"
-import { keepPreviousData } from "@tanstack/react-query"
+import { Buildings, PencilSquare, Plus } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
+import { Container, Heading } from "@medusajs/ui"
+import { keepPreviousData } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 
+import { RowSelectionState } from "@tanstack/react-table"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { ActionMenu } from "../../../../../components/common/action-menu"
 import { DataTable } from "../../../../../components/table/data-table"
+import { useProductVariants } from "../../../../../hooks/api/products"
 import { useDataTable } from "../../../../../hooks/use-data-table"
+import { PRODUCT_VARIANT_IDS_KEY } from "../../../common/constants"
 import { useProductVariantTableColumns } from "./use-variant-table-columns"
 import { useProductVariantTableFilters } from "./use-variant-table-filters"
 import { useProductVariantTableQuery } from "./use-variant-table-query"
-import { useProductVariants } from "../../../../../hooks/api/products"
 
 type ProductVariantSectionProps = {
   product: HttpTypes.AdminProduct
@@ -22,6 +26,7 @@ export const ProductVariantSection = ({
   product,
 }: ProductVariantSectionProps) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   const { searchParams, raw } = useProductVariantTableQuery({
     pageSize: PAGE_SIZE,
@@ -37,6 +42,8 @@ export const ProductVariantSection = ({
     }
   )
 
+  const [selection, setSelection] = useState<RowSelectionState>({})
+
   const filters = useProductVariantTableFilters()
   const columns = useProductVariantTableColumns(product)
 
@@ -47,6 +54,11 @@ export const ProductVariantSection = ({
     enablePagination: true,
     getRowId: (row) => row.id,
     pageSize: PAGE_SIZE,
+    enableRowSelection: true,
+    rowSelection: {
+      state: selection,
+      updater: setSelection,
+    },
     meta: {
       product,
     },
@@ -74,6 +86,11 @@ export const ProductVariantSection = ({
                   to: `prices`,
                   icon: <PencilSquare />,
                 },
+                {
+                  label: t("inventory.stock.action"),
+                  to: `stock`,
+                  icon: <Buildings />,
+                },
               ],
             },
           ]}
@@ -86,13 +103,30 @@ export const ProductVariantSection = ({
         count={count}
         pageSize={PAGE_SIZE}
         isLoading={isLoading}
-        orderBy={["title", "created_at", "updated_at"]}
+        orderBy={[
+          { key: "title", label: t("fields.title") },
+          { key: "created_at", label: t("fields.createdAt") },
+          { key: "updated_at", label: t("fields.updatedAt") },
+        ]}
         navigateTo={(row) =>
           `/products/${row.original.product_id}/variants/${row.id}`
         }
         pagination
         search
         queryObject={raw}
+        commands={[
+          {
+            action: async (selection) => {
+              navigate(
+                `stock?${PRODUCT_VARIANT_IDS_KEY}=${Object.keys(selection).join(
+                  ","
+                )}`
+              )
+            },
+            label: t("inventory.stock.action"),
+            shortcut: "i",
+          },
+        ]}
       />
     </Container>
   )

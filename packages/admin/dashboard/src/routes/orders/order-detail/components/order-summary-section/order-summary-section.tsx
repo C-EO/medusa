@@ -18,12 +18,14 @@ import {
   AdminOrder,
   AdminOrderLineItem,
   AdminOrderPreview,
+  AdminRegion,
   AdminReturn,
-  ReservationItemDTO,
+  AdminPaymentCollection,
 } from "@medusajs/types"
 import {
   Badge,
   Button,
+  clx,
   Container,
   Copy,
   Heading,
@@ -34,9 +36,8 @@ import {
   usePrompt,
 } from "@medusajs/ui"
 
-import { AdminPaymentCollection } from "../../../../../../../../core/types/dist/http/payment/admin/entities"
+import { AdminReservation } from "@medusajs/types/src/http"
 import { ActionMenu } from "../../../../../components/common/action-menu"
-import { ButtonMenu } from "../../../../../components/common/button-menu/button-menu"
 import { Thumbnail } from "../../../../../components/common/thumbnail"
 import { useClaims } from "../../../../../hooks/api/claims"
 import { useExchanges } from "../../../../../hooks/api/exchanges"
@@ -171,7 +172,7 @@ export const OrderSummarySection = ({ order }: OrderSummarySectionProps) => {
   return (
     <Container className="divide-y divide-dashed p-0">
       <Header order={order} orderPreview={orderPreview} />
-      <ItemBreakdown order={order} />
+      <ItemBreakdown order={order} reservations={reservations!} />
       <CostBreakdown order={order} />
       <Total order={order} />
 
@@ -191,7 +192,7 @@ export const OrderSummarySection = ({ order }: OrderSummarySectionProps) => {
                 {t("orders.returns.receive.action")}
               </Button>
             ) : (
-              <ButtonMenu
+              <ActionMenu
                 groups={[
                   {
                     actions: receivableReturns.map((r) => {
@@ -223,7 +224,7 @@ export const OrderSummarySection = ({ order }: OrderSummarySectionProps) => {
                 <Button variant="secondary" size="small">
                   {t("orders.returns.receive.action")}
                 </Button>
-              </ButtonMenu>
+              </ActionMenu>
             ))}
 
           {showAllocateButton && (
@@ -308,6 +309,7 @@ const Header = ({
                 to: `/orders/${order.id}/edits`,
                 icon: <PencilSquare />,
                 disabled:
+                  order.status === "canceled" ||
                   (orderPreview?.order_change &&
                     orderPreview?.order_change?.change_type !== "edit") ||
                   (orderPreview?.order_change?.change_type === "edit" &&
@@ -317,11 +319,6 @@ const Header = ({
           },
           {
             actions: [
-              // {
-              //   label: t("orders.summary.allocateItems"),
-              //   to: "#", // TODO: Open modal to allocate items
-              //   icon: <Buildings />,
-              // },
               {
                 label: t("orders.returns.create"),
                 to: `/orders/${order.id}/returns`,
@@ -344,7 +341,7 @@ const Header = ({
                   shouldDisableReturn ||
                   isOrderEditActive ||
                   (!!orderPreview?.order_change?.return_id &&
-                    !!!orderPreview?.order_change?.exchange_id) ||
+                    !orderPreview?.order_change?.exchange_id) ||
                   !!orderPreview?.order_change?.claim_id,
               },
               {
@@ -359,7 +356,7 @@ const Header = ({
                   shouldDisableReturn ||
                   isOrderEditActive ||
                   (!!orderPreview?.order_change?.return_id &&
-                    !!!orderPreview?.order_change?.claim_id) ||
+                    !orderPreview?.order_change?.claim_id) ||
                   !!orderPreview?.order_change?.exchange_id,
               },
             ],
@@ -380,15 +377,17 @@ const Item = ({
 }: {
   item: AdminOrderLineItem
   currencyCode: string
-  reservation?: ReservationItemDTO | null
+  reservation?: AdminReservation
   returns: AdminReturn[]
   claims: AdminClaim[]
   exchanges: AdminExchange[]
 }) => {
   const { t } = useTranslation()
+
   const isInventoryManaged = item.variant?.manage_inventory
   const hasInventoryKit =
     isInventoryManaged && (item.variant?.inventory_items?.length || 0) > 1
+  const hasUnfulfilledItems = item.quantity - item.detail.fulfilled_quantity > 0
 
   return (
     <>
@@ -435,7 +434,7 @@ const Item = ({
             </div>
 
             <div className="overflow-visible">
-              {isInventoryManaged && (
+              {isInventoryManaged && hasUnfulfilledItems && (
                 <StatusBadge
                   color={reservation ? "green" : "orange"}
                   className="text-nowrap"
@@ -477,11 +476,13 @@ const Item = ({
   )
 }
 
-const ItemBreakdown = ({ order }: { order: AdminOrder }) => {
-  const { reservations } = useReservationItems({
-    line_item_id: order.items.map((i) => i.id),
-  })
-
+const ItemBreakdown = ({
+  order,
+  reservations,
+}: {
+  order: AdminOrder
+  reservations?: AdminReservation[]
+}) => {
   const { claims = [] } = useClaims({
     order_id: order.id,
     fields: "*additional_items",
@@ -497,12 +498,15 @@ const ItemBreakdown = ({ order }: { order: AdminOrder }) => {
     fields: "*items,*items.reason",
   })
 
+  const reservationsMap = useMemo(
+    () => new Map((reservations || []).map((r) => [r.line_item_id, r])),
+    [reservations]
+  )
+
   return (
     <div>
       {order.items?.map((item) => {
-        const reservation = reservations
-          ? reservations.find((r) => r.line_item_id === item.id)
-          : null
+        const reservation = reservationsMap.get(item.id)
 
         return (
           <Item
@@ -526,9 +530,9 @@ const Cost = ({
   secondaryValue,
   tooltip,
 }: {
-  label: string
+  label: ReactNode
   value: string | number
-  secondaryValue: string
+  secondaryValue?: string
   tooltip?: ReactNode
 }) => (
   <div className="grid grid-cols-3 items-center">
@@ -548,46 +552,191 @@ const Cost = ({
   </div>
 )
 
-const CostBreakdown = ({ order }: { order: AdminOrder }) => {
+const CostBreakdown = ({
+  order,
+}: {
+  order: AdminOrder & { region?: AdminRegion | null }
+}) => {
   const { t } = useTranslation()
+  const [isTaxOpen, setIsTaxOpen] = useState(false)
+  const [isShippingOpen, setIsShippingOpen] = useState(false)
+
+  const discountCodes = useMemo(() => {
+    const codes = new Set()
+    order.items.forEach((item) =>
+      item.adjustments?.forEach((adj) => {
+        codes.add(adj.code)
+      })
+    )
+
+    return Array.from(codes).sort()
+  }, [order])
+
+  const taxCodes = useMemo(() => {
+    const taxCodeMap = {}
+
+    order.items.forEach((item) => {
+      item.tax_lines?.forEach((line) => {
+        taxCodeMap[line.code] = (taxCodeMap[line.code] || 0) + line.total
+      })
+    })
+
+    order.shipping_methods.forEach((sm) => {
+      sm.tax_lines?.forEach((line) => {
+        taxCodeMap[line.code] = (taxCodeMap[line.code] || 0) + line.total
+      })
+    })
+
+    return taxCodeMap
+  }, [order])
+
+  const automaticTaxesOn = !!order.region?.automatic_taxes
+  const hasTaxLines = !!Object.keys(taxCodes).length
+
+  const discountTotal = automaticTaxesOn
+    ? order.discount_total
+    : order.discount_subtotal
 
   return (
     <div className="text-ui-fg-subtle flex flex-col gap-y-2 px-6 py-4">
       <Cost
-        label={t("fields.discount")}
-        // TODO: DISCOUNTS -> moved to line items now
-        // secondaryValue={
-        //   order.discounts.length > 0
-        //     ? order.discounts.map((d) => d.code).join(", ")
-        //     : "-"
-        // }
+        label={t(
+          automaticTaxesOn
+            ? "orders.summary.itemTotal"
+            : "orders.summary.itemSubtotal"
+        )}
+        value={getLocaleAmount(order.item_total, order.currency_code)}
+      />
+      <Cost
+        label={
+          <div
+            onClick={() => setIsShippingOpen((o) => !o)}
+            className="flex cursor-pointer items-center gap-1"
+          >
+            <span>
+              {t(
+                automaticTaxesOn
+                  ? "orders.summary.shippingTotal"
+                  : "orders.summary.shippingSubtotal"
+              )}
+            </span>
+            <TriangleDownMini
+              style={{
+                transform: `rotate(${isShippingOpen ? 0 : -90}deg)`,
+              }}
+            />
+          </div>
+        }
+        value={getLocaleAmount(
+          automaticTaxesOn ? order.shipping_total : order.shipping_subtotal,
+          order.currency_code
+        )}
+      />
+
+      {isShippingOpen && (
+        <div className="flex flex-col gap-1 pl-5">
+          {(order.shipping_methods || [])
+            .sort((m1, m2) =>
+              (m1.created_at as string).localeCompare(m2.created_at as string)
+            )
+            .map((sm, i) => {
+              return (
+                <div
+                  key={sm.id}
+                  className="flex items-center justify-between gap-x-2"
+                >
+                  <div>
+                    <span className="txt-small text-ui-fg-subtle font-medium">
+                      {sm.name}
+                      {sm.detail.return_id &&
+                        ` (${t("fields.returnShipping")})`}{" "}
+                      <ShippingInfoPopover key={i} shippingMethod={sm} />
+                    </span>
+                  </div>
+                  <div className="relative flex-1">
+                    <div className="bottom-[calc(50% - 2px)] absolute h-[1px] w-full border-b border-dashed" />
+                  </div>
+                  <span className="txt-small text-ui-fg-muted">
+                    {getLocaleAmount(
+                      automaticTaxesOn ? sm.total : sm.subtotal,
+                      order.currency_code
+                    )}
+                  </span>
+                </div>
+              )
+            })}
+        </div>
+      )}
+
+      <Cost
+        label={t(
+          automaticTaxesOn
+            ? "orders.summary.discountTotal"
+            : "orders.summary.discountSubtotal"
+        )}
+        secondaryValue={discountCodes.join(", ")}
         value={
-          order.discount_total > 0
-            ? `- ${getLocaleAmount(order.discount_total, order.currency_code)}`
+          discountTotal > 0
+            ? `- ${getLocaleAmount(discountTotal, order.currency_code)}`
             : "-"
         }
       />
-      {(order.shipping_methods || [])
-        .sort((m1, m2) =>
-          (m1.created_at as string).localeCompare(m2.created_at as string)
-        )
-        .map((sm, i) => {
-          return (
-            <div>
-              <Cost
-                key={sm.id}
-                label={
-                  sm.detail.return_id
-                    ? t("fields.returnShipping")
-                    : t("fields.outboundShipping")
-                }
-                secondaryValue={sm.name}
-                value={getLocaleAmount(sm.total, order.currency_code)}
-                tooltip={<ShippingInfoPopover key={i} shippingMethod={sm} />}
+
+      <>
+        <div className="flex justify-between">
+          <div
+            onClick={() => hasTaxLines && setIsTaxOpen((o) => !o)}
+            className={clx("flex items-center gap-1", {
+              "cursor-pointer": hasTaxLines,
+            })}
+          >
+            <span className="txt-small select-none">
+              {t(
+                automaticTaxesOn
+                  ? "orders.summary.taxTotalIncl"
+                  : "orders.summary.taxTotal"
+              )}
+            </span>
+            {hasTaxLines && (
+              <TriangleDownMini
+                style={{
+                  transform: `rotate(${isTaxOpen ? 0 : -90}deg)`,
+                }}
               />
-            </div>
-          )
-        })}
+            )}
+          </div>
+
+          <div className="text-right">
+            <Text size="small" leading="compact">
+              {getLocaleAmount(order.tax_total, order.currency_code)}
+            </Text>
+          </div>
+        </div>
+        {isTaxOpen && (
+          <div className="flex flex-col gap-1 pl-5">
+            {Object.entries(taxCodes).map(([code, total]) => {
+              return (
+                <div
+                  key={code}
+                  className="flex items-center justify-between gap-x-2"
+                >
+                  <div>
+                    <span className="txt-small text-ui-fg-subtle font-medium">
+                      {code}
+                    </span>
+                  </div>
+                  <div className="relative flex-1">
+                    <div className="bottom-[calc(50% - 2px)] absolute h-[1px] w-full border-b border-dashed" />
+                  </div>
+                  <span className="txt-small text-ui-fg-muted">
+                    {getLocaleAmount(total, order.currency_code)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </>
     </div>
   )
 }
@@ -597,7 +746,7 @@ const InventoryKitBreakdown = ({ item }: { item: AdminOrderLineItem }) => {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const inventory = item.variant.inventory_items
+  const inventory = item.variant?.inventory_items || []
 
   return (
     <>

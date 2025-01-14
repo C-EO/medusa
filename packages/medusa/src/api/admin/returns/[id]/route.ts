@@ -2,13 +2,13 @@ import { updateReturnWorkflow } from "@medusajs/core-flows"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminPostReturnsReturnReqSchemaType } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -26,7 +26,7 @@ export const GET = async (
         ...req.filterableFields,
       },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [orderReturn] = await remoteQuery(queryObject, {
@@ -58,7 +58,7 @@ export const POST = async (
         ...req.filterableFields,
       },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [orderReturn] = await remoteQuery(queryObject)

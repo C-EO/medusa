@@ -1,18 +1,24 @@
 import { DocsConfig, SidebarItem } from "types"
-import { getMobileSidebarItems } from "docs-ui"
 import { generatedSidebar as sidebar } from "@/generated/sidebar.mjs"
+import { globalConfig } from "docs-ui"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
 export const config: DocsConfig = {
+  ...globalConfig,
   titleSuffix: "Medusa Admin User Guide",
   baseUrl,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   sidebar: {
     default: sidebar as SidebarItem[],
-    mobile: getMobileSidebarItems({
-      baseUrl,
-      version: "v2",
-    }),
+    mobile: [],
   },
+  project: {
+    title: "User Guide",
+    key: "user-guide",
+  },
+  breadcrumbOptions: {
+    showCategories: true,
+  },
+  logo: `${process.env.NEXT_PUBLIC_BASE_PATH}/images/logo.png`,
 }

@@ -1,4 +1,4 @@
-import { RegionCountryDTO } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/types"
 import { useTranslation } from "react-i18next"
 
 import { countries as COUNTRIES } from "../../../../../lib/data/countries"
@@ -6,24 +6,24 @@ import { ListSummary } from "../../../../common/list-summary"
 import { PlaceholderCell } from "../../common/placeholder-cell"
 
 type CountriesCellProps = {
-  countries?: RegionCountryDTO[] | null
+  countries?: HttpTypes.AdminRegionCountry[] | null
 }
 
 export const CountriesCell = ({ countries }: CountriesCellProps) => {
-  const { t } = useTranslation()
-
   if (!countries || countries.length === 0) {
     return <PlaceholderCell />
   }
 
+  const list = countries
+    .map(
+      (country) =>
+        COUNTRIES.find((c) => c.iso_2 === country.iso_2)?.display_name
+    )
+    .filter(Boolean) as string[]
+
   return (
     <div className="flex size-full items-center overflow-hidden">
-      <ListSummary
-        list={countries.map(
-          (country) =>
-            COUNTRIES.find((c) => c.iso_2 === country.iso_2)!.display_name
-        )}
-      />
+      <ListSummary list={list} />
     </div>
   )
 }

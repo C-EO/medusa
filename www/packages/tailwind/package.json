@@ -4,9 +4,6 @@
   "private": true,
   "license": "MIT",
   "main": "tailwind.config.js",
-  "devDependencies": {
-    "eslint-config-docs": "*"
-  },
   "publishConfig": {
     "access": "public"
   },

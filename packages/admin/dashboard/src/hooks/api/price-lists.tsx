@@ -128,7 +128,7 @@ export const useBatchPriceListPrices = (
   id: string,
   query?: HttpTypes.AdminPriceListParams,
   options?: UseMutationOptions<
-    HttpTypes.AdminPriceListResponse,
+    HttpTypes.AdminPriceListBatchResponse,
     FetchError,
     HttpTypes.AdminBatchPriceListPrice
   >

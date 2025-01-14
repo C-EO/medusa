@@ -1,3 +1,5 @@
+import { Constructor } from "../modules-sdk"
+
 type ExpandProperty<T> = T extends (infer U)[] ? NonNullable<U> : NonNullable<T>
 
 export type Dictionary<T = any> = {
@@ -82,27 +84,31 @@ type FilterValue<T> =
   | FilterValue2<T>[]
   | null
 
-type PrevLimit = [never, 1, 2, 3]
+type PrevLimit = [never, 0, 1, 2]
+
+export type FilterQueryProperties<T, Prev extends number = 3> = {
+  [Key in keyof T]?: T[Key] extends
+    | boolean
+    | number
+    | string
+    | bigint
+    | symbol
+    | Date
+    ? T[Key] | OperatorMap<T[Key]>
+    : T[Key] extends infer U
+    ? U extends { [x: number]: infer V }
+      ? V extends object
+        ? FilterQuery<Partial<V>, PrevLimit[Prev]>
+        : never
+      : never
+    : never
+}
 
 export type FilterQuery<T = any, Prev extends number = 3> = Prev extends never
   ? never
-  : {
-      [Key in keyof T]?: T[Key] extends
-        | boolean
-        | number
-        | string
-        | bigint
-        | symbol
-        | Date
-        ? T[Key] | OperatorMap<T[Key]>
-        : T[Key] extends infer U
-        ? U extends { [x: number]: infer V }
-          ? V extends object
-            ? FilterQuery<Partial<V>, PrevLimit[Prev]>
-            : never
-          : never
-        : never
-    }
+  : T extends Constructor<infer Prototype>
+  ? FilterQueryProperties<Prototype, Prev>
+  : FilterQueryProperties<T, Prev>
 
 declare type QueryOrder = "ASC" | "DESC" | "asc" | "desc"
 

@@ -1,6 +1,7 @@
 import { HandTruck, PencilSquare } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Container, Heading } from "@medusajs/ui"
+import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
@@ -20,6 +21,7 @@ function LocationsFulfillmentProvidersSection({
   const { fulfillment_providers } = useFulfillmentProviders({
     stock_location_id: location.id,
     fields: "id",
+    is_enabled: true,
   })
 
   return (
@@ -49,7 +51,7 @@ function LocationsFulfillmentProvidersSection({
           <div className="grid grid-cols-[28px_1fr] items-center gap-x-3 gap-y-3">
             {fulfillment_providers?.map((fulfillmentProvider) => {
               return (
-                <>
+                <Fragment key={fulfillmentProvider.id}>
                   <IconAvatar>
                     <HandTruck className="text-ui-fg-subtle" />
                   </IconAvatar>
@@ -57,7 +59,7 @@ function LocationsFulfillmentProvidersSection({
                   <div className="txt-compact-small">
                     {formatProvider(fulfillmentProvider.id)}
                   </div>
-                </>
+                </Fragment>
               )
             })}
           </div>

@@ -5,10 +5,10 @@ import {
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+} from "@medusajs/framework/http"
 
-import { AdditionalData, HttpTypes } from "@medusajs/types"
-import { refetchEntity } from "../../../../../utils/refetch-entity"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
+import { refetchEntity } from "@medusajs/framework/http"
 import {
   remapKeysForProduct,
   remapKeysForVariant,
@@ -28,7 +28,7 @@ export const GET = async (
     "variant",
     variables,
     req.scope,
-    remapKeysForVariant(req.remoteQueryConfig.fields ?? [])
+    remapKeysForVariant(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({ variant: remapVariantResponse(variant) })
@@ -56,7 +56,7 @@ export const POST = async (
     "product",
     productId,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({ product: remapProductResponse(product) })
@@ -78,7 +78,7 @@ export const DELETE = async (
     "product",
     productId,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({

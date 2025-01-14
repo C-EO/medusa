@@ -50,6 +50,13 @@ export interface SoftDeletableEntity extends BaseEntity {
 }
 
 /**
+ * Temporary type fixing to allow any level of orders until we get to properly clean all the types
+ */
+export type FindConfigOrder = {
+  [Key: string]: "ASC" | "DESC" | (string & {}) | FindConfigOrder
+}
+
+/**
  * @interface
  *
  * An object that is used to configure how an entity is retrieved from the database. It accepts as a typed parameter an `Entity` class,
@@ -80,9 +87,7 @@ export interface FindConfig<Entity> {
    * An object used to specify how to sort the returned records. Its keys are the names of attributes of the entity, and a key's value can either be `ASC`
    * to sort retrieved records in an ascending order, or `DESC` to sort retrieved records in a descending order.
    */
-  order?: {
-    [K: string]: "ASC" | "DESC"
-  }
+  order?: FindConfigOrder
 
   /**
    * A boolean indicating whether deleted records should also be retrieved as part of the result. This only works if the entity extends the
@@ -121,12 +126,6 @@ export type TotalField =
  * Fields that can be passed in the query parameters of a request.
  */
 export type RequestQueryFields = {
-  /**
-   * Comma-separated relations that should be expanded in the returned data.
-   * @deprecated Use `fields` instead and the relations will be inferred
-   */
-  expand?: string
-
   /**
    * Comma-separated fields that should be included in the returned data.
    * if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default fields.
@@ -249,38 +248,161 @@ export interface NumericalComparisonOperator {
 }
 
 /**
+ * The keywords that does not have a plural form
+ */
+type UncountableRules =
+  | "adulthood"
+  | "advice"
+  | "agenda"
+  | "aid"
+  | "aircraft"
+  | "alcohol"
+  | "ammo"
+  | "analytics"
+  | "anime"
+  | "athletics"
+  | "audio"
+  | "bison"
+  | "blood"
+  | "bream"
+  | "buffalo"
+  | "butter"
+  | "carp"
+  | "cash"
+  | "chassis"
+  | "chess"
+  | "clothing"
+  | "cod"
+  | "commerce"
+  | "cooperation"
+  | "corps"
+  | "debris"
+  | "diabetes"
+  | "digestion"
+  | "elk"
+  | "energy"
+  | "equipment"
+  | "excretion"
+  | "expertise"
+  | "firmware"
+  | "flounder"
+  | "fun"
+  | "gallows"
+  | "garbage"
+  | "graffiti"
+  | "hardware"
+  | "headquarters"
+  | "health"
+  | "herpes"
+  | "highjinks"
+  | "homework"
+  | "housework"
+  | "information"
+  | "jeans"
+  | "justice"
+  | "kudos"
+  | "labour"
+  | "literature"
+  | "machinery"
+  | "mackerel"
+  | "mail"
+  | "media"
+  | "mews"
+  | "moose"
+  | "music"
+  | "mud"
+  | "manga"
+  | "news"
+  | "only"
+  | "personnel"
+  | "pike"
+  | "plankton"
+  | "pliers"
+  | "police"
+  | "pollution"
+  | "premises"
+  | "rain"
+  | "research"
+  | "rice"
+  | "salmon"
+  | "scissors"
+  | "series"
+  | "sewage"
+  | "shambles"
+  | "shrimp"
+  | "software"
+  | "staff"
+  | "swine"
+  | "tennis"
+  | "traffic"
+  | "transportation"
+  | "trout"
+  | "tuna"
+  | "wealth"
+  | "welfare"
+  | "whiting"
+  | "wildebeest"
+  | "wildlife"
+  | "you"
+  | "deer"
+  | "sheep"
+  | "info"
+
+type PluralizationSpecialRules = {
+  person: "people"
+  child: "children"
+  man: "men"
+  criterion: "criteria"
+  tooth: "teeth"
+  foot: "feet"
+}
+
+/**
  * @ignore
  */
-export type Pluralize<Singular extends string> = Singular extends `${infer R}ss`
-  ? `${Singular}es`
-  : Singular extends `${infer R}sis`
-  ? `${R}ses`
-  : Singular extends `${infer R}is`
-  ? `${R}ises`
-  : Singular extends `${infer R}s`
-  ? `${Singular}`
-  : Singular extends `${infer R}ey`
-  ? `${R}eys`
-  : Singular extends `${infer R}y`
-  ? `${R}ies`
-  : Singular extends `${infer R}es`
-  ? `${Singular}`
-  : Singular extends
-      | `${infer R}sh`
-      | `${infer R}ch`
-      | `${infer R}x`
-      | `${infer R}z`
-      | `${infer R}o`
-  ? `${Singular}es`
-  : Singular extends `${infer R}fe`
-  ? `${R}ves`
-  : Singular extends `${infer R}ex` | `${infer R}ix`
-  ? `${R}ices`
-  : Singular extends `${infer R}eau`
-  ? `${R}eaux`
-  : Singular extends `${infer R}ieu`
-  ? `${R}ieux`
-  : `${Singular}s`
+export type Pluralize<Singular extends string> =
+  Lowercase<Singular> extends keyof PluralizationSpecialRules
+    ? PluralizationSpecialRules[Lowercase<Singular>]
+    : Lowercase<Singular> extends UncountableRules
+    ? Singular
+    : Singular extends `${string}ss`
+    ? `${Singular}es`
+    : Singular extends `${infer R}sis`
+    ? `${R}ses`
+    : Singular extends `${infer R}is`
+    ? `${R}ises`
+    : Singular extends `${string}s`
+    ? `${Singular}`
+    : Singular extends `${infer R}ay`
+    ? `${R}ays`
+    : Singular extends `${infer R}ey`
+    ? `${R}eys`
+    : Singular extends `${infer R}iy`
+    ? `${R}iys`
+    : Singular extends `${infer R}oy`
+    ? `${R}oys`
+    : Singular extends `${infer R}uy`
+    ? `${R}uys`
+    : Singular extends `${infer R}y`
+    ? `${R}ies`
+    : Singular extends `${string}es`
+    ? `${Singular}`
+    : Singular extends
+        | `${string}sh`
+        | `${string}ch`
+        | `${string}x`
+        | `${string}z`
+        | `${string}o`
+    ? `${Singular}es`
+    : Singular extends `${infer R}fe`
+    ? `${R}ves`
+    : Singular extends `${infer R}ex` | `${infer R}ix`
+    ? `${R}ices`
+    : Singular extends `${infer R}eau`
+    ? `${R}eaux`
+    : Singular extends `${infer R}ieu`
+    ? `${R}ieux`
+    : `${Singular}s`
 
 export type SnakeCase<S extends string> =
   S extends `${infer T}${infer U}${infer V}`
@@ -306,15 +428,31 @@ export type RawRounding = {
 /**
  * @ignore
  */
-export type QueryConfig<TEntity extends BaseEntity> = {
-  deafults?: (keyof TEntity | string)[]
-  allowed?: (keyof TEntity | string)[]
+export type QueryConfig<TEntity> = {
+  /**
+   * Default fields and relations to return.
+   * use `*` or `.*` to select all fields from a relations (e.g '*products' or 'products.*' will select all products properties)
+   */
+  defaults?: (keyof TEntity | string)[]
+  /**
+   * Fields and relations that are allowed to be requested.
+   * Symbol such as `*`, `+` and `-` should be removed as they dont make sense for
+   * the authorization search.
+   */
+  allowed?: string[]
   defaultLimit?: number
+  /**
+   * If the route that will use that configuration is supposed to return a list of entities. This
+   * will change the configuration that will be created on req.listConfig and req.queryConfig (among
+   * other things it will include pagination and sorting)
+   */
   isList?: boolean
 }
 
 export type TransformObjectMethodToAsync<T extends object> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
     ? (...args: A) => Promise<Awaited<R>>
-    : T[K] extends object ? TransformObjectMethodToAsync<T[K]> : T[K];
+    : T[K] extends object
+    ? TransformObjectMethodToAsync<T[K]>
+    : T[K]
 }

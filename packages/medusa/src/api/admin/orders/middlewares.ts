@@ -1,16 +1,22 @@
-import { MiddlewareRoute } from "@medusajs/framework"
-import { validateAndTransformBody } from "../../utils/validate-body"
-import { validateAndTransformQuery } from "../../utils/validate-query"
+import {
+  validateAndTransformBody,
+  validateAndTransformQuery,
+} from "@medusajs/framework"
+import { MiddlewareRoute } from "@medusajs/framework/http"
 import * as QueryConfig from "./query-config"
 import {
+  AdminCancelOrderTransferRequest,
   AdminCompleteOrder,
+  AdminGetOrdersOrderItemsParams,
   AdminGetOrdersOrderParams,
   AdminGetOrdersParams,
   AdminMarkOrderFulfillmentDelivered,
   AdminOrderCancelFulfillment,
-  AdminOrderChanges,
+  AdminOrderChangesParams,
   AdminOrderCreateFulfillment,
   AdminOrderCreateShipment,
+  AdminTransferOrder,
+  AdminUpdateOrder,
 } from "./validators"
 
 export const adminOrderRoutesMiddlewares: MiddlewareRoute[] = [
@@ -35,11 +41,32 @@ export const adminOrderRoutesMiddlewares: MiddlewareRoute[] = [
     ],
   },
   {
+    method: ["POST"],
+    matcher: "/admin/orders/:id",
+    middlewares: [
+      validateAndTransformBody(AdminUpdateOrder),
+      validateAndTransformQuery(
+        AdminGetOrdersOrderParams,
+        QueryConfig.retrieveTransformQueryConfig
+      ),
+    ],
+  },
+  {
+    method: ["GET"],
+    matcher: "/admin/orders/:id/line-items",
+    middlewares: [
+      validateAndTransformQuery(
+        AdminGetOrdersOrderItemsParams,
+        QueryConfig.listOrderItemsQueryConfig
+      ),
+    ],
+  },
+  {
     method: ["GET"],
     matcher: "/admin/orders/:id/changes",
     middlewares: [
       validateAndTransformQuery(
-        AdminOrderChanges,
+        AdminOrderChangesParams,
         QueryConfig.retrieveOrderChangesTransformQueryConfig
       ),
     ],
@@ -125,6 +152,28 @@ export const adminOrderRoutesMiddlewares: MiddlewareRoute[] = [
     matcher: "/admin/orders/:id/fulfillments/:fulfillment_id/mark-as-delivered",
     middlewares: [
       validateAndTransformBody(AdminMarkOrderFulfillmentDelivered),
+      validateAndTransformQuery(
+        AdminGetOrdersOrderParams,
+        QueryConfig.retrieveTransformQueryConfig
+      ),
+    ],
+  },
+  {
+    method: ["POST"],
+    matcher: "/admin/orders/:id/transfer",
+    middlewares: [
+      validateAndTransformBody(AdminTransferOrder),
+      validateAndTransformQuery(
+        AdminGetOrdersOrderParams,
+        QueryConfig.retrieveTransformQueryConfig
+      ),
+    ],
+  },
+  {
+    method: ["POST"],
+    matcher: "/admin/orders/:id/transfer/cancel",
+    middlewares: [
+      validateAndTransformBody(AdminCancelOrderTransferRequest),
       validateAndTransformQuery(
         AdminGetOrdersOrderParams,
         QueryConfig.retrieveTransformQueryConfig

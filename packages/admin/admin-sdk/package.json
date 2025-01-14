@@ -1,7 +1,7 @@
 {
   "name": "@medusajs/admin-sdk",
   "description": "SDK for building extension for the Medusa admin dashboard.",
-  "version": "0.0.1",
+  "version": "2.2.0",
   "author": "Kasper Kristensen <kasper@medusajs.com>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -21,10 +21,14 @@
   "devDependencies": {
     "@types/react": "^18.3.2",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "zod": "^3.22"
   },
   "dependencies": {
-    "@medusajs/admin-shared": "^0.0.1"
+    "@medusajs/admin-shared": "^2.2.0"
+  },
+  "peerDependencies": {
+    "zod": "^3.22"
   },
   "packageManager": "yarn@3.2.1"
 }

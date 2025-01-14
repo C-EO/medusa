@@ -1,7 +1,7 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { PageEvent } from "typedoc"
-import { MarkdownTheme } from "../../theme"
-import { getDisplayName } from "../../utils"
+import { MarkdownTheme } from "../../theme.js"
+import { getDisplayName } from "../../utils.js"
 import { escapeChars } from "utils"
 
 export default function (theme: MarkdownTheme) {

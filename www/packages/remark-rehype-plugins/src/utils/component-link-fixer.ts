@@ -1,21 +1,13 @@
 import path from "path"
 import { Transformer } from "unified"
-import {
-  ComponentLinkFixerLinkType,
-  ExpressionJsVar,
-  UnistNodeWithData,
-  UnistTree,
-} from "../types/index.js"
+import { UnistNodeWithData, UnistTree } from "../types/index.js"
 import { FixLinkOptions, fixLinkUtil } from "../index.js"
 import getAttribute from "../utils/get-attribute.js"
 import { estreeToJs } from "../utils/estree-to-js.js"
-import {
-  isExpressionJsVarLiteral,
-  isExpressionJsVarObj,
-} from "../utils/expression-is-utils.js"
 import { ComponentLinkFixerOptions } from "../types/index.js"
+import { performActionOnLiteral } from "./perform-action-on-literal.js"
+import { MD_LINK_REGEX } from "../constants.js"
 
-const MD_LINK_REGEX = /\[(.*?)\]\((?<link>.*?)\)/gm
 const VALUE_LINK_REGEX = /^(![a-z]+!|\.)/gm
 
 function matchMdLinks(
@@ -23,8 +15,10 @@ function matchMdLinks(
   linkOptions: Omit<FixLinkOptions, "linkedPath">
 ) {
   let linkMatches
+  // reset regex
+  MD_LINK_REGEX.lastIndex = 0
   while ((linkMatches = MD_LINK_REGEX.exec(str)) !== null) {
-    if (!linkMatches.groups?.link || linkMatches.groups?.link.startsWith("http")) {
+    if (!linkMatches.groups?.link) {
       return
     }
 
@@ -34,6 +28,8 @@ function matchMdLinks(
     })
 
     str = str.replace(linkMatches.groups.link, newUrl)
+    // reset regex
+    MD_LINK_REGEX.lastIndex = 0
   }
 
   return str
@@ -43,7 +39,9 @@ function matchValueLink(
   str: string,
   linkOptions: Omit<FixLinkOptions, "linkedPath">
 ) {
-  if (!VALUE_LINK_REGEX.exec(str) || str.startsWith("http")) {
+  // reset index
+  VALUE_LINK_REGEX.lastIndex = 0
+  if (!VALUE_LINK_REGEX.exec(str)) {
     return str
   }
 
@@ -51,33 +49,6 @@ function matchValueLink(
     ...linkOptions,
     linkedPath: str,
   })
-}
-
-function traverseJsVar(
-  item: ExpressionJsVar[] | ExpressionJsVar,
-  linkOptions: Omit<FixLinkOptions, "linkedPath">,
-  checkLinksType: ComponentLinkFixerLinkType
-) {
-  const linkFn = checkLinksType === "md" ? matchMdLinks : matchValueLink
-  if (Array.isArray(item)) {
-    item.forEach((item) => traverseJsVar(item, linkOptions, checkLinksType))
-  } else if (isExpressionJsVarLiteral(item)) {
-    item.original.value = linkFn(item.original.value as string, linkOptions)
-    item.original.raw = JSON.stringify(item.original.value)
-  } else {
-    Object.values(item).forEach((value) => {
-      if (Array.isArray(value) || isExpressionJsVarObj(value)) {
-        return traverseJsVar(value, linkOptions, checkLinksType)
-      }
-
-      if (!isExpressionJsVarLiteral(value)) {
-        return
-      }
-
-      value.original.value = linkFn(value.original.value as string, linkOptions)
-      value.original.raw = JSON.stringify(value.original.value)
-    })
-  }
 }
 
 export function componentLinkFixer(
@@ -106,18 +77,15 @@ export function componentLinkFixer(
       ""
     )
     const appsPath = basePath || path.join(file.cwd, "app")
+    const linkFn = checkLinksType === "md" ? matchMdLinks : matchValueLink
     visit(tree as UnistTree, "mdxJsxFlowElement", (node: UnistNodeWithData) => {
       if (node.name !== componentName) {
         return
       }
 
-      const workflowAttribute = getAttribute(node, attributeName)
+      const attribute = getAttribute(node, attributeName)
 
-      if (
-        !workflowAttribute ||
-        typeof workflowAttribute.value === "string" ||
-        !workflowAttribute.value.data?.estree
-      ) {
+      if (!attribute) {
         return
       }
 
@@ -126,13 +94,26 @@ export function componentLinkFixer(
         appsPath,
       }
 
-      const itemJsVar = estreeToJs(workflowAttribute.value.data.estree)
+      if (typeof attribute.value === "string") {
+        attribute.value =
+          linkFn(attribute.value, linkOptions) || attribute.value
+        return
+      }
+
+      if (!attribute.value.data?.estree) {
+        return
+      }
+
+      const itemJsVar = estreeToJs(attribute.value.data.estree)
 
       if (!itemJsVar) {
         return
       }
 
-      traverseJsVar(itemJsVar, linkOptions, checkLinksType)
+      performActionOnLiteral(itemJsVar, (item) => {
+        item.original.value = linkFn(item.original.value as string, linkOptions)
+        item.original.raw = JSON.stringify(item.original.value)
+      })
     })
   }
 }

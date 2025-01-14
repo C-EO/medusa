@@ -22,9 +22,7 @@ export const ModalFooter = ({
         className
       )}
     >
-      {actions?.map((action, index) => (
-        <Button {...action} key={index} />
-      ))}
+      {actions?.map((action, index) => <Button {...action} key={index} />)}
       {children}
     </div>
   )

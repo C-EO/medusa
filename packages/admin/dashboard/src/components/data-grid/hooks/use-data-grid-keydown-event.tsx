@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import React, { useCallback } from "react"
 import type {
   FieldValues,
   Path,
@@ -39,6 +39,7 @@ type UseDataGridKeydownEventOptions<TData, TFieldValues extends FieldValues> = {
   ) => PathValue<TFieldValues, Path<TFieldValues>>[]
   setSelectionValues: (fields: string[], values: string[]) => void
   restoreSnapshot: () => void
+  createSnapshot: (coords: DataGridCoordinates) => void
 }
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]
@@ -46,7 +47,7 @@ const VERTICAL_KEYS = ["ArrowUp", "ArrowDown"]
 
 export const useDataGridKeydownEvent = <
   TData,
-  TFieldValues extends FieldValues,
+  TFieldValues extends FieldValues
 >({
   containerRef,
   matrix,
@@ -67,6 +68,7 @@ export const useDataGridKeydownEvent = <
   getSelectionValues,
   setSelectionValues,
   restoreSnapshot,
+  createSnapshot,
 }: UseDataGridKeydownEventOptions<TData, TFieldValues>) => {
   const handleKeyboardNavigation = useCallback(
     (e: KeyboardEvent) => {
@@ -108,8 +110,8 @@ export const useDataGridKeydownEvent = <
         direction === "horizontal"
           ? setSingleRange
           : e.shiftKey
-            ? setRangeEnd
-            : setSingleRange
+          ? setRangeEnd
+          : setSingleRange
 
       if (!basis) {
         return
@@ -218,6 +220,8 @@ export const useDataGridKeydownEvent = <
         return
       }
 
+      createSnapshot(anchor)
+
       const current = getValues(field as Path<TFieldValues>)
       const next = ""
 
@@ -236,7 +240,46 @@ export const useDataGridKeydownEvent = <
 
       input.focus()
     },
-    [matrix, queryTool, getValues, execute, setValue]
+    [matrix, queryTool, getValues, execute, setValue, createSnapshot]
+  )
+
+  const handleSpaceKeyTogglableNumber = useCallback(
+    (anchor: DataGridCoordinates) => {
+      const field = matrix.getCellField(anchor)
+      const input = queryTool?.getInput(anchor)
+
+      if (!field || !input) {
+        return
+      }
+
+      createSnapshot(anchor)
+
+      const current = getValues(field as Path<TFieldValues>)
+      let checked = current.checked
+
+      // If the toggle is not disabled, then we want to uncheck the toggle.
+      if (!current.disabledToggle) {
+        checked = false
+      }
+
+      const next = { ...current, quantity: "", checked }
+
+      const command = new DataGridUpdateCommand({
+        next,
+        prev: current,
+        setter: (value) => {
+          setValue(field as Path<TFieldValues>, value, {
+            shouldDirty: true,
+            shouldTouch: true,
+          })
+        },
+      })
+
+      execute(command)
+
+      input.focus()
+    },
+    [matrix, queryTool, getValues, execute, setValue, createSnapshot]
   )
 
   const handleSpaceKey = useCallback(
@@ -257,6 +300,9 @@ export const useDataGridKeydownEvent = <
         case "boolean":
           handleSpaceKeyBoolean(anchor)
           break
+        case "togglable-number":
+          handleSpaceKeyTogglableNumber(anchor)
+          break
         case "number":
         case "text":
           handleSpaceKeyTextOrNumber(anchor)
@@ -269,6 +315,7 @@ export const useDataGridKeydownEvent = <
       matrix,
       handleSpaceKeyBoolean,
       handleSpaceKeyTextOrNumber,
+      handleSpaceKeyTogglableNumber,
     ]
   )
 
@@ -390,6 +437,7 @@ export const useDataGridKeydownEvent = <
       const type = matrix.getCellType(anchor)
 
       switch (type) {
+        case "togglable-number":
         case "text":
         case "number":
           handleEnterKeyTextOrNumber(e, anchor)
@@ -401,6 +449,29 @@ export const useDataGridKeydownEvent = <
       }
     },
     [anchor, matrix, handleEnterKeyTextOrNumber, handleEnterKeyBoolean]
+  )
+
+  const handleDeleteKeyTogglableNumber = useCallback(
+    (anchor: DataGridCoordinates, rangeEnd: DataGridCoordinates) => {
+      const fields = matrix.getFieldsInSelection(anchor, rangeEnd)
+      const prev = getSelectionValues(fields)
+
+      const next = prev.map((value) => ({
+        ...value,
+        quantity: "",
+        checked: value.disableToggle ? value.checked : false,
+      }))
+
+      const command = new DataGridBulkUpdateCommand({
+        fields,
+        next,
+        prev,
+        setter: setSelectionValues,
+      })
+
+      execute(command)
+    },
+    [matrix, getSelectionValues, setSelectionValues, execute]
   )
 
   const handleDeleteKeyTextOrNumber = useCallback(
@@ -461,6 +532,9 @@ export const useDataGridKeydownEvent = <
         case "boolean":
           handleDeleteKeyBoolean(anchor, rangeEnd)
           break
+        case "togglable-number":
+          handleDeleteKeyTogglableNumber(anchor, rangeEnd)
+          break
       }
     },
     [
@@ -470,6 +544,7 @@ export const useDataGridKeydownEvent = <
       matrix,
       handleDeleteKeyTextOrNumber,
       handleDeleteKeyBoolean,
+      handleDeleteKeyTogglableNumber,
     ]
   )
 
@@ -518,7 +593,7 @@ export const useDataGridKeydownEvent = <
           break
       }
     },
-    [anchor, isEditing, setTrapActive, containerRef]
+    [isEditing, setTrapActive, containerRef]
   )
 
   const handleKeyDownEvent = useCallback(

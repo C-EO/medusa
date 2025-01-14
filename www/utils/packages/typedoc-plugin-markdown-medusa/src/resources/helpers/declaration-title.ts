@@ -1,4 +1,4 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import {
   DeclarationReflection,
   LiteralType,
@@ -6,8 +6,8 @@ import {
   ReflectionKind,
   ReflectionType,
 } from "typedoc"
-import { MarkdownTheme } from "../../theme"
-import { memberSymbol, stripComments } from "../../utils"
+import { MarkdownTheme } from "../../theme.js"
+import { memberSymbol, stripComments } from "../../utils.js"
 import { escapeChars, stripLineBreaks, getType as getTypeUtils } from "utils"
 
 export default function (theme: MarkdownTheme) {

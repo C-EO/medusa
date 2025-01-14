@@ -1,38 +1,124 @@
-import { AdditionalData, PricingTypes, ProductTypes } from "@medusajs/types"
-import { ProductVariantWorkflowEvents } from "@medusajs/utils"
+import {
+  AdditionalData,
+  PricingTypes,
+  ProductTypes,
+} from "@medusajs/framework/types"
+import { ProductVariantWorkflowEvents } from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createHook,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep } from "../../common"
 import { updatePriceSetsStep } from "../../pricing"
 import { updateProductVariantsStep } from "../steps"
 import { getVariantPricingLinkStep } from "../steps/get-variant-pricing-link"
 
+/**
+ * The data to update one or more product variants, along with custom data that's passed to the workflow's hooks.
+ */
 export type UpdateProductVariantsWorkflowInput =
-  | {
+  (| {
+      /**
+       * A filter to select the product variants to update.
+       */
       selector: ProductTypes.FilterableProductVariantProps
+      /**
+       * The data to update in the product variants.
+       */
       update: ProductTypes.UpdateProductVariantDTO & {
+        /**
+         * The product variant's prices.
+         */
         prices?: Partial<PricingTypes.CreateMoneyAmountDTO>[]
       }
     }
   | {
+      /**
+       * The product variants to update.
+       */
       product_variants: (ProductTypes.UpsertProductVariantDTO & {
+        /**
+         * The product variant's prices.
+         */
         prices?: Partial<PricingTypes.CreateMoneyAmountDTO>[]
       })[]
-    }
+    }) & AdditionalData
 
 export const updateProductVariantsWorkflowId = "update-product-variants"
 /**
- * This workflow updates one or more product variants.
+ * This workflow updates one or more product variants. It's used by the [Update Product Variant Admin API Route](https://docs.medusajs.com/api/admin#products_postproductsidvariantsvariant_id).
+ * 
+ * This workflow has a hook that allows you to perform custom actions on the updated product variants. For example, you can pass under `additional_data` custom data that 
+ * allows you to update custom data models linked to the product variants.
+ * 
+ * You can also use this workflow within your own custom workflows, allowing you to wrap custom logic around product-variant update.
+ * 
+ * @example
+ * To update product variants by their IDs:
+ * 
+ * ```ts
+ * const { result } = await updateProductVariantsWorkflow(container)
+ * .run({
+ *   input: {
+ *     product_variants: [
+ *       {
+ *         id: "variant_123",
+ *         prices: [
+ *           {
+ *             amount: 10,
+ *             currency_code: "usd",
+ *           }
+ *         ]
+ *       },
+ *       {
+ *         id: "variant_321",
+ *         title: "Small Shirt",
+ *       },
+ *     ],
+ *     additional_data: {
+ *       erp_id: "123"
+ *     }
+ *   }
+ * })
+ * ```
+ * 
+ * You can also update product variants by a selector:
+ * 
+ * ```ts
+ * const { result } = await updateProductVariantsWorkflow(container)
+ * .run({
+ *   input: {
+ *     selector: {
+ *       product_id: "prod_123"
+ *     },
+ *     update: {
+ *       prices: [
+ *         {
+ *           amount: 10,
+ *           currency_code: "usd"
+ *         }
+ *       ]
+ *     },
+ *     additional_data: {
+ *       erp_id: "123"
+ *     }
+ *   }
+ * })
+ * ```
+ * 
+ * @summary
+ * 
+ * Update one or more product variants.
+ * 
+ * @property hooks.productVariantsUpdated - This hook is executed after the product variants are updated. You can consume this hook to perform custom actions on the updated product variants.
  */
 export const updateProductVariantsWorkflow = createWorkflow(
   updateProductVariantsWorkflowId,
   (
-    input: WorkflowData<UpdateProductVariantsWorkflowInput & AdditionalData>
+    input: WorkflowData<UpdateProductVariantsWorkflowInput>
   ) => {
     // Passing prices to the product module will fail, we want to keep them for after the variant is updated.
     const updateWithoutPrices = transform({ input }, (data) => {

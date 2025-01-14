@@ -1,7 +1,7 @@
-import { IAuthModuleService } from "@medusajs/types"
-import { Module, Modules } from "@medusajs/utils"
+import { IAuthModuleService } from "@medusajs/framework/types"
+import { Module, Modules } from "@medusajs/framework/utils"
 import { AuthModuleService } from "@services"
-import { SuiteOptions, moduleIntegrationTestRunner } from "medusa-test-utils"
+import { moduleIntegrationTestRunner, SuiteOptions } from "@medusajs/test-utils"
 import { resolve } from "path"
 
 let moduleOptions = {
@@ -54,7 +54,7 @@ moduleIntegrationTestRunner({
             linkable: "auth_identity_id",
             entity: "AuthIdentity",
             primaryKey: "id",
-            serviceName: "Auth",
+            serviceName: "auth",
             field: "authIdentity",
           },
         })
@@ -66,7 +66,7 @@ moduleIntegrationTestRunner({
             linkable: "provider_identity_id",
             entity: "ProviderIdentity",
             primaryKey: "id",
-            serviceName: "Auth",
+            serviceName: "auth",
             field: "providerIdentity",
           },
         })
@@ -84,7 +84,9 @@ moduleIntegrationTestRunner({
 
         expect(err).toEqual({
           success: false,
-          error: "Could not find a auth provider with id: facebook",
+          error: `
+Unable to retrieve the auth provider with id: facebook
+Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.`,
         })
       })
 

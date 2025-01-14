@@ -1,14 +1,20 @@
-import { isObject, isString } from "@medusajs/utils"
-import { GraphQLList } from "graphql"
-import { Knex } from "knex"
-import {
-  OrderBy,
-  QueryFormat,
-  QueryOptions,
-  SchemaObjectRepresentation,
-  SchemaPropertiesMap,
-  Select,
-} from "../types"
+import { Knex } from "@mikro-orm/knex"
+import { IndexTypes } from "@medusajs/framework/types"
+import { OrderBy, QueryFormat, QueryOptions, Select } from "@types"
+import { isObject, isString, GraphQLUtils } from "@medusajs/framework/utils"
+
+export const OPERATOR_MAP = {
+  $eq: "=",
+  $lt: "<",
+  $gt: ">",
+  $lte: "<=",
+  $gte: ">=",
+  $ne: "!=",
+  $in: "IN",
+  $is: "IS",
+  $like: "LIKE",
+  $ilike: "ILIKE",
+}
 
 export class QueryBuilder {
   private readonly structure: Select
@@ -16,10 +22,10 @@ export class QueryBuilder {
   private readonly knex: Knex
   private readonly selector: QueryFormat
   private readonly options?: QueryOptions
-  private readonly schema: SchemaObjectRepresentation
+  private readonly schema: IndexTypes.SchemaObjectRepresentation
 
   constructor(args: {
-    schema: SchemaObjectRepresentation
+    schema: IndexTypes.SchemaObjectRepresentation
     entityMap: Record<string, any>
     knex: Knex
     selector: QueryFormat
@@ -37,7 +43,7 @@ export class QueryBuilder {
     return Object.keys(structure ?? {}).filter((key) => key !== "entity")
   }
 
-  private getEntity(path): SchemaPropertiesMap[0] {
+  private getEntity(path): IndexTypes.SchemaPropertiesMap[0] {
     if (!this.schema._schemaPropertiesMap[path]) {
       throw new Error(`Could not find entity for path: ${path}`)
     }
@@ -55,7 +61,7 @@ export class QueryBuilder {
     let currentType = fieldRef.type
     let isArray = false
     while (currentType.ofType) {
-      if (currentType instanceof GraphQLList) {
+      if (currentType instanceof GraphQLUtils.GraphQLList) {
         isArray = true
       }
 
@@ -109,9 +115,7 @@ export class QueryBuilder {
     const isList = graphqlType.endsWith("[]")
     graphqlType = graphqlType.replace("[]", "")
 
-    return (
-      (graphqlToPostgresTypeMap[graphqlType] ?? "") + (isList ? "[]" : "") ?? ""
-    )
+    return (graphqlToPostgresTypeMap[graphqlType] ?? "") + (isList ? "[]" : "")
   }
 
   private parseWhere(
@@ -119,18 +123,6 @@ export class QueryBuilder {
     obj: object,
     builder: Knex.QueryBuilder
   ) {
-    const OPERATOR_MAP = {
-      $eq: "=",
-      $lt: "<",
-      $gt: ">",
-      $lte: "<=",
-      $gte: ">=",
-      $ne: "!=",
-      $in: "IN",
-      $is: "IS",
-      $like: "LIKE",
-      $ilike: "ILIKE",
-    }
     const keys = Object.keys(obj)
 
     const getPathAndField = (key: string) => {

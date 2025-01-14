@@ -1,6 +1,6 @@
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ICustomerModuleService } from "@medusajs/types"
 import { Modules } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
 import {
   generatePublishableKey,
   generateStoreHeaders,
@@ -32,7 +32,8 @@ medusaIntegrationTestRunner({
 
       it("should get all customer addresses and its count", async () => {
         const { customer, jwt } = await createAuthenticatedCustomer(
-          appContainer
+          api,
+          storeHeaders
         )
 
         await customerModuleService.createCustomerAddresses([

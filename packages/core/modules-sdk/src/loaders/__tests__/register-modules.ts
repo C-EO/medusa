@@ -1,20 +1,21 @@
 import { InternalModuleDeclaration, ModuleDefinition } from "@medusajs/types"
 import { ModulesDefinition } from "../../definitions"
-import { MODULE_RESOURCE_TYPE, MODULE_SCOPE } from "../../types"
+import { MODULE_SCOPE } from "../../types"
 import { registerMedusaModule } from "../register-modules"
 
-const RESOLVED_PACKAGE = "@medusajs/test-service-resolved"
-jest.mock("resolve-cwd", () => jest.fn(() => RESOLVED_PACKAGE))
+const testServiceResolved = require.resolve(
+  "../__fixtures__/test-service-resolved"
+)
+const defaultTestService = require.resolve("../__fixtures__/test-service")
 
 describe("module definitions loader", () => {
   const defaultDefinition: ModuleDefinition = {
     key: "testService",
-    defaultPackage: "@medusajs/test-service",
+    defaultPackage: defaultTestService,
     label: "TestService",
     isRequired: false,
     defaultModuleDeclaration: {
       scope: MODULE_SCOPE.INTERNAL,
-      resources: MODULE_RESOURCE_TYPE.SHARED,
     },
   }
 
@@ -43,7 +44,6 @@ describe("module definitions loader", () => {
         options: {},
         moduleDeclaration: {
           scope: "internal",
-          resources: "shared",
         },
       })
     )
@@ -51,6 +51,7 @@ describe("module definitions loader", () => {
 
   it("Resolves a custom module without pre-defined definition", () => {
     const res = registerMedusaModule("customModulesABC", {
+      resolve: testServiceResolved,
       options: {
         test: 123,
       },
@@ -58,13 +59,12 @@ describe("module definitions loader", () => {
 
     expect(res).toEqual({
       customModulesABC: expect.objectContaining({
-        resolutionPath: "@medusajs/test-service-resolved",
+        resolutionPath: testServiceResolved,
         definition: expect.objectContaining({
           key: "customModulesABC",
           label: "Custom: customModulesABC",
         }),
         moduleDeclaration: {
-          resources: "shared",
           scope: "internal",
         },
         options: {
@@ -127,7 +127,6 @@ describe("module definitions loader", () => {
         options: {},
         moduleDeclaration: {
           scope: "internal",
-          resources: "shared",
         },
       })
     )
@@ -146,12 +145,11 @@ describe("module definitions loader", () => {
 
       expect(res[defaultDefinition.key]).toEqual(
         expect.objectContaining({
-          resolutionPath: RESOLVED_PACKAGE,
+          resolutionPath: defaultTestService,
           definition: defaultDefinition,
           options: {},
           moduleDeclaration: {
             scope: "internal",
-            resources: "shared",
           },
         })
       )
@@ -167,17 +165,16 @@ describe("module definitions loader", () => {
       const res = registerMedusaModule(defaultDefinition.key, {
         scope: MODULE_SCOPE.INTERNAL,
         resolve: defaultDefinition.defaultPackage,
-        resources: MODULE_RESOURCE_TYPE.ISOLATED,
       } as InternalModuleDeclaration)
 
       expect(res[defaultDefinition.key]).toEqual(
         expect.objectContaining({
-          resolutionPath: RESOLVED_PACKAGE,
+          resolutionPath: defaultTestService,
           definition: defaultDefinition,
           options: {},
           moduleDeclaration: {
             scope: "internal",
-            resources: "isolated",
+
             resolve: defaultDefinition.defaultPackage,
           },
         })
@@ -200,7 +197,7 @@ describe("module definitions loader", () => {
           options: { test: 123 },
           moduleDeclaration: {
             scope: "internal",
-            resources: "shared",
+
             options: { test: 123 },
           },
         })
@@ -216,17 +213,16 @@ describe("module definitions loader", () => {
         resolve: defaultDefinition.defaultPackage,
         options: { test: 123 },
         scope: "internal",
-        resources: "isolated",
       } as any)
 
       expect(res[defaultDefinition.key]).toEqual(
         expect.objectContaining({
-          resolutionPath: RESOLVED_PACKAGE,
+          resolutionPath: defaultTestService,
           definition: defaultDefinition,
           options: { test: 123 },
           moduleDeclaration: {
             scope: "internal",
-            resources: "isolated",
+
             resolve: defaultDefinition.defaultPackage,
             options: { test: 123 },
           },

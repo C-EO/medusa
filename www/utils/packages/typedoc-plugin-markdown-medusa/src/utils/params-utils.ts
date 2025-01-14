@@ -1,5 +1,5 @@
 import { ReflectionKind } from "typedoc"
-import { ReflectionParameterType } from "../types"
+import { ReflectionParameterType } from "../types.js"
 
 export function flattenParams(
   current: ReflectionParameterType

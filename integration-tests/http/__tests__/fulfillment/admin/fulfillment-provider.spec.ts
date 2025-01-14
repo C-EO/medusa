@@ -1,4 +1,4 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   adminHeaders,
   createAdminUser,
@@ -31,12 +31,18 @@ medusaIntegrationTestRunner({
           )
 
           expect(response.status).toEqual(200)
-          expect(response.data.fulfillment_providers).toEqual([
-            expect.objectContaining({
-              id: "manual_test-provider",
-              is_enabled: true,
-            }),
-          ])
+          expect(response.data.fulfillment_providers).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: "manual_test-provider",
+                is_enabled: true,
+              }),
+              expect.objectContaining({
+                id: "manual-calculated_test-provider-calculated",
+                is_enabled: true,
+              }),
+            ])
+          )
         })
 
         it("should list all fulfillment providers scoped by stock location", async () => {

@@ -7,6 +7,7 @@ import {
   ComputerDesktopSolid,
   BuildingStorefront,
 } from "@medusajs/icons"
+import React from "react"
 
 const H1 = MDXComponents.h1!
 const P = MDXComponents.p!
@@ -18,8 +19,11 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div>
+      {/* @ts-expect-error React v19 doesn't recognize these as elements. */}
       <H1>Page Not Found</H1>
+      {/* @ts-expect-error React v19 doesn't recognize these as elements. */}
       <P>The page you were looking for isn&apos;t available.</P>
+      {/* @ts-expect-error React v19 doesn't recognize these as elements. */}
       <P>
         If you think this is a mistake, please
         <Link href="https://github.com/medusajs/medusa/issues/new?assignees=&labels=type%3A+docs&template=docs.yml">
@@ -35,7 +39,7 @@ export default function NotFound() {
             icon: BookOpen,
           },
           {
-            title: "Learning Resources",
+            title: "Development Resources",
             href: "!resources!",
             icon: AcademicCapSolid,
           },

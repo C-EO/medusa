@@ -2,28 +2,47 @@ import * as Dialog from "@radix-ui/react-dialog"
 
 import { SidebarLeft, TriangleRightMini, XMark } from "@medusajs/icons"
 import { IconButton, clx } from "@medusajs/ui"
-import { PropsWithChildren } from "react"
+import { AnimatePresence } from "motion/react"
+import { PropsWithChildren, ReactNode, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Link, Outlet, UIMatch, useMatches } from "react-router-dom"
+import {
+  Link,
+  Outlet,
+  UIMatch,
+  useMatches,
+  useNavigation,
+} from "react-router-dom"
 
 import { KeybindProvider } from "../../../providers/keybind-provider"
 import { useGlobalShortcuts } from "../../../providers/keybind-provider/hooks"
 import { useSidebar } from "../../../providers/sidebar-provider"
+import { ProgressBar } from "../../common/progress-bar"
 import { Notifications } from "../notifications"
 
 export const Shell = ({ children }: PropsWithChildren) => {
   const globalShortcuts = useGlobalShortcuts()
+  const navigation = useNavigation()
+
+  const loading = navigation.state === "loading"
 
   return (
     <KeybindProvider shortcuts={globalShortcuts}>
-      <div className="flex h-screen flex-col items-start overflow-hidden lg:flex-row">
+      <div className="relative flex h-screen flex-col items-start overflow-hidden lg:flex-row">
+        <NavigationBar loading={loading} />
         <div>
           <MobileSidebarContainer>{children}</MobileSidebarContainer>
           <DesktopSidebarContainer>{children}</DesktopSidebarContainer>
         </div>
         <div className="flex h-screen w-full flex-col overflow-auto">
           <Topbar />
-          <main className="flex h-full w-full flex-col items-center overflow-y-auto">
+          <main
+            className={clx(
+              "flex h-full w-full flex-col items-center overflow-y-auto transition-opacity delay-200 duration-200",
+              {
+                "opacity-25": loading,
+              }
+            )}
+          >
             <Gutter>
               <Outlet />
             </Gutter>
@@ -31,6 +50,36 @@ export const Shell = ({ children }: PropsWithChildren) => {
         </div>
       </div>
     </KeybindProvider>
+  )
+}
+
+const NavigationBar = ({ loading }: { loading: boolean }) => {
+  const [showBar, setShowBar] = useState(false)
+
+  /**
+   * If the loading state is true, we want to show the bar after a short delay.
+   * The delay is used to prevent the bar from flashing on quick navigations.
+   */
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>
+
+    if (loading) {
+      timeout = setTimeout(() => {
+        setShowBar(true)
+      }, 200)
+    } else {
+      setShowBar(false)
+    }
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [loading])
+
+  return (
+    <div className="fixed inset-x-0 top-0 z-50 h-1">
+      <AnimatePresence>{showBar ? <ProgressBar /> : null}</AnimatePresence>
+    </div>
   )
 }
 
@@ -45,18 +94,20 @@ const Gutter = ({ children }: PropsWithChildren) => {
 const Breadcrumbs = () => {
   const matches = useMatches() as unknown as UIMatch<
     unknown,
-    { crumb?: (data?: unknown) => string }
+    {
+      breadcrumb?: (match?: UIMatch) => string | ReactNode
+    }
   >[]
 
   const crumbs = matches
-    .filter((match) => Boolean(match.handle?.crumb))
+    .filter((match) => match.handle?.breadcrumb)
     .map((match) => {
       const handle = match.handle
 
-      let label: string | null = null
+      let label: string | ReactNode | undefined = undefined
 
       try {
-        label = handle.crumb!(match.data)
+        label = handle.breadcrumb?.(match)
       } catch (error) {
         // noop
       }
@@ -70,7 +121,7 @@ const Breadcrumbs = () => {
         path: match.pathname,
       }
     })
-    .filter(Boolean) as { label: string; path: string }[]
+    .filter(Boolean) as { label: string | ReactNode; path: string }[]
 
   return (
     <ol

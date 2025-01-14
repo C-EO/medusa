@@ -13,23 +13,23 @@ This documentation provides a reference to the data models in the Payment Module
 
 ```mermaid
 erDiagram
-	Capture }|--|{ Payment : payment
 	Payment ||--|| Refund : refunds
-	Payment }|--|{ PaymentCollection : payment_collection
-	Payment ||--|| PaymentSession : payment_session
+	Payment ||--|| Capture : captures
 	PaymentCollection }|--|{ PaymentProvider : payment_providers
 	PaymentCollection ||--|| PaymentSession : payment_sessions
-	Refund }|--|{ RefundReason : refund_reason
+	PaymentCollection ||--|| Payment : payments
+	PaymentSession ||--|| Payment : payment
+	RefundReason ||--|| Refund : refunds
 
 ```
 
-## Classes
+## Data Models
 
-- [Capture](../../payment_models/classes/payment_models.Capture/page.mdx)
-- [PaymentCollection](../../payment_models/classes/payment_models.PaymentCollection/page.mdx)
-- [PaymentMethodToken](../../payment_models/classes/payment_models.PaymentMethodToken/page.mdx)
-- [PaymentProvider](../../payment_models/classes/payment_models.PaymentProvider/page.mdx)
-- [PaymentSession](../../payment_models/classes/payment_models.PaymentSession/page.mdx)
-- [Payment](../../payment_models/classes/payment_models.Payment/page.mdx)
-- [RefundReason](../../payment_models/classes/payment_models.RefundReason/page.mdx)
-- [Refund](../../payment_models/classes/payment_models.Refund/page.mdx)
+- [Capture](../../payment_models/variables/payment_models.Capture/page.mdx)
+- [Payment](../../payment_models/variables/payment_models.Payment/page.mdx)
+- [PaymentCollection](../../payment_models/variables/payment_models.PaymentCollection/page.mdx)
+- [PaymentMethodToken](../../payment_models/variables/payment_models.PaymentMethodToken/page.mdx)
+- [PaymentProvider](../../payment_models/variables/payment_models.PaymentProvider/page.mdx)
+- [PaymentSession](../../payment_models/variables/payment_models.PaymentSession/page.mdx)
+- [Refund](../../payment_models/variables/payment_models.Refund/page.mdx)
+- [RefundReason](../../payment_models/variables/payment_models.RefundReason/page.mdx)

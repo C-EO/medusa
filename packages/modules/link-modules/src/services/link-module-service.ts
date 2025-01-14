@@ -8,7 +8,7 @@ import {
   ModuleJoinerConfig,
   RestoreReturn,
   SoftDeleteReturn,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   CommonEvents,
   InjectManager,
@@ -20,9 +20,8 @@ import {
   MedusaError,
   Modules,
   ModulesSdkUtils,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { LinkService } from "@services"
-import { shouldForceTransaction } from "../utils"
 
 type InjectedDependencies = {
   baseRepository: DAL.RepositoryService
@@ -35,9 +34,9 @@ type InjectedDependencies = {
   [Modules.EVENT_BUS]?: IEventBusModuleService
 }
 
-export default class LinkModuleService<TLink> implements ILinkModule {
+export default class LinkModuleService implements ILinkModule {
   protected baseRepository_: DAL.RepositoryService
-  protected readonly linkService_: LinkService<TLink>
+  protected readonly linkService_: LinkService<any>
   protected readonly eventBusModuleService_?: IEventBusModuleService
   protected readonly entityName_: string
   protected readonly serviceName_: string
@@ -151,7 +150,7 @@ export default class LinkModuleService<TLink> implements ILinkModule {
 
     const rows = await this.linkService_.list(filters, config, sharedContext)
 
-    return await this.baseRepository_.serialize<object[]>(rows)
+    return rows.map((row) => row.toJSON())
   }
 
   @InjectManager()
@@ -170,10 +169,10 @@ export default class LinkModuleService<TLink> implements ILinkModule {
       sharedContext
     )
 
-    return [await this.baseRepository_.serialize<object[]>(rows), count]
+    return [rows.map((row) => row.toJSON()), count]
   }
 
-  @InjectTransactionManager(shouldForceTransaction, "baseRepository_")
+  @InjectTransactionManager()
   async create(
     primaryKeyOrBulkData:
       | string
@@ -219,10 +218,10 @@ export default class LinkModuleService<TLink> implements ILinkModule {
       }))
     )
 
-    return await this.baseRepository_.serialize<object[]>(links)
+    return links.map((row) => row.toJSON())
   }
 
-  @InjectTransactionManager(shouldForceTransaction, "baseRepository_")
+  @InjectTransactionManager()
   async dismiss(
     primaryKeyOrBulkData: string | string[] | [string | string[], string][],
     foreignKeyData?: string,
@@ -244,10 +243,10 @@ export default class LinkModuleService<TLink> implements ILinkModule {
 
     const links = await this.linkService_.dismiss(data, sharedContext)
 
-    return await this.baseRepository_.serialize<object[]>(links)
+    return links.map((row) => row.toJSON())
   }
 
-  @InjectTransactionManager(shouldForceTransaction, "baseRepository_")
+  @InjectTransactionManager()
   async delete(
     data: any,
     @MedusaContext() sharedContext: Context = {}
@@ -322,7 +321,7 @@ export default class LinkModuleService<TLink> implements ILinkModule {
     return mappedCascadedEntitiesMap ? mappedCascadedEntitiesMap : void 0
   }
 
-  @InjectTransactionManager(shouldForceTransaction, "baseRepository_")
+  @InjectTransactionManager()
   protected async softDelete_(
     data: any[],
     @MedusaContext() sharedContext: Context = {}
@@ -380,7 +379,7 @@ export default class LinkModuleService<TLink> implements ILinkModule {
     return mappedCascadedEntitiesMap ? mappedCascadedEntitiesMap : void 0
   }
 
-  @InjectTransactionManager(shouldForceTransaction, "baseRepository_")
+  @InjectTransactionManager()
   async restore_(
     data: any,
     @MedusaContext() sharedContext: Context = {}

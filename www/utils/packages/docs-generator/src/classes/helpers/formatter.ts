@@ -4,8 +4,8 @@ import path from "path"
 import dirname from "../../utils/dirname.js"
 import { minimatch } from "minimatch"
 import { existsSync } from "fs"
-import * as prettier from "prettier"
 import getRelativePaths from "../../utils/get-relative-paths.js"
+import { formatWithPrettier } from "utils"
 
 /**
  * A class used to apply formatting to files using ESLint and other formatting options.
@@ -174,10 +174,7 @@ class Formatter {
     content: string,
     fileName: string
   ): Promise<string> {
-    const prettifiedContent = await this.formatStrWithPrettier(
-      content,
-      fileName
-    )
+    const prettifiedContent = await formatWithPrettier(content, fileName)
     const relevantConfig = await this.getESLintOverridesConfigForFile(fileName)
 
     const eslint = new ESLint({
@@ -201,27 +198,6 @@ class Formatter {
     }
 
     return newContent
-  }
-
-  /**
-   * Format a file's content with prettier.
-   *
-   * @param content - The content to format.
-   * @param fileName - The name of the file the content belongs to.
-   * @returns The formatted content
-   */
-  async formatStrWithPrettier(
-    content: string,
-    fileName: string
-  ): Promise<string> {
-    // load config of the file
-    const prettierConfig = (await prettier.resolveConfig(fileName)) || undefined
-
-    if (prettierConfig && !prettierConfig.parser) {
-      prettierConfig.parser = "babel-ts"
-    }
-
-    return await prettier.format(content, prettierConfig)
   }
 
   /**

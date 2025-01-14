@@ -1,10 +1,10 @@
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { MedusaRequest, MedusaResponse } from "../../../../types/routing"
+} from "@medusajs/framework/utils"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { StoreReturnReasonParamsType } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: MedusaRequest<StoreReturnReasonParamsType>,
@@ -17,7 +17,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "return_reason",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [return_reason] = await remoteQuery(queryObject)

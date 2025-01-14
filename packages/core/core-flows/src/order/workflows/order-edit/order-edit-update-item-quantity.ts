@@ -3,15 +3,20 @@ import {
   OrderDTO,
   OrderPreviewDTO,
   OrderWorkflow,
-} from "@medusajs/types"
-import { ChangeActionType, OrderChangeStatus } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  BigNumber,
+  ChangeActionType,
+  MathBN,
+  OrderChangeStatus,
+} from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createStep,
   createWorkflow,
   transform,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../../common"
 import { previewOrderChangeStep } from "../../steps/preview-order-change"
 import {
@@ -75,17 +80,30 @@ export const orderEditUpdateItemQuantityWorkflow = createWorkflow(
     const orderChangeActionInput = transform(
       { order, orderChange, items: input.items },
       ({ order, orderChange, items }) => {
-        return items.map((item) => ({
-          order_change_id: orderChange.id,
-          order_id: order.id,
-          version: orderChange.version,
-          action: ChangeActionType.ITEM_UPDATE,
-          internal_note: item.internal_note,
-          details: {
-            reference_id: item.id,
-            quantity: item.quantity,
-          },
-        }))
+        return items.map((item) => {
+          const existing = order?.items?.find(
+            (exItem) => exItem.id === item.id
+          )!
+
+          const quantityDiff = new BigNumber(
+            MathBN.sub(item.quantity, existing.quantity)
+          )
+
+          return {
+            order_change_id: orderChange.id,
+            order_id: order.id,
+            version: orderChange.version,
+            action: ChangeActionType.ITEM_UPDATE,
+            internal_note: item.internal_note,
+            details: {
+              reference_id: item.id,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              compare_at_unit_price: item.compare_at_unit_price,
+              quantity_diff: quantityDiff,
+            },
+          }
+        })
       }
     )
 

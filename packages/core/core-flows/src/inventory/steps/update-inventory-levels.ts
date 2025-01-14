@@ -1,11 +1,11 @@
-import { IInventoryService, InventoryTypes } from "@medusajs/types"
+import { IInventoryService, InventoryTypes } from "@medusajs/framework/types"
 import {
   convertItemResponseToUpdateRequest,
   getSelectsAndRelationsFromObjectArray,
-} from "@medusajs/utils"
-import { StepResponse, createStep } from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/utils"
+import { StepResponse, createStep } from "@medusajs/framework/workflows-sdk"
 
-import { Modules } from "@medusajs/utils"
+import { Modules } from "@medusajs/framework/utils"
 
 export const updateInventoryLevelsStepId = "update-inventory-levels-step"
 /**
@@ -13,10 +13,7 @@ export const updateInventoryLevelsStepId = "update-inventory-levels-step"
  */
 export const updateInventoryLevelsStep = createStep(
   updateInventoryLevelsStepId,
-  async (
-    input: InventoryTypes.BulkUpdateInventoryLevelInput[],
-    { container }
-  ) => {
+  async (input: InventoryTypes.UpdateInventoryLevelInput[], { container }) => {
     const inventoryService: IInventoryService = container.resolve(
       Modules.INVENTORY
     )
@@ -54,7 +51,7 @@ export const updateInventoryLevelsStep = createStep(
     await inventoryService.updateInventoryLevels(
       dataBeforeUpdate.map((data) =>
         convertItemResponseToUpdateRequest(data, selects, relations)
-      ) as InventoryTypes.BulkUpdateInventoryLevelInput[]
+      ) as InventoryTypes.UpdateInventoryLevelInput[]
     )
   }
 )

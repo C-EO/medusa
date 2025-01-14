@@ -609,6 +609,11 @@ export interface CartLineItemDTO extends CartLineItemTotalsDTO {
   product_type?: string
 
   /**
+   * The type of the associated product.
+   */
+  product_type_id?: string
+
+  /**
    * The collection of the associated product.
    */
   product_collection?: string
@@ -657,6 +662,11 @@ export interface CartLineItemDTO extends CartLineItemTotalsDTO {
    * Whether the line item price is tax inclusive.
    */
   is_tax_inclusive: boolean
+
+  /**
+   * Whether the line item price is a custom price.
+   */
+  is_custom_price: boolean
 
   /**
    * The calculated price of the line item.

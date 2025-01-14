@@ -8,7 +8,7 @@ import * as React from "react"
 
 const iconNames = Object.keys(Icons).filter((name) => name !== "default")
 
-const IconSearch = React.memo(function IconSearch() {
+const IconSearch = () => {
   const [query, setQuery] = React.useState<string | undefined>("")
 
   return (
@@ -23,7 +23,7 @@ const IconSearch = React.memo(function IconSearch() {
       </Container>
     </div>
   )
-})
+}
 
 const SearchResults = ({ query = "" }: { query?: string }) => {
   const cleanQuery = escapeStringRegexp(query.trim().replace(/\s/g, " "))

@@ -7,13 +7,13 @@ import { Form } from "../../common/form"
 
 type RouteModalFormProps<TFieldValues extends FieldValues> = PropsWithChildren<{
   form: UseFormReturn<TFieldValues>
-  blockSearch?: boolean
+  blockSearchParams?: boolean
   onClose?: (isSubmitSuccessful: boolean) => void
 }>
 
 export const RouteModalForm = <TFieldValues extends FieldValues = any>({
   form,
-  blockSearch = false,
+  blockSearchParams: blockSearch = false,
   children,
   onClose,
 }: RouteModalFormProps<TFieldValues>) => {

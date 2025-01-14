@@ -13,6 +13,7 @@ export const Npm2YarnCode = ({ npmCode, ...rest }: Npm2YarnCodeProps) => {
   const lang = "bash"
 
   const { title = "", ...codeOptions } = rest
+  codeOptions.hasTabs = true
 
   const tabs = [
     {

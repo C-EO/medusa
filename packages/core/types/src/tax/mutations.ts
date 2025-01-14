@@ -129,7 +129,7 @@ export interface UpdateTaxRateDTO {
   /**
    * Whether the tax rate is combinable.
    *
-   * Learn more [here](https://docs.medusajs.com/v2/resources/commerce-modules/tax/tax-rates-and-rules#combinable-tax-rates).
+   * Learn more [here](https://docs.medusajs.com/resources/commerce-modules/tax/tax-rates-and-rules#combinable-tax-rates).
    */
   is_combinable?: boolean
 
@@ -207,6 +207,26 @@ export interface CreateTaxRegionDTO {
 }
 
 /**
+ * The tax region to be updated.
+ */
+export interface UpdateTaxRegionDTO {
+  /**
+   * The id of the tax region to update
+   */
+  id: string
+
+  /**
+   * The province code of the tax region.
+   */
+  province_code?: string | null
+
+  /**
+   * Holds custom data in key-value pairs.
+   */
+  metadata?: MetadataType
+}
+
+/**
  * The tax rate rule to be created.
  */
 export interface CreateTaxRateRuleDTO {
@@ -214,7 +234,7 @@ export interface CreateTaxRateRuleDTO {
    * The snake-case name of the data model that the tax rule references.
    * For example, `product`.
    *
-   * Learn more in [this guide](https://docs.medusajs.com/experimental/tax/tax-rates-and-rules/#what-are-tax-rules).
+   * Learn more in [this guide](https://docs.medusajs.com/resources/commerce-modules/tax/tax-rates-and-rules#override-tax-rates-with-rules).
    */
   reference: string
 
@@ -222,7 +242,7 @@ export interface CreateTaxRateRuleDTO {
    * The ID of the record of the data model that the tax rule references.
    * For example, `prod_123`.
    *
-   * Learn more in [this guide](https://docs.medusajs.com/experimental/tax/tax-rates-and-rules/#what-are-tax-rules).
+   * Learn more in [this guide](https://docs.medusajs.com/resources/commerce-modules/tax/tax-rates-and-rules#override-tax-rates-with-rules).
    */
   reference_id: string
 

@@ -2,10 +2,10 @@ import { revokeApiKeysWorkflow } from "@medusajs/core-flows"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
+} from "@medusajs/framework/http"
 import { AdminRevokeApiKeyType } from "../../validators"
 import { refetchApiKey } from "../../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<AdminRevokeApiKeyType>,
@@ -24,7 +24,7 @@ export const POST = async (
   const apiKey = await refetchApiKey(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ api_key: apiKey })

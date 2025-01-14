@@ -287,7 +287,7 @@ export const ExchangeInboundSection = ({
           return true
         }
 
-        if (!item.variant.manage_inventory) {
+        if (!item.variant?.manage_inventory) {
           return true
         }
 
@@ -486,7 +486,7 @@ export const ExchangeInboundSection = ({
                 <Text
                   size="small"
                   leading="compact"
-                  className="text-ui-fg-muted inline ml-1"
+                  className="text-ui-fg-muted ml-1 inline"
                 >
                   ({t("fields.optional")})
                 </Text>

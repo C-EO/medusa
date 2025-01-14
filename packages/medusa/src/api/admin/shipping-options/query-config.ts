@@ -10,6 +10,7 @@ export const defaultAdminShippingOptionFields = [
   "*rules",
   "*type",
   "*prices",
+  "*prices.price_rules",
   "*service_zone",
   "*shipping_profile",
   "*provider",

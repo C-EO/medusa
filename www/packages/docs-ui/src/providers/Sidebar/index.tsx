@@ -6,13 +6,13 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
 } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { getScrolledTop } from "@/utils"
-import { useIsBrowser } from "@/hooks"
 import {
   SidebarItemSections,
   SidebarItem,
@@ -20,7 +20,9 @@ import {
   SidebarItemLink,
   InteractiveSidebarItem,
   SidebarItemCategory,
+  SidebarItemLinkWithParent,
 } from "types"
+import { useIsBrowser } from "../BrowserProvider"
 
 export type CurrentItemsState = SidebarSectionItems & {
   previousSidebar?: CurrentItemsState
@@ -34,11 +36,12 @@ export type SidebarContextType = {
   items: SidebarSectionItems
   currentItems: CurrentItemsState | undefined
   activePath: string | null
-  getActiveItem: () => SidebarItemLink | undefined
+  activeItem: SidebarItemLinkWithParent | undefined
   setActivePath: (path: string | null) => void
   isLinkActive: (item: SidebarItem, checkChildren?: boolean) => boolean
   isChildrenActive: (item: SidebarItemCategory) => boolean
-  addItems: (item: SidebarItem[], options?: ActionOptionsType) => void
+  addItems: (items: SidebarItem[], options?: ActionOptionsType) => void
+  removeItems: (items: SidebarItem[]) => void
   findItemInSection: (
     section: SidebarItem[],
     item: Partial<SidebarItem>,
@@ -50,7 +53,7 @@ export type SidebarContextType = {
   setDesktopSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>
   staticSidebarItems?: boolean
   shouldHandleHashChange: boolean
-  sidebarRef: React.RefObject<HTMLDivElement>
+  sidebarRef: React.RefObject<HTMLDivElement | null>
   goBack: () => void
   sidebarTopHeight: number
   setSidebarTopHeight: React.Dispatch<React.SetStateAction<number>>
@@ -59,6 +62,7 @@ export type SidebarContextType = {
   updatePersistedCategoryState: (title: string, opened: boolean) => void
   getPersistedCategoryState: (title: string) => boolean | undefined
   persistState: boolean
+  isSidebarShown: boolean
 } & SidebarStyleOptions
 
 export const SidebarContext = createContext<SidebarContextType | null>(null)
@@ -84,6 +88,22 @@ export type ActionType =
       type: "replace"
       replacementItems: SidebarSectionItems
     }
+  | {
+      type: "remove"
+      items: SidebarItem[]
+    }
+
+type LinksMap = Map<string, SidebarItemLinkWithParent>
+
+export const isSidebarItemLink = (
+  item: SidebarItem | undefined,
+  checkRef = true
+): item is SidebarItemLink => {
+  return (
+    item !== undefined &&
+    (item.type === "link" || (checkRef && item.type === "ref"))
+  )
+}
 
 const areItemsEqual = (itemA: SidebarItem, itemB: SidebarItem): boolean => {
   if (itemA.type === "separator" || itemB.type === "separator") {
@@ -91,7 +111,10 @@ const areItemsEqual = (itemA: SidebarItem, itemB: SidebarItem): boolean => {
   }
   const hasSameTitle = itemA.title === itemB.title
   const hasSamePath =
-    itemA.type === "link" && itemB.type === "link" && itemA.path === itemB.path
+    isSidebarItemLink(itemA) &&
+    isSidebarItemLink(itemB) &&
+    itemA.type === itemB.type &&
+    itemA.path === itemB.path
 
   return hasSameTitle || hasSamePath
 }
@@ -100,16 +123,19 @@ const findItem = (
   section: SidebarItem[],
   item: Partial<SidebarItem>,
   checkChildren = true
-): SidebarItemLink | undefined => {
-  let foundItem: SidebarItemLink | undefined
+): SidebarItemLinkWithParent | undefined => {
+  let foundItem: SidebarItemLinkWithParent | undefined
   section.some((i) => {
     if (i.type === "separator") {
       return false
     }
-    if (areItemsEqual(item as SidebarItem, i) && i.type === "link") {
-      foundItem = i
+    if (areItemsEqual(item as SidebarItem, i)) {
+      foundItem = i as SidebarItemLink
     } else if (checkChildren && i.children) {
       foundItem = findItem(i.children, item)
+      if (foundItem && !foundItem.parentItem) {
+        foundItem.parentItem = i
+      }
     }
 
     return foundItem !== undefined
@@ -118,9 +144,71 @@ const findItem = (
   return foundItem
 }
 
-export const reducer = (state: SidebarSectionItems, actionData: ActionType) => {
+const getLinksMap = (
+  items: SidebarItem[],
+  initMap?: LinksMap,
+  parentItem?: InteractiveSidebarItem
+): LinksMap => {
+  const map: LinksMap = initMap || new Map()
+
+  items.forEach((item) => {
+    if (item.type === "separator") {
+      return
+    }
+
+    if (isSidebarItemLink(item)) {
+      map.set(item.path, {
+        ...item,
+        parentItem,
+      })
+    }
+    if (item.children?.length) {
+      getLinksMap(item.children, map, item)
+    }
+  })
+
+  return map
+}
+
+export const reducer = (
+  state: SidebarSectionItems,
+  actionData: ActionType
+): SidebarSectionItems => {
   if (actionData.type === "replace") {
     return actionData.replacementItems
+  }
+  if (actionData.type === "remove") {
+    return {
+      ...state,
+      default: state.default.filter((item) => {
+        if (item.type === "separator") {
+          return true
+        }
+
+        const found = actionData.items.some((itemToRemove) => {
+          if (
+            itemToRemove.type === "separator" ||
+            itemToRemove.type !== item.type
+          ) {
+            return false
+          }
+
+          if (
+            itemToRemove.type === "category" ||
+            itemToRemove.type === "sub-category"
+          ) {
+            return itemToRemove.title === item.title
+          }
+
+          return (
+            itemToRemove.path === (item as SidebarItemLink).path &&
+            itemToRemove.title === (item as SidebarItemLink).title
+          )
+        })
+
+        return !found
+      }),
+    }
   }
   const { type, options } = actionData
   let { items } = actionData
@@ -171,9 +259,9 @@ export const reducer = (state: SidebarSectionItems, actionData: ActionType) => {
                   : [...(i.children || []), ...items],
               loaded: parent.changeLoaded
                 ? true
-                : i.type === "link"
-                ? i.loaded
-                : true,
+                : isSidebarItemLink(i)
+                  ? i.loaded
+                  : true,
             }
           }
           return i
@@ -222,6 +310,20 @@ export const SidebarProvider = ({
     CurrentItemsState | undefined
   >()
   const [activePath, setActivePath] = useState<string | null>("")
+  const linksMap: LinksMap = useMemo(() => {
+    return new Map([
+      ...getLinksMap(items.mobile),
+      ...getLinksMap(items.default),
+    ])
+  }, [items])
+  const findItemInSection = useCallback(findItem, [])
+  const activeItem = useMemo(() => {
+    if (activePath === null) {
+      return undefined
+    }
+
+    return linksMap.get(activePath)
+  }, [activePath, linksMap])
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false)
   const [sidebarTopHeight, setSidebarTopHeight] = useState(0)
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true)
@@ -229,34 +331,26 @@ export const SidebarProvider = ({
 
   const pathname = usePathname()
   const router = useRouter()
-  const isBrowser = useIsBrowser()
+  const { isBrowser } = useIsBrowser()
   const getResolvedScrollableElement = useCallback(() => {
     return scrollableElement || window
   }, [scrollableElement])
+  const isSidebarShown = useMemo(() => {
+    if (!isBrowser) {
+      return true
+    }
 
-  const findItemInSection = useCallback(findItem, [])
+    return document.getElementsByTagName("aside").length > 0
+  }, [isBrowser])
 
   const isItemLoaded = useCallback(
     (path: string) => {
-      const item =
-        findItemInSection(items.mobile, { path, type: "link" }) ||
-        findItemInSection(items.default, { path, type: "link" })
+      const item = linksMap.get(path)
 
       return item?.loaded || false
     },
-    [items]
+    [items, linksMap]
   )
-
-  const getActiveItem = useCallback(() => {
-    if (activePath === null) {
-      return undefined
-    }
-
-    return (
-      findItemInSection(items.mobile, { path: activePath, type: "link" }) ||
-      findItemInSection(items.default, { path: activePath, type: "link" })
-    )
-  }, [activePath, items, findItemInSection])
 
   const addItems = (newItems: SidebarItem[], options?: ActionOptionsType) => {
     dispatch({
@@ -266,9 +360,16 @@ export const SidebarProvider = ({
     })
   }
 
+  const removeItems = (itemsToRemove: SidebarItem[]) => {
+    dispatch({
+      type: "remove",
+      items: itemsToRemove,
+    })
+  }
+
   const isLinkActive = useCallback(
-    (item: SidebarItem, checkChildren = false): boolean => {
-      if (item.type !== "link") {
+    (item: SidebarItem, checkChildren = false, checkRef = true): boolean => {
+      if (!isSidebarItemLink(item, checkRef)) {
         return false
       }
 
@@ -311,22 +412,28 @@ export const SidebarProvider = ({
         if (item.type === "separator") {
           return false
         }
-        if (item.isChildSidebar && isLinkActive(item)) {
+        if (item.isChildSidebar && isLinkActive(item, false, false)) {
           currentSidebar = item
+          return true
+        }
+        if (!item.children?.length) {
+          return false
         }
 
-        if (!currentSidebar && item.children?.length) {
-          const childSidebar =
-            getCurrentSidebar(item.children) ||
-            findItem(item.children, {
-              path: activePath || undefined,
-              type: "link",
-            })
+        const childSidebar =
+          getCurrentSidebar(item.children) ||
+          (activePath
+            ? findItem(item.children, {
+                path: activePath,
+                type: "link",
+              })
+            : undefined)
 
-          if (childSidebar) {
-            currentSidebar = childSidebar.isChildSidebar ? childSidebar : item
-          }
-        }
+        currentSidebar = childSidebar
+          ? childSidebar.isChildSidebar
+            ? childSidebar
+            : item
+          : undefined
 
         return currentSidebar !== undefined
       })
@@ -344,7 +451,7 @@ export const SidebarProvider = ({
     const previousSidebar = currentItems.previousSidebar || items
 
     const backItem = previousSidebar.default.find(
-      (item) => item.type === "link" && !item.isChildSidebar
+      (item) => isSidebarItemLink(item) && !item.isChildSidebar
     ) as SidebarItemLink
 
     if (!backItem) {
@@ -381,10 +488,16 @@ export const SidebarProvider = ({
 
     const handleScroll = () => {
       if (getScrolledTop(resolvedScrollableElement) === 0) {
-        setActivePath("")
-        // can't use next router as it doesn't support
-        // changing url without scrolling
-        history.replaceState({}, "", location.pathname)
+        const firstItemPath =
+          items.default.length && isSidebarItemLink(items.default[0])
+            ? items.default[0].path
+            : ""
+        setActivePath(firstItemPath)
+        if (firstItemPath) {
+          router.push(`#${firstItemPath}`, {
+            scroll: false,
+          })
+        }
       }
     }
 
@@ -452,8 +565,8 @@ export const SidebarProvider = ({
     ) {
       const { children, ...parentItem } = currentSidebar
       const hasPreviousSidebar =
-        currentItems?.previousSidebar?.parentItem?.type === "link" &&
-        parentItem.type === "link" &&
+        isSidebarItemLink(currentItems?.previousSidebar?.parentItem) &&
+        isSidebarItemLink(parentItem) &&
         currentItems.previousSidebar.parentItem.path !== parentItem.path
 
       setCurrentItems({
@@ -468,6 +581,7 @@ export const SidebarProvider = ({
   useEffect(() => {
     if (resetOnCondition?.()) {
       resetItems()
+      setActivePath(null)
     }
   }, [resetOnCondition, resetItems])
 
@@ -527,6 +641,7 @@ export const SidebarProvider = ({
         items,
         currentItems,
         addItems,
+        removeItems,
         activePath,
         setActivePath,
         isLinkActive: isLinkActive,
@@ -536,7 +651,7 @@ export const SidebarProvider = ({
         setMobileSidebarOpen,
         desktopSidebarOpen,
         setDesktopSidebarOpen,
-        getActiveItem,
+        activeItem,
         staticSidebarItems,
         disableActiveTransition,
         shouldHandleHashChange,
@@ -549,6 +664,7 @@ export const SidebarProvider = ({
         updatePersistedCategoryState,
         getPersistedCategoryState,
         persistState,
+        isSidebarShown,
       }}
     >
       {children}

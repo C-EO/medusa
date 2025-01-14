@@ -3,17 +3,14 @@
  * operationId: PostActor_typeAuth_providerCallback
  * summary: Validate Authentication Callback
  * description: >
- *   This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. 
- * 
- * 
- *   It validates the authentication with the third-party provider and, if successful, returns an authentication token.
- * 
+ *   This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token.
+ *   All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route.
  *   
  *   You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the storefront. If the decoded data doesn't 
  *   have an `actor_id` property, then you must register the customer using the Create Customer API route passing the token in the request's Authorization header.
  * externalDocs:
- *   url: https://docs.medusajs.com/v2/resources/commerce-modules/auth/authentication-route#2-third-party-service-authenticate-flow
- *   description: Learn about third-party authentication flow.
+ *   url: https://docs.medusajs.com/v2/storefront-development/customers/third-party-login
+ *   description: "Storefront development: Implement third-party (social) login."
  * x-authenticated: false
  * parameters:
  *   - name: auth_provider
@@ -27,7 +24,7 @@
  *   - lang: Shell
  *     label: Google Provider
  *     source: curl -X POST '{backend_url}/auth/customer/google/callback?code=123'
- *   - lang: Shell
+ *   - lang: Bash
  *     label: GitHub Provider
  *     source: curl -X POST '{backend_url}/auth/customer/github/callback?code=123'
  * tags:

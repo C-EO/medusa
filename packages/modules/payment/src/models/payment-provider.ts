@@ -1,15 +1,12 @@
-import { Entity, OptionalProps, PrimaryKey, Property } from "@mikro-orm/core"
+import { model } from "@medusajs/framework/utils"
+import PaymentCollection from "./payment-collection"
 
-@Entity({ tableName: "payment_provider" })
-export default class PaymentProvider {
-  [OptionalProps]?: "is_enabled"
+const PaymentProvider = model.define("PaymentProvider", {
+  id: model.id().primaryKey(),
+  is_enabled: model.boolean().default(true),
+  payment_collections: model.manyToMany(() => PaymentCollection, {
+    mappedBy: "payment_providers",
+  }),
+})
 
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({
-    default: true,
-    columnType: "boolean",
-  })
-  is_enabled: boolean = true
-}
+export default PaymentProvider

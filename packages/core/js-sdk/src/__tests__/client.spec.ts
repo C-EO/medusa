@@ -12,13 +12,18 @@ const server = setupServer(
       test: "test",
     })
   }),
+  http.get(`${baseUrl}/some/path/test`, ({ request, params, cookies }) => {
+    return HttpResponse.json({
+      test: "test",
+    })
+  }),
   http.get(`${baseUrl}/throw`, ({ request, params, cookies }) => {
     return new HttpResponse(null, {
       status: 500,
       statusText: "Internal Server Error",
     })
   }),
-  http.get(`${baseUrl}/header`, ({ request, params, cookies }) => {
+  http.get(`${baseUrl}/header`, ({ request }) => {
     if (
       request.headers.get("X-custom-header") === "test" &&
       request.headers.get("Content-Type") === "application/json"
@@ -27,28 +32,43 @@ const server = setupServer(
         test: "test",
       })
     }
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
   }),
-  http.get(`${baseUrl}/replaced-header`, ({ request, params, cookies }) => {
-    request.headers
+  http.get(`${baseUrl}/replaced-header`, ({ request }) => {
     if (request.headers.get("Content-Type") === "application/xml") {
       return HttpResponse.json({
         test: "test",
       })
     }
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
   }),
-  http.get(`${baseUrl}/apikey`, ({ request, params, cookies }) => {
+  http.get(`${baseUrl}/apikey`, ({ request }) => {
     if (request.headers.get("authorization")?.startsWith("Basic")) {
       return HttpResponse.json({
         test: "test",
       })
     }
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
   }),
-  http.get(`${baseUrl}/pubkey`, ({ request, params, cookies }) => {
+  http.get(`${baseUrl}/pubkey`, ({ request }) => {
     if (request.headers.get(PUBLISHABLE_KEY_HEADER) === "test-pub-key") {
       return HttpResponse.json({
         test: "test",
       })
     }
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
   }),
   http.post(`${baseUrl}/create`, async ({ request, params, cookies }) => {
     return HttpResponse.json(await request.json())
@@ -56,12 +76,33 @@ const server = setupServer(
   http.delete(`${baseUrl}/delete/123`, async ({ request, params, cookies }) => {
     return HttpResponse.json({ test: "test" })
   }),
-  http.get(`${baseUrl}/jwt`, ({ request, params, cookies }) => {
+  http.get(`${baseUrl}/jwt`, ({ request }) => {
     if (request.headers.get("authorization") === "Bearer token-123") {
       return HttpResponse.json({
         test: "test",
       })
     }
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
+  }),
+  http.get(`${baseUrl}/nostore`, ({ request }) => {
+    if (!request.headers.get("authorization")) {
+      return HttpResponse.json({
+        test: "test",
+      })
+    }
+
+    return new HttpResponse(null, {
+      status: 500,
+      statusText: "Internal Server Error",
+    })
+  }),
+  http.get(`https://test.com/baseUrl`, ({ request, params, cookies }) => {
+    return HttpResponse.json({
+      test: "test",
+    })
   }),
   http.all("*", ({ request, params, cookies }) => {
     return new HttpResponse(null, {
@@ -83,7 +124,7 @@ describe("Client", () => {
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
-  describe("header configuration", () => {
+  describe("configuration", () => {
     it("should allow passing custom request headers while the defaults are preserved", async () => {
       const resp = await client.fetch<any>("header", {
         headers: { "X-custom-header": "test" },
@@ -131,6 +172,59 @@ describe("Client", () => {
       const resp = await pubClient.fetch<any>("pubkey")
       expect(resp).toEqual({ test: "test" })
     })
+
+    it("should gracefully handle a root base URL", async () => {
+      global.window = {
+        location: {
+          origin: "https://test.com",
+        },
+      } as any
+
+      const pubClient = new Client({
+        baseUrl: "/",
+      })
+
+      const resp = await pubClient.fetch<any>("baseUrl")
+      expect(resp).toEqual({ test: "test" })
+
+      global.window = undefined as any
+    })
+
+    it("should handle baseUrl with path correctly", async () => {
+      const pathClient = new Client({
+        baseUrl: `${baseUrl}/some/path`,
+      })
+
+      const resp = await pathClient.fetch<any>("test")
+      expect(resp).toEqual({ test: "test" })
+    })
+
+    it("should handle baseUrl with trailing slash path correctly", async () => {
+      const pathClient = new Client({
+        baseUrl: `${baseUrl}/some/path/`,
+      })
+
+      const resp = await pathClient.fetch<any>("test")
+      expect(resp).toEqual({ test: "test" })
+    })
+
+    it("should handle baseUrl with just origin", async () => {
+      const originClient = new Client({
+        baseUrl,
+      })
+
+      const resp = await originClient.fetch<any>("test")
+      expect(resp).toEqual({ test: "test" })
+    })
+
+    it("should handle baseUrl with just origin and trailing slash", async () => {
+      const originClient = new Client({
+        baseUrl: `${baseUrl}/`,
+      })
+
+      const resp = await originClient.fetch<any>("test")
+      expect(resp).toEqual({ test: "test" })
+    })
   })
 
   describe("GET requests", () => {
@@ -166,11 +260,11 @@ describe("Client", () => {
   })
 
   describe("Authrized requests", () => {
-    it("should set the token in memory by default", async () => {
+    it("should not store the token by default", async () => {
       const token = "token-123" // Eg. from a response after a successful authentication
       client.setToken(token)
 
-      const resp = await client.fetch<any>("jwt")
+      const resp = await client.fetch<any>("nostore")
       expect(resp).toEqual({ test: "test" })
     })
 
@@ -194,4 +288,6 @@ describe("Client", () => {
       global.window = undefined as any
     })
   })
+
+  
 })

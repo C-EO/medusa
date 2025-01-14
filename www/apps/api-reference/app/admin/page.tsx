@@ -1,43 +1,34 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import AreaProvider from "@/providers/area"
-import AdminContentV2 from "../_mdx/admin.mdx"
-import ClientLibrariesV2 from "../_mdx/client-libraries.mdx"
-import Section from "@/components/Section"
+import AdminContent from "@/markdown/admin.mdx"
 import Tags from "@/components/Tags"
-import DividedLayout from "@/layouts/Divided"
 import PageTitleProvider from "@/providers/page-title"
+import { getBaseSpecs } from "../../lib"
+import BaseSpecsProvider from "../../providers/base-specs"
+import React from "react"
 
-const ReferencePage = async () => {
+const AdminPage = async () => {
+  const data = await getBaseSpecs("admin")
+
   return (
-    <AreaProvider area={"admin"}>
-      <PageTitleProvider>
-        <h1 className="!text-h2 scroll-m-56 lg:pl-4" id="introduction">
-          Medusa V2 Admin API Reference
-        </h1>
-        <DividedLayout
-          mainContent={
-            <Section checkActiveOnScroll={true}>
-              <AdminContentV2 />
-            </Section>
-          }
-          codeContent={
-            <div className="mb-1 lg:mb-0">
-              <ClientLibrariesV2 />
-            </div>
-          }
-          className="flex-col-reverse"
-        />
-        <Tags />
-      </PageTitleProvider>
-    </AreaProvider>
+    <BaseSpecsProvider baseSpecs={data}>
+      <AreaProvider area={"admin"}>
+        <PageTitleProvider>
+          {/* @ts-ignore React v19 doesn't see MDX as valid component */}
+          <AdminContent />
+          <Tags tags={data?.tags} />
+        </PageTitleProvider>
+      </AreaProvider>
+    </BaseSpecsProvider>
   )
 }
 
-export default ReferencePage
+export default AdminPage
 
 export function generateMetadata() {
   return {
     title: `Medusa Admin API Reference`,
-    description: `REST API reference for the Medusa admin API. This reference includes code snippets and examples for Medusa JS Client and cURL.`,
+    description: `REST API reference for the Medusa v2 admin API, with code snippets and examples.`,
     metadataBase: process.env.NEXT_PUBLIC_BASE_URL,
   }
 }

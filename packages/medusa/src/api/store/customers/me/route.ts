@@ -1,27 +1,23 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import {
   StoreGetCustomerParamsType,
   StoreUpdateCustomerType,
 } from "../validators"
 import { refetchCustomer } from "../helpers"
-import { MedusaError } from "@medusajs/utils"
+import { MedusaError } from "@medusajs/framework/utils"
 import { updateCustomersWorkflow } from "@medusajs/core-flows"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<StoreGetCustomerParamsType>,
   res: MedusaResponse<HttpTypes.StoreCustomerResponse>
 ) => {
   const id = req.auth_context.actor_id
-  const customer = await refetchCustomer(
-    id,
-    req.scope,
-    req.remoteQueryConfig.fields
-  )
+  const customer = await refetchCustomer(id, req.scope, req.queryConfig.fields)
 
   if (!customer) {
     throw new MedusaError(
@@ -46,9 +42,9 @@ export const POST = async (
   })
 
   const customer = await refetchCustomer(
-    req.params.id,
+    customerId,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ customer })
 }

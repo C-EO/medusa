@@ -12,7 +12,7 @@ const workflowsOptions: FormattingOptionsType = {
   },
   "^modules/workflows/page\\.mdx": {
     reflectionDescription:
-      "This section of the documentation provides a reference to the utility functions of the `@medusajs/workflows-sdk` package.",
+      "This section of the documentation provides a reference to Medusa's Workflows SDK, where you can find all accepted inputs, expected output, and example code snippets.",
     reflectionGroups: {
       Namespaces: false,
       Enumerations: false,
@@ -26,13 +26,13 @@ const workflowsOptions: FormattingOptionsType = {
       slug: "/references/workflows",
     },
     reflectionTitle: {
-      fullReplacement: "Workflows API Reference",
+      fullReplacement: "Workflows SDK Reference",
     },
   },
   "^workflows/functions": {
     maxLevel: 1,
     reflectionDescription:
-      "This documentation provides a reference to the `{{alias}}` {{kind}}. It belongs to the `@medusajs/workflows-sdk` package.",
+      "This documentation provides a reference to the `{{alias}}` {{kind}}. It belongs to the Workflows SDK.",
     frontmatterData: {
       slug: "/references/workflows/{{alias}}",
       sidebar_label: "{{alias}}",
@@ -40,7 +40,7 @@ const workflowsOptions: FormattingOptionsType = {
     reflectionTitle: {
       kind: false,
       typeParameters: false,
-      suffix: "- Workflows API Reference",
+      suffix: "- Workflows SDK Reference",
     },
   },
   "^workflows/.*classes/.*StepResponse": {

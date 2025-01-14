@@ -108,7 +108,7 @@ export const SelectBadge = ({
         isValueSelected={isValueSelected}
         handleSelectAll={handleSelectAll}
         handleChange={handleChange}
-        parentRef={ref}
+        parentRef={ref as React.RefObject<HTMLDivElement>}
         passedRef={dropdownRef}
         setSelectedValues={setSelectedValues}
       />

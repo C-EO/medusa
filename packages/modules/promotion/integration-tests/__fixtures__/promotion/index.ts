@@ -2,8 +2,8 @@ import {
   CreatePromotionDTO,
   IPromotionModuleService,
   PromotionDTO,
-} from "@medusajs/types"
-import { isPresent } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import { isPresent, toMikroORMEntity } from "@medusajs/framework/utils"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
 import { Promotion } from "@models"
 import { defaultPromotionsData } from "./data"
@@ -17,7 +17,7 @@ export async function createPromotions(
   const promotions: Promotion[] = []
 
   for (let promotionData of promotionsData) {
-    let promotion = manager.create(Promotion, promotionData)
+    let promotion = manager.create(toMikroORMEntity(Promotion), promotionData)
 
     manager.persist(promotion)
     await manager.flush()

@@ -1,14 +1,14 @@
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 
 import { AdminGetWorkflowExecutionDetailsParamsType } from "../validators"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetWorkflowExecutionDetailsParamsType>,
@@ -20,7 +20,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "workflow_execution",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [workflowExecution] = await remoteQuery(queryObject)

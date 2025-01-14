@@ -1,5 +1,64 @@
 # @medusajs/product
 
+## 2.2.0
+
+## 2.1.3
+
+### Patch Changes
+
+- [#10668](https://github.com/medusajs/medusa/pull/10668) [`d08b71f9b87c68350e57016e62e406a9bdd82342`](https://github.com/medusajs/medusa/commit/d08b71f9b87c68350e57016e62e406a9bdd82342) Thanks [@riqwan](https://github.com/riqwan)! - fix(product): updating collections with products fix
+
+## 2.1.2
+
+### Patch Changes
+
+- [#10535](https://github.com/medusajs/medusa/pull/10535) [`16192d9b3077e36c6b1df7409a0c0f26f643cc6d`](https://github.com/medusajs/medusa/commit/16192d9b3077e36c6b1df7409a0c0f26f643cc6d) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(product): Only apply default order to products if user has not specified an order
+
+## 2.1.1
+
+## 2.1.0
+
+### Patch Changes
+
+- [#10326](https://github.com/medusajs/medusa/pull/10326) [`2838100efc8f1bef7f1bea022912dfbfa064bb56`](https://github.com/medusajs/medusa/commit/2838100efc8f1bef7f1bea022912dfbfa064bb56) Thanks [@shahednasser](https://github.com/shahednasser)! - fix(product): change export name of ProductImage
+
+## 2.0.7
+
+## 2.0.6
+
+### Patch Changes
+
+- [#10254](https://github.com/medusajs/medusa/pull/10254) [`c28d0db1647a5c8edaf0ba0faba6426e8a740399`](https://github.com/medusajs/medusa/commit/c28d0db1647a5c8edaf0ba0faba6426e8a740399) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(product,dashboard): Avoid duplicating images
+
+## 2.0.5
+
+### Patch Changes
+
+- [#10187](https://github.com/medusajs/medusa/pull/10187) [`1659c9be5d3ace1bed9f3a6e7206fe54e60645c0`](https://github.com/medusajs/medusa/commit/1659c9be5d3ace1bed9f3a6e7206fe54e60645c0) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(dashboard): Allow re-ordering product images
+
+- [#10144](https://github.com/medusajs/medusa/pull/10144) [`1f44281ed6bc2de0ba8ffec43f0671902b711520`](https://github.com/medusajs/medusa/commit/1f44281ed6bc2de0ba8ffec43f0671902b711520) Thanks [@adrien2p](https://github.com/adrien2p)! - fix(product): Update full descendant true when update parent category id
+
+- [#10119](https://github.com/medusajs/medusa/pull/10119) [`2822972e04f12d2ca9378dd09529ab6ca308a286`](https://github.com/medusajs/medusa/commit/2822972e04f12d2ca9378dd09529ab6ca308a286) Thanks [@adrien2p](https://github.com/adrien2p)! - Fix/mikro orm cli wrapper
+
+## 2.0.4
+
+## 2.0.3
+
+## 2.0.2
+
+## 2.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- [#7341](https://github.com/medusajs/medusa/pull/7341) [`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Medusa 2.0
+
+### Patch Changes
+
+- Updated dependencies [[`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e)]:
+  - @medusajs/framework@2.0.0
+
 ## 0.3.12
 
 ### Patch Changes

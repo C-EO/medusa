@@ -18,12 +18,13 @@ import {
   Trash,
 } from "@medusajs/icons"
 import { FetchError } from "@medusajs/js-sdk"
-import { ComponentPropsWithoutRef, forwardRef, useRef } from "react"
+import { ComponentPropsWithoutRef, forwardRef } from "react"
 import { ConditionalTooltip } from "../../common/conditional-tooltip"
 import { Form } from "../../common/form"
 import { InlineTip } from "../../common/inline-tip"
 import { Skeleton } from "../../common/skeleton"
 import { RouteDrawer, useRouteModal } from "../../modals"
+import { KeyboundForm } from "../../utilities/keybound-form"
 
 type MetaDataSubmitHook<TRes> = (
   params: { metadata?: Record<string, any> | null },
@@ -77,7 +78,6 @@ const InnerForm = <TRes,>({
   const { t } = useTranslation()
   const { handleSuccess } = useRouteModal()
 
-  const deletedOriginalRows = useRef<string[]>([])
   const hasUneditableRows = getHasUneditableRows(metadata)
 
   const form = useForm<z.infer<typeof MetadataSchema>>({
@@ -125,7 +125,7 @@ const InnerForm = <TRes,>({
 
   return (
     <RouteDrawer.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex flex-1 flex-col overflow-hidden"
       >
@@ -277,7 +277,7 @@ const InnerForm = <TRes,>({
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

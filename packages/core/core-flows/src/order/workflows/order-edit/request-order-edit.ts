@@ -1,10 +1,15 @@
-import { OrderChangeDTO, OrderDTO, OrderPreviewDTO } from "@medusajs/types"
-import { OrderChangeStatus } from "@medusajs/utils"
+import {
+  OrderChangeDTO,
+  OrderDTO,
+  OrderPreviewDTO,
+} from "@medusajs/framework/types"
+import { OrderChangeStatus } from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
   createStep,
   createWorkflow,
-} from "@medusajs/workflows-sdk"
+  transform,
+} from "@medusajs/framework/workflows-sdk"
 import { useRemoteQueryStep } from "../../../common"
 import { previewOrderChangeStep } from "../../steps"
 import { updateOrderChangesStep } from "../../steps/update-order-changes"
@@ -17,6 +22,25 @@ import { createOrUpdateOrderPaymentCollectionWorkflow } from "../create-or-updat
 export type OrderEditRequestWorkflowInput = {
   order_id: string
   requested_by?: string
+}
+
+function getOrderChangesData({
+  input,
+  orderChange,
+}: {
+  input: { requested_by?: string }
+  orderChange: { id: string }
+}) {
+  return transform({ input, orderChange }, ({ input, orderChange }) => {
+    return [
+      {
+        id: orderChange.id,
+        status: OrderChangeStatus.REQUESTED,
+        requested_at: new Date(),
+        requested_by: input.requested_by,
+      },
+    ]
+  })
 }
 
 /**
@@ -70,14 +94,8 @@ export const requestOrderEditRequestWorkflow = createWorkflow(
       orderChange,
     })
 
-    updateOrderChangesStep([
-      {
-        id: orderChange.id,
-        status: OrderChangeStatus.REQUESTED,
-        requested_at: new Date(),
-        requested_by: input.requested_by,
-      },
-    ])
+    const updateOrderChangesData = getOrderChangesData({ input, orderChange })
+    updateOrderChangesStep(updateOrderChangesData)
 
     createOrUpdateOrderPaymentCollectionWorkflow.runAsStep({
       input: {

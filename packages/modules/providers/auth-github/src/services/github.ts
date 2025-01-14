@@ -1,11 +1,15 @@
+import crypto from "crypto"
 import {
   AuthenticationInput,
   AuthenticationResponse,
   AuthIdentityProviderService,
   GithubAuthProviderOptions,
   Logger,
-} from "@medusajs/types"
-import { AbstractAuthModuleProvider, MedusaError } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  AbstractAuthModuleProvider,
+  MedusaError,
+} from "@medusajs/framework/utils"
 
 type InjectedDependencies = {
   logger: Logger
@@ -13,8 +17,10 @@ type InjectedDependencies = {
 
 interface LocalServiceConfig extends GithubAuthProviderOptions {}
 
-// TODO: Add state param that is stored in Redis, to prevent CSRF attacks
 export class GithubAuthService extends AbstractAuthModuleProvider {
+  static identifier = "github"
+  static DISPLAY_NAME = "Github Authentication"
+
   protected config_: LocalServiceConfig
   protected logger_: Logger
 
@@ -36,7 +42,8 @@ export class GithubAuthService extends AbstractAuthModuleProvider {
     { logger }: InjectedDependencies,
     options: GithubAuthProviderOptions
   ) {
-    super({}, { provider: "github", displayName: "Github Authentication" })
+    // @ts-ignore
+    super(...arguments)
     this.config_ = options
     this.logger_ = logger
   }
@@ -49,37 +56,53 @@ export class GithubAuthService extends AbstractAuthModuleProvider {
   }
 
   async authenticate(
-    req: AuthenticationInput
+    req: AuthenticationInput,
+    authIdentityService: AuthIdentityProviderService
   ): Promise<AuthenticationResponse> {
-    if (req.query?.error) {
+    const query: Record<string, string> = req.query ?? {}
+    const body: Record<string, string> = req.body ?? {}
+
+    if (query.error) {
       return {
         success: false,
-        error: `${req.query.error_description}, read more at: ${req.query.error_uri}`,
+        error: `${query.error_description}, read more at: ${query.error_uri}`,
       }
     }
 
-    return this.getRedirect(this.config_)
+    const stateKey = crypto.randomBytes(32).toString("hex")
+    const state = {
+      callback_url: body?.callback_url ?? this.config_.callbackUrl,
+    }
+
+    await authIdentityService.setState(stateKey, state)
+    return this.getRedirect(this.config_.clientId, state.callback_url, stateKey)
   }
 
   async validateCallback(
     req: AuthenticationInput,
     authIdentityService: AuthIdentityProviderService
   ): Promise<AuthenticationResponse> {
-    if (req.query && req.query.error) {
+    const query: Record<string, string> = req.query ?? {}
+    const body: Record<string, string> = req.body ?? {}
+
+    if (query.error) {
       return {
         success: false,
-        error: `${req.query.error_description}, read more at: ${req.query.error_uri}`,
+        error: `${query.error_description}, read more at: ${query.error_uri}`,
       }
     }
 
-    const code = req.query?.code ?? req.body?.code
+    const code = query?.code ?? body?.code
     if (!code) {
       return { success: false, error: "No code provided" }
     }
 
-    const params = `client_id=${this.config_.clientId}&client_secret=${
-      this.config_.clientSecret
-    }&code=${code}&redirect_uri=${encodeURIComponent(this.config_.callbackUrl)}`
+    const state = await authIdentityService.getState(query?.state as string)
+    if (!state) {
+      return { success: false, error: "No state provided, or session expired" }
+    }
+
+    const params = `client_id=${this.config_.clientId}&client_secret=${this.config_.clientSecret}&code=${code}&redirect_uri=${state.callback_url}`
 
     const exchangeTokenUrl = new URL(
       `https://github.com/login/oauth/access_token?${params}`
@@ -185,18 +208,12 @@ export class GithubAuthService extends AbstractAuthModuleProvider {
     }
   }
 
-  private getRedirect({ clientId, callbackUrl }: LocalServiceConfig) {
-    const redirectUrlParam = `redirect_uri=${encodeURIComponent(callbackUrl)}`
-    const clientIdParam = `client_id=${clientId}`
-    const responseTypeParam = "response_type=code"
-
-    const authUrl = new URL(
-      `https://github.com/login/oauth/authorize?${[
-        redirectUrlParam,
-        clientIdParam,
-        responseTypeParam,
-      ].join("&")}`
-    )
+  private getRedirect(clientId: string, callbackUrl: string, stateKey: string) {
+    const authUrl = new URL(`https://github.com/login/oauth/authorize`)
+    authUrl.searchParams.set("redirect_uri", callbackUrl)
+    authUrl.searchParams.set("client_id", clientId)
+    authUrl.searchParams.set("response_type", "code")
+    authUrl.searchParams.set("state", stateKey)
 
     return { success: true, location: authUrl.toString() }
   }

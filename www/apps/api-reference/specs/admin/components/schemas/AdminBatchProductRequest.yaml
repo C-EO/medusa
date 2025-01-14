@@ -11,7 +11,7 @@ properties:
     type: array
     description: The products to update.
     items:
-      $ref: ./AdminUpdateProduct.yaml
+      $ref: ./AdminBatchUpdateProduct.yaml
   delete:
     type: array
     description: The products to delete.

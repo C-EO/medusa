@@ -6,9 +6,9 @@ import {
   ReflectionKind,
   ReflectionType,
 } from "typedoc"
-import * as Handlebars from "handlebars"
-import { stripCode } from "../utils"
-import { Parameter, ParameterStyle, ReflectionParameterType } from "../types"
+import Handlebars from "handlebars"
+import { stripCode } from "../utils.js"
+import { Parameter, ParameterStyle, ReflectionParameterType } from "../types.js"
 import {
   getDmlRelationProperties,
   getReflectionType,
@@ -17,8 +17,9 @@ import {
   isDmlRelation,
   stripLineBreaks,
 } from "utils"
-import { MarkdownTheme } from "../theme"
+import { MarkdownTheme } from "../theme.js"
 import { getDmlProperties, isDmlEntity } from "utils"
+import { loadComment } from "./reflection-type-parameters.js"
 
 const ALLOWED_KINDS: ReflectionKind[] = [
   ReflectionKind.EnumMember,
@@ -336,6 +337,18 @@ export function getComments(
       parameter.type?.declaration?.signatures[0]?.comment
     ) {
       return parameter.type?.declaration?.signatures[0]?.comment
+    }
+  }
+  if (!parameter.comment && parameter.type?.type === "reference") {
+    // try to load comment
+    const commentContent = loadComment(parameter.type.name, parameter.project)
+    if (commentContent) {
+      return new Comment([
+        {
+          kind: "text",
+          text: commentContent,
+        },
+      ])
     }
   }
   return parameter.comment

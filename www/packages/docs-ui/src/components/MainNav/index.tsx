@@ -2,57 +2,81 @@
 
 import clsx from "clsx"
 import React from "react"
-import { MainNavigationDropdown } from "./NavigationDropdown"
-import { MainNavBreadcrumbs } from "./Breadcrumb"
 import {
+  BorderedIcon,
   Button,
   LinkButton,
   SearchModalOpener,
   useMainNav,
   useSidebar,
+  useSiteConfig,
 } from "../.."
-import { MainNavColorMode } from "./ColorMode"
-import { MainNavDivider } from "./Divider"
-import { MainNavSidebarOpener } from "./SidebarOpener"
-import { MainNavHelpButton } from "./HelpButton"
-import { SidebarLeftIcon } from "../Icons/SidebarLeft"
 import { MainNavEditDate } from "./EditDate"
+import { MainNavItems } from "./Items"
+import { MainNavDesktopMenu } from "./DesktopMenu"
+import { SidebarLeftIcon } from "../Icons/SidebarLeft"
+import { MainNavMobileMenu } from "./MobileMenu"
+import Link from "next/link"
+import { MainNavVersion } from "./Version"
 
-export const MainNav = () => {
-  const { reportIssueLink, editDate } = useMainNav()
-  const { setMobileSidebarOpen } = useSidebar()
+type MainNavProps = {
+  className?: string
+  itemsClassName?: string
+}
+
+export const MainNav = ({ className, itemsClassName }: MainNavProps) => {
+  const { editDate } = useMainNav()
+  const { setMobileSidebarOpen, isSidebarShown } = useSidebar()
+  const { config } = useSiteConfig()
+
   return (
     <div
       className={clsx(
-        "hidden sm:flex justify-between items-center",
-        "px-docs_1 py-docs_0.75 w-full z-20",
-        "sticky top-0 bg-medusa-bg-base"
+        "flex justify-between items-center",
+        "px-docs_1 w-full z-20",
+        "sticky top-0 bg-medusa-bg-base",
+        className
       )}
     >
-      <div className="flex items-center gap-docs_0.25">
-        <Button
-          className="lg:hidden"
-          variant="transparent-clear"
-          onClick={() => setMobileSidebarOpen(true)}
-        >
-          <SidebarLeftIcon />
-        </Button>
-        <MainNavSidebarOpener />
-        <MainNavigationDropdown />
-        <MainNavBreadcrumbs />
+      <div className="flex items-center gap-docs_1">
+        <div className="flex items-center gap-[10px]">
+          {isSidebarShown && (
+            <Button
+              className="lg:hidden my-docs_0.75 !p-[6.5px]"
+              variant="transparent-clear"
+              onClick={() => setMobileSidebarOpen(true)}
+            >
+              <SidebarLeftIcon />
+            </Button>
+          )}
+          <Link href={`${config.baseUrl}`}>
+            <BorderedIcon
+              icon={config.logo}
+              iconWrapperClassName="my-[14px]"
+              iconWidth={20}
+              iconHeight={20}
+            />
+          </Link>
+        </div>
+        <MainNavItems className={itemsClassName} />
       </div>
-      <div className="flex items-center gap-docs_0.75">
-        <div className="flex items-center gap-[6px] text-medusa-fg-muted">
+      <div className="flex items-center gap-docs_0.75 my-docs_0.75">
+        <div className="lg:flex items-center gap-docs_0.5 text-medusa-fg-subtle hidden">
+          <MainNavVersion />
           {editDate && <MainNavEditDate date={editDate} />}
-          <LinkButton href={reportIssueLink} variant="muted" target="_blank">
+          <LinkButton
+            href={config.reportIssueLink || ""}
+            variant="subtle"
+            target="_blank"
+            className="text-compact-small-plus"
+          >
             Report Issue
           </LinkButton>
         </div>
-        <MainNavDivider />
         <div className="flex items-center gap-docs_0.25">
-          <MainNavHelpButton />
-          <MainNavColorMode />
           <SearchModalOpener />
+          <MainNavDesktopMenu />
+          <MainNavMobileMenu />
         </div>
       </div>
     </div>

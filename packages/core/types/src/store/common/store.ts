@@ -1,4 +1,4 @@
-import { BaseFilterable } from "../../dal"
+import { BaseFilterable, OperatorMap } from "../../dal"
 
 export interface StoreCurrencyDTO {
   /**
@@ -99,4 +99,8 @@ export interface FilterableStoreProps
    * Filter stores by their names.
    */
   name?: string | string[]
+  /**
+   * Filter stores by their associated default sales channel's ID.
+   */
+  default_sales_channel_id?: string | string[] | OperatorMap<string | string[]>
 }

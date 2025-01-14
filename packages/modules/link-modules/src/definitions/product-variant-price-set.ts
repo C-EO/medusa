@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const ProductVariantPriceSet: ModuleJoinerConfig = {
   serviceName: LINKS.ProductVariantPriceSet,
@@ -41,6 +41,7 @@ export const ProductVariantPriceSet: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.PRODUCT,
+      entity: "ProductVariant",
       fieldAlias: {
         price_set: "price_set_link.price_set",
         prices: {
@@ -62,6 +63,7 @@ export const ProductVariantPriceSet: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.PRICING,
+      entity: "PriceSet",
       relationship: {
         serviceName: LINKS.ProductVariantPriceSet,
         primaryKey: "price_set_id",

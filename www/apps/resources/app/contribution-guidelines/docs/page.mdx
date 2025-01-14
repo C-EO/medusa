@@ -19,10 +19,10 @@ Medusa's documentation projects are all part of the documentation yarn workspace
 The workspace has the following two directories:
 
 - `apps`: this directory holds the different documentation websites and projects.
-  - `book`: includes the codebase for the Medusa Book. It's built with [Next.js 14](https://nextjs.org/).
-  - `resources`: includes the codebase for the Medusa Learning Resources documentation. It's built with [Next.js 14](https://nextjs.org/).
-  - `api-reference`: includes the codebase for the API reference website. It's built with [Next.js 14](https://nextjs.org/).
-  - `ui`: includes the codebase for the Medusa UI documentation website. It's built with [Next.js 14](https://nextjs.org/).
+  - `book`: includes the codebase for the [main Medusa documentation](https://docs.medusajs.com/). It's built with [Next.js 15](https://nextjs.org/).
+  - `resources`: includes the codebase for the Medusa Development Resources documentation. It's built with [Next.js 15](https://nextjs.org/).
+  - `api-reference`: includes the codebase for the API reference website. It's built with [Next.js 15](https://nextjs.org/).
+  - `ui`: includes the codebase for the Medusa UI documentation website. It's built with [Next.js 15](https://nextjs.org/).
 - `packages`: this directory holds the shared packages and components necessary for the development of the projects in the `apps` directory.
   - `docs-ui` includes the shared React components between the different apps.
   - `remark-rehype-plugins` includes Remark and Rehype plugins used by the documentation projects.
@@ -33,13 +33,13 @@ The workspace has the following two directories:
 
 All documentation projects are built with Next.js. The content is writtin in MDX files.
 
-### Medusa Book Content
+### Medusa Main Docs Content
 
-The content of the Medusa Book is placed under the `www/apps/book/app` directory.
+The content of the Medusa main docs are under the `www/apps/book/app` directory.
 
-### Medusa Learning Resources Content
+### Medusa Development Resources Content
 
-The content of the Medusa Resources documentation is placed under the `www/apps/resources/app` directory.
+The content of the Medusa Resources documentation are under the `www/apps/resources/app` directory.
 
 <Note>
 
@@ -51,7 +51,7 @@ Documentation pages under the `www/apps/resources/references` directory are gene
 
 The API reference's content is split into two types:
 
-1. Static content, which are the content related to getting started, expanding fields, and more. These are located in the `www/apps/api-reference/app/_mdx` directory. They are MDX files.
+1. Static content, which are the content related to getting started, expanding fields, and more. These are located in the `www/apps/api-reference/markdown` directory. They are MDX files.
 2. OpenAPI specs that are shown to developers when checking the reference of an API Route. These are generated from OpenApi Spec comments, which are under the `www/utils/generated/oas-output` directory.
 
 ### Medusa UI Documentation
@@ -119,7 +119,7 @@ The code snippet must be written using NPM.
 When a command uses the global option `-g`, add it at the end of the NPM command to ensure that it’s transformed to a Yarn command properly. For example:
 
 ```bash npm2yarn
-npm install @medusajs/medusa-cli -g
+npm install @medusajs/cli -g
 ```
 
 ---

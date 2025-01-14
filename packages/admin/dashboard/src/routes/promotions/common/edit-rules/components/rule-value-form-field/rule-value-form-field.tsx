@@ -1,6 +1,6 @@
 import { RuleAttributeOptionsResponse, StoreDTO } from "@medusajs/types"
 import { Input, Select } from "@medusajs/ui"
-import { RefCallBack, useWatch } from "react-hook-form"
+import { useWatch } from "react-hook-form"
 import { Form } from "../../../../../../components/common/form"
 import { Combobox } from "../../../../../../components/inputs/combobox"
 import { usePromotionRuleValues } from "../../../../../../hooks/api/promotions"
@@ -13,9 +13,8 @@ type RuleValueFormFieldType = {
     | "application_method.buy_rules"
     | "rules"
     | "application_method.target_rules"
-  valuesField: any
-  operatorsField: any
-  valuesRef: RefCallBack
+  name: string
+  operator: string
   fieldRule: any
   attributes: RuleAttributeOptionsResponse[]
   ruleType: "rules" | "target-rules" | "buy-rules"
@@ -39,9 +38,8 @@ export const RuleValueFormField = ({
   form,
   identifier,
   scope,
-  valuesField,
-  operatorsField,
-  valuesRef,
+  name,
+  operator,
   fieldRule,
   attributes,
   ruleType,
@@ -65,13 +63,13 @@ export const RuleValueFormField = ({
 
   const watchOperator = useWatch({
     control: form.control,
-    name: operatorsField.name,
+    name: operator,
   })
 
   return (
     <Form.Field
-      key={`${identifier}.${scope}.${valuesField.name}-${fieldRule.attribute}`}
-      {...valuesField}
+      key={`${identifier}.${scope}.${name}-${fieldRule.attribute}`}
+      name={name}
       render={({ field: { onChange, ref, ...field } }) => {
         if (attribute?.field_type === "number") {
           return (
@@ -82,7 +80,7 @@ export const RuleValueFormField = ({
                   type="number"
                   onChange={onChange}
                   className="bg-ui-bg-base"
-                  ref={valuesRef}
+                  ref={ref}
                   min={1}
                   disabled={!fieldRule.attribute}
                 />
@@ -96,6 +94,7 @@ export const RuleValueFormField = ({
               <Form.Control>
                 <Input
                   {...field}
+                  ref={ref}
                   onChange={onChange}
                   className="bg-ui-bg-base"
                   disabled={!fieldRule.attribute}
@@ -143,6 +142,7 @@ export const RuleValueFormField = ({
               <Form.Control>
                 <Combobox
                   {...field}
+                  ref={ref}
                   placeholder="Select Values"
                   options={options}
                   onChange={onChange}

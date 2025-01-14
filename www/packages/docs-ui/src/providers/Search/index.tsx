@@ -13,8 +13,12 @@ import { checkArraySameElms } from "../../utils"
 import {
   liteClient as algoliasearch,
   LiteClient as SearchClient,
+  type SearchResponses,
+  type SearchHits,
+  SearchResponse,
 } from "algoliasearch/lite"
 import clsx from "clsx"
+// @ts-expect-error can't install the types package because it doesn't support React v19
 import { CSSTransition, SwitchTransition } from "react-transition-group"
 
 export type SearchCommand = {
@@ -78,11 +82,37 @@ export const SearchProvider = ({
       async search(searchParams) {
         const requests =
           "requests" in searchParams ? searchParams.requests : searchParams
-        const noQueries = requests.every(
+        // always send this request, which is the main request with no filters
+        const mainRequest = requests[0]
+
+        // retrieve only requests that have filters
+        // this is to ensure that we show no result if no filter is selected
+        const requestsWithFilters = requests.filter((item) => {
+          if (
+            !item.params ||
+            typeof item.params !== "object" ||
+            !("tagFilters" in item.params)
+          ) {
+            return false
+          }
+
+          const tagFilters = item.params.tagFilters as string[]
+
+          // if no tag filters are specified, there's still one item,
+          // which is an empty array
+          return tagFilters.length >= 1 && tagFilters[0].length > 0
+        })
+
+        // check whether a query is entered in the search box
+        const noQueries = requestsWithFilters.every(
           (item) =>
-            ("facetQuery" in item && !item.facetQuery) ||
-            ("query" in item && !item.query)
+            !item.facetQuery &&
+            (!item.params ||
+              typeof item.params !== "object" ||
+              !("query" in item.params) ||
+              !item.params.query)
         )
+
         if (noQueries) {
           return Promise.resolve({
             results: requests.map(() => ({
@@ -99,7 +129,73 @@ export const SearchProvider = ({
           })
         }
 
-        return algoliaClient.search(searchParams)
+        // split requests per tags
+        const newRequests: typeof requestsWithFilters = [mainRequest]
+        for (const request of requestsWithFilters) {
+          const params = request.params as Record<string, unknown>
+          const tagFilters = (params.tagFilters as string[][])[0]
+
+          // if only one tag is selected, keep the request as-is
+          if (tagFilters.length === 1) {
+            newRequests.push(request)
+
+            continue
+          }
+
+          // if multiple tags are selected, split the tags
+          // to retrieve a small subset of results per each tag.
+          newRequests.push(
+            ...tagFilters.map((tag) => ({
+              ...request,
+              params: {
+                ...params,
+                tagFilters: [tag],
+              },
+              hitsPerPage: 4,
+            }))
+          )
+        }
+
+        return algoliaClient
+          .search<SearchHits>(newRequests)
+          .then((response) => {
+            // combine results of the same index and return the results
+            const resultsByIndex: {
+              [indexName: string]: SearchResponse<SearchHits>
+            } = {}
+            // extract the response of the main request
+            const mainResult = response.results[0]
+
+            response.results.forEach((result, indexNum) => {
+              if (indexNum === 0) {
+                // ignore the main request's result
+                return
+              }
+              const resultIndex = "index" in result ? result.index : undefined
+              const resultHits = "hits" in result ? result.hits : []
+
+              if (!resultIndex) {
+                return
+              }
+
+              resultsByIndex[resultIndex] = {
+                ...result,
+                ...(resultsByIndex[resultIndex] || {}),
+                hits: [
+                  ...(resultsByIndex[resultIndex]?.hits || []),
+                  ...resultHits,
+                ],
+                nbHits:
+                  (resultsByIndex[resultIndex]?.nbHits || 0) +
+                  resultHits.length,
+              }
+            })
+
+            return {
+              // append the results with the main request's results
+              results: [mainResult, ...Object.values(resultsByIndex)],
+            } as SearchResponses<any>
+          })
       },
     }
   }, [algolia.appId, algolia.apiKey])
@@ -112,6 +208,8 @@ export const SearchProvider = ({
       setDefaultFilters(initialDefaultFilters)
     }
   }, [initialDefaultFilters])
+
+  const componentWrapperRef = useRef(null)
 
   return (
     <SearchContext.Provider
@@ -133,7 +231,7 @@ export const SearchProvider = ({
           "!p-0 overflow-hidden relative h-full",
           "flex flex-col justify-between"
         )}
-        modalContainerClassName="sm:h-[480px] sm:max-h-[480px]"
+        modalContainerClassName="!h-[480px] max-h-[480px]"
         open={isOpen}
         onClose={() => setIsOpen(false)}
         passedRef={modalRef}
@@ -153,13 +251,14 @@ export const SearchProvider = ({
             }}
             timeout={250}
             key={command?.name || "search"}
+            nodeRef={componentWrapperRef}
           >
-            <>
+            <div ref={componentWrapperRef} className="h-full">
               {command === null && (
                 <Search {...searchProps} algolia={algolia} />
               )}
               {command?.component}
-            </>
+            </div>
           </CSSTransition>
         </SwitchTransition>
       </Modal>

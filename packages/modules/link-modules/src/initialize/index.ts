@@ -1,8 +1,4 @@
-import {
-  MedusaModule,
-  MODULE_RESOURCE_TYPE,
-  MODULE_SCOPE,
-} from "@medusajs/modules-sdk"
+import { MedusaModule, MODULE_SCOPE } from "@medusajs/framework/modules-sdk"
 import {
   ExternalModuleDeclaration,
   ILinkModule,
@@ -12,7 +8,7 @@ import {
   ModuleJoinerConfig,
   ModuleServiceInitializeCustomDataLayerOptions,
   ModuleServiceInitializeOptions,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   arrayDifference,
   composeLinkName,
@@ -21,7 +17,7 @@ import {
   Modules,
   simpleHash,
   toPascalCase,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import * as linkDefinitions from "../definitions"
 import { MigrationsExecutionPlanner } from "../migration"
 import { InitializeModuleInjectableDependencies } from "../types"
@@ -158,11 +154,6 @@ export const initialize = async (
       dependencies: [Modules.EVENT_BUS],
       defaultModuleDeclaration: {
         scope: MODULE_SCOPE.INTERNAL,
-        resources: injectedDependencies?.[
-          ContainerRegistrationKeys.PG_CONNECTION
-        ]
-          ? MODULE_RESOURCE_TYPE.SHARED
-          : MODULE_RESOURCE_TYPE.ISOLATED,
       },
     }
 

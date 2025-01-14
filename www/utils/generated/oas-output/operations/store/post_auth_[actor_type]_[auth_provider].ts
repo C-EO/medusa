@@ -9,8 +9,8 @@
  *   When used with a third-party provider, such as Google, the request returns a `location` property. You redirect to the
  *   specified URL in your storefront to continue authentication with the third-party service.
  * externalDocs:
- *   url: https://docs.medusajs.com/v2/resources/commerce-modules/auth/authentication-route#types-of-authentication-flows
- *   description: Learn about different authentication flows.
+ *   url: https://docs.medusajs.com/v2/storefront-development/customers/login#1-using-a-jwt-token
+ *   description: "Storefront development: How to login as a customer"
  * x-authenticated: false
  * parameters:
  *   - name: auth_provider
@@ -26,7 +26,12 @@
  *       schema:
  *         type: object
  *         title: input
- *         description: The input data necessary for authentication. For example, for email-pass authentication, pass `email` and `password` properties.
+ *         description: >
+ *           The input data necessary for authentication. 
+ * 
+ *           For example, for email-pass authentication, pass `email` and `password` properties. 
+ * 
+ *           For the Google and GitHub authentication providers, you can pass `callback_url` to indicate the URL in the frontend that the customer should be redirected to after completing their authentication. This will override the provider's `callbackUrl` configurations in `medusa-config.ts`.
  * x-codeSamples:
  *   - lang: Shell
  *     label: EmailPass Provider
@@ -37,14 +42,10 @@
  *         "email": "customer@gmail.com",
  *         "password": "supersecret"
  *       }'
- *   - lang: Shell
+ *   - lang: Bash
  *     label: Google Provider
  *     source:  |-
  *       curl -X POST '{backend_url}/auth/customer/google'
- *   - lang: Shell
- *     label: GitHub Provider
- *     source:  |-
- *       curl -X POST '{backend_url}/auth/customer/github'
  * tags:
  *   - Auth
  * responses:

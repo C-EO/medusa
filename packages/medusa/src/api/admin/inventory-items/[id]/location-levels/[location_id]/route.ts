@@ -2,14 +2,14 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { MedusaRequest, MedusaResponse } from "../../../../../../types/routing"
+} from "@medusajs/framework/utils"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
 import {
   deleteInventoryLevelsWorkflow,
   updateInventoryLevelsWorkflow,
 } from "@medusajs/core-flows"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import { refetchInventoryItem } from "../../../helpers"
 import { AdminUpdateInventoryLocationLevelType } from "../../../validators"
 
@@ -52,7 +52,7 @@ export const DELETE = async (
   const inventoryItem = await refetchInventoryItem(
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({
@@ -77,7 +77,7 @@ export const POST = async (
   const inventoryItem = await refetchInventoryItem(
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({

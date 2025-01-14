@@ -1,27 +1,30 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 
-import { productsQueryKeys } from "../../../hooks/api/products"
+import { productVariantQueryKeys } from "../../../hooks/api"
 import { sdk } from "../../../lib/client"
 import { queryClient } from "../../../lib/query-client"
 
-const queryKey = (id: string) => {
-  return [productsQueryKeys.detail(id)]
+const queryFn = async (id: string, variantId: string) => {
+  return await sdk.admin.product.retrieveVariant(id, variantId)
 }
 
-const queryFn = async (id: string) => {
-  return await sdk.admin.product.retrieve(id)
-}
-
-const editProductVariantQuery = (id: string) => ({
-  queryKey: queryKey(id),
-  queryFn: async () => queryFn(id),
+const editProductVariantQuery = (id: string, variantId: string) => ({
+  queryKey: productVariantQueryKeys.detail(variantId),
+  queryFn: async () => queryFn(id, variantId),
 })
 
 export const editProductVariantLoader = async ({
   params,
+  request,
 }: LoaderFunctionArgs) => {
   const id = params.id
-  const query = editProductVariantQuery(id!)
+
+  const searchParams = new URL(request.url).searchParams
+  const searchVariantId = searchParams.get("variant_id")
+
+  const variantId = params.variant_id || searchVariantId
+
+  const query = editProductVariantQuery(id!, variantId || searchVariantId!)
 
   return (
     queryClient.getQueryData<ReturnType<typeof queryFn>>(query.queryKey) ??

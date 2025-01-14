@@ -1,4 +1,4 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   adminHeaders,
   createAdminUser,
@@ -156,6 +156,37 @@ medusaIntegrationTestRunner({
             expect(e.response.data.message).toEqual("Unauthorized")
           })
       })
+
+      it("should fail to accept with an expired token", async () => {
+        jest.useFakeTimers()
+
+        const signup = await api.post("/auth/user/emailpass/register", {
+          email: "test@medusa-commerce.com",
+          password: "secret_password",
+        })
+
+        // Advance time by 25 hours
+        jest.advanceTimersByTime(25 * 60 * 60 * 1000)
+
+        await api
+          .post(
+            `/admin/invites/accept?token=${invite.token}`,
+            {
+              first_name: "Another Test",
+              last_name: "User",
+            },
+            {
+              headers: { authorization: `Bearer ${signup.data.token}` },
+            }
+          )
+          .catch((e) => {
+            expect(e.response.status).toEqual(401)
+            expect(e.response.data.message).toEqual("Unauthorized")
+          })
+
+        jest.useRealTimers()
+      })
+
       it("should resend an invite", async () => {
         const resendResponse = (
           await api.post(`/admin/invites/${invite.id}/resend`, {}, adminHeaders)

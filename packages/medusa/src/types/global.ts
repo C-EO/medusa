@@ -1,8 +1,9 @@
 import {
-  MedusaContainer as coreMedusaContainer,
+  FindConfig,
   RequestQueryFields,
-} from "@medusajs/types"
-import { FindConfig } from "./common"
+  Logger as coreLogger,
+  MedusaContainer as coreMedusaContainer,
+} from "@medusajs/framework/types"
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -27,25 +28,25 @@ declare global {
       /**
        * An object containing fields and variables to be used with the remoteQuery
        */
-      remoteQueryConfig: {
+      queryConfig: {
         fields: string[]
         pagination: {
           order?: Record<string, string>
-          skip?: number
+          skip: number
           take?: number
         }
       }
+
+      /**
+       * @deprecated. Instead use "req.queryConfig"
+       */
+      remoteQueryConfig: Request["queryConfig"]
+
       /**
        * An object containing the fields that are filterable e.g `{ id: Any<String> }`
        */
       filterableFields: Record<string, unknown>
       includes?: Record<string, boolean>
-      /**
-       * An array of fields and relations that are allowed to be queried, this can be set by the
-       * consumer as part of a middleware and it will take precedence over the defaultAllowedFields
-       * @deprecated use `allowed` instead
-       */
-      allowedFields?: string[]
       /**
        * An array of fields and relations that are allowed to be queried, this can be set by the
        * consumer as part of a middleware and it will take precedence over the defaultAllowedFields set
@@ -64,20 +65,6 @@ export type ClassConstructor<T> = {
 
 export type MedusaContainer = coreMedusaContainer
 
-export type Logger = {
-  panic: (data) => void
-  shouldLog: (level: string) => void
-  setLogLevel: (level: string) => void
-  unsetLogLevel: () => void
-  activity: (message: string, config?) => void
-  progress: (activityId, message) => void
-  error: (messageOrError, error?) => void
-  failure: (activityId, message) => void
-  success: (activityId, message) => void
-  debug: (message) => void
-  info: (message) => void
-  warn: (message) => void
-  log: (...args) => void
-}
+export type Logger = coreLogger
 
 export type Constructor<T> = new (...args: any[]) => T

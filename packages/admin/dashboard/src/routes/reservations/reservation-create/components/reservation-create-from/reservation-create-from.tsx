@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { Form } from "../../../../../components/common/form"
 import { Combobox } from "../../../../../components/inputs/combobox"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useInventoryItems } from "../../../../../hooks/api/inventory"
 import { useCreateReservationItem } from "../../../../../hooks/api/reservations"
 import { useStockLocations } from "../../../../../hooks/api/stock-locations"
@@ -91,6 +92,31 @@ export const ReservationCreateForm = (props: { inventoryItemId?: string }) => {
   const { mutateAsync, isPending } = useCreateReservationItem()
 
   const handleSubmit = form.handleSubmit(async (data) => {
+    const min = 1
+    const max = selectedLocationLevel?.available_quantity
+      ? selectedLocationLevel.available_quantity
+      : 0
+
+    if (!selectedLocationLevel?.available_quantity) {
+      form.setError("quantity", {
+        type: "manual",
+        message: t("inventory.reservation.errors.noAvaliableQuantity"),
+      })
+
+      return
+    }
+
+    if (data.quantity < min || data.quantity > max) {
+      form.setError("quantity", {
+        type: "manual",
+        message: t("inventory.reservation.errors.quantityOutOfRange", {
+          max: max,
+        }),
+      })
+
+      return
+    }
+
     await mutateAsync(data, {
       onSuccess: ({ reservation }) => {
         toast.success(t("inventory.reservation.successToast"))
@@ -108,7 +134,7 @@ export const ReservationCreateForm = (props: { inventoryItemId?: string }) => {
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex size-full flex-col overflow-hidden"
       >
@@ -219,12 +245,6 @@ export const ReservationCreateForm = (props: { inventoryItemId?: string }) => {
                           placeholder={t(
                             "inventory.reservation.quantityPlaceholder"
                           )}
-                          min={1}
-                          max={
-                            selectedLocationLevel?.available_quantity
-                              ? selectedLocationLevel.available_quantity
-                              : 0
-                          }
                           value={value || ""}
                           onChange={(e) => {
                             const value = e.target.value
@@ -285,7 +305,7 @@ export const ReservationCreateForm = (props: { inventoryItemId?: string }) => {
             </Button>
           </div>
         </RouteFocusModal.Footer>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

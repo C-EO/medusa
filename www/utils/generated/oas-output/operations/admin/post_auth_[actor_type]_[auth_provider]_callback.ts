@@ -3,10 +3,8 @@
  * operationId: PostActor_typeAuth_providerCallback
  * summary: Validate Authentication Callback
  * description: >
- *   This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. 
- * 
- * 
- *   It validates the authentication with the third-party provider and, if successful, returns an authentication token.
+ *   This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token.
+ *   All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route.
  * 
  *   
  *   You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the frontend. If the decoded data doesn't 
@@ -27,7 +25,7 @@
  *   - lang: Shell
  *     label: Google Provider
  *     source: curl -X POST '{backend_url}/auth/user/google/callback?code=123'
- *   - lang: Shell
+ *   - lang: Bash
  *     label: GitHub Provider
  *     source: curl -X POST '{backend_url}/auth/user/github/callback?code=123'
  * tags:

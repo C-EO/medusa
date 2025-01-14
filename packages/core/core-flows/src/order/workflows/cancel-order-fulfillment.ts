@@ -4,8 +4,12 @@ import {
   FulfillmentDTO,
   OrderDTO,
   OrderWorkflow,
-} from "@medusajs/types"
-import { MedusaError, Modules } from "@medusajs/utils"
+} from "@medusajs/framework/types"
+import {
+  MedusaError,
+  Modules,
+  OrderWorkflowEvents,
+} from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
@@ -14,8 +18,8 @@ import {
   createWorkflow,
   parallelize,
   transform,
-} from "@medusajs/workflows-sdk"
-import { useRemoteQueryStep } from "../../common"
+} from "@medusajs/framework/workflows-sdk"
+import { emitEventStep, useRemoteQueryStep } from "../../common"
 import { cancelFulfillmentWorkflow } from "../../fulfillment"
 import { adjustInventoryLevelsStep } from "../../inventory"
 import { cancelOrderFulfillmentStep } from "../steps/cancel-fulfillment"
@@ -111,16 +115,42 @@ function prepareInventoryUpdate({
   }
 }
 
+/**
+ * The data to cancel an order's fulfillment, along with custom data that's passed to the workflow's hooks.
+ */
+export type CancelOrderFulfillmentWorkflowInput = OrderWorkflow.CancelOrderFulfillmentWorkflowInput & AdditionalData
+
 export const cancelOrderFulfillmentWorkflowId = "cancel-order-fulfillment"
 /**
- * This workflow cancels an order's fulfillment.
+ * This workflow cancels an order's fulfillment. It's used by the [Cancel Order's Fulfillment Admin API Route](https://docs.medusajs.com/api/admin#orders_postordersidfulfillmentsfulfillment_idcancel).
+ * 
+ * This workflow has a hook that allows you to perform custom actions on the canceled fulfillment. For example, you can pass under `additional_data` custom data that 
+ * allows you to update custom data models linked to the fulfillment.
+ * 
+ * You can also use this workflow within your own custom workflows, allowing you to wrap custom logic around canceling a fulfillment.
+ * 
+ * @example
+ * const { result } = await cancelOrderFulfillmentWorkflow(container)
+ * .run({
+ *   input: {
+ *     order_id: "order_123",
+ *     fulfillment_id: "ful_123",
+ *     additional_data: {
+ *       reason: "Customer changed their mind"
+ *     }
+ *   }
+ * })
+ * 
+ * @summary
+ * 
+ * Cancel an order's fulfillment.
+ * 
+ * @property hooks.orderFulfillmentCanceled - This hook is executed after the fulfillment is canceled. You can consume this hook to perform custom actions on the canceled fulfillment.
  */
 export const cancelOrderFulfillmentWorkflow = createWorkflow(
   cancelOrderFulfillmentWorkflowId,
   (
-    input: WorkflowData<
-      OrderWorkflow.CancelOrderFulfillmentWorkflowInput & AdditionalData
-    >
+    input: WorkflowData<CancelOrderFulfillmentWorkflowInput>
   ) => {
     const order: OrderDTO & { fulfillments: FulfillmentDTO[] } =
       useRemoteQueryStep({
@@ -153,9 +183,20 @@ export const cancelOrderFulfillmentWorkflow = createWorkflow(
       prepareInventoryUpdate
     )
 
+    const eventData = transform({ order, fulfillment }, (data) => {
+      return {
+        order_id: data.order.id,
+        fulfillment_id: data.fulfillment.id,
+      }
+    })
+
     parallelize(
       cancelOrderFulfillmentStep(cancelOrderFulfillmentData),
-      adjustInventoryLevelsStep(inventoryAdjustment)
+      adjustInventoryLevelsStep(inventoryAdjustment),
+      emitEventStep({
+        eventName: OrderWorkflowEvents.FULFILLMENT_CANCELED,
+        data: eventData,
+      })
     )
 
     // last step because there is no compensation for this step

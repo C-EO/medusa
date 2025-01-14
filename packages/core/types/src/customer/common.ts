@@ -103,7 +103,7 @@ export interface CustomerAddressDTO {
 export interface FilterableCustomerAddressProps
   extends BaseFilterable<FilterableCustomerAddressProps> {
   /**
-   * Searches for addreses by properties such as name and street using this search term.
+   * Searches for addresses by properties such as name and street using this search term.
    */
   q?: string
 

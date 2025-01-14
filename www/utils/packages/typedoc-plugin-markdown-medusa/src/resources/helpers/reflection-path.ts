@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { ContainerReflection, ReflectionKind } from "typedoc"
-import { PageEvent } from "typedoc/dist/lib/output/events"
+import { PageEvent } from "typedoc"
 
 export default function () {
   Handlebars.registerHelper(

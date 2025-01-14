@@ -7,10 +7,11 @@ import {
   CustomerTypes,
   DAL,
   ICustomerModuleService,
+  InferEntityType,
   InternalModuleDeclaration,
   ModuleJoinerConfig,
   ModulesSdkTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 
 import {
   InjectManager,
@@ -18,7 +19,7 @@ import {
   isString,
   MedusaContext,
   MedusaService,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { EntityManager } from "@mikro-orm/core"
 import {
   Customer,
@@ -51,10 +52,18 @@ export default class CustomerModuleService
   implements ICustomerModuleService
 {
   protected baseRepository_: DAL.RepositoryService
-  protected customerService_: ModulesSdkTypes.IMedusaInternalService<Customer>
-  protected customerAddressService_: ModulesSdkTypes.IMedusaInternalService<CustomerAddress>
-  protected customerGroupService_: ModulesSdkTypes.IMedusaInternalService<CustomerGroup>
-  protected customerGroupCustomerService_: ModulesSdkTypes.IMedusaInternalService<CustomerGroupCustomer>
+  protected customerService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof Customer>
+  >
+  protected customerAddressService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof CustomerAddress>
+  >
+  protected customerGroupService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof CustomerGroup>
+  >
+  protected customerGroupCustomerService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof CustomerGroupCustomer>
+  >
 
   constructor(
     {
@@ -117,8 +126,14 @@ export default class CustomerModuleService
     @MedusaContext() sharedContext: Context = {}
   ): Promise<CustomerTypes.CustomerDTO[]> {
     const data = Array.isArray(dataOrArray) ? dataOrArray : [dataOrArray]
+    const customerAttributes = data.map(({ addresses, ...rest }) => {
+      return rest
+    })
 
-    const customers = await this.customerService_.create(data, sharedContext)
+    const customers = await this.customerService_.create(
+      customerAttributes,
+      sharedContext
+    )
 
     const addressDataWithCustomerIds = data
       .map(({ addresses }, i) => {
@@ -320,9 +335,11 @@ export default class CustomerModuleService
     )
 
     if (Array.isArray(data)) {
-      return (groupCustomers as unknown as CustomerGroupCustomer[]).map(
-        (gc) => ({ id: gc.id })
-      )
+      return (
+        groupCustomers as unknown as InferEntityType<
+          typeof CustomerGroupCustomer
+        >[]
+      ).map((gc) => ({ id: gc.id }))
     }
 
     return { id: groupCustomers.id }

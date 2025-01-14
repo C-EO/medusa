@@ -1,8 +1,5 @@
-import {
-  AdminInviteResponse,
-  HttpTypes,
-  PaginatedResponse,
-} from "@medusajs/types"
+import { FetchError } from "@medusajs/js-sdk"
+import { HttpTypes } from "@medusajs/types"
 import {
   QueryKey,
   UseMutationOptions,
@@ -13,7 +10,6 @@ import {
 import { sdk } from "../../lib/client"
 import { queryClient } from "../../lib/query-client"
 import { queryKeysFactory } from "../../lib/query-key-factory"
-import { FetchError } from "@medusajs/js-sdk"
 
 const INVITES_QUERY_KEY = "invites" as const
 const invitesQueryKeys = queryKeysFactory(INVITES_QUERY_KEY)
@@ -22,9 +18,9 @@ export const useInvite = (
   id: string,
   options?: Omit<
     UseQueryOptions<
-      { invite: HttpTypes.AdminInviteResponse },
+      HttpTypes.AdminInviteResponse,
       FetchError,
-      { invite: HttpTypes.AdminInviteResponse },
+      HttpTypes.AdminInviteResponse,
       QueryKey
     >,
     "queryFn" | "queryKey"
@@ -43,9 +39,9 @@ export const useInvites = (
   query?: Record<string, any>,
   options?: Omit<
     UseQueryOptions<
-      PaginatedResponse<{ invites: HttpTypes.AdminInviteResponse[] }>,
+      HttpTypes.AdminInviteListResponse,
       FetchError,
-      PaginatedResponse<{ invites: HttpTypes.AdminInviteResponse[] }>,
+      HttpTypes.AdminInviteListResponse,
       QueryKey
     >,
     "queryFn" | "queryKey"
@@ -62,7 +58,7 @@ export const useInvites = (
 
 export const useCreateInvite = (
   options?: UseMutationOptions<
-    { invite: AdminInviteResponse },
+    HttpTypes.AdminInviteResponse,
     FetchError,
     HttpTypes.AdminCreateInvite
   >
@@ -79,11 +75,7 @@ export const useCreateInvite = (
 
 export const useResendInvite = (
   id: string,
-  options?: UseMutationOptions<
-    { invite: AdminInviteResponse },
-    FetchError,
-    void
-  >
+  options?: UseMutationOptions<HttpTypes.AdminInviteResponse, FetchError, void>
 ) => {
   return useMutation({
     mutationFn: () => sdk.admin.invite.resend(id),
@@ -118,7 +110,7 @@ export const useDeleteInvite = (
 export const useAcceptInvite = (
   inviteToken: string,
   options?: UseMutationOptions<
-    { user: HttpTypes.AdminUserResponse },
+    HttpTypes.AdminAcceptInviteResponse,
     FetchError,
     HttpTypes.AdminAcceptInvite & { auth_token: string }
   >

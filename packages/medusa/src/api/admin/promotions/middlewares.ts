@@ -1,7 +1,9 @@
-import { MiddlewareRoute } from "@medusajs/framework"
-import { unlessPath } from "../../utils/unless-path"
-import { validateAndTransformBody } from "../../utils/validate-body"
-import { validateAndTransformQuery } from "../../utils/validate-query"
+import {
+  validateAndTransformBody,
+  validateAndTransformQuery,
+} from "@medusajs/framework"
+import { MiddlewareRoute, unlessPath } from "@medusajs/framework/http"
+import { DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT } from "../../../utils/middlewares"
 import { createBatchBody } from "../../utils/validators"
 import * as QueryConfig from "./query-config"
 import {
@@ -75,6 +77,9 @@ export const adminPromotionRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/promotions/:id/rules/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(AdminCreatePromotionRule, AdminUpdatePromotionRule)
@@ -88,6 +93,9 @@ export const adminPromotionRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/promotions/:id/target-rules/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(AdminCreatePromotionRule, AdminUpdatePromotionRule)
@@ -101,6 +109,9 @@ export const adminPromotionRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/promotions/:id/buy-rules/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(AdminCreatePromotionRule, AdminUpdatePromotionRule)

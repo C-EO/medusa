@@ -7,13 +7,11 @@ import { CampaignPromotionSection } from "./components/campaign-promotion-sectio
 import { CampaignSpend } from "./components/campaign-spend"
 import { campaignLoader } from "./loader"
 
-import after from "virtual:medusa/widgets/campaign/details/after"
-import before from "virtual:medusa/widgets/campaign/details/before"
-import sideAfter from "virtual:medusa/widgets/campaign/details/side/after"
-import sideBefore from "virtual:medusa/widgets/campaign/details/side/before"
 import { TwoColumnPageSkeleton } from "../../../components/common/skeleton"
 import { TwoColumnPage } from "../../../components/layout/pages"
+import { useDashboardExtension } from "../../../extensions"
 import { CampaignConfigurationSection } from "./components/campaign-configuration-section"
+import { CAMPAIGN_DETAIL_FIELDS } from "./constants"
 
 export const CampaignDetail = () => {
   const initialData = useLoaderData() as Awaited<
@@ -23,9 +21,11 @@ export const CampaignDetail = () => {
   const { id } = useParams()
   const { campaign, isLoading, isError, error } = useCampaign(
     id!,
-    { fields: "+promotions.id" },
+    { fields: CAMPAIGN_DETAIL_FIELDS },
     { initialData }
   )
+
+  const { getWidgets } = useDashboardExtension()
 
   if (isLoading || !campaign) {
     return (
@@ -45,10 +45,10 @@ export const CampaignDetail = () => {
   return (
     <TwoColumnPage
       widgets={{
-        after,
-        before,
-        sideAfter,
-        sideBefore,
+        after: getWidgets("campaign.details.after"),
+        before: getWidgets("campaign.details.before"),
+        sideAfter: getWidgets("campaign.details.side.after"),
+        sideBefore: getWidgets("campaign.details.side.before"),
       }}
       hasOutlet
       showJSON

@@ -1,5 +1,45 @@
 # @medusajs/ui
 
+## 4.0.3
+
+### Patch Changes
+
+- [#10458](https://github.com/medusajs/medusa/pull/10458) [`f7aaf2c8bb243c8478a943285628ba8eb331feb6`](https://github.com/medusajs/medusa/commit/f7aaf2c8bb243c8478a943285628ba8eb331feb6) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - chore(ui,icons): Add React 19/19-rc to peer dependencies
+
+- [#10753](https://github.com/medusajs/medusa/pull/10753) [`3253e19b3603adacd913b8cbb3e88c9beb0c931a`](https://github.com/medusajs/medusa/commit/3253e19b3603adacd913b8cbb3e88c9beb0c931a) Thanks [@shahednasser](https://github.com/shahednasser)! - chore(ui): general updates and fixes to TSDocs and types
+
+- Updated dependencies [[`f7aaf2c8bb243c8478a943285628ba8eb331feb6`](https://github.com/medusajs/medusa/commit/f7aaf2c8bb243c8478a943285628ba8eb331feb6)]:
+  - @medusajs/icons@2.2.0
+
+## 4.0.2
+
+### Patch Changes
+
+- [#10481](https://github.com/medusajs/medusa/pull/10481) [`c9a66b19afcfcc626f9e2e4531771dc36f66a65e`](https://github.com/medusajs/medusa/commit/c9a66b19afcfcc626f9e2e4531771dc36f66a65e) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard,ui): Bring ConditionBlock in line with design
+
+- Updated dependencies []:
+  - @medusajs/icons@2.1.1
+
+## 4.0.1
+
+### Patch Changes
+
+- [#9775](https://github.com/medusajs/medusa/pull/9775) [`59e6747800133e091d20c2c167f600981abc5c0d`](https://github.com/medusajs/medusa/commit/59e6747800133e091d20c2c167f600981abc5c0d) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard,ui): DateFilter should remain open
+
+- Updated dependencies []:
+  - @medusajs/icons@2.0.1
+
+## 4.0.0
+
+### Major Changes
+
+- [#7341](https://github.com/medusajs/medusa/pull/7341) [`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Medusa 2.0
+
+### Patch Changes
+
+- Updated dependencies [[`2e42e053d4c9d5445d227bdc268c66713aad8e2e`](https://github.com/medusajs/medusa/commit/2e42e053d4c9d5445d227bdc268c66713aad8e2e)]:
+  - @medusajs/icons@2.0.0
+
 ## 3.0.0
 
 ### Major Changes

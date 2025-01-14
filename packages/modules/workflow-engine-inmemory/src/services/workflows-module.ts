@@ -1,20 +1,21 @@
 import {
   Context,
   DAL,
+  InferEntityType,
   InternalModuleDeclaration,
   MedusaContainer,
   ModulesSdkTypes,
   WorkflowsSdkTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   InjectSharedContext,
   MedusaContext,
   ModulesSdkUtils,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import type {
   ReturnWorkflow,
   UnwrapWorkflowInputDataType,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { WorkflowExecution } from "@models"
 import { WorkflowOrchestratorService } from "@services"
 
@@ -25,9 +26,11 @@ type InjectedDependencies = {
 }
 
 export class WorkflowsModuleService<
-  TWorkflowExecution extends WorkflowExecution = WorkflowExecution
+  TWorkflowExecution extends InferEntityType<
+    typeof WorkflowExecution
+  > = InferEntityType<typeof WorkflowExecution>
 > extends ModulesSdkUtils.MedusaService<{
-  WorkflowExecution: { dto: WorkflowExecution }
+  WorkflowExecution: { dto: InferEntityType<typeof WorkflowExecution> }
 }>({ WorkflowExecution }) {
   protected baseRepository_: DAL.RepositoryService
   protected workflowExecutionService_: ModulesSdkTypes.IMedusaInternalService<TWorkflowExecution>

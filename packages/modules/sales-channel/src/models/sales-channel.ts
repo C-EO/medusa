@@ -1,67 +1,11 @@
-import { DALUtils, Searchable, generateEntityId } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 
-import { DAL } from "@medusajs/types"
-import {
-  BeforeCreate,
-  Entity,
-  Filter,
-  Index,
-  OnInit,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-} from "@mikro-orm/core"
+const SalesChannel = model.define("SalesChannel", {
+  id: model.id({ prefix: "sc" }).primaryKey(),
+  name: model.text().searchable(),
+  description: model.text().searchable().nullable(),
+  is_disabled: model.boolean().default(false),
+  metadata: model.json().nullable(),
+})
 
-type SalesChannelOptionalProps = "is_disabled" | DAL.ModelDateColumns
-
-@Entity()
-@Filter(DALUtils.mikroOrmSoftDeletableFilterOptions)
-export default class SalesChannel {
-  [OptionalProps]?: SalesChannelOptionalProps
-
-  @PrimaryKey({ columnType: "text" })
-  id!: string
-
-  @Searchable()
-  @Property({ columnType: "text" })
-  name!: string
-
-  @Searchable()
-  @Property({ columnType: "text", nullable: true })
-  description: string | null = null
-
-  @Property({ columnType: "boolean", default: false })
-  is_disabled: boolean = false
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  created_at: Date
-
-  @Property({ columnType: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null = null
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  updated_at: Date
-
-  @Index({ name: "IDX_sales_channel_deleted_at" })
-  @Property({ columnType: "timestamptz", nullable: true })
-  deleted_at: Date | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "sc")
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "sc")
-  }
-}
+export default SalesChannel

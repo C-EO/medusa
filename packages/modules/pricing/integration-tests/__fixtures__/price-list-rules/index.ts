@@ -1,5 +1,6 @@
 import { SqlEntityManager } from "@mikro-orm/postgresql"
 import { PriceListRule } from "@models"
+import { toMikroORMEntity } from "@medusajs/framework/utils"
 import { defaultPriceListRuleData } from "./data"
 
 export * from "./data"
@@ -11,7 +12,7 @@ export async function createPriceListRules(
   const priceListRules: PriceListRule[] = []
 
   for (let data of priceListRuleData) {
-    const plr = manager.create(PriceListRule, data)
+    const plr = manager.create(toMikroORMEntity(PriceListRule), data)
 
     priceListRules.push(plr)
   }

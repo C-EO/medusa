@@ -1,8 +1,10 @@
-import * as Handlebars from "handlebars"
-import { MarkdownTheme } from "../../theme"
+import Handlebars from "handlebars"
+import { MarkdownTheme } from "../../theme.js"
 import { stringify } from "yaml"
-import { replaceTemplateVariables } from "../../utils/reflection-template-strings"
+import { replaceTemplateVariables } from "../../utils/reflection-template-strings.js"
 import { Reflection } from "typedoc"
+import { FrontmatterData } from "types"
+import { getTagComments, getTagsAsArray, getUniqueStrArray } from "utils"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper("frontmatter", function (this: Reflection) {
@@ -13,34 +15,44 @@ export default function (theme: MarkdownTheme) {
     }
 
     // format frontmatter data in case it has any template variables
+    const resolvedFrontmatter = resolveFrontmatterVariables(
+      frontmatterData,
+      this
+    )
 
-    return `---\n${stringify(
-      resolveFrontmatterVariables(frontmatterData, this)
-    ).trim()}\n---\n\n`
+    // check if reflection has an `@tags` tag
+    const tagsComment = getTagComments(this)
+    if (tagsComment?.length && !("tags" in resolvedFrontmatter)) {
+      resolvedFrontmatter["tags"] = []
+    }
+    tagsComment?.forEach((tag) => {
+      const tagContent = getTagsAsArray(tag)
+      resolvedFrontmatter["tags"]?.push(...tagContent)
+    })
+    if (resolvedFrontmatter["tags"]?.length) {
+      resolvedFrontmatter["tags"] = getUniqueStrArray(
+        resolvedFrontmatter["tags"]
+      )
+    }
+
+    return `---\n${stringify(resolvedFrontmatter).trim()}\n---\n\n`
   })
 }
 
 function resolveFrontmatterVariables(
-  frontmatterData: Record<string, unknown>,
+  frontmatterData: FrontmatterData,
   reflection: Reflection
-): Record<string, unknown> {
-  const tempFrontmatterData = Object.assign({}, frontmatterData)
+): FrontmatterData {
+  const tempFrontmatterData: FrontmatterData = JSON.parse(
+    JSON.stringify(frontmatterData)
+  )
   Object.keys(tempFrontmatterData).forEach((key) => {
     const value = tempFrontmatterData[key]
-    if (!value) {
+    if (!value || typeof value !== "string") {
       return
     }
 
-    switch (typeof value) {
-      case "object":
-        tempFrontmatterData[key] = resolveFrontmatterVariables(
-          value as Record<string, unknown>,
-          reflection
-        )
-        break
-      case "string":
-        tempFrontmatterData[key] = replaceTemplateVariables(reflection, value)
-    }
+    tempFrontmatterData[key] = replaceTemplateVariables(reflection, value)
   })
 
   return tempFrontmatterData

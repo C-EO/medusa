@@ -8,7 +8,9 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCreateProductCategory } from "../../../../../hooks/api/categories"
+import { transformNullableFormData } from "../../../../../lib/form-helpers"
 import { CreateCategoryDetails } from "./create-category-details"
 import { CreateCategoryNesting } from "./create-category-nesting"
 import { CreateCategoryDetailsSchema, CreateCategorySchema } from "./schema"
@@ -78,13 +80,15 @@ export const CreateCategoryForm = ({
   const { mutateAsync, isPending } = useCreateProductCategory()
 
   const handleSubmit = form.handleSubmit((data) => {
-    const { visibility, status, parent_category_id, rank, ...rest } = data
+    const { visibility, status, parent_category_id, rank, name, ...rest } = data
+    const parsedData = transformNullableFormData(rest, false)
 
     setShouldFreeze(true)
 
     mutateAsync(
       {
-        ...rest,
+        name: name,
+        ...parsedData,
         parent_category_id: parent_category_id ?? undefined,
         rank: rank ?? undefined,
         is_active: status === "active",
@@ -121,7 +125,7 @@ export const CreateCategoryForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex size-full flex-col overflow-hidden"
       >
@@ -132,12 +136,12 @@ export const CreateCategoryForm = ({
         >
           <RouteFocusModal.Header>
             <div className="flex w-full items-center justify-between">
-              <div className="-my-2 w-fit border-l">
-                <ProgressTabs.List className="grid w-full grid-cols-4">
+              <div className="-my-2 w-full max-w-[400px] border-l">
+                <ProgressTabs.List className="grid w-full grid-cols-2">
                   <ProgressTabs.Trigger
                     value={Tab.DETAILS}
                     status={detailsStatus}
-                    className="w-full min-w-0 max-w-[200px] overflow-hidden"
+                    className="w-full min-w-0 overflow-hidden"
                   >
                     <span className="truncate">
                       {t("categories.create.tabs.details")}
@@ -146,7 +150,7 @@ export const CreateCategoryForm = ({
                   <ProgressTabs.Trigger
                     value={Tab.ORGANIZE}
                     status={nestingStatus}
-                    className="w-full min-w-0 max-w-[200px] overflow-hidden"
+                    className="w-full min-w-0 overflow-hidden"
                   >
                     <span className="truncate">
                       {t("categories.create.tabs.organize")}
@@ -198,7 +202,7 @@ export const CreateCategoryForm = ({
             </div>
           </RouteFocusModal.Footer>
         </ProgressTabs>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

@@ -1,11 +1,11 @@
-import { IPricingModuleService } from "@medusajs/types"
+import { IPricingModuleService } from "@medusajs/framework/types"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
 import { Price } from "../../../../src/models"
 import { createPrices } from "../../../__fixtures__/price"
 import { createPriceRules } from "../../../__fixtures__/price-rule"
 import { createPriceSets } from "../../../__fixtures__/price-set"
-import { Modules } from "@medusajs/utils"
+import { Modules, toMikroORMEntity } from "@medusajs/framework/utils"
 
 jest.setTimeout(30000)
 
@@ -268,13 +268,13 @@ moduleIntegrationTestRunner<IPricingModuleService>({
           })
 
           it("should create a PriceRule successfully", async () => {
-            const price: Price = testManager.create(Price, {
+            const price = testManager.create(toMikroORMEntity(Price), {
               currency_code: "EUR",
               amount: 100,
               price_set_id: "price-set-1",
               title: "test",
               rules_count: 0,
-            } as Price)
+            })
 
             await testManager.persist(price).flush()
 

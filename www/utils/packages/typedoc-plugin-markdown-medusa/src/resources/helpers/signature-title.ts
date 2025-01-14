@@ -1,13 +1,13 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import {
   ParameterReflection,
   ReflectionKind,
   SignatureReflection,
 } from "typedoc"
-import { memberSymbol } from "../../utils"
-import { MarkdownTheme } from "../../theme"
+import { memberSymbol } from "../../utils.js"
+import { MarkdownTheme } from "../../theme.js"
 import { getHTMLChar } from "utils"
-import getCorrectDeclarationReflection from "../../utils/get-correct-declaration-reflection"
+import getCorrectDeclarationReflection from "../../utils/get-correct-declaration-reflection.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

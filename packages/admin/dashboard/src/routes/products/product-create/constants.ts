@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { i18n } from "../../../components/utilities/i18n/i18n.tsx"
-import { optionalInt } from "../../../lib/validation.ts"
+import { optionalFloat, optionalInt } from "../../../lib/validation.ts"
 import { decorateVariantsWithDefaultValues } from "./utils.ts"
 
 export const MediaSchema = z.object({
@@ -25,14 +25,13 @@ const ProductCreateVariantSchema = z.object({
   weight: optionalInt,
   material: z.string().optional(),
   origin_country: z.string().optional(),
-  custom_title: z.string().optional(),
   sku: z.string().optional(),
   manage_inventory: z.boolean().optional(),
   allow_backorder: z.boolean().optional(),
   inventory_kit: z.boolean().optional(),
   options: z.record(z.string(), z.string()),
   variant_rank: z.number(),
-  prices: z.record(z.string(), optionalInt).optional(),
+  prices: z.record(z.string(), optionalFloat).optional(),
   inventory: z
     .array(
       z.object({

@@ -1,10 +1,15 @@
 import { BaseRelationship } from "./base"
-import { NullableModifier } from "./nullable"
+import { RelationNullableModifier } from "./nullable"
 
-export class BelongsTo<T> extends BaseRelationship<T> {
+export class BelongsTo<
+  T,
+  const OptionalForeignKeyName extends string | undefined = undefined
+> extends BaseRelationship<T> {
   type = "belongsTo" as const
+  declare $foreignKey: true
+  declare $foreignKeyName: OptionalForeignKeyName
 
-  static isBelongsTo<T>(relationship: any): relationship is BelongsTo<T> {
+  static isBelongsTo<T>(relationship: any): relationship is BelongsTo<T, any> {
     return relationship?.type === "belongsTo"
   }
 
@@ -12,6 +17,10 @@ export class BelongsTo<T> extends BaseRelationship<T> {
    * Apply nullable modifier on the schema
    */
   nullable() {
-    return new NullableModifier<T, BelongsTo<T>>(this)
+    return new RelationNullableModifier<
+      T,
+      BelongsTo<T, OptionalForeignKeyName>,
+      true
+    >(this)
   }
 }

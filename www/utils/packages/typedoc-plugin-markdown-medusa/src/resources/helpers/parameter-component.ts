@@ -1,16 +1,17 @@
-import * as Handlebars from "handlebars"
-import { ReflectionParameterType } from "../../types"
-import { parseParams } from "../../utils/params-utils"
-import { MarkdownTheme } from "../../theme"
-import { reflectionComponentFormatter } from "../../utils/reflection-formatter"
-import { formatParameterComponent } from "../../utils/format-parameter-component"
+import Handlebars from "handlebars"
+import { ReflectionParameterType } from "../../types.js"
+import { parseParams } from "../../utils/params-utils.js"
+import { MarkdownTheme } from "../../theme.js"
+import { reflectionComponentFormatter } from "../../utils/reflection-formatter.js"
+import { formatParameterComponent } from "../../utils/format-parameter-component.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(
     "parameterComponent",
     function (
       this: ReflectionParameterType[],
-      options: Handlebars.HelperOptions
+      options: Handlebars.HelperOptions,
+      extraProps?: Record<string, unknown>
     ) {
       const { parameterComponent, maxLevel, parameterComponentExtraProps } =
         theme.getFormattingOptionsForLocation()
@@ -34,7 +35,10 @@ export default function (theme: MarkdownTheme) {
       return formatParameterComponent({
         parameterComponent,
         componentItems: parameters,
-        extraProps: parameterComponentExtraProps,
+        extraProps: {
+          ...parameterComponentExtraProps,
+          ...extraProps,
+        },
         sectionTitle: options.hash.sectionTitle,
       })
     }

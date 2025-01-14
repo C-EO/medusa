@@ -2,24 +2,24 @@ import {
   ContainerRegistrationKeys,
   isPresent,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { MedusaResponse } from "../../../types/routing"
-import { wrapVariantsWithInventoryQuantity } from "../../utils/middlewares"
+} from "@medusajs/framework/utils"
+import { MedusaResponse } from "@medusajs/framework/http"
+import { wrapVariantsWithInventoryQuantityForSalesChannel } from "../../utils/middlewares"
 import { RequestWithContext, wrapProductsWithTaxPrices } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
-  req: RequestWithContext<HttpTypes.StoreProductParams>,
+  req: RequestWithContext<HttpTypes.StoreProductListParams>,
   res: MedusaResponse<HttpTypes.StoreProductListResponse>
 ) => {
   const remoteQuery = req.scope.resolve(ContainerRegistrationKeys.REMOTE_QUERY)
   const context: object = {}
-  const withInventoryQuantity = req.remoteQueryConfig.fields.some((field) =>
+  const withInventoryQuantity = req.queryConfig.fields.some((field) =>
     field.includes("variants.inventory_quantity")
   )
 
   if (withInventoryQuantity) {
-    req.remoteQueryConfig.fields = req.remoteQueryConfig.fields.filter(
+    req.queryConfig.fields = req.queryConfig.fields.filter(
       (field) => !field.includes("variants.inventory_quantity")
     )
   }
@@ -34,16 +34,16 @@ export const GET = async (
     entryPoint: "product",
     variables: {
       filters: req.filterableFields,
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
       ...context,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: products, metadata } = await remoteQuery(queryObject)
 
   if (withInventoryQuantity) {
-    await wrapVariantsWithInventoryQuantity(
+    await wrapVariantsWithInventoryQuantityForSalesChannel(
       req,
       products.map((product) => product.variants).flat(1)
     )

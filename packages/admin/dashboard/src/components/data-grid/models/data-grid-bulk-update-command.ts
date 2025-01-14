@@ -4,7 +4,7 @@ export type DataGridBulkUpdateCommandArgs = {
   fields: string[]
   next: any[]
   prev: any[]
-  setter: (fields: string[], values: any[]) => void
+  setter: (fields: string[], values: any[], isHistory?: boolean) => void
 }
 
 export class DataGridBulkUpdateCommand implements Command {
@@ -13,7 +13,11 @@ export class DataGridBulkUpdateCommand implements Command {
   private _prev: any[]
   private _next: any[]
 
-  private _setter: (fields: string[], any: string[]) => void
+  private _setter: (
+    fields: string[],
+    values: any[],
+    isHistory?: boolean
+  ) => void
 
   constructor({ fields, prev, next, setter }: DataGridBulkUpdateCommandArgs) {
     this._fields = fields
@@ -22,13 +26,13 @@ export class DataGridBulkUpdateCommand implements Command {
     this._setter = setter
   }
 
-  execute(): void {
-    this._setter(this._fields, this._next)
+  execute(redo = false): void {
+    this._setter(this._fields, this._next, redo)
   }
   undo(): void {
-    this._setter(this._fields, this._prev)
+    this._setter(this._fields, this._prev, true)
   }
   redo(): void {
-    this.execute()
+    this.execute(true)
   }
 }

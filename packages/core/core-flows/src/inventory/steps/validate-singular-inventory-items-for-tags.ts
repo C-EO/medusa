@@ -2,8 +2,8 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   Modules,
-} from "@medusajs/utils"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/utils"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 export const validateInventoryItemsForCreateStepId =
   "validate-inventory-items-for-create-step"
@@ -18,7 +18,7 @@ export const validateInventoryItemsForCreate = createStep(
     }[],
     { container }
   ) => {
-    const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK)
+    const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
 
     const linkService = remoteLink.getLinkModule(
       Modules.PRODUCT,

@@ -1,7 +1,11 @@
-import { ProductStatus } from "@medusajs/utils"
+import {
+  kebabCase,
+  ProductStatus,
+  toMikroORMEntity,
+} from "@medusajs/framework/utils"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
 import {
-  Image,
+  ProductImage,
   Product,
   ProductCategory,
   ProductCollection,
@@ -10,6 +14,7 @@ import {
 } from "@models"
 
 import ProductOption from "../../../src/models/product-option"
+import { InferEntityType } from "@medusajs/types"
 
 export * from "./data/create-product"
 
@@ -24,7 +29,7 @@ export async function createProductAndTags(
   }[]
 ) {
   const products: any[] = data.map((productData) => {
-    return manager.create(Product, productData)
+    return manager.create(toMikroORMEntity(Product), productData)
   })
 
   await manager.persistAndFlush(products)
@@ -42,7 +47,7 @@ export async function createProductAndTypes(
   }[]
 ) {
   const products: any[] = data.map((productData) => {
-    return manager.create(Product, productData)
+    return manager.create(toMikroORMEntity(Product), productData)
   })
 
   await manager.persistAndFlush(products)
@@ -55,7 +60,7 @@ export async function createProductVariants(
   data: any[]
 ) {
   const variants: any[] = data.map((variantsData) => {
-    return manager.create(ProductVariant, variantsData)
+    return manager.create(toMikroORMEntity(ProductVariant), variantsData)
   })
 
   await manager.persistAndFlush(variants)
@@ -72,7 +77,10 @@ export async function createCollections(
   }[]
 ) {
   const collections: any[] = collectionData.map((collectionData) => {
-    return manager.create(ProductCollection, collectionData)
+    if (!collectionData.handle && collectionData.title) {
+      collectionData.handle = kebabCase(collectionData.title)
+    }
+    return manager.create(toMikroORMEntity(ProductCollection), collectionData)
   })
 
   await manager.persistAndFlush(collections)
@@ -88,7 +96,7 @@ export async function createTypes(
   }[]
 ) {
   const types: any[] = typesData.map((typesData) => {
-    return manager.create(ProductType, typesData)
+    return manager.create(toMikroORMEntity(ProductType), typesData)
   })
 
   await manager.persistAndFlush(types)
@@ -112,7 +120,7 @@ export async function createOptions(
   }[]
 ) {
   const options: any[] = optionsData.map((option) => {
-    return manager.create(ProductOption, option)
+    return manager.create(toMikroORMEntity(ProductOption), option)
   })
 
   await manager.persistAndFlush(options)
@@ -125,7 +133,7 @@ export async function createImages(
   imagesData: string[]
 ) {
   const images: any[] = imagesData.map((img) => {
-    return manager.create(Image, { url: img })
+    return manager.create(toMikroORMEntity(ProductImage), { url: img })
   })
 
   await manager.persistAndFlush(images)
@@ -135,8 +143,8 @@ export async function createImages(
 
 export async function assignCategoriesToProduct(
   manager: SqlEntityManager,
-  product: Product,
-  categories: ProductCategory[]
+  product: InferEntityType<Product>,
+  categories: InferEntityType<ProductCategory>[]
 ) {
   product.categories.add(categories)
 

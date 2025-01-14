@@ -73,6 +73,7 @@ export const SearchHitsWrapper = ({
     <div className="h-full overflow-auto px-docs_0.5">
       {status !== "loading" && showNoResults && <SearchNoResult />}
       {indices.map((indexName, index) => (
+        // @ts-expect-error React v19 doesn't see this type as a React element
         <Index indexName={indexName} key={index}>
           <SearchHits
             indexName={indexName}
@@ -97,7 +98,7 @@ export const SearchHits = ({
   setNoResults,
   checkInternalPattern,
 }: SearchHitsProps) => {
-  const { hits } = useHits<HitType>()
+  const { items: hits } = useHits<HitType>()
   const { status } = useInstantSearch()
   const { setIsOpen } = useSearch()
 
@@ -177,6 +178,7 @@ export const SearchHits = ({
                   "max-w-full"
                 )}
               >
+                {/* @ts-expect-error React v19 doesn't see this type as a React element */}
                 <Snippet
                   attribute={[
                     "hierarchy",
@@ -192,6 +194,7 @@ export const SearchHits = ({
               </span>
               {item.type !== "lvl1" && (
                 <span className="text-compact-small text-medusa-fg-subtle">
+                  {/* @ts-expect-error React v19 doesn't see this type as a React element */}
                   <Snippet
                     attribute={
                       item.content

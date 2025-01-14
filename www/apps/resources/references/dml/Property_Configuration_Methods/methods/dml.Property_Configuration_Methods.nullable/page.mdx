@@ -5,14 +5,14 @@ sidebar_label: nullable
 
 import { TypeList } from "docs-ui"
 
-# nullable Method - API Reference
+# nullable Method - DML Reference
 
 This method indicates that a property's value can be `null`.
 
 ## Example
 
 ```ts
-import { model } from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 
 const MyCustom = model.define("my_custom", {
   price: model.bigNumber().nullable(),

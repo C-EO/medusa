@@ -4,10 +4,13 @@ import {
   transform,
   WorkflowData,
   WorkflowResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 
-import { FilterableInventoryLevelProps } from "@medusajs/types"
-import { deduplicate, MedusaError, Modules } from "@medusajs/utils"
+import {
+  FilterableInventoryLevelProps,
+  InventoryLevelDTO,
+} from "@medusajs/framework/types"
+import { deduplicate, MedusaError, Modules } from "@medusajs/framework/utils"
 import { useRemoteQueryStep } from "../../common"
 import { deleteEntitiesStep } from "../../common/steps/delete-entities"
 
@@ -16,23 +19,51 @@ import { deleteEntitiesStep } from "../../common/steps/delete-entities"
  */
 export const validateInventoryLevelsDelete = createStep(
   "validate-inventory-levels-delete",
-  async function ({ inventoryLevels }: { inventoryLevels: any[] }) {
-    const undeleteableItems = inventoryLevels.filter(
-      (i) => i.reserved_quantity > 0 || i.stocked_quantity > 0
+  async function ({
+    inventoryLevels,
+    force,
+  }: {
+    inventoryLevels: InventoryLevelDTO[]
+    force?: boolean
+  }) {
+    const undeleteableDueToReservation = inventoryLevels.filter(
+      (i) => i.reserved_quantity > 0 || i.incoming_quantity > 0
     )
 
-    if (undeleteableItems.length) {
-      const stockLocationIds = deduplicate(
-        undeleteableItems.map((item) => item.location_id)
+    if (undeleteableDueToReservation.length) {
+      const locationIds = deduplicate(
+        undeleteableDueToReservation.map((item) => item.location_id)
       )
-
       throw new MedusaError(
         MedusaError.Types.NOT_ALLOWED,
-        `Cannot remove Inventory Levels for ${stockLocationIds} because there are stocked or reserved items at the locations`
+        `Cannot remove Inventory Levels for ${locationIds.join(
+          ", "
+        )} because there are reserved or incoming items at the locations`
+      )
+    }
+
+    const undeleteableDueToStock = inventoryLevels.filter(
+      (i) => !force && i.stocked_quantity > 0
+    )
+
+    if (undeleteableDueToStock.length) {
+      const locationIds = deduplicate(
+        undeleteableDueToStock.map((item) => item.location_id)
+      )
+      throw new MedusaError(
+        MedusaError.Types.NOT_ALLOWED,
+        `Cannot remove Inventory Levels for ${locationIds.join(
+          ", "
+        )} because there are stocked items at the locations. Use force flag to delete anyway.`
       )
     }
   }
 )
+
+export interface DeleteInventoryLevelsWorkflowInput
+  extends FilterableInventoryLevelProps {
+  force?: boolean
+}
 
 export const deleteInventoryLevelsWorkflowId =
   "delete-inventory-levels-workflow"
@@ -41,16 +72,25 @@ export const deleteInventoryLevelsWorkflowId =
  */
 export const deleteInventoryLevelsWorkflow = createWorkflow(
   deleteInventoryLevelsWorkflowId,
-  (input: WorkflowData<FilterableInventoryLevelProps>) => {
+  (input: WorkflowData<DeleteInventoryLevelsWorkflowInput>) => {
+    const { filters, force } = transform(input, (data) => {
+      const { force, ...filters } = data
+
+      return {
+        filters,
+        force,
+      }
+    })
+
     const inventoryLevels = useRemoteQueryStep({
       entry_point: "inventory_levels",
       fields: ["id", "stocked_quantity", "reserved_quantity", "location_id"],
       variables: {
-        filters: input,
+        filters: filters,
       },
     })
 
-    validateInventoryLevelsDelete({ inventoryLevels })
+    validateInventoryLevelsDelete({ inventoryLevels, force })
 
     const idsToDelete = transform({ inventoryLevels }, ({ inventoryLevels }) =>
       inventoryLevels.map((il) => il.id)

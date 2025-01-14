@@ -13,7 +13,7 @@
  *     type: array
  *     description: The products to update.
  *     items:
- *       $ref: "#/components/schemas/AdminUpdateProduct"
+ *       $ref: "#/components/schemas/AdminBatchUpdateProduct"
  *   delete:
  *     type: array
  *     description: The products to delete.

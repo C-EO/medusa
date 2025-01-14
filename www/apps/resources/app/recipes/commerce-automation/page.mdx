@@ -1,13 +1,13 @@
 import { AcademicCapSolid, BoltSolid } from "@medusajs/icons"
-import { LearningPath, BetaBadge } from "docs-ui"
+import { BetaBadge } from "docs-ui"
 
 export const metadata = {
   title: `Commerce Automation Recipe`,
 }
 
-# {metadata.title} <BetaBadge text="Soon" tooltipText="This recipe is a work in progress, as some features are not ready yet in Medusa V2." />
+# {metadata.title} <BetaBadge text="Soon" tooltipText="This recipe is a work in progress." />
 
-This recipe provides the general steps to implement a B2B store with Medusa.
+This recipe provides the general steps to implement commerce automation with Medusa.
 
 ## Overview
 
@@ -19,374 +19,14 @@ Medusa provides the necessary architecture and tools to implement commerce autom
 
 ## Re-Stock Notifications
 
-Customers may be interested in a product that is currently out of stock.
-
-To implement sending restock notifications, you can:
-
-- Create a module that manages the customers subscribed to a variant's restock notification.
-- Create relationships to the Product and Sales Channel modules. A variant's inventory is managed by the sales channel's associated stock locations.
-- Create an API route that allows customers to subscribe to a variant's restock notification.
-- Create a subscriber that listens to the `inventory-item.updated` event and sends a notification to the subscribed customers if the variant's quantity is more than `0`.
-
-<Note type="soon">
-
-The `inventory-item.updated` event is currently not emitted. 
-
-</Note>
-
-<CardList items={[
-  {
-    href: "!docs!/basics/modules-and-services",
-    title: "Create a Module",
-    text: "Learn how to create a module in Medusa.",
-    icon: AcademicCapSolid,
-  },
-  {
-    href: "!docs!/basics/data-models",
-    title: "Create a Data Model",
-    text: "Learn how to create a data model.",
-    icon: AcademicCapSolid,
-  },
-]} />
-
-<CardList items={[
-  {
-    href: "!docs!/basics/api-routes",
-    title: "Create an API Route",
-    text: "Learn how to create an API route in Medusa.",
-    icon: AcademicCapSolid,
-  },
-  {
-    href: "!docs!/basics/events-and-subscribers",
-    title: "Create a Subscriber",
-    text: "Learn how to create a subscriber in Medusa.",
-    icon: AcademicCapSolid,
-  },
-]} className="mt-1" />
-
-<Details summaryContent="Example">
-
-  In this example, you'll create a Restock Notification Module with the features explained above.
-
-  ### Create Restock Notification Module
-
-  Start by creating the `src/modules/restock-notification` directory.
-
-  Then, create the file `src/modules/restock-notification/models/restock-notification.ts` with the following content:
-
-export const restockModelHighlights = [
-  ["5", "email", "The email of the customer to send the notification to when the item is restocked."],
-  ["6", "variant_id", "The ID of the variant the customer is subscribed to."],
-  ["7", "sales_channel_id", "The ID of the sales channel the customer is viewing the product variant from."]
-]
-
-  ```ts title="src/modules/restock-notification/models/restock-notification.ts" highlights={restockModelHighlights}
-  import { model } from "@medusajs/utils"
-
-  const RestockNotification = model.define("restock_notification", {
-    id: model.id().primaryKey(),
-    email: model.text(),
-    variant_id: model.text(),
-    sales_channel_id: model.text(),
-  })
-
-  export default RestockNotification
-  ```
-
-  This creates a `RestockNotification` data model with the following properties:
-
-  - `id`: An automatically generated ID.
-  - `email`: The email of the customer to send the notification to when the item is restocked.
-  - `variant_id`: The ID of the variant the customer is subscribed to. This will later be used to form a relationship with the `ProductVariant` data model of the Product Module.
-  - `sales_channel_id`: The ID of the sales channel the customer is viewing the product variant from. This will later be used to form a relationship with the `SalesChannel` data model of the Sales Channel Module.
-
-  Since a variant's inventory is managed based on the locations of each sales channel, you have to specify which sales channel to check stock quantity in.
-
-  Next, create the file `src/modules/restock-notification/migrations/Migration20240516140616.ts` with the following content:
-
-  ```ts title="src/modules/restock-notification/migrations/Migration20240516140616.ts"
-  import { Migration } from "@mikro-orm/migrations"
-  
-  export class Migration20240516140616 extends Migration {
-
-    async up(): Promise<void> {
-      this.addSql("create table if not exists \"restock_notification\" (\"id\" text not null, \"email\" text not null, \"variant_id\" text not null, \"sales_channel_id\" text not null, constraint \"restock_notification_pkey\" primary key (\"id\"));")
-    }
-
-    async down(): Promise<void> {
-      this.addSql("drop table if exists \"restock_notification\" cascade;")
-    }
-
-  }
-  ```
-
-  You'll run the migration to reflect the changes on the database after finishing the module's definition.
-
-  Then, create the module's main service at `src/modules/restock-notification/service.ts` with the following content:
-
-  ```ts title="src/modules/restock-notification/service.ts"
-  import { MedusaService } from "@medusajs/utils"
-  import RestockNotification from "./models/restock-notification"
-
-  class RestockNotificationModuleService extends MedusaService({
-    RestockNotification,
-  }){
-    // TODO add custom methods
-  }
-
-  export default RestockNotificationModuleService
-  ```
-
-  The module's main service extends the service factory which generates basic management features for the `RestockNotification` data model.
-
-  Next, create the module's definition file `src/modules/restock-notification/index.ts` with the following content:
-
-  ```ts title="src/modules/restock-notification/index.ts"
-  import RestockNotificationModuleService from "./service"
-  import { Module } from "@medusajs/utils"
-
-  export default Module("restock-notification", {
-    service: RestockNotificationModuleService,
-  })
-  ```
-
-  Finally, add the module to the `modules` object in `medusa-config.js`:
-
-  ```js title="medusa-config.js"
-  module.exports = defineConfig({
-    // ...
-    modules: {
-      "restockNotificationModuleService": {
-        resolve: "./modules/restock-notification",
-        definition: {
-          isQueryable: true,
-        },
-      },
-    },
-  })
-  ```
-
-  You can now run the migrations with the following command:
-
-  ```bash npm2yarn
-  npx medusa db:migrate
-  ```
-
-  ### Create Restock Notification API Route
-
-  Create the file `src/api/store/restock-notification/route.ts` with the following content:
-
-  ```ts title="src/api/store/restock-notification/route.ts" collapsibleLines="1-13" expandButtonLabel="Show Imports"
-  import type { 
-    MedusaRequest, 
-    MedusaResponse,
-  } from "@medusajs/medusa"
-  import RestockNotificationModuleService 
-    from "../../../modules/restock-notification/service"
-
-  type RestockNotificationReq = {
-    email: string
-    variant_id: string
-    sales_channel_id: string
-  }
-
-  export async function POST(
-    req: MedusaRequest<RestockNotificationReq>, 
-    res: MedusaResponse
-  ) {
-    const restockNotificationModuleService: 
-      RestockNotificationModuleService = req.scope.resolve(
-        "restockNotificationModuleService"
-      )
-
-    await restockNotificationModuleService.createRestockNotifications(
-      req.body
-    )
-
-    res.json({
-      success: true,
-    })
-  }
-  ```
-
-  This creates a `POST` API route at `/store/restock-notification`. It accepts the `email`, `variant_id`, and `sales_channel_id` request body parameters and creates a restock notification.
-
-  ### Create Inventory Item Updated Subscriber
-
-  To handle the sending of the restock notifications, create a subscriber that listens to the `inventory-item.updated` event, then sends a notification using the Notification Module to subscribed emails.
-
-  <Note type="soon">
-
-  The `inventory-item.updated` event is currently not emitted.
-
-  </Note>
-
-  {/* To handle the sending of the restock notifications, create the file `src/subscribers/inventory-item-update.ts` with the following content: */}
-
-export const subscriberHighlights = [
-  ["48", "inventoryVariantLinkService", "Retrieve an instance of the link service for the product-variant-inventory-item link module."],
-  ["55", "inventoryVariantItems", "Retrieve the variants linked to the updated inventory item."],
-  ["68", "restockQuery", "Assemble the query to retrieve the restock notifications with their associated variants."],
-  ["81", "restockNotifications", "Retrieve the restock notifications using the query."],
-  ["84", "salesChannelLocationService", "Retrieve an instance of the link service for the sales-channel-stock-location link module."],
-  ["93", "salesChannelLocations", "Retrieve the stock locations linked to the restock notification's sales channel."],
-  ["107", "availableQuantity", "Retrieve the available quantity of the variant in the retrieved stock locations."],
-  ["116", "continue", "Only send the notification if the available quantity is greater than `0`"],
-  ["119", "createNotifications", "Send the notification to the customer using the Notification Module."],
-  ["122", '"test_template"', "Replace with the actual template used for sending the email."],
-  ["123", "data", "The data to send along to the third-party service sending the notification."],
-  ["131", "deleteRestockNotifications", "Delete the restock notification to not send the notification again."]
-]
-
-  {/* ```ts title="src/subscribers/inventory-item-update.ts" highlights={subscriberHighlights} collapsibleLines="1-20" expandButtonLabel="Show Imports"
-  import type {
-    SubscriberArgs,
-    SubscriberConfig,
-  } from "@medusajs/medusa"
-  import { 
-    IInventoryService, 
-    INotificationModuleService, 
-    RemoteQueryFunction,
-  } from "@medusajs/types"
-  import { 
-    ContainerRegistrationKeys, 
-    Modules, 
-    remoteQueryObjectFromString,
-  } from "@medusajs/utils"
-  import { 
-    RemoteLink,
-  } from "@medusajs/modules-sdk"
-  import RestockNotificationModuleService 
-    from "../modules/restock-notification/service"
-
-  // subscriber function
-  export default async function inventoryItemUpdateHandler({
-    data,
-    container,
-  }: SubscriberArgs<{ id: string }>) {
-    const remoteQuery: RemoteQueryFunction = container.resolve(
-      ContainerRegistrationKeys.REMOTE_QUERY
-    )
-    const remoteLink: RemoteLink = container.resolve(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
-    const restockNotificationModuleService: 
-      RestockNotificationModuleService = container.resolve(
-        "restockNotificationModuleService"
-      )
-    const inventoryModuleService: IInventoryService = 
-      container.resolve(Modules.INVENTORY)
-    const notificationModuleService: INotificationModuleService =
-      container.resolve(
-        Modules.NOTIFICATION
-      )
-
-    const inventoryItemId = data.data.id
-
-    const inventoryVariantLinkService = remoteLink.getLinkModule(
-      Modules.PRODUCT, 
-      "variant_id", 
-      Modules.INVENTORY, 
-      "inventory_item_id"
-    )
-
-    const inventoryVariantItems = 
-      await inventoryVariantLinkService.list({
-        inventory_item_id: [inventoryItemId],
-      }) as {
-        variant_id: string,
-        inventory_item_id: string
-      }[]
-
-    if (!inventoryVariantItems.length) {
-      console.log("no inventory variant items")
-      return
-    }
-
-    const restockQuery = remoteQueryObjectFromString({
-      entryPoint: "restock_notification",
-      fields: [
-        "email",
-        "variant.name",
-      ],
-      variables: {
-        filters: {
-          variant_id: inventoryVariantItems[0].variant_id,
-        },
-      },
-    })
-
-    const restockNotifications = 
-      await remoteQuery(restockQuery)
-
-    const salesChannelLocationService = remoteLink.getLinkModule(
-      Modules.SALES_CHANNEL,
-      "sales_channel_id",
-      Modules.STOCK_LOCATION,
-      "stock_location_id"
-    )
-
-    for (const restockNotification of restockNotifications) {
-      const salesChannelLocations = 
-        await salesChannelLocationService.list({
-          sales_channel_id: [
-            restockNotification.sales_channel_id,
-          ],
-        }) as {
-          stock_location_id: string
-          sales_channel_id: string
-        }[]
-
-      if (!salesChannelLocations.length) {
-        continue
-      }
-
-      const availableQuantity = await inventoryModuleService
-        .retrieveAvailableQuantity(
-          inventoryItemId,
-          salesChannelLocations.map(
-            (salesChannelLocation) => 
-              salesChannelLocation.stock_location_id
-          )
-        )
-
-      if (availableQuantity === 0) {
-        continue
-      }
-      
-      notificationModuleService.createNotifications({
-        to: restockNotification.email,
-        channel: "email",
-        template: "test_template",
-        data: {
-          variant_id: restockNotification.variant_id,
-          variant_name: restockNotification.variant.title,
-          // other data...
-        },
-      })
-
-      // delete the restock notification
-      await restockNotificationModuleService
-        .deleteRestockNotifications(restockNotification.id)
-    }
-  }
-
-  // subscriber config
-  export const config: SubscriberConfig = {
-    event: "inventory-item.updated",
-  }
-  ```
-
-  This adds a subscriber to the `inventory-item.updated` event. In the subscriber handler function, you:
-
-  - Retrieve an instance of the link service for the product-variant-inventory-item link module.
-  - Retrieve the variants linked to the updated inventory item.
-  - Retrieve the restock notifications of those variants.
-  - For each restock notification, you:
-      - Retrieve its quantity based on the stock location associated with the restock notification's sales channel.
-      - If the quantity is greater than `0`, you send a notification using the Notification Module and delete the restock notification. */}
-
-</Details>
+Customers may be interested in a product that is currently out of stock. The following guide explains how to add restock notifications in your Medusa application:
+
+<Card
+  href="/recipes/commerce-automation/restock-notification"
+  title="Restock Notification Guide"
+  text="Learn how to implement restock notifications in the Medusa application."
+  icon={AcademicCapSolid}
+/>
 
 ---
 
@@ -412,7 +52,7 @@ Medusa also provides Notification Module Providers that integrate with third-par
     icon: AcademicCapSolid,
   },
   {
-    href: "!docs!/basics/events-and-subscribers",
+    href: "!docs!/learn/fundamentals/events-and-subscribers",
     title: "Create Subscriber",
     text: "Learn how to create a subscriber to handle events.",
     icon: AcademicCapSolid,
@@ -431,7 +71,7 @@ To implement that:
 - Create a scheduled job that executes the workflow automatically at the specified time pattern.
 
 <Card
-  href="!docs!/basics/scheduled-jobs"
+  href="!docs!/learn/fundamentals/scheduled-jobs"
   title="Create a Scheduled Job"
   text="Learn how to create a scheduled job in Medusa."
   icon={AcademicCapSolid}
@@ -461,19 +101,19 @@ export const syncProductsWorkflowHighlight = [
 
   ```ts title="src/workflows/sync-products.ts" highlights={syncProductsWorkflowHighlight} collapsibleLines="1-16" expandButtonLabel="Show Imports"
   import { 
-    Modules
-  } from "@medusajs/utils"
+    Modules,
+  } from "@medusajs/framework/utils"
   import { 
     IProductModuleService, 
     IStoreModuleService, 
     ProductDTO, 
-    StoreDTO
-  } from "@medusajs/types"
+    StoreDTO,
+  } from "@medusajs/framework/types"
   import { 
     StepResponse, 
     createStep, 
     createWorkflow,
-  } from "@medusajs/workflows-sdk"
+  } from "@medusajs/framework/workflows-sdk"
 
   type RetrieveStoreStepInput = {
     id: string
@@ -616,7 +256,7 @@ export const syncProductsWorkflowHighlight = [
   Then, create a scheduled job at `src/jobs/sync-products.ts` that executes the workflow at the specified interval:
 
   ```ts
-  import { MedusaContainer } from "@medusajs/types"
+  import { MedusaContainer } from "@medusajs/framework/types"
   import { 
     syncProductsWorkflow,
   } from "../workflows/sync-products"
@@ -657,7 +297,7 @@ The `order.placed` event is currently not emitted.
 </Note>
 
 <Card
-  href="!docs!/basics/events-and-subscribers"
+  href="!docs!/learn/fundamentals/events-and-subscribers"
   title="Create a Subscriber"
   text="Learn how to create a subscriber in Medusa."
   icon={AcademicCapSolid}
@@ -665,7 +305,7 @@ The `order.placed` event is currently not emitted.
 
 {/* <CardList items={[
   {
-    href: "!docs!/basics/events-and-subscribers",
+    href: "!docs!/learn/fundamentals/events-and-subscribers",
     title: "Create a Subscriber",
     text: "Learn how to create a subscriber in Medusa.",
     icon: AcademicCapSolid,
@@ -698,7 +338,7 @@ Medusa's commerce features are geared towards automating RMA flows and ensuring 
     icon: AcademicCapSolid,
   },
   {
-    href: "!docs!/basics/events-and-subscribers",
+    href: "!docs!/learn/fundamentals/events-and-subscribers",
     title: "Create a Subscriber",
     text: "Learn how to create a subscriber in Medusa.",
     icon: AcademicCapSolid,
@@ -741,7 +381,7 @@ The `order.placed` event is currently not emitted.
     icon: AcademicCapSolid,
   },
   {
-    href: "!docs!/basics/events-and-subscribers",
+    href: "!docs!/learn/fundamentals/events-and-subscribers",
     title: "Create a Subscriber",
     text: "Learn how to create a subscriber in Medusa.",
     icon: AcademicCapSolid,
@@ -762,14 +402,14 @@ The `order.placed` event is currently not emitted.
   import type {
     SubscriberArgs,
     SubscriberConfig,
-  } from "@medusajs/medusa"
+  } from "@medusajs/framework"
   import { 
     Modules,
-  } from "@medusajs/utils"
+  } from "@medusajs/framework/utils"
   import { 
     ICustomerModuleService, 
     IOrderModuleService,
-  } from "@medusajs/types"
+  } from "@medusajs/framework/types"
 
   export default async function orderCreatedHandler({
     event: { data },
@@ -843,13 +483,13 @@ You can also create a scheduled job that checks whether the number of new produc
 
 <CardList items={[
   {
-    href: "!docs!/basics/events-and-subscribers",
+    href: "!docs!/learn/fundamentals/events-and-subscribers",
     title: "Create a Subscriber",
     text: "Learn how to create a subscriber in Medusa.",
     icon: AcademicCapSolid,
   },
   {
-    href: "!docs!/basics/scheduled-jobs",
+    href: "!docs!/learn/fundamentals/scheduled-jobs",
     title: "Scheduled Jobs",
     text: "Learn how to create a scheduled job in Medusa.",
     icon: AcademicCapSolid,
@@ -876,16 +516,16 @@ export const newsletterHighlights = [
   import type {
     SubscriberArgs,
     SubscriberConfig,
-  } from "@medusajs/medusa"
+  } from "@medusajs/framework"
   import { 
     Modules,
-  } from "@medusajs/utils"
+  } from "@medusajs/framework/utils"
   import { 
     ICustomerModuleService, 
     IProductModuleService, 
     IStoreModuleService,
     INotificationModuleService,
-  } from "@medusajs/types"
+  } from "@medusajs/framework/types"
 
   export default async function productCreateHandler({
     container,

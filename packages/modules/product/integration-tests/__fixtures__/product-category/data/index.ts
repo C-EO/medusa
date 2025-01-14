@@ -1,3 +1,5 @@
+import { kebabCase } from "@medusajs/framework/utils"
+
 export const productCategoriesData = [
   {
     id: "category-0",
@@ -25,7 +27,12 @@ export const productCategoriesData = [
     name: "category 1 b 1",
     parent_category_id: "category-1-b",
   },
-]
+].map((entry) => {
+  return {
+    handle: kebabCase(entry.name),
+    ...entry,
+  }
+})
 
 export const productCategoriesRankData = [
   {
@@ -64,7 +71,12 @@ export const productCategoriesRankData = [
     parent_category_id: "category-0-0",
     rank: 2,
   },
-]
+].map((entry) => {
+  return {
+    handle: kebabCase(entry.name),
+    ...entry,
+  }
+})
 
 export const eletronicsCategoriesData = [
   {
@@ -188,4 +200,9 @@ export const eletronicsCategoriesData = [
     name: "Mini Models",
     parent_category_id: "iphones",
   },
-]
+].map((entry) => {
+  return {
+    handle: kebabCase(entry.name),
+    ...entry,
+  }
+})

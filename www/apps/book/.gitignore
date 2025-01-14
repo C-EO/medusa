@@ -15,6 +15,7 @@
 
 # production
 /build
+!/app/learn/build
 
 # misc
 .DS_Store

@@ -5,7 +5,7 @@ export interface AdminCreateRegion {
   automatic_taxes?: boolean
   is_tax_inclusive?: boolean
   payment_providers?: string[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }
 
 export interface AdminUpdateRegion {
@@ -15,5 +15,5 @@ export interface AdminUpdateRegion {
   automatic_taxes?: boolean
   is_tax_inclusive?: boolean
   payment_providers?: string[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }

@@ -7,6 +7,7 @@ import {
   MoneyAmountDTO,
   UpdateMoneyAmountDTO,
 } from "./money-amount"
+import { PricingRuleOperatorValues } from "./price-rule"
 
 export interface PricingRepositoryService {
   calculatePrices(
@@ -206,6 +207,11 @@ export interface CalculatedPriceSet {
   }
 }
 
+export interface RuleWithOperator {
+  operator: PricingRuleOperatorValues
+  value: number
+}
+
 /**
  * @interface
  *
@@ -214,7 +220,8 @@ export interface CalculatedPriceSet {
  * Each key of the object is a the attribute, and its value
  * is the values of the rule.
  */
-export interface CreatePriceSetPriceRules extends Record<string, string> {}
+export interface CreatePriceSetPriceRules
+  extends Record<string, string | RuleWithOperator[]> {}
 
 /**
  * @interface

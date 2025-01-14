@@ -1,10 +1,12 @@
 import { PriceRule } from "@models"
 
-import { CreatePriceRuleDTO } from "@medusajs/types"
+import { CreatePriceRuleDTO } from "@medusajs/framework/types"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
+import { toMikroORMEntity } from "@medusajs/framework/utils"
 import { defaultPriceRuleData } from "./data"
 
 export * from "./data"
+export * from "./operators"
 
 export async function createPriceRules(
   manager: SqlEntityManager,
@@ -19,7 +21,10 @@ export async function createPriceRules(
     priceRuleDataClone.attribute = priceRuleDataClone.attribute
     priceRuleDataClone.price_id = priceRuleDataClone.price_id
 
-    const priceRule = manager.create(PriceRule, priceRuleDataClone)
+    const priceRule = manager.create(
+      toMikroORMEntity(PriceRule),
+      priceRuleDataClone
+    )
 
     priceRules.push(priceRule)
   }

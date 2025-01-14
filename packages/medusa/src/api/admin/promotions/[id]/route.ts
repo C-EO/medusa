@@ -6,17 +6,17 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchPromotion } from "../helpers"
 import {
   AdminGetPromotionParamsType,
   AdminUpdatePromotionType,
 } from "../validators"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetPromotionParamsType>,
@@ -29,7 +29,7 @@ export const GET = async (
     variables: {
       filters: { $or: [{ id: idOrCode }, { code: idOrCode }] },
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [promotion] = await remoteQuery(queryObject)
@@ -63,7 +63,7 @@ export const POST = async (
   const promotion = await refetchPromotion(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ promotion })

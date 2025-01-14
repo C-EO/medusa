@@ -1,3 +1,11 @@
+---
+tags:
+  - publishable api key
+  - api key
+  - storefront
+  - sales channel
+---
+
 export const metadata = {
   title: `Use a Publishable API Key in the Storefront`,
 }
@@ -67,7 +75,7 @@ export const highlights = [
 fetch(`http://localhost:9000/store/products`, {
   credentials: "include",
   headers: {
-    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
   },
 })
 .then((res) => res.json())

@@ -39,10 +39,11 @@ jobs:
         run: yarn build
         env:
           NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
+          NEXT_PUBLIC_BASE_PATH: /api
           NEXT_PUBLIC_DOCS_URL: "https://medusa-docs.vercel.app"
-          NEXT_PUBLIC_UI_URL: "https://docs-ui.vercel.app"
+          NODE_ENV: production
+          NEXT_PUBLIC_RESOURCES_URL: "http://medusa-types-nine.vercel.app"
           # TODO change once we have actual URLs
-          NEXT_PUBLIC_RESOURCES_URL: "http://example.com"
           NEXT_PUBLIC_USER_GUIDE_URL: "http://example.com"
 
   vale-book:
@@ -317,7 +318,7 @@ jobs:
       - name: Get Directories to Scan
         if: ${{ steps.pr-files.outputs.files_lt_threshold == 'true' }}
         working-directory: www/vale
-        run: ./get-files.sh api-reference app/_mdx
+        run: ./get-files.sh api-reference markdown
         id: directories
 
       - name: Vale Linter

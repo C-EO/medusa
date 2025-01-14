@@ -31,6 +31,10 @@ interface CalendarProps
   extends Omit<BaseCalendarProps<CalendarDate>, keyof CalendarValueProps>,
     CalendarValueProps {}
 
+/**
+ * Calendar component used to select a date.
+ * Its props are based on [React Aria Calendar](https://react-spectrum.adobe.com/react-aria/Calendar.html#calendar-1).
+ */
 const Calendar = (props: CalendarProps) => {
   const [value, setValue] = React.useState<CalendarDate  | null | undefined>(
     () => getDefaultCalendarDate(props.value, props.defaultValue)

@@ -17,6 +17,7 @@ describe("Enum property", () => {
         },
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
     })
@@ -42,6 +43,7 @@ describe("Enum property", () => {
         },
       },
       nullable: true,
+      computed: false,
       indexes: [],
       relationships: [],
     })
@@ -66,6 +68,7 @@ describe("Enum property", () => {
         },
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
     })
@@ -90,6 +93,7 @@ describe("Enum property", () => {
         },
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
     })

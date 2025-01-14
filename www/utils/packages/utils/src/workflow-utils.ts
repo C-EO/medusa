@@ -1,4 +1,12 @@
-import { ReferenceType, SignatureReflection, SomeType } from "typedoc"
+import {
+  DeclarationReflection,
+  ProjectReflection,
+  ReferenceType,
+  Reflection,
+  ReflectionKind,
+  SignatureReflection,
+  SomeType,
+} from "typedoc"
 
 export function isWorkflow(reflection: SignatureReflection): boolean {
   return (
@@ -59,4 +67,22 @@ function isAllowedType(type: SomeType | undefined): boolean {
     (type.type !== "intrinsic" ||
       !disallowedIntrinsicTypeNames.includes(type.name))
   )
+}
+
+export function findReflectionInNamespaces(
+  parent: ProjectReflection | DeclarationReflection,
+  childName: string
+): Reflection | undefined {
+  let childReflection: Reflection | undefined
+  parent.getChildrenByKind(ReflectionKind.Namespace).some((namespace) => {
+    childReflection = namespace.getChildByName(childName)
+
+    if (!childReflection) {
+      childReflection = findReflectionInNamespaces(namespace, childName)
+    }
+
+    return childReflection !== undefined
+  })
+
+  return childReflection
 }

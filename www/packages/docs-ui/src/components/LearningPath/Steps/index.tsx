@@ -5,6 +5,7 @@ import clsx from "clsx"
 import { IconCircleDottedLine } from "@/components/Icons"
 import { CheckCircleSolid, CircleMiniSolid, ListBullet } from "@medusajs/icons"
 import { Badge, Button, Link } from "@/components"
+// @ts-expect-error can't install the types package because it doesn't support React v19
 import { CSSTransition, SwitchTransition } from "react-transition-group"
 
 type LearningPathStepsProps = {
@@ -17,7 +18,7 @@ export const LearningPathSteps = ({ ...rest }: LearningPathStepsProps) => {
   const [collapsed, setCollapsed] = useState(false)
   const stepsRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const nodeRef: React.RefObject<HTMLElement> = collapsed ? buttonRef : stepsRef
+  const nodeRef = collapsed ? buttonRef : stepsRef
 
   const handleScroll = useCallback(() => {
     if (window.scrollY > 100 && !collapsed) {
@@ -51,7 +52,7 @@ export const LearningPathSteps = ({ ...rest }: LearningPathStepsProps) => {
         key={collapsed ? "show_path" : "show_button"}
         nodeRef={nodeRef}
         timeout={300}
-        addEndListener={(done) => {
+        addEndListener={(done: () => void) => {
           nodeRef.current?.addEventListener("transitionend", done, false)
         }}
         classNames={{
@@ -120,7 +121,8 @@ export const LearningPathSteps = ({ ...rest }: LearningPathStepsProps) => {
                             "text-medium text-ui-fg-subtle mt-docs_1"
                           )}
                         >
-                          {step.descriptionJSX ?? step.description}
+                          {(step.descriptionJSX as React.ReactNode) ??
+                            step.description}
                         </div>
                       </div>
                     )}

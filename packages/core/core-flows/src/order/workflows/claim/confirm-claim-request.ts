@@ -7,14 +7,15 @@ import {
   OrderDTO,
   OrderPreviewDTO,
   OrderReturnItemDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ChangeActionType,
   MedusaError,
   Modules,
   OrderChangeStatus,
+  OrderWorkflowEvents,
   ReturnStatus,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
   createStep,
@@ -22,10 +23,14 @@ import {
   parallelize,
   transform,
   when,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { reserveInventoryStep } from "../../../cart/steps/reserve-inventory"
 import { prepareConfirmInventoryInput } from "../../../cart/utils/prepare-confirm-inventory-input"
-import { createRemoteLinkStep, useRemoteQueryStep } from "../../../common"
+import {
+  createRemoteLinkStep,
+  emitEventStep,
+  useRemoteQueryStep,
+} from "../../../common"
 import { createReturnFulfillmentWorkflow } from "../../../fulfillment/workflows/create-return-fulfillment"
 import { previewOrderChangeStep, updateReturnsStep } from "../../steps"
 import { createOrderClaimItemsFromActionsStep } from "../../steps/claim/create-claim-items-from-actions"
@@ -40,6 +45,18 @@ import { createOrUpdateOrderPaymentCollectionWorkflow } from "../create-or-updat
 export type ConfirmClaimRequestWorkflowInput = {
   claim_id: string
   confirmed_by?: string
+}
+
+function getUpdateReturnData({ returnId }: { returnId: string }) {
+  return transform({ returnId }, ({ returnId }) => {
+    return [
+      {
+        id: returnId,
+        status: ReturnStatus.REQUESTED,
+        requested_at: new Date(),
+      },
+    ]
+  })
 }
 
 /**
@@ -246,6 +263,7 @@ export const confirmClaimRequestWorkflow = createWorkflow(
       entry_point: "order_change",
       fields: [
         "id",
+        "status",
         "actions.id",
         "actions.claim_id",
         "actions.return_id",
@@ -291,18 +309,17 @@ export const confirmClaimRequestWorkflow = createWorkflow(
       }
     )
 
-    confirmOrderChanges({ changes: [orderChange], orderId: order.id })
+    confirmOrderChanges({
+      changes: [orderChange],
+      orderId: order.id,
+      confirmed_by: input.confirmed_by,
+    })
 
     when({ returnId }, ({ returnId }) => {
       return !!returnId
     }).then(() => {
-      updateReturnsStep([
-        {
-          id: returnId,
-          status: ReturnStatus.REQUESTED,
-          requested_at: new Date(),
-        },
-      ])
+      const updateReturnDate = getUpdateReturnData({ returnId })
+      updateReturnsStep(updateReturnDate)
     })
 
     const claimId = transform(
@@ -431,6 +448,14 @@ export const confirmClaimRequestWorkflow = createWorkflow(
     createOrUpdateOrderPaymentCollectionWorkflow.runAsStep({
       input: {
         order_id: order.id,
+      },
+    })
+
+    emitEventStep({
+      eventName: OrderWorkflowEvents.CLAIM_CREATED,
+      data: {
+        order_id: order.id,
+        claim_id: orderClaim.id,
       },
     })
 

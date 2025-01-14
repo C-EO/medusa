@@ -1,90 +1,24 @@
-import {
-  createPsqlIndexStatementHelper,
-  DALUtils,
-  generateEntityId,
-} from "@medusajs/utils"
+import { model } from "@medusajs/framework/utils"
 
-import { DAL } from "@medusajs/types"
-import {
-  BeforeCreate,
-  Cascade,
-  Collection,
-  Entity,
-  Filter,
-  OneToMany,
-  OnInit,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-  Rel,
-} from "@mikro-orm/core"
-import ServiceZone from "./service-zone"
+import { ServiceZone } from "./service-zone"
 
-type FulfillmentSetOptionalProps = DAL.SoftDeletableModelDateColumns
-
-const DeletedAtIndex = createPsqlIndexStatementHelper({
-  tableName: "fulfillment_set",
-  columns: "deleted_at",
-  where: "deleted_at IS NOT NULL",
-})
-
-const NameIndex = createPsqlIndexStatementHelper({
-  tableName: "fulfillment_set",
-  columns: "name",
-  unique: true,
-  where: "deleted_at IS NULL",
-})
-
-@Entity()
-@Filter(DALUtils.mikroOrmSoftDeletableFilterOptions)
-export default class FulfillmentSet {
-  [OptionalProps]?: FulfillmentSetOptionalProps
-
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Property({ columnType: "text" })
-  @NameIndex.MikroORMIndex()
-  name: string
-
-  @Property({ columnType: "text" })
-  type: string
-
-  @Property({ columnType: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null = null
-
-  @OneToMany(() => ServiceZone, "fulfillment_set", {
-    cascade: [Cascade.PERSIST, "soft-remove"] as any,
-    orphanRemoval: true,
+export const FulfillmentSet = model
+  .define("fulfillment_set", {
+    id: model.id({ prefix: "fuset" }).primaryKey(),
+    name: model.text(),
+    type: model.text(),
+    service_zones: model.hasMany(() => ServiceZone, {
+      mappedBy: "fulfillment_set",
+    }),
+    metadata: model.json().nullable(),
   })
-  service_zones = new Collection<Rel<ServiceZone>>(this)
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
+  .indexes([
+    {
+      on: ["name"],
+      where: "deleted_at IS NULL",
+      unique: true,
+    },
+  ])
+  .cascades({
+    delete: ["service_zones"],
   })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  updated_at: Date
-
-  @Property({ columnType: "timestamptz", nullable: true })
-  @DeletedAtIndex.MikroORMIndex()
-  deleted_at: Date | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "fuset")
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "fuset")
-  }
-}

@@ -2,13 +2,37 @@ import {
   deleteShippingOptionsWorkflow,
   updateShippingOptionsWorkflow,
 } from "@medusajs/core-flows"
-import { FulfillmentWorkflow, HttpTypes } from "@medusajs/types"
+import { FulfillmentWorkflow, HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchShippingOption } from "../helpers"
-import { AdminUpdateShippingOptionType } from "../validators"
+import {
+  AdminGetShippingOptionParamsType,
+  AdminUpdateShippingOptionType,
+} from "../validators"
+import { MedusaError } from "@medusajs/framework/utils"
+
+export const GET = async (
+  req: AuthenticatedMedusaRequest<AdminGetShippingOptionParamsType>,
+  res: MedusaResponse<HttpTypes.AdminShippingOptionResponse>
+) => {
+  const shippingOption = await refetchShippingOption(
+    req.params.id,
+    req.scope,
+    req.queryConfig.fields
+  )
+
+  if (!shippingOption) {
+    throw new MedusaError(
+      MedusaError.Types.NOT_FOUND,
+      `Shipping Option with id: ${req.params.id} not found`
+    )
+  }
+
+  res.json({ shipping_option: shippingOption })
+}
 
 export const POST = async (
   req: AuthenticatedMedusaRequest<AdminUpdateShippingOptionType>,
@@ -31,7 +55,7 @@ export const POST = async (
   const shippingOption = await refetchShippingOption(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ shipping_option: shippingOption })

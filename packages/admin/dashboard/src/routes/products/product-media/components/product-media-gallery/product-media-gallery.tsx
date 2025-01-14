@@ -24,39 +24,39 @@ export const ProductMediaGallery = ({ product }: ProductMediaGalleryProps) => {
 
   const { t } = useTranslation()
   const prompt = usePrompt()
-  const { mutateAsync, isLoading } = useUpdateProduct(product.id)
+  const { mutateAsync, isPending } = useUpdateProduct(product.id)
 
   const media = getMedia(product.images, product.thumbnail)
 
   const next = useCallback(() => {
-    if (isLoading) {
+    if (isPending) {
       return
     }
 
     setCurr((prev) => (prev + 1) % media.length)
-  }, [media, isLoading])
+  }, [media, isPending])
 
   const prev = useCallback(() => {
-    if (isLoading) {
+    if (isPending) {
       return
     }
 
     setCurr((prev) => (prev - 1 + media.length) % media.length)
-  }, [media, isLoading])
+  }, [media, isPending])
 
   const goTo = useCallback(
     (index: number) => {
-      if (isLoading) {
+      if (isPending) {
         return
       }
 
       setCurr(index)
     },
-    [isLoading]
+    [isPending]
   )
 
   const handleDownloadCurrent = () => {
-    if (isLoading) {
+    if (isPending) {
       return
     }
 
@@ -87,9 +87,10 @@ export const ProductMediaGallery = ({ product }: ProductMediaGalleryProps) => {
       return
     }
 
-    const mediaToKeep = product.images
-      .filter((i) => i.id !== current.id)
-      .map((i) => i.url)
+    const mediaToKeep =
+      product.images
+        ?.filter((i) => i.id !== current.id)
+        .map((i) => ({ url: i.url })) || []
 
     if (curr === media.length - 1) {
       setCurr((prev) => prev - 1)
@@ -195,7 +196,7 @@ const Canvas = ({ media, curr }: { media: Media[]; curr: number }) => {
   return (
     <div className="bg-ui-bg-subtle relative size-full overflow-hidden">
       <div className="flex size-full items-center justify-center p-6">
-        <div className="relative h-full w-fit">
+        <div className="relative inline-block max-h-full max-w-full">
           {media[curr].isThumbnail && (
             <div className="absolute left-2 top-2">
               <Tooltip content={t("products.media.thumbnailTooltip")}>
@@ -206,7 +207,7 @@ const Canvas = ({ media, curr }: { media: Media[]; curr: number }) => {
           <img
             src={media[curr].url}
             alt=""
-            className="object-fit shadow-elevation-card-rest size-full rounded-xl object-contain"
+            className="object-fit shadow-elevation-card-rest max-h-[calc(100vh-200px)] w-auto rounded-xl object-contain"
           />
         </div>
       </div>

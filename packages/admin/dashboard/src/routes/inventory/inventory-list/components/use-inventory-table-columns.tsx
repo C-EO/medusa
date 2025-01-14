@@ -1,10 +1,11 @@
 import { InventoryTypes, ProductVariantDTO } from "@medusajs/types"
 
-import { InventoryActions } from "./inventory-actions"
-import { PlaceholderCell } from "../../../../components/table/table-cells/common/placeholder-cell"
+import { Checkbox } from "@medusajs/ui"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { PlaceholderCell } from "../../../../components/table/table-cells/common/placeholder-cell"
+import { InventoryActions } from "./inventory-actions"
 
 /**
  * Adds missing properties to the InventoryItemDTO type.
@@ -22,6 +23,34 @@ export const useInventoryTableColumns = () => {
 
   return useMemo(
     () => [
+      columnHelper.display({
+        id: "select",
+        header: ({ table }) => {
+          return (
+            <Checkbox
+              checked={
+                table.getIsSomePageRowsSelected()
+                  ? "indeterminate"
+                  : table.getIsAllPageRowsSelected()
+              }
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+            />
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            />
+          )
+        },
+      }),
       columnHelper.accessor("title", {
         header: t("fields.title"),
         cell: ({ getValue }) => {

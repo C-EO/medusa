@@ -1,14 +1,14 @@
-import { InventoryLevelDTO, InventoryTypes } from "@medusajs/types"
+import { InventoryLevelDTO, InventoryTypes } from "@medusajs/framework/types"
 import {
   WorkflowData,
   WorkflowResponse,
   createWorkflow,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 
 import { updateInventoryLevelsStep } from "../steps/update-inventory-levels"
 
 export interface UpdateInventoryLevelsWorkflowInput {
-  updates: InventoryTypes.BulkUpdateInventoryLevelInput[]
+  updates: InventoryTypes.UpdateInventoryLevelInput[]
 }
 export const updateInventoryLevelsWorkflowId =
   "update-inventory-levels-workflow"

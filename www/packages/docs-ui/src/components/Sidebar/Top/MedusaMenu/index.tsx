@@ -14,7 +14,6 @@ import {
   SidebarLeft,
   TimelineVertical,
 } from "@medusajs/icons"
-import { MedusaIcon } from "../../../Icons/MedusaLogo"
 import { HouseIcon } from "../../../Icons/House"
 import { Menu } from "../../../Menu"
 
@@ -51,7 +50,7 @@ export const SidebarTopMedusaMenu = () => {
         tabIndex={-1}
         onClick={toggleOpen}
       >
-        <BorderedIcon IconComponent={MedusaIcon} />
+        <BorderedIcon icon="/images/logo.png" />
         <span className="text-compact-small-plus text-medusa-fg-base flex-1">
           Medusa Docs
         </span>

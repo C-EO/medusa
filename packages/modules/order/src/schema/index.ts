@@ -161,6 +161,7 @@ type OrderLineItem {
   product_description: String
   product_subtitle: String
   product_type: String
+  product_type_id: String
   product_collection: String
   product_handle: String
   variant_sku: String

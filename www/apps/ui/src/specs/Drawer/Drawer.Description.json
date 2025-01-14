@@ -1,5 +1,5 @@
 {
-  "description": "",
+  "description": "This component adds accessible description to the drawer.\nIt accepts props from the [Radix UI Dialog Description](https://www.radix-ui.com/primitives/docs/components/dialog#description) component.",
   "methods": [],
   "displayName": "Drawer.Description",
   "props": {}

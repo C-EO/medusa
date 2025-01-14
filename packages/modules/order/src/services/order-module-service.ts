@@ -8,6 +8,7 @@ import {
   IOrderModuleService,
   ModuleJoinerConfig,
   ModulesSdkTypes,
+  OrderChangeDTO,
   OrderDTO,
   OrderReturnReasonDTO,
   OrderShippingMethodDTO,
@@ -16,9 +17,10 @@ import {
   SoftDeleteReturn,
   UpdateOrderItemWithSelectorDTO,
   UpdateOrderReturnReasonDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   BigNumber,
+  ChangeActionType,
   createRawPropertiesFromBigNumber,
   DecorateCartLikeInputDTO,
   decorateCartTotals,
@@ -36,7 +38,7 @@ import {
   OrderStatus,
   promiseAll,
   transformPropertiesToBigNumber,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   Order,
   OrderAddress,
@@ -45,6 +47,7 @@ import {
   OrderClaim,
   OrderClaimItem,
   OrderClaimItemImage,
+  OrderCreditLine,
   OrderExchange,
   OrderExchangeItem,
   OrderItem,
@@ -72,8 +75,8 @@ import {
   UpdateOrderLineItemDTO,
   UpdateOrderLineItemTaxLineDTO,
   UpdateOrderShippingMethodTaxLineDTO,
+  UpdateReturnReasonDTO,
 } from "@types"
-import { UpdateReturnReasonDTO } from "src/types/return-reason"
 import { joinerConfig } from "../joiner-config"
 import {
   applyChangesToOrder,
@@ -130,6 +133,7 @@ const generateMethodForModels = {
   OrderClaimItemImage,
   OrderExchange,
   OrderExchangeItem,
+  OrderCreditLine,
 }
 
 // TODO: rm template args here, keep it for later to not collide with carlos work at least as little as possible
@@ -155,7 +159,8 @@ export default class OrderModuleService<
     TClaimItem extends OrderClaimItem = OrderClaimItem,
     TClaimItemImage extends OrderClaimItemImage = OrderClaimItemImage,
     TExchange extends OrderExchange = OrderExchange,
-    TExchangeItem extends OrderExchangeItem = OrderExchangeItem
+    TExchangeItem extends OrderExchangeItem = OrderExchangeItem,
+    TCreditLine extends OrderCreditLine = OrderCreditLine
   >
   extends ModulesSdkUtils.MedusaService<{
     Order: { dto: OrderTypes.OrderDTO }
@@ -184,6 +189,7 @@ export default class OrderModuleService<
     OrderClaimItemImage: { dto: OrderTypes.OrderClaimItemImageDTO }
     OrderExchange: { dto: OrderTypes.OrderExchangeDTO }
     OrderExchangeItem: { dto: OrderTypes.OrderExchangeItemDTO }
+    OrderCreditLine: { dto: OrderTypes.OrderCreditLineDTO }
   }>(generateMethodForModels)
   implements IOrderModuleService
 {
@@ -1991,7 +1997,13 @@ export default class OrderModuleService<
     for (const item of calculated.order.items) {
       const isExistingItem = item.id === item.detail?.item_id
       if (!isExistingItem) {
-        addedItems[item.id] = item
+        addedItems[item.id] = {
+          ...item,
+          quantity: item.detail?.quantity ?? item.quantity,
+          unit_price: item.detail?.unit_price || item.unit_price,
+          compare_at_unit_price:
+            item.detail?.compare_at_unit_price || item.compare_at_unit_price,
+        }
       }
     }
 
@@ -2021,11 +2033,16 @@ export default class OrderModuleService<
         delete item.actions
 
         const newItem = itemsToUpsert.find((d) => d.item_id === item.id)!
+        const unitPrice = newItem?.unit_price ?? item.unit_price
+        const compareAtUnitPrice =
+          newItem?.compare_at_unit_price ?? item.compare_at_unit_price
 
         calculated.order.items[idx] = {
           ...lineItem,
           actions,
           quantity: newItem.quantity,
+          unit_price: unitPrice,
+          compare_at_unit_price: compareAtUnitPrice,
           detail: {
             ...newItem,
             ...item,
@@ -2221,6 +2238,59 @@ export default class OrderModuleService<
     await this.orderChangeService_.update(updates as any, sharedContext)
   }
 
+  async registerOrderChange(
+    data: OrderTypes.RegisterOrderChangeDTO,
+    sharedContext?: Context
+  ): Promise<OrderTypes.OrderChangeDTO>
+  async registerOrderChange(
+    data: OrderTypes.RegisterOrderChangeDTO[],
+    sharedContext?: Context
+  ): Promise<OrderTypes.OrderChangeDTO[]>
+
+  @InjectManager()
+  async registerOrderChange(
+    data:
+      | OrderTypes.RegisterOrderChangeDTO
+      | OrderTypes.RegisterOrderChangeDTO[],
+    sharedContext?: Context
+  ): Promise<OrderTypes.OrderChangeDTO | OrderTypes.OrderChangeDTO[]> {
+    const inputData = Array.isArray(data) ? data : [data]
+
+    const orders = await this.orderService_.list(
+      { id: inputData.map((d) => d.order_id) },
+      { select: ["id", "version"] },
+      sharedContext
+    )
+
+    const orderVersionsMap = new Map(orders.map((o) => [o.id, o.version]))
+
+    const changes = (await this.orderChangeService_.create(
+      inputData.map((d) => ({
+        order_id: d.order_id,
+        change_type: d.change_type,
+        internal_note: d.internal_note,
+        description: d.description,
+        metadata: d.metadata,
+        confirmed_at: new Date(),
+        created_by: d.created_by,
+        confirmed_by: d.confirmed_by,
+        status: OrderChangeStatus.CONFIRMED,
+        version: orderVersionsMap.get(d.order_id)!,
+        actions: [
+          {
+            action: ChangeActionType.UPDATE_ORDER_PROPERTIES,
+            details: d.details,
+            version: orderVersionsMap.get(d.order_id)!,
+            applied: true,
+          },
+        ],
+      })) as CreateOrderChangeDTO[],
+      sharedContext
+    )) as OrderTypes.OrderChangeDTO[]
+
+    return Array.isArray(data) ? changes : changes[0]
+  }
+
   @InjectManager()
   async applyPendingOrderActions(
     orderId: string | string[],
@@ -2296,13 +2366,39 @@ export default class OrderModuleService<
     return await this.revertLastChange_(order, sharedContext)
   }
 
+  @InjectManager()
+  async undoLastChange(
+    orderId: string,
+    lastOrderChange?: Partial<OrderChangeDTO>,
+    @MedusaContext() sharedContext?: Context
+  ) {
+    const order = await super.retrieveOrder(
+      orderId,
+      {
+        select: ["id", "version"],
+      },
+      sharedContext
+    )
+
+    if (order.version < 2) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Order with id ${orderId} has no previous versions`
+      )
+    }
+
+    return await this.undoLastChange_(order, lastOrderChange, sharedContext)
+  }
+
   @InjectTransactionManager()
-  protected async revertLastChange_(
+  protected async undoLastChange_(
     order: OrderDTO,
+    lastOrderChange?: Partial<OrderChangeDTO>,
     sharedContext?: Context
   ): Promise<void> {
     const currentVersion = order.version
 
+    const updatePromises: Promise<any>[] = []
     // Order Changes
     const orderChanges = await this.orderChangeService_.list(
       {
@@ -2312,9 +2408,18 @@ export default class OrderModuleService<
       { select: ["id", "version"] },
       sharedContext
     )
-    const orderChangesIds = orderChanges.map((change) => change.id)
 
-    await this.orderChangeService_.softDelete(orderChangesIds, sharedContext)
+    const orderChangesIds = orderChanges.map((change) => {
+      return {
+        id: change.id,
+        status: lastOrderChange?.status ?? OrderChangeStatus.PENDING,
+        confirmed_at: null,
+      }
+    })
+
+    updatePromises.push(
+      this.orderChangeService_.update(orderChangesIds, sharedContext)
+    )
 
     // Order Changes Actions
     const orderChangesActions = await this.orderChangeActionService_.list(
@@ -2325,11 +2430,18 @@ export default class OrderModuleService<
       { select: ["id", "version"] },
       sharedContext
     )
-    const orderChangeActionsIds = orderChangesActions.map((action) => action.id)
+    const orderChangeActionsIds = orderChangesActions.map((action) => {
+      return {
+        id: action.id,
+        applied: false,
+      }
+    })
 
-    await this.orderChangeActionService_.softDelete(
-      orderChangeActionsIds,
-      sharedContext
+    updatePromises.push(
+      this.orderChangeActionService_.update(
+        orderChangeActionsIds,
+        sharedContext
+      )
     )
 
     // Order Summary
@@ -2343,7 +2455,9 @@ export default class OrderModuleService<
     )
     const orderSummaryIds = orderSummary.map((summary) => summary.id)
 
-    await this.orderSummaryService_.softDelete(orderSummaryIds, sharedContext)
+    updatePromises.push(
+      this.orderSummaryService_.softDelete(orderSummaryIds, sharedContext)
+    )
 
     // Order Items
     const orderItems = await this.orderItemService_.list(
@@ -2356,7 +2470,9 @@ export default class OrderModuleService<
     )
     const orderItemIds = orderItems.map((summary) => summary.id)
 
-    await this.orderItemService_.softDelete(orderItemIds, sharedContext)
+    updatePromises.push(
+      this.orderItemService_.softDelete(orderItemIds, sharedContext)
+    )
 
     // Order Shipping
     const orderShippings = await this.orderShippingService_.list(
@@ -2369,29 +2485,141 @@ export default class OrderModuleService<
     )
     const orderShippingIds = orderShippings.map((sh) => sh.id)
 
-    await this.orderShippingService_.softDelete(orderShippingIds, sharedContext)
+    updatePromises.push(
+      this.orderShippingService_.softDelete(orderShippingIds, sharedContext)
+    )
 
     // Order
-    await this.orderService_.update(
+    updatePromises.push(
+      this.orderService_.update(
+        {
+          selector: {
+            id: order.id,
+          },
+          data: {
+            version: order.version - 1,
+          },
+        },
+        sharedContext
+      )
+    )
+
+    await promiseAll(updatePromises)
+  }
+
+  @InjectTransactionManager()
+  protected async revertLastChange_(
+    order: OrderDTO,
+    sharedContext?: Context
+  ): Promise<void> {
+    const currentVersion = order.version
+
+    const updatePromises: Promise<any>[] = []
+    // Order Changes
+    const orderChanges = await this.orderChangeService_.list(
       {
-        selector: {
-          id: order.id,
-        },
-        data: {
-          version: order.version - 1,
-        },
+        order_id: order.id,
+        version: currentVersion,
       },
+      { select: ["id", "version"] },
       sharedContext
+    )
+    const orderChangesIds = orderChanges.map((change) => change.id)
+
+    updatePromises.push(
+      this.orderChangeService_.softDelete(orderChangesIds, sharedContext)
+    )
+
+    // Order Changes Actions
+    const orderChangesActions = await this.orderChangeActionService_.list(
+      {
+        order_id: order.id,
+        version: currentVersion,
+      },
+      { select: ["id", "version"] },
+      sharedContext
+    )
+    const orderChangeActionsIds = orderChangesActions.map((action) => action.id)
+
+    updatePromises.push(
+      this.orderChangeActionService_.softDelete(
+        orderChangeActionsIds,
+        sharedContext
+      )
+    )
+
+    // Order Summary
+    const orderSummary = await this.orderSummaryService_.list(
+      {
+        order_id: order.id,
+        version: currentVersion,
+      },
+      { select: ["id", "version"] },
+      sharedContext
+    )
+    const orderSummaryIds = orderSummary.map((summary) => summary.id)
+
+    updatePromises.push(
+      this.orderSummaryService_.softDelete(orderSummaryIds, sharedContext)
+    )
+
+    // Order Items
+    const orderItems = await this.orderItemService_.list(
+      {
+        order_id: order.id,
+        version: currentVersion,
+      },
+      { select: ["id", "version"] },
+      sharedContext
+    )
+    const orderItemIds = orderItems.map((summary) => summary.id)
+
+    updatePromises.push(
+      this.orderItemService_.softDelete(orderItemIds, sharedContext)
+    )
+
+    // Order Shipping
+    const orderShippings = await this.orderShippingService_.list(
+      {
+        order_id: order.id,
+        version: currentVersion,
+      },
+      { select: ["id", "version"] },
+      sharedContext
+    )
+    const orderShippingIds = orderShippings.map((sh) => sh.id)
+
+    updatePromises.push(
+      this.orderShippingService_.softDelete(orderShippingIds, sharedContext)
+    )
+
+    // Order
+    updatePromises.push(
+      this.orderService_.update(
+        {
+          selector: {
+            id: order.id,
+          },
+          data: {
+            version: order.version - 1,
+          },
+        },
+        sharedContext
+      )
     )
 
     // Returns
-    await this.returnService_.delete(
-      {
-        order_id: order.id,
-        order_version: currentVersion,
-      },
-      sharedContext
+    updatePromises.push(
+      this.returnService_.delete(
+        {
+          order_id: order.id,
+          order_version: currentVersion,
+        },
+        sharedContext
+      )
     )
+
+    await promiseAll(updatePromises)
   }
 
   private async getActiveOrderChange_(
@@ -2678,7 +2906,6 @@ export default class OrderModuleService<
           : transactionData.order_id,
       },
       {
-        take: null,
         select: ["id", "version"],
       },
       sharedContext
@@ -2726,7 +2953,6 @@ export default class OrderModuleService<
       },
       {
         select: ["order_id", "version", "amount"],
-        take: null,
       },
       sharedContext
     )
@@ -2752,7 +2978,6 @@ export default class OrderModuleService<
         id: transactionIds,
       },
       {
-        take: null,
         select: ["order_id", "amount"],
       },
       sharedContext
@@ -2787,7 +3012,6 @@ export default class OrderModuleService<
       {
         select: ["order_id", "amount"],
         withDeleted: true,
-        take: null,
       },
       sharedContext
     )
@@ -2820,7 +3044,7 @@ export default class OrderModuleService<
       {
         order_id: transactionData.map((trx) => trx.order_id),
       },
-      { take: null },
+      {},
       sharedContext
     )
 
@@ -2835,6 +3059,7 @@ export default class OrderModuleService<
       transformPropertiesToBigNumber(trxs)
 
       const op = isRemoved ? MathBN.sub : MathBN.add
+
       for (const trx of trxs) {
         if (MathBN.gt(trx.amount, 0)) {
           summary.totals.paid_total = new BigNumber(
@@ -2913,10 +3138,12 @@ export default class OrderModuleService<
     }
 
     await this.orderService_.update(
-      {
-        id: orderIds,
-        status: OrderStatus.ARCHIVED,
-      },
+      orderIds.map((id) => {
+        return {
+          id,
+          status: OrderStatus.ARCHIVED,
+        }
+      }),
       sharedContext
     )
 

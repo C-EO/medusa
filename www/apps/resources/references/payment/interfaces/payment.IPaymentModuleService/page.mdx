@@ -9,39 +9,45 @@ import { TypeList } from "docs-ui"
 
 This section of the documentation provides a reference to the `IPaymentModuleService` interface’s methods. This is the interface developers use to use the functionalities provided by the Payment Module.
 
+<Note>
+
+You should only use the methods in this reference when implementing complex customizations. For common cases, check out [available workflows instead](/medusa-workflows-reference).
+
+</Note>
+
 The main service interface for the Payment Module.
 
 ## Methods
 
-- [createPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections/page.mdx)
-- [retrievePaymentCollection](../../IPaymentModuleService/methods/payment.IPaymentModuleService.retrievePaymentCollection/page.mdx)
-- [listPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentCollections/page.mdx)
-- [listAndCountPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listAndCountPaymentCollections/page.mdx)
-- [updatePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePaymentCollections/page.mdx)
-- [upsertPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.upsertPaymentCollections/page.mdx)
-- [deletePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentCollections/page.mdx)
-- [softDeletePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.softDeletePaymentCollections/page.mdx)
-- [restorePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.restorePaymentCollections/page.mdx)
-- [completePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.completePaymentCollections/page.mdx)
-- [retrievePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.retrievePaymentSession/page.mdx)
-- [createPaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentSession/page.mdx)
-- [updatePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePaymentSession/page.mdx)
-- [deletePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentSession/page.mdx)
 - [authorizePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.authorizePaymentSession/page.mdx)
-- [listPaymentSessions](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentSessions/page.mdx)
-- [listPayments](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPayments/page.mdx)
-- [updatePayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePayment/page.mdx)
-- [capturePayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.capturePayment/page.mdx)
-- [refundPayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.refundPayment/page.mdx)
 - [cancelPayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.cancelPayment/page.mdx)
-- [listPaymentProviders](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentProviders/page.mdx)
+- [capturePayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.capturePayment/page.mdx)
+- [completePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.completePaymentCollections/page.mdx)
+- [createPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections/page.mdx)
+- [createPaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentSession/page.mdx)
+- [createRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons/page.mdx)
+- [deletePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentCollections/page.mdx)
+- [deletePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentSession/page.mdx)
+- [deleteRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons/page.mdx)
+- [getWebhookActionAndData](../../IPaymentModuleService/methods/payment.IPaymentModuleService.getWebhookActionAndData/page.mdx)
+- [listAndCountPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listAndCountPaymentCollections/page.mdx)
 - [listAndCountPaymentProviders](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listAndCountPaymentProviders/page.mdx)
 - [listCaptures](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listCaptures/page.mdx)
-- [listRefunds](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listRefunds/page.mdx)
-- [createRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons/page.mdx)
-- [deleteRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons/page.mdx)
-- [softDeleteRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.softDeleteRefundReasons/page.mdx)
-- [restoreRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.restoreRefundReasons/page.mdx)
-- [updateRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updateRefundReasons/page.mdx)
+- [listPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentCollections/page.mdx)
+- [listPaymentProviders](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentProviders/page.mdx)
+- [listPayments](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPayments/page.mdx)
+- [listPaymentSessions](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listPaymentSessions/page.mdx)
 - [listRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listRefundReasons/page.mdx)
-- [processEvent](../../IPaymentModuleService/methods/payment.IPaymentModuleService.processEvent/page.mdx)
+- [listRefunds](../../IPaymentModuleService/methods/payment.IPaymentModuleService.listRefunds/page.mdx)
+- [refundPayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.refundPayment/page.mdx)
+- [restorePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.restorePaymentCollections/page.mdx)
+- [restoreRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.restoreRefundReasons/page.mdx)
+- [retrievePaymentCollection](../../IPaymentModuleService/methods/payment.IPaymentModuleService.retrievePaymentCollection/page.mdx)
+- [retrievePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.retrievePaymentSession/page.mdx)
+- [softDeletePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.softDeletePaymentCollections/page.mdx)
+- [softDeleteRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.softDeleteRefundReasons/page.mdx)
+- [updatePayment](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePayment/page.mdx)
+- [updatePaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePaymentCollections/page.mdx)
+- [updatePaymentSession](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updatePaymentSession/page.mdx)
+- [updateRefundReasons](../../IPaymentModuleService/methods/payment.IPaymentModuleService.updateRefundReasons/page.mdx)
+- [upsertPaymentCollections](../../IPaymentModuleService/methods/payment.IPaymentModuleService.upsertPaymentCollections/page.mdx)

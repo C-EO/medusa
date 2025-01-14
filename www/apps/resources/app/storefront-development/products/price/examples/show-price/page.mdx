@@ -1,6 +1,10 @@
 ---
 sidebar_position: 1
 sidebar_label: "Example: Show Variant's Price"
+tags:
+  - product
+  - storefront
+  - pricing
 ---
 
 export const metadata = {
@@ -10,20 +14,6 @@ export const metadata = {
 # {metadata.title}
 
 In this document, you'll learn how to display a product variant's price with a full React example.
-
-## Display Selected Variant Price
-
-Once the customer selects a variant, use its `calculated_price.calculated_amount` property to display its price:
-
-```ts
-const price = formatPrice(
-  selectedVariantPrice.calculated_price.calculated_amount
-)
-```
-
-You'll learn about the `formatPrice` function in the next section.
-
----
 
 ## Price Formatting
 
@@ -41,6 +31,20 @@ const formatPrice = (amount: number): string => {
 
 ---
 
+## Display Selected Variant Price
+
+Once the customer selects a variant, use its `calculated_price.calculated_amount` property to display its price:
+
+```ts
+const price = formatPrice(
+  selectedVariantPrice.calculated_price.calculated_amount
+)
+```
+
+You'll learn about the `formatPrice` function in the next section.
+
+---
+
 ## Full React Example
 
 The following React-based storefront example retrieves the product's price based on the selected variant:
@@ -53,17 +57,16 @@ The example only passes the `region_id` query parameter for pricing. Learn how t
 
 export const priceHighlights = [
   ["5", "useRegion", "The `useRegion` hook is implemented in the Region React Context guide."],
-  ["13", "{ params: { id } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["19", "region", "Access the region using the `useRegion` hook."],
-  ["26", "queryParams", "Build the pricing query parameters."],
-  ["58", "formatPrice", "A utility function to format an amount with its currency."],
-  ["59", `"en-US"`, "If you use a different locale change it here."],
-  ["66", "selectedVariantPrice", "Assign the variant to compute its price, which is either the selected or cheapest variant."],
-  ["68", "selectedVariant", "Use the selected variant for pricing."],
-  ["71", "", "If there isn't a selected variant, retrieve the variant with the cheapest price."],
-  ["79", "price", "Compute the price of the selected or cheapest variant."],
-  ["123", "", "If there's a computed price but no selected variant, show a `From` prefix to the price."],
-  ["124", "price", "Display the computed price."]
+  ["17", "region", "Access the region using the `useRegion` hook."],
+  ["24", "queryParams", "Build the pricing query parameters."],
+  ["56", "formatPrice", "A utility function to format an amount with its currency."],
+  ["57", `"en-US"`, "If you use a different locale change it here."],
+  ["64", "selectedVariantPrice", "Assign the variant to compute its price, which is either the selected or cheapest variant."],
+  ["66", "selectedVariant", "Use the selected variant for pricing."],
+  ["69", "", "If there isn't a selected variant, retrieve the variant with the cheapest price."],
+  ["77", "price", "Compute the price of the selected or cheapest variant."],
+  ["121", "", "If there's a computed price but no selected variant, show a `From` prefix to the price."],
+  ["122", "price", "Display the computed price."]
 ]
 
 ```tsx highlights={priceHighlights}
@@ -73,13 +76,11 @@ import { useEffect, useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { useRegion } from "../providers/region"
 
-type Params = {
-  params: {
-    id: string
-  }
+type Props = {
+  id: string
 }
 
-export default function Product({ params: { id } }: Params) {
+export default function Product({ id }: Props) {
   const [loading, setLoading] = useState(true)
   const [product, setProduct] = useState<
     HttpTypes.StoreProduct | undefined
@@ -100,7 +101,7 @@ export default function Product({ params: { id } }: Params) {
     fetch(`http://localhost:9000/store/products/${id}?${queryParams.toString()}`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())

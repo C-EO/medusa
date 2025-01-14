@@ -5,14 +5,6 @@
  * description: Retrieve a list of draft orders. The draft orders can be filtered by fields such as `id`. The draft orders can also be sorted or paginated.
  * x-authenticated: true
  * parameters:
- *   - name: expand
- *     in: query
- *     description: Comma-separated relations that should be expanded in the returned data.
- *     required: false
- *     schema:
- *       type: string
- *       title: expand
- *       description: Comma-separated relations that should be expanded in the returned data.
  *   - name: fields
  *     in: query
  *     description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
@@ -23,6 +15,8 @@
  *       title: fields
  *       description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
  *         fields. without prefix it will replace the entire default fields.
+ *       externalDocs:
+ *         url: "#select-fields-and-relations"
  *   - name: offset
  *     in: query
  *     description: The number of items to skip when retrieving a list.
@@ -31,6 +25,8 @@
  *       type: number
  *       title: offset
  *       description: The number of items to skip when retrieving a list.
+ *       externalDocs:
+ *         url: "#pagination"
  *   - name: limit
  *     in: query
  *     description: Limit the number of items returned in the list.
@@ -39,6 +35,8 @@
  *       type: number
  *       title: limit
  *       description: Limit the number of items returned in the list.
+ *       externalDocs:
+ *         url: "#pagination"
  *   - name: order
  *     in: query
  *     description: The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
@@ -971,12 +969,16 @@
  *     description: Filter by region IDs to retrieve their associated draft orders.
  *     required: false
  *     schema:
- *       type: array
- *       description: Filter by region IDs to retrieve their associated draft orders.
- *       items:
- *         type: string
- *         title: region_id
- *         description: A region's ID.
+ *       oneOf:
+ *         - type: string
+ *           title: region_id
+ *           description: The draft order's region id.
+ *         - type: array
+ *           description: The draft order's region id.
+ *           items:
+ *             type: string
+ *             title: region_id
+ *             description: The region id's details.
  *   - name: q
  *     in: query
  *     description: Search term to filter the order's searchable properties.
@@ -1447,6 +1449,20 @@
  *           type: boolean
  *           title: $exists
  *           description: Filter by whether a value for this parameter exists (not `null`).
+ *   - name: customer_id
+ *     in: query
+ *     required: false
+ *     schema:
+ *       oneOf:
+ *         - type: string
+ *           title: customer_id
+ *           description: The draft order's customer id.
+ *         - type: array
+ *           description: The draft order's customer id.
+ *           items:
+ *             type: string
+ *             title: customer_id
+ *             description: The customer id's details.
  * security:
  *   - api_token: []
  *   - cookie_auth: []
@@ -1467,7 +1483,7 @@
  *         schema:
  *           allOf:
  *             - type: object
- *               description: SUMMARY
+ *               description: The paginated list of draft orders.
  *               required:
  *                 - limit
  *                 - offset
@@ -1476,17 +1492,17 @@
  *                 limit:
  *                   type: number
  *                   title: limit
- *                   description: The draft order's limit.
+ *                   description: The maximum number of items returned.
  *                 offset:
  *                   type: number
  *                   title: offset
- *                   description: The draft order's offset.
+ *                   description: The number of items skipped before retrieving the returned items.
  *                 count:
  *                   type: number
  *                   title: count
- *                   description: The draft order's count.
+ *                   description: The total number of items.
  *             - type: object
- *               description: SUMMARY
+ *               description: The paginated list of draft orders.
  *               required:
  *                 - draft_orders
  *               properties:

@@ -1,4 +1,3 @@
-import { AdminTaxRegionResponse } from "@medusajs/types"
 import { LoaderFunctionArgs } from "react-router-dom"
 import { taxRegionsQueryKeys } from "../../../hooks/api/tax-regions"
 import { sdk } from "../../../lib/client"
@@ -13,8 +12,5 @@ export const taxRegionLoader = async ({ params }: LoaderFunctionArgs) => {
   const id = params.province_id
   const query = taxRegionDetailQuery(id!)
 
-  return (
-    queryClient.getQueryData<AdminTaxRegionResponse>(query.queryKey) ??
-    (await queryClient.fetchQuery(query))
-  )
+  return queryClient.ensureQueryData(query)
 }

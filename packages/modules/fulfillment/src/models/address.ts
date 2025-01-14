@@ -1,91 +1,16 @@
-import { DAL } from "@medusajs/types"
-import {
-  createPsqlIndexStatementHelper,
-  generateEntityId,
-} from "@medusajs/utils"
-import {
-  BeforeCreate,
-  Entity,
-  OnInit,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-} from "@mikro-orm/core"
+import { model } from "@medusajs/framework/utils"
 
-type OptionalAddressProps = DAL.SoftDeletableModelDateColumns
-
-const FulfillmentDeletedAtIndex = createPsqlIndexStatementHelper({
-  tableName: "fulfillment_address",
-  columns: "deleted_at",
-  where: "deleted_at IS NOT NULL",
+export const FulfillmentAddress = model.define("fulfillment_address", {
+  id: model.id({ prefix: "fuladdr" }).primaryKey(),
+  company: model.text().nullable(),
+  first_name: model.text().nullable(),
+  last_name: model.text().nullable(),
+  address_1: model.text().nullable(),
+  address_2: model.text().nullable(),
+  city: model.text().nullable(),
+  country_code: model.text().nullable(),
+  province: model.text().nullable(),
+  postal_code: model.text().nullable(),
+  phone: model.text().nullable(),
+  metadata: model.json().nullable(),
 })
-
-@Entity({ tableName: "fulfillment_address" })
-export default class FulfillmentAddress {
-  [OptionalProps]: OptionalAddressProps
-
-  @PrimaryKey({ columnType: "text" })
-  id!: string
-
-  @Property({ columnType: "text", nullable: true })
-  company: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  first_name: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  last_name: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  address_1: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  address_2: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  city: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  country_code: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  province: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  postal_code: string | null = null
-
-  @Property({ columnType: "text", nullable: true })
-  phone: string | null = null
-
-  @Property({ columnType: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null = null
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  updated_at: Date
-
-  @Property({ columnType: "timestamptz", nullable: true })
-  @FulfillmentDeletedAtIndex.MikroORMIndex()
-  deleted_at: Date | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "fuladdr")
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "fuladdr")
-  }
-}

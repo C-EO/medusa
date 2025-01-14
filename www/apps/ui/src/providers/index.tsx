@@ -1,9 +1,6 @@
 "use client"
 
 import {
-  ColorModeProvider,
-  MobileProvider,
-  ModalProvider,
   AnalyticsProvider,
   ScrollControllerProvider,
   SiteConfigProvider,
@@ -12,6 +9,7 @@ import SearchProvider from "./search"
 import SidebarProvider from "./sidebar"
 import { siteConfig } from "../config/site"
 import { MainNavProvider } from "./main-nav"
+import { TooltipProvider } from "@medusajs/ui"
 
 type ProvidersProps = {
   children: React.ReactNode
@@ -21,19 +19,15 @@ const Providers = ({ children }: ProvidersProps) => {
   return (
     <AnalyticsProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_API_KEY}>
       <SiteConfigProvider config={siteConfig}>
-        <MobileProvider>
-          <ColorModeProvider>
-            <ModalProvider>
-              <ScrollControllerProvider scrollableSelector="#main">
-                <SidebarProvider>
-                  <MainNavProvider>
-                    <SearchProvider>{children}</SearchProvider>
-                  </MainNavProvider>
-                </SidebarProvider>
-              </ScrollControllerProvider>
-            </ModalProvider>
-          </ColorModeProvider>
-        </MobileProvider>
+        <ScrollControllerProvider scrollableSelector="#main">
+          <SidebarProvider>
+            <MainNavProvider>
+              <SearchProvider>
+                <TooltipProvider>{children}</TooltipProvider>
+              </SearchProvider>
+            </MainNavProvider>
+          </SidebarProvider>
+        </ScrollControllerProvider>
       </SiteConfigProvider>
     </AnalyticsProvider>
   )

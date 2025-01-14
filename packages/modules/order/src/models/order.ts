@@ -1,9 +1,10 @@
-import { DAL } from "@medusajs/types"
+import { DAL } from "@medusajs/framework/types"
 import {
   OrderStatus,
+  Searchable,
   createPsqlIndexStatementHelper,
   generateEntityId,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   BeforeCreate,
   Cascade,
@@ -19,6 +20,7 @@ import {
   Rel,
 } from "@mikro-orm/core"
 import OrderAddress from "./address"
+import OrderCreditLine from "./credit-line"
 import OrderItem from "./order-item"
 import OrderShipping from "./order-shipping-method"
 import OrderSummary from "./order-summary"
@@ -90,6 +92,7 @@ export default class Order {
   @PrimaryKey({ columnType: "text" })
   id: string
 
+  @Searchable()
   @Property({ autoincrement: true, primary: false })
   @DisplayIdIndex.MikroORMIndex()
   display_id: number
@@ -130,6 +133,7 @@ export default class Order {
   @IsDraftOrderIndex.MikroORMIndex()
   is_draft_order: boolean = false
 
+  @Searchable()
   @Property({ columnType: "text", nullable: true })
   email: string | null = null
 
@@ -176,6 +180,11 @@ export default class Order {
     cascade: [Cascade.PERSIST],
   })
   items = new Collection<Rel<OrderItem>>(this)
+
+  @OneToMany(() => OrderCreditLine, (creditLine) => creditLine.order, {
+    cascade: [Cascade.PERSIST],
+  })
+  credit_lines = new Collection<Rel<OrderCreditLine>>(this)
 
   @OneToMany(() => OrderShipping, (shippingMethod) => shippingMethod.order, {
     cascade: [Cascade.PERSIST],

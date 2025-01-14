@@ -1,22 +1,31 @@
 import clsx from "clsx"
 import SectionDivider from "../Divider"
 import { forwardRef } from "react"
+import { WideSection } from "docs-ui"
 
 type SectionContainerProps = {
   children: React.ReactNode
   noTopPadding?: boolean
   noDivider?: boolean
+  className?: string
 }
 
 const SectionContainer = forwardRef<HTMLDivElement, SectionContainerProps>(
   function SectionContainer(
-    { children, noTopPadding = false, noDivider = false },
+    { children, noTopPadding = false, noDivider = false, className },
     ref
   ) {
     return (
-      <div className={clsx("relative pb-7", !noTopPadding && "pt-7")} ref={ref}>
-        {children}
-        {!noDivider && <SectionDivider className="-left-1.5 lg:!-left-4" />}
+      <div
+        ref={ref}
+        className={clsx(
+          "relative pb-4 md:pb-7",
+          !noTopPadding && "pt-7",
+          className
+        )}
+      >
+        <WideSection>{children}</WideSection>
+        {!noDivider && <SectionDivider />}
       </div>
     )
   }

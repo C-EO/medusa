@@ -2,9 +2,9 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
-import { MedusaRequest, MedusaResponse } from "../../../../types/routing"
-import { HttpTypes } from "@medusajs/types"
+} from "@medusajs/framework/utils"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: MedusaRequest,
@@ -17,7 +17,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "currency",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [currency] = await remoteQuery(queryObject)

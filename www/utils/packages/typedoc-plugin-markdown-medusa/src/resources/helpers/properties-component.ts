@@ -1,8 +1,7 @@
-import * as Handlebars from "handlebars"
-import { MarkdownTheme } from "../../theme"
+import Handlebars from "handlebars"
 import { DeclarationReference } from "typedoc"
 
-export default function (theme: MarkdownTheme) {
+export default function () {
   Handlebars.registerHelper(
     "propertiesComponent",
     function (this: DeclarationReference) {

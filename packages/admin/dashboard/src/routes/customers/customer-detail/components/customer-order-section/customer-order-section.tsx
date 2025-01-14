@@ -1,5 +1,6 @@
 import { ArrowPath } from "@medusajs/icons"
-import { Button, Container, Heading } from "@medusajs/ui"
+import { HttpTypes } from "@medusajs/types"
+import { Container, Heading } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -11,12 +12,12 @@ import { useOrderTableColumns } from "../../../../../hooks/table/columns/use-ord
 import { useOrderTableFilters } from "../../../../../hooks/table/filters/use-order-table-filters"
 import { useOrderTableQuery } from "../../../../../hooks/table/query/use-order-table-query"
 import { useDataTable } from "../../../../../hooks/use-data-table"
-import { HttpTypes } from "@medusajs/types"
 
 type CustomerGeneralSectionProps = {
   customer: HttpTypes.AdminCustomer
 }
 
+const PREFIX = "cusord"
 const PAGE_SIZE = 10
 const DEFAULT_RELATIONS = "*customer,*items,*sales_channel"
 const DEFAULT_FIELDS =
@@ -29,6 +30,7 @@ export const CustomerOrderSection = ({
 
   const { searchParams, raw } = useOrderTableQuery({
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
   const { orders, count, isLoading, isError, error } = useOrders(
     {
@@ -50,6 +52,7 @@ export const CustomerOrderSection = ({
     enablePagination: true,
     count,
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
 
   if (isError) {
@@ -60,11 +63,12 @@ export const CustomerOrderSection = ({
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">{t("orders.domain")}</Heading>
-        <div className="flex items-center gap-x-2">
-          <Button size="small" variant="secondary">
-            {t("actions.create")}
-          </Button>
-        </div>
+        {/*TODO: ENABLE WHEN DRAFT ORDERS ARE DONE*/}
+        {/*<div className="flex items-center gap-x-2">*/}
+        {/*  <Button size="small" variant="secondary">*/}
+        {/*    {t("actions.create")}*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </div>
       <DataTable
         columns={columns}
@@ -75,9 +79,14 @@ export const CustomerOrderSection = ({
         count={count}
         isLoading={isLoading}
         pageSize={PAGE_SIZE}
-        orderBy={["display_id", "created_at", "updated_at"]}
+        orderBy={[
+          { key: "display_id", label: t("orders.fields.displayId") },
+          { key: "created_at", label: t("fields.createdAt") },
+          { key: "updated_at", label: t("fields.updatedAt") },
+        ]}
         search={true}
         queryObject={raw}
+        prefix={PREFIX}
       />
     </Container>
   )
@@ -93,7 +102,7 @@ const CustomerOrderActions = ({ order }: { order: HttpTypes.AdminOrder }) => {
           actions: [
             {
               label: t("transferOwnership.label"),
-              to: `${order.id}/transfer-ownership`,
+              to: `${order.id}/transfer`,
               icon: <ArrowPath />,
             },
           ],

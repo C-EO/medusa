@@ -20,6 +20,10 @@ export async function promiseAll<T extends readonly unknown[] | []>(
   promises: T,
   { aggregateErrors } = { aggregateErrors: false }
 ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }> {
+  if (!promises.length) {
+    return [] as unknown as Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>
+  }
+
   const states = await Promise.allSettled(promises)
 
   const rejected = (states as PromiseSettledResult<unknown>[]).filter(

@@ -1,6 +1,6 @@
 "use client"
 
-import { EllipseMiniSolid, TrianglesMini } from "@medusajs/icons"
+import { Check, TrianglesMini } from "@medusajs/icons"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { cva } from "cva"
 import * as React from "react"
@@ -82,6 +82,7 @@ const triggerVariants = cva({
 
 /**
  * The trigger that toggles the select.
+ * It's based on [Radix UI Select Trigger](https://www.radix-ui.com/primitives/docs/components/select#trigger).
  */
 const Trigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -104,19 +105,35 @@ const Trigger = React.forwardRef<
 })
 Trigger.displayName = "Select.Trigger"
 
+interface SelectContentProps extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> {
+}
+
+/**
+ * The content that appears when the select is open.
+ * It's based on [Radix UI Select Content](https://www.radix-ui.com/primitives/docs/components/select#content).
+ */
 const Content = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+  SelectContentProps
 >(
   (
     {
       className,
       children,
+      /**
+       * Whether to show the select items below (`popper`) or over (`item-aligned`) the select input.
+       */
       position = "popper",
+      /**
+       * The distance of the content pop-up in pixels from the select input. Only available when position is set to popper.
+       */
       sideOffset = 8,
+      /**
+       * The distance in pixels from the boundary edges where collision detection should occur. Only available when position is set to popper.
+       */
       collisionPadding = 24,
       ...props
-    },
+    }: SelectContentProps,
     ref
   ) => (
     <SelectPrimitive.Portal>
@@ -155,6 +172,7 @@ Content.displayName = "Select.Content"
 
 /**
  * Used to label a group of items.
+ * It's based on [Radix UI Select Label](https://www.radix-ui.com/primitives/docs/components/select#label).
  */
 const Label = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
@@ -194,7 +212,7 @@ const Item = React.forwardRef<
     >
       <span className="flex h-[15px] w-[15px] items-center justify-center">
         <SelectPrimitive.ItemIndicator className="flex items-center justify-center">
-          <EllipseMiniSolid />
+          <Check />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText className="flex-1 truncate">

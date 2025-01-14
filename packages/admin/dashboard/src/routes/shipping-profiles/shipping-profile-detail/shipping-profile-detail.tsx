@@ -1,30 +1,30 @@
-import { useParams } from "react-router-dom"
+import { useLoaderData, useParams } from "react-router-dom"
 
-import { JsonViewSection } from "../../../components/common/json-view-section"
-import {
-  GeneralSectionSkeleton,
-  JsonViewSectionSkeleton,
-} from "../../../components/common/skeleton"
+import { SingleColumnPageSkeleton } from "../../../components/common/skeleton"
 import { useShippingProfile } from "../../../hooks/api/shipping-profiles"
 import { ShippingProfileGeneralSection } from "./components/shipping-profile-general-section"
 
-import after from "virtual:medusa/widgets/shipping_profile/details/after"
-import before from "virtual:medusa/widgets/shipping_profile/details/before"
+import { SingleColumnPage } from "../../../components/layout/pages"
+import { useDashboardExtension } from "../../../extensions"
+import { shippingProfileLoader } from "./loader"
 
 export const ShippingProfileDetail = () => {
-  const { id } = useParams()
+  const { shipping_profile_id } = useParams()
+
+  const initialData = useLoaderData() as Awaited<
+    ReturnType<typeof shippingProfileLoader>
+  >
 
   const { shipping_profile, isLoading, isError, error } = useShippingProfile(
-    id!
+    shipping_profile_id!,
+    undefined,
+    { initialData }
   )
 
+  const { getWidgets } = useDashboardExtension()
+
   if (isLoading || !shipping_profile) {
-    return (
-      <div className="flex flex-col gap-y-2">
-        <GeneralSectionSkeleton rowCount={1} />
-        <JsonViewSectionSkeleton />
-      </div>
-    )
+    return <SingleColumnPageSkeleton sections={1} showJSON showMetadata />
   }
 
   if (isError) {
@@ -32,23 +32,16 @@ export const ShippingProfileDetail = () => {
   }
 
   return (
-    <div className="flex flex-col gap-y-3">
-      {before.widgets.map((w, i) => {
-        return (
-          <div key={i}>
-            <w.Component data={shipping_profile} />
-          </div>
-        )
-      })}
+    <SingleColumnPage
+      widgets={{
+        before: getWidgets("shipping_profile.details.before"),
+        after: getWidgets("shipping_profile.details.after"),
+      }}
+      showMetadata
+      showJSON
+      data={shipping_profile}
+    >
       <ShippingProfileGeneralSection profile={shipping_profile} />
-      {after.widgets.map((w, i) => {
-        return (
-          <div key={i}>
-            <w.Component data={shipping_profile} />
-          </div>
-        )
-      })}
-      <JsonViewSection data={shipping_profile} />
-    </div>
+    </SingleColumnPage>
   )
 }

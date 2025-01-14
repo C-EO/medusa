@@ -1,5 +1,5 @@
-import * as Handlebars from "handlebars"
-import { PageEvent } from "typedoc/dist/lib/output/events"
+import Handlebars from "handlebars"
+import { PageEvent } from "typedoc"
 
 export interface FrontMatterVars {
   [key: string]: string | number | boolean

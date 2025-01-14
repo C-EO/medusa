@@ -1,4 +1,4 @@
-import { ChildDocs } from "docs-ui"
+import { CardList } from "docs-ui"
 
 export const metadata = {
   title: `Workflow Engine Modules`,
@@ -10,4 +10,23 @@ Workflow engine modules handle tracking and recording the transactions and statu
 
 Medusa uses the In-Memory Workflow Engine Module by default. For production purposes, it's recommended to use the Redis Engine Module instead.
 
-<ChildDocs type="item" hideItems={["Guides"]} onlyTopLevel={true} />
+<CardList
+  items={[
+    {
+      title: "In-Memory",
+      href: "/architectural-modules/workflow-engine/in-memory",
+      badge: {
+        variant: "neutral",
+        children: "For Development"
+      }
+    },
+    {
+      title: "Redis",
+      href: "/architectural-modules/workflow-engine/redis",
+      badge: {
+        variant: "green",
+        children: "For Production"
+      }
+    }
+  ]}
+/>

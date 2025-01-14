@@ -1,6 +1,8 @@
+import { TransactionState } from "@medusajs/utils"
 import { createStep } from "../create-step"
 import { createWorkflow } from "../create-workflow"
 import { StepResponse } from "../helpers"
+import { WorkflowResponse } from "../helpers/workflow-response"
 import { transform } from "../transform"
 import { WorkflowData } from "../type"
 import { when } from "../when"
@@ -25,7 +27,7 @@ describe("Workflow composer", () => {
         getNewWorkflowId(),
         function (input: WorkflowData<string>) {
           step1()
-          return step2(input)
+          return new WorkflowResponse(step2(input))
         }
       )
 
@@ -33,12 +35,50 @@ describe("Workflow composer", () => {
         const subWorkflowRes = subWorkflow.runAsStep({
           input: "hi from outside",
         })
-        return step3(subWorkflowRes.result)
+        return new WorkflowResponse(step3(subWorkflowRes.result))
       })
 
       const { result } = await workflow.run({ input: {} })
 
       expect(result).toEqual({ result: "hi from outside" })
+    })
+
+    it("should cancel transaction on failed sub workflow call", async function () {
+      const step1 = createStep("step1", async (_, context) => {
+        return new StepResponse("step1")
+      })
+
+      const step2 = createStep("step2", async (input: string, context) => {
+        return new StepResponse({ result: input })
+      })
+      const step3 = createStep("step3", async (input: string, context) => {
+        throw new Error("I have failed")
+      })
+
+      const subWorkflow = createWorkflow(
+        getNewWorkflowId(),
+        function (input: WorkflowData<string>) {
+          step1()
+          return new WorkflowResponse(step2(input))
+        }
+      )
+
+      const workflow = createWorkflow(getNewWorkflowId(), function () {
+        const subWorkflowRes = subWorkflow.runAsStep({
+          input: "hi from outside",
+        })
+        return new WorkflowResponse(step3(subWorkflowRes.result))
+      })
+
+      const { errors, transaction } = await workflow.run({
+        input: {},
+        throwOnError: false,
+      })
+
+      expect(errors).toHaveLength(1)
+      expect(errors[0].error.message).toEqual("I have failed")
+
+      expect(transaction.getState()).toEqual(TransactionState.REVERTED)
     })
 
     it("should skip step if condition is false", async function () {
@@ -59,7 +99,7 @@ describe("Workflow composer", () => {
         getNewWorkflowId(),
         function (input: WorkflowData<string>) {
           step1()
-          return step2(input)
+          return new WorkflowResponse(step2(input))
         }
       )
 
@@ -74,7 +114,7 @@ describe("Workflow composer", () => {
             })
           })
 
-          return step3(subWorkflowRes.result)
+          return new WorkflowResponse(step3(subWorkflowRes!.result))
         }
       )
 
@@ -101,7 +141,7 @@ describe("Workflow composer", () => {
         getNewWorkflowId(),
         function (input: WorkflowData<string>) {
           step1()
-          return step2(input)
+          return new WorkflowResponse(step2(input))
         }
       )
 
@@ -116,7 +156,7 @@ describe("Workflow composer", () => {
             })
           })
 
-          return step3(subWorkflowRes.result)
+          return new WorkflowResponse(step3(subWorkflowRes!.result))
         }
       )
 
@@ -131,6 +171,33 @@ describe("Workflow composer", () => {
       })
 
       expect(res2).toEqual({ result: "default response" })
+    })
+
+    it("should not return value if when condition is false", async function () {
+      const workflow = createWorkflow(
+        getNewWorkflowId(),
+        function (input: { ret: boolean }) {
+          const value = when({ input }, ({ input }) => {
+            return input.ret
+          }).then(() => {
+            return { hasValue: true }
+          })
+
+          return new WorkflowResponse(value)
+        }
+      )
+
+      const { result } = await workflow.run({
+        input: { ret: false },
+      })
+
+      expect(result).toEqual(undefined)
+
+      const { result: res2 } = await workflow.run({
+        input: { ret: true },
+      })
+
+      expect(res2).toEqual({ hasValue: true })
     })
 
     it("should revert the workflow and sub workflow on failure", async function () {
@@ -169,7 +236,7 @@ describe("Workflow composer", () => {
         getNewWorkflowId(),
         function (input: WorkflowData<string>) {
           step1()
-          return step2(input)
+          return new WorkflowResponse(step2(input))
         }
       )
 
@@ -179,7 +246,7 @@ describe("Workflow composer", () => {
           input: "hi from outside",
         })
         step4WithError()
-        return subWorkflowRes
+        return new WorkflowResponse(subWorkflowRes)
       })
 
       const { errors } = await workflow.run({ throwOnError: false })
@@ -215,11 +282,12 @@ describe("Workflow composer", () => {
         return new StepResponse({ result: input })
       })
 
+      const wfId = getNewWorkflowId()
       const subWorkflow = createWorkflow(
-        getNewWorkflowId(),
+        wfId,
         function (input: WorkflowData<string>) {
           childWorkflowStep1()
-          return childWorkflowStep2(input)
+          return new WorkflowResponse(childWorkflowStep2(input))
         }
       )
 
@@ -227,7 +295,7 @@ describe("Workflow composer", () => {
         const subWorkflowRes = subWorkflow.runAsStep({
           input: "hi from outside",
         })
-        return step1(subWorkflowRes.result)
+        return new WorkflowResponse(step1(subWorkflowRes.result))
       })
 
       const { result } = await workflow.run({
@@ -241,8 +309,8 @@ describe("Workflow composer", () => {
       expect(result).toEqual({ result: "hi from outside" })
 
       expect(parentContext.transactionId).toEqual(expect.any(String))
-      expect(parentContext.transactionId).not.toEqual(
-        childContext.transactionId
+      expect(childContext.transactionId).toEqual(
+        wfId + "-as-step-" + parentContext.transactionId
       )
 
       expect(parentContext.eventGroupId).toEqual("eventGroupId")
@@ -267,11 +335,12 @@ describe("Workflow composer", () => {
         return new StepResponse({ result: input })
       })
 
+      const wfId = getNewWorkflowId()
       const subWorkflow = createWorkflow(
-        getNewWorkflowId(),
+        wfId,
         function (input: WorkflowData<string>) {
           childWorkflowStep1()
-          return childWorkflowStep2(input)
+          return new WorkflowResponse(childWorkflowStep2(input))
         }
       )
 
@@ -279,7 +348,7 @@ describe("Workflow composer", () => {
         const subWorkflowRes = subWorkflow.runAsStep({
           input: "hi from outside",
         })
-        return step1(subWorkflowRes.result)
+        return new WorkflowResponse(step1(subWorkflowRes.result))
       })
 
       const { result } = await workflow.run({
@@ -289,8 +358,8 @@ describe("Workflow composer", () => {
       expect(result).toEqual({ result: "hi from outside" })
 
       expect(parentContext.transactionId).toBeTruthy()
-      expect(parentContext.transactionId).not.toEqual(
-        childContext.transactionId
+      expect(childContext.transactionId).toEqual(
+        wfId + "-as-step-" + parentContext.transactionId
       )
 
       expect(parentContext.eventGroupId).toBeTruthy()
@@ -307,16 +376,19 @@ describe("Workflow composer", () => {
     })
 
     const work = createWorkflow("id" as any, () => {
-      const resStep1 = step1()
+      step1()
       const resStep2 = step2()
 
       const transformedData = transform({ data: resStep2 }, (data) => {
+        // @ts-expect-error "Since we are reading result from undefined"
         return { result: data.data.result }
       })
 
-      return transform({ data: transformedData, resStep2 }, (data) => {
-        return { result: data.data }
-      })
+      return new WorkflowResponse(
+        transform({ data: transformedData, resStep2 }, (data) => {
+          return { result: data.data }
+        })
+      )
     })
 
     const { errors } = await work.run({ input: {}, throwOnError: false })

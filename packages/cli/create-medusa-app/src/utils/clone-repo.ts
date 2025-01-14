@@ -1,29 +1,38 @@
-import execute from "./execute.js"
-import { Ora } from "ora"
-import { isAbortError } from "./create-abort-controller.js"
-import logMessage from "./log-message.js"
 import fs from "fs"
+import { Ora } from "ora"
 import path from "path"
+import { isAbortError } from "./create-abort-controller.js"
+import execute from "./execute.js"
+import logMessage from "./log-message.js"
 
 type CloneRepoOptions = {
   directoryName?: string
   repoUrl?: string
   abortController?: AbortController
   verbose?: boolean
+  isPlugin?: boolean
 }
 
 const DEFAULT_REPO = "https://github.com/medusajs/medusa-starter-default"
-const V2_BRANCH = "feat/v2"
+const DEFAULT_PLUGIN_REPO = "https://github.com/medusajs/medusa-starter-plugin"
+const BRANCH = "master"
+const PLUGIN_BRANCH = "main"
 
 export default async function cloneRepo({
   directoryName = "",
   repoUrl,
   abortController,
   verbose = false,
+  isPlugin = false,
 }: CloneRepoOptions) {
+  const defaultRepo = isPlugin ? DEFAULT_PLUGIN_REPO : DEFAULT_REPO
+  const branch = isPlugin ? PLUGIN_BRANCH : BRANCH
+
   await execute(
     [
-      `git clone ${repoUrl || DEFAULT_REPO} -b ${V2_BRANCH} ${directoryName}`,
+      `git clone ${
+        repoUrl || defaultRepo
+      } -b ${branch} ${directoryName} --depth 1`,
       {
         signal: abortController?.signal,
       },
@@ -38,12 +47,14 @@ export async function runCloneRepo({
   abortController,
   spinner,
   verbose = false,
+  isPlugin = false,
 }: {
   projectName: string
   repoUrl: string
   abortController: AbortController
   spinner: Ora
   verbose?: boolean
+  isPlugin?: boolean
 }) {
   try {
     await cloneRepo({
@@ -51,6 +62,7 @@ export async function runCloneRepo({
       repoUrl,
       abortController,
       verbose,
+      isPlugin,
     })
 
     deleteGitDirectory(projectName)

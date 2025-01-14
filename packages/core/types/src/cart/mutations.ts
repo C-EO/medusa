@@ -501,6 +501,11 @@ export interface CreateLineItemDTO {
   product_type?: string
 
   /**
+   * The ID of type of the associated product.
+   */
+  product_type_id?: string
+
+  /**
    * The collection of the associated product.
    */
   product_collection?: string
@@ -549,6 +554,11 @@ export interface CreateLineItemDTO {
    * Whether the line item's amount is tax inclusive.
    */
   is_tax_inclusive?: boolean
+
+  /**
+   * Whether the line item's amount is a custom price.
+   */
+  is_custom_price?: boolean
 
   /**
    * The calculated price of the line item after applying promotions.
@@ -761,6 +771,11 @@ export interface UpdateShippingMethodDTO {
    * The amount of the shipping method.
    */
   amount?: BigNumberInput
+
+  /**
+   * The tax inclusivity setting of the shipping method.
+   */
+  is_tax_inclusive?: boolean
 
   /**
    * The data of the shipping method.

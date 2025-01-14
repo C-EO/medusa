@@ -1,4 +1,4 @@
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import {
   generatePublishableKey,
   generateStoreHeaders,
@@ -28,7 +28,8 @@ medusaIntegrationTestRunner({
 
       it("should retrieve auth user's customer", async () => {
         const { customer, jwt } = await createAuthenticatedCustomer(
-          appContainer
+          api,
+          storeHeaders
         )
 
         const response = await api.get(`/store/customers/me`, {
@@ -41,7 +42,7 @@ medusaIntegrationTestRunner({
             id: customer.id,
             first_name: "John",
             last_name: "Doe",
-            email: "john@me.com",
+            email: "tony@start.com",
           })
         )
       })

@@ -3,7 +3,7 @@ import { AdminReturn } from "@medusajs/types"
 import { Badge, Popover, Text } from "@medusajs/ui"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { formatDate } from "../../../../../components/common/date"
+import { useDate } from "../../../../../hooks/use-date"
 
 type ReturnInfoPopoverProps = {
   orderReturn: AdminReturn
@@ -12,6 +12,8 @@ type ReturnInfoPopoverProps = {
 function ReturnInfoPopover({ orderReturn }: ReturnInfoPopoverProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+
+  const { getFullDate } = useDate()
 
   const handleMouseEnter = () => {
     setOpen(true)
@@ -44,7 +46,7 @@ function ReturnInfoPopover({ orderReturn }: ReturnInfoPopoverProps) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         autoFocus={false}
-        className="focus-visible:outline-none align-sub"
+        className="align-sub focus-visible:outline-none"
       >
         <InformationCircleSolid />
       </Popover.Trigger>
@@ -52,7 +54,7 @@ function ReturnInfoPopover({ orderReturn }: ReturnInfoPopoverProps) {
       <Popover.Content
         align="center"
         side="top"
-        className="bg-ui-bg-component focus-visible:outline-none p-2"
+        className="bg-ui-bg-component p-2 focus-visible:outline-none"
       >
         <div className="">
           <Badge size="2xsmall" className="mb-2" rounded="full">
@@ -64,7 +66,7 @@ function ReturnInfoPopover({ orderReturn }: ReturnInfoPopoverProps) {
               {t(`orders.returns.returnRequested`)}
             </span>
             {" · "}
-            {formatDate(orderReturn.requested_at)}
+            {getFullDate({ date: orderReturn.requested_at, includeTime: true })}
           </Text>
 
           <Text size="xsmall">
@@ -73,7 +75,10 @@ function ReturnInfoPopover({ orderReturn }: ReturnInfoPopoverProps) {
             </span>
             {" · "}
             {orderReturn.received_at
-              ? formatDate(orderReturn.received_at)
+              ? getFullDate({
+                  date: orderReturn.received_at,
+                  includeTime: true,
+                })
               : "-"}
           </Text>
         </div>

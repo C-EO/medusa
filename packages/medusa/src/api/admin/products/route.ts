@@ -1,24 +1,25 @@
 import { createProductsWorkflow } from "@medusajs/core-flows"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
-import { refetchEntities, refetchEntity } from "../../utils/refetch-entity"
+  refetchEntities,
+  refetchEntity,
+} from "@medusajs/framework/http"
 import { remapKeysForProduct, remapProductResponse } from "./helpers"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminProductListParams>,
   res: MedusaResponse<HttpTypes.AdminProductListResponse>
 ) => {
-  const selectFields = remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+  const selectFields = remapKeysForProduct(req.queryConfig.fields ?? [])
 
   const { rows: products, metadata } = await refetchEntities(
     "product",
     req.filterableFields,
     req.scope,
     selectFields,
-    req.remoteQueryConfig.pagination
+    req.queryConfig.pagination
   )
 
   res.json({
@@ -45,7 +46,7 @@ export const POST = async (
     "product",
     result[0].id,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({ product: remapProductResponse(product) })

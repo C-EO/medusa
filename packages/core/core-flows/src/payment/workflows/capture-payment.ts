@@ -1,12 +1,12 @@
-import { BigNumberInput, PaymentDTO } from "@medusajs/types"
-import { PaymentEvents } from "@medusajs/utils"
+import { BigNumberInput, PaymentDTO } from "@medusajs/framework/types"
+import { PaymentEvents } from "@medusajs/framework/utils"
 import {
   WorkflowData,
   WorkflowResponse,
   createWorkflow,
   transform,
   when,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { emitEventStep, useRemoteQueryStep } from "../../common"
 import { addOrderTransactionStep } from "../../order/steps/add-order-transaction"
 import { capturePaymentStep } from "../steps/capture-payment"
@@ -39,13 +39,15 @@ export const capturePaymentWorkflow = createWorkflow(
       const orderTransactionData = transform(
         { input, payment, orderPayment },
         ({ input, payment, orderPayment }) => {
-          return {
-            order_id: orderPayment.order.id,
-            amount: input.amount ?? payment.raw_amount ?? payment.amount,
-            currency_code: payment.currency_code,
-            reference_id: payment.id,
-            reference: "capture",
-          }
+          return payment.captures?.map((capture) => {
+            return {
+              order_id: orderPayment.order.id,
+              amount: input.amount ?? capture.raw_amount ?? capture.amount,
+              currency_code: payment.currency_code,
+              reference_id: capture.id,
+              reference: "capture",
+            }
+          })
         }
       )
 

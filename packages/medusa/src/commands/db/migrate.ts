@@ -1,6 +1,11 @@
 import { join } from "path"
-import { ContainerRegistrationKeys } from "@medusajs/utils"
-import { LinkLoader, logger, MedusaAppLoader } from "@medusajs/framework"
+import {
+  ContainerRegistrationKeys,
+  mergePluginModules,
+} from "@medusajs/framework/utils"
+import { LinkLoader } from "@medusajs/framework/links"
+import { logger } from "@medusajs/framework/logger"
+import { MedusaAppLoader } from "@medusajs/framework"
 
 import { syncLinks } from "./sync-links"
 import { ensureDbExists } from "../utils"
@@ -35,7 +40,9 @@ export async function migrate({
     ContainerRegistrationKeys.CONFIG_MODULE
   )
 
-  const plugins = getResolvedPlugins(directory, configModule, true) || []
+  const plugins = await getResolvedPlugins(directory, configModule, true)
+  mergePluginModules(configModule, plugins)
+
   const linksSourcePaths = plugins.map((plugin) =>
     join(plugin.resolve, "links")
   )

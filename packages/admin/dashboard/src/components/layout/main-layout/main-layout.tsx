@@ -19,14 +19,13 @@ import * as Collapsible from "@radix-ui/react-collapsible"
 import { useTranslation } from "react-i18next"
 
 import { useStore } from "../../../hooks/api/store"
-import { settingsRouteRegex } from "../../../lib/extension-helpers"
 import { Divider } from "../../common/divider"
 import { Skeleton } from "../../common/skeleton"
-import { NavItem, NavItemProps } from "../../layout/nav-item"
+import { INavItem, NavItem } from "../../layout/nav-item"
 import { Shell } from "../../layout/shell"
 
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import routes from "virtual:medusa/routes/links"
+import { useDashboardExtension } from "../../../extensions"
 import { useLogout } from "../../../hooks/api"
 import { queryClient } from "../../../lib/query-client"
 import { useSearch } from "../../../providers/search-provider"
@@ -177,7 +176,7 @@ const Header = () => {
   )
 }
 
-const useCoreRoutes = (): Omit<NavItemProps, "pathname">[] => {
+const useCoreRoutes = (): Omit<INavItem, "pathname">[] => {
   const { t } = useTranslation()
 
   return [
@@ -285,6 +284,19 @@ const Searchbar = () => {
 const CoreRouteSection = () => {
   const coreRoutes = useCoreRoutes()
 
+  const { getMenu } = useDashboardExtension()
+
+  const menuItems = getMenu("coreExtensions")
+
+  menuItems.forEach((item) => {
+    if (item.nested) {
+      const route = coreRoutes.find((route) => route.to === item.nested)
+      if (route) {
+        route.items?.push(item)
+      }
+    }
+  })
+
   return (
     <nav className="flex flex-col gap-y-1 py-3">
       <Searchbar />
@@ -297,14 +309,11 @@ const CoreRouteSection = () => {
 
 const ExtensionRouteSection = () => {
   const { t } = useTranslation()
+  const { getMenu } = useDashboardExtension()
 
-  const links = routes.links
+  const menuItems = getMenu("coreExtensions").filter((item) => !item.nested)
 
-  const extensionLinks = links
-    .filter((link) => !settingsRouteRegex.test(link.path))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
-  if (!extensionLinks.length) {
+  if (!menuItems.length) {
     return null
   }
 
@@ -330,13 +339,14 @@ const ExtensionRouteSection = () => {
           </div>
           <Collapsible.Content>
             <nav className="flex flex-col gap-y-0.5 py-1 pb-4">
-              {extensionLinks.map((link) => {
+              {menuItems.map((item, i) => {
                 return (
                   <NavItem
-                    key={link.path}
-                    to={link.path}
-                    label={link.label}
-                    icon={link.icon ? <link.icon /> : <SquaresPlus />}
+                    key={i}
+                    to={item.to}
+                    label={item.label}
+                    icon={item.icon ? item.icon : <SquaresPlus />}
+                    items={item.items}
                     type="extension"
                   />
                 )

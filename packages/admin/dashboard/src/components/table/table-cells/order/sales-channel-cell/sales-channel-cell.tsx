@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 export const SalesChannelCell = ({
   channel,
 }: {
-  channel: HttpTypes.AdminSalesChannel | null
+  channel?: HttpTypes.AdminSalesChannel | null
 }) => {
   if (!channel) {
     return <span className="text-ui-fg-muted">-</span>

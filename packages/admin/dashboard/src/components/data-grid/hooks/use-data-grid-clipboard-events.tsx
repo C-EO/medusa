@@ -45,7 +45,14 @@ export const useDataGridClipboardEvents = <
       const fields = matrix.getFieldsInSelection(anchor, rangeEnd)
       const values = getSelectionValues(fields)
 
-      const text = values.map((value) => `${value}` ?? "").join("\t")
+      const text = values
+        .map((value) => {
+          if (typeof value === "object" && value !== null) {
+            return JSON.stringify(value)
+          }
+          return `${value}` ?? ""
+        })
+        .join("\t")
 
       e.clipboardData?.setData("text/plain", text)
     },

@@ -20,15 +20,11 @@ export function load(app: Application) {
   })
   app.converter.on(Converter.EVENT_RESOLVE_BEGIN, async (context: Context) => {
     const eslintConfigPath = app.options.getValue("eslintPathName") as string
-    const pluginsResolvePath = app.options.getValue(
-      "pluginsResolvePath"
-    ) as string
     if (!eslintConfigPath) {
       return
     }
     const eslint = new ESLint({
       overrideConfigFile: eslintConfigPath,
-      resolvePluginsRelativeTo: pluginsResolvePath,
       fix: true,
     })
     for (const reflection of context.project.getReflectionsByKind(

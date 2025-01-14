@@ -1,3 +1,9 @@
+---
+tags:
+  - cart
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -37,7 +43,7 @@ For example:
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
     body: JSON.stringify({
       shipping_address: address,
@@ -58,7 +64,7 @@ export const highlights = [
   ["4", "useCart", "The `useCart` hook was defined in the Cart React Context documentation."],
   ["29", "address", "Assemble the address object to be used for both shipping and billing addresses."],
   ["41"], ["42"], ["43"], ["44"], ["45"], ["46"], ["47"], ["48"],
-  ["49"], ["50"], ["51"], ["52"], ["53"], ["54"], ["55"], ["56"]
+  ["49"], ["50"], ["51"], ["52"], ["53"], ["54"], ["55"], ["56"],
   ["103", "", "The address's country can only be within the cart's region."]
 ]
 
@@ -108,7 +114,7 @@ export const highlights = [
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
         body: JSON.stringify({
           shipping_address: address,

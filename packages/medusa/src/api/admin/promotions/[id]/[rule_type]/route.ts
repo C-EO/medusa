@@ -1,14 +1,14 @@
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
   RuleOperator,
   RuleType,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   getRuleAttributesMap,
   operatorsMap,
@@ -29,7 +29,7 @@ export const GET = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "promotion",
     variables: { id },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [promotion] = await remoteQuery(queryObject)

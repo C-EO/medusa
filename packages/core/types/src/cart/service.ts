@@ -32,12 +32,13 @@ import {
   CreateShippingMethodForSingleCartDTO,
   CreateShippingMethodTaxLineDTO,
   UpdateAddressDTO,
-  UpdateCartDTO,
   UpdateCartDataDTO,
+  UpdateCartDTO,
   UpdateLineItemDTO,
   UpdateLineItemTaxLineDTO,
   UpdateLineItemWithSelectorDTO,
   UpdateShippingMethodAdjustmentDTO,
+  UpdateShippingMethodDTO,
   UpdateShippingMethodTaxLineDTO,
   UpsertLineItemAdjustmentDTO,
 } from "./mutations"
@@ -821,6 +822,46 @@ export interface ICartModuleService extends IModuleService {
     methods: CreateShippingMethodForSingleCartDTO[],
     sharedContext?: Context
   ): Promise<CartShippingMethodDTO[]>
+
+  /**
+   * This method updates existing shipping methods.
+   *
+   * @param {UpdateShippingMethodDTO[]} data - A list of shipping methods to update
+   * @returns {Promise<CartShippingMethodDTO[]>} The updated shipping methods.
+   *
+   * @example
+   * const shippingMethods = await cartModuleService.updateShippingMethods([
+   *   {
+   *     id: "casm_123",
+   *     amount: 2,
+   *   },
+   * ])
+   */
+  updateShippingMethods(
+    data: UpdateShippingMethodDTO[]
+  ): Promise<CartShippingMethodDTO[]>
+
+  /**
+   * This method updates an existing shipping method.
+   *
+   * @param {string} shippingMethodId - The shipping methods's ID.
+   * @param {Partial<UpdateShippingMethodDTO>} data - The attributes to update in the shipping method.
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<CartShippingMethodDTO>} The updated shipping method.
+   *
+   * @example
+   * const lineItem = await cartModuleService.updateShippingMethods(
+   *   "casm_123",
+   *   {
+   *     amount: 3000,
+   *   }
+   * )
+   */
+  updateShippingMethods(
+    shippingMethodId: string,
+    data: Partial<UpdateShippingMethodDTO>,
+    sharedContext?: Context
+  ): Promise<CartShippingMethodDTO>
 
   /**
    * This method retrieves a paginated list of line item adjustments based on optional filters and configuration.

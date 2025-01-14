@@ -1,4 +1,4 @@
-import { DeclarationReflection, ReferenceType, ReflectionType } from "typedoc"
+import { DeclarationReflection, ReferenceType } from "typedoc"
 
 export function isDmlEntity(reflection: DeclarationReflection) {
   if (reflection.type?.type !== "reference") {
@@ -8,7 +8,13 @@ export function isDmlEntity(reflection: DeclarationReflection) {
   return reflection.type.name === "DmlEntity"
 }
 
-export const RELATION_NAMES = ["HasOne", "HasMany", "BelongsTo", "ManyToMany"]
+export const RELATION_NAMES = [
+  "HasOne",
+  "HasMany",
+  "BelongsTo",
+  "ManyToMany",
+  "HasOneWithForeignKey",
+]
 
 export function isDmlRelation(reflection: DeclarationReflection) {
   if (reflection.type?.type !== "reference") {
@@ -33,14 +39,31 @@ export function getDmlProperties(
   }
   if (
     !reflectionType.typeArguments?.length ||
-    reflectionType.typeArguments[0].type !== "intersection"
+    reflectionType.typeArguments[0].type !== "reference" ||
+    reflectionType.typeArguments[0].name !== "DMLEntitySchemaBuilder" ||
+    !reflectionType.typeArguments[0].typeArguments?.length ||
+    (reflectionType.typeArguments[0].typeArguments[0].type !== "reflection" &&
+      reflectionType.typeArguments[0].typeArguments[0].type !== "reference")
   ) {
     return []
   }
 
-  const schemaType = reflectionType.typeArguments[0].types[0] as ReflectionType
+  let schemaType: DeclarationReflection | undefined
 
-  return schemaType.declaration.children || []
+  if (reflectionType.typeArguments[0].typeArguments[0].type === "reflection") {
+    schemaType = reflectionType.typeArguments[0].typeArguments[0].declaration
+  } else if (
+    reflectionType.typeArguments[0].typeArguments[0].reflection instanceof
+      DeclarationReflection &&
+    reflectionType.typeArguments[0].typeArguments[0].reflection.type?.type ===
+      "reflection"
+  ) {
+    schemaType =
+      reflectionType.typeArguments[0].typeArguments[0].reflection.type
+        .declaration
+  }
+
+  return schemaType?.children || []
 }
 
 export function getDmlRelationProperties(

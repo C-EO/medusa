@@ -25,5 +25,6 @@ export function parseEntityName(entity: DmlEntity<any, any>) {
     tableName,
     modelName: upperCaseFirst(toCamelCase(parsedEntity.name)),
     pgSchema: rest.length ? pgSchema : undefined,
+    tableNameWithoutSchema: rest.length ? rest.join(".") : pgSchema,
   }
 }

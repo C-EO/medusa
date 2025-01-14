@@ -1,11 +1,14 @@
 import { Buildings, Component, PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes, InventoryItemDTO } from "@medusajs/types"
-import { Badge, clx, usePrompt } from "@medusajs/ui"
+import { Badge, Checkbox, clx, usePrompt } from "@medusajs/ui"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-import { ActionMenu } from "../../../../../components/common/action-menu"
+import {
+  Action,
+  ActionMenu,
+} from "../../../../../components/common/action-menu"
 import { PlaceholderCell } from "../../../../../components/table/table-cells/common/placeholder-cell"
 import { useDeleteVariant } from "../../../../../hooks/api/products"
 
@@ -67,13 +70,8 @@ const VariantActions = ({
           actions: [
             {
               label: t("actions.edit"),
-              to: `variants/${variant.id}/edit`,
+              to: `edit-variant?variant_id=${variant.id}`,
               icon: <PencilSquare />,
-            },
-            {
-              label: t("actions.delete"),
-              onClick: handleDelete,
-              icon: <Trash />,
             },
             hasInventoryItem
               ? {
@@ -89,7 +87,16 @@ const VariantActions = ({
                   icon: <Component />,
                 }
               : false,
-          ].filter(Boolean),
+          ].filter(Boolean) as Action[],
+        },
+        {
+          actions: [
+            {
+              label: t("actions.delete"),
+              onClick: handleDelete,
+              icon: <Trash />,
+            },
+          ],
         },
       ]}
     />
@@ -104,10 +111,11 @@ export const useProductVariantTableColumns = (
   const { t } = useTranslation()
 
   const optionColumns = useMemo(() => {
-    if (!product) {
+    if (!product?.options) {
       return []
     }
-    return product.options?.map((option) => {
+
+    return product.options.map((option) => {
       return columnHelper.display({
         id: option.id,
         header: () => (
@@ -116,8 +124,8 @@ export const useProductVariantTableColumns = (
           </div>
         ),
         cell: ({ row }) => {
-          const variantOpt: any = row.original.options.find(
-            (opt: any) => opt.option_id === option.id
+          const variantOpt = row.original.options?.find(
+            (opt) => opt.option_id === option.id
           )
           if (!variantOpt) {
             return <PlaceholderCell />
@@ -141,6 +149,34 @@ export const useProductVariantTableColumns = (
 
   return useMemo(
     () => [
+      columnHelper.display({
+        id: "select",
+        header: ({ table }) => {
+          return (
+            <Checkbox
+              checked={
+                table.getIsSomePageRowsSelected()
+                  ? "indeterminate"
+                  : table.getIsAllPageRowsSelected()
+              }
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+            />
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            />
+          )
+        },
+      }),
       columnHelper.accessor("title", {
         header: () => (
           <div className="flex h-full w-full items-center">

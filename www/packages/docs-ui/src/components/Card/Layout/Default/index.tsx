@@ -16,6 +16,7 @@ export const CardDefaultLayout = ({
   iconClassName,
   children,
   badge,
+  rightIcon: RightIconComponent,
 }: CardProps) => {
   const isExternal = useIsExternalLink({ href })
 
@@ -42,10 +43,7 @@ export const CardDefaultLayout = ({
       )}
       {image && (
         <BorderedIcon
-          wrapperClassName={clsx(
-            "p-[4.5px] bg-medusa-bg-component-hover",
-            iconClassName
-          )}
+          wrapperClassName={clsx("bg-medusa-bg-base", iconClassName)}
           icon={image}
         />
       )}
@@ -53,26 +51,27 @@ export const CardDefaultLayout = ({
         className={clsx("flex flex-col flex-1 overflow-auto", contentClassName)}
       >
         {title && (
-          <div className="text-compact-small-plus text-medusa-fg-base truncate">
+          <div className="text-small-plus text-medusa-fg-base truncate">
             {title}
           </div>
         )}
         {text && (
-          <span className="text-compact-small text-medusa-fg-subtle">
-            {text}
-          </span>
+          <span className="text-small-plus text-medusa-fg-subtle">{text}</span>
         )}
         {children}
       </div>
       {badge && <Badge {...badge} />}
-      <span className="text-medusa-fg-muted">
-        {isExternal ? <ArrowUpRightOnBox /> : <TriangleRightMini />}
+      <span className="text-medusa-fg-subtle">
+        {RightIconComponent && <RightIconComponent />}
+        {!RightIconComponent && isExternal && <ArrowUpRightOnBox />}
+        {!RightIconComponent && !isExternal && <TriangleRightMini />}
       </span>
 
       {href && (
         <Link
           href={href}
           className="absolute left-0 top-0 h-full w-full rounded"
+          prefetch={false}
         />
       )}
     </div>

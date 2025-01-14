@@ -1,5 +1,10 @@
 ---
-sidebar_label: "Get Product Variant Prices"
+sidebar_label: "Get Variant Prices"
+tags:
+  - product
+  - pricing
+  - query
+  - server
 ---
 
 export const metadata = {
@@ -8,7 +13,7 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you'll learn how to retrieve product variant prices in the Medusa application using the [Query](!docs!/advanced-development/modules/query).
+In this document, you'll learn how to retrieve product variant prices in the Medusa application using [Query](!docs!/learn/fundamentals/module-links/query).
 
 <Note title="Why use Query?">
 
@@ -57,12 +62,12 @@ Learn more about prices calculation in [this Pricing Module documentation](../..
 To retrieve calculated prices of variants based on a context, retrieve the products using Query and:
 
 - Pass `variants.calculated_price.*` in the `fields` property.
-- Pass a `context` property in the object parameter. Its value is an object of objects to sets the context for the retrieved fields.
+- Pass a `context` property in the object parameter. Its value is an object of objects that sets the context for the retrieved fields.
 
 For example:
 
-```ts highlights={[["6"], ["12"], ["13"], ["14"], ["15"], ["16"], ["17"]]}
-import { QueryContext } from "@medusajs/utils"
+```ts highlights={[["10"], ["15"], ["16"], ["17"], ["18"], ["19"], ["20"], ["21"], ["22"]]}
+import { QueryContext } from "@medusajs/framework/utils"
 
 // ...
 
@@ -89,6 +94,6 @@ const { data: products } = await query.graph({
 
 For the context of the product variant's calculated price, you pass an object to `context` with the property `variants`, whose value is another object with the property `calculated_price`.
 
-`calculated_price`'s value is created using the `QueryContext` utility function, passing it a [calculation context object](../../../pricing/price-calculation/page.mdx#calculation-context).
+`calculated_price`'s value is created using `QueryContext` from the Modules SDK, passing it a [calculation context object](../../../pricing/price-calculation/page.mdx#calculation-context).
 
 Each variant in the retrieved products has a `calculated_price` object. Learn more about its properties in [this Pricing Module guide](../../../pricing/price-calculation/page.mdx#returned-price-object).

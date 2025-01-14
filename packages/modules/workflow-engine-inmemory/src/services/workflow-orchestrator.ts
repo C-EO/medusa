@@ -5,21 +5,25 @@ import {
   TransactionHandlerType,
   TransactionStep,
   WorkflowScheduler,
-} from "@medusajs/orchestration"
-import { ContainerLike, Context, MedusaContainer } from "@medusajs/types"
+} from "@medusajs/framework/orchestration"
+import {
+  ContainerLike,
+  Context,
+  MedusaContainer,
+} from "@medusajs/framework/types"
 import {
   InjectSharedContext,
+  isString,
   MedusaContext,
   MedusaError,
   TransactionState,
-  isString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
-  MedusaWorkflow,
-  ReturnWorkflow,
-  resolveValue,
   type FlowRunOptions,
-} from "@medusajs/workflows-sdk"
+  MedusaWorkflow,
+  resolveValue,
+  ReturnWorkflow,
+} from "@medusajs/framework/workflows-sdk"
 import { ulid } from "ulid"
 import { InMemoryDistributedTransactionStorage } from "../utils"
 
@@ -127,16 +131,19 @@ export class WorkflowOrchestratorService {
     options?: WorkflowOrchestratorRunOptions<T>,
     @MedusaContext() sharedContext: Context = {}
   ) {
-    let {
+    const {
       input,
-      context,
       transactionId,
       resultFrom,
-      throwOnError,
       logOnError,
       events: eventHandlers,
       container,
     } = options ?? {}
+
+    let { throwOnError, context } = options ?? {}
+    throwOnError ??= true
+    context ??= {}
+    context.transactionId ??= transactionId ?? ulid()
 
     const workflowId = isString(workflowIdOrWorkflow)
       ? workflowIdOrWorkflow
@@ -148,9 +155,6 @@ export class WorkflowOrchestratorService {
         `Workflow ID is required`
       )
     }
-
-    context ??= {}
-    context.transactionId ??= transactionId ?? ulid()
 
     const events: FlowRunOptions["events"] = this.buildWorkflowEvents({
       customEventHandlers: eventHandlers,
@@ -168,7 +172,7 @@ export class WorkflowOrchestratorService {
 
     const ret = await exportedWorkflow.run({
       input,
-      throwOnError,
+      throwOnError: false,
       logOnError,
       resultFrom,
       context,
@@ -204,6 +208,10 @@ export class WorkflowOrchestratorService {
       })
 
       await this.triggerParentStep(ret.transaction, result)
+    }
+
+    if (throwOnError && ret.thrownError) {
+      throw ret.thrownError
     }
 
     return { acknowledgement, ...ret }
@@ -258,12 +266,14 @@ export class WorkflowOrchestratorService {
   ) {
     const {
       context,
-      throwOnError,
       logOnError,
       resultFrom,
       container,
       events: eventHandlers,
     } = options ?? {}
+
+    let { throwOnError } = options ?? {}
+    throwOnError ??= true
 
     const [idempotencyKey_, { workflowId, transactionId }] =
       this.buildIdempotencyKeyAndParts(idempotencyKey)
@@ -283,7 +293,7 @@ export class WorkflowOrchestratorService {
       idempotencyKey: idempotencyKey_,
       context,
       resultFrom,
-      throwOnError,
+      throwOnError: false,
       logOnError,
       events,
       response: stepResponse,
@@ -302,6 +312,10 @@ export class WorkflowOrchestratorService {
       })
 
       await this.triggerParentStep(ret.transaction, result)
+    }
+
+    if (throwOnError && ret.thrownError) {
+      throw ret.thrownError
     }
 
     return ret
@@ -322,12 +336,14 @@ export class WorkflowOrchestratorService {
   ) {
     const {
       context,
-      throwOnError,
       logOnError,
       resultFrom,
       container,
       events: eventHandlers,
     } = options ?? {}
+
+    let { throwOnError } = options ?? {}
+    throwOnError ??= true
 
     const [idempotencyKey_, { workflowId, transactionId }] =
       this.buildIdempotencyKeyAndParts(idempotencyKey)
@@ -347,7 +363,7 @@ export class WorkflowOrchestratorService {
       idempotencyKey: idempotencyKey_,
       context,
       resultFrom,
-      throwOnError,
+      throwOnError: false,
       logOnError,
       events,
       response: stepResponse,
@@ -366,6 +382,10 @@ export class WorkflowOrchestratorService {
       })
 
       await this.triggerParentStep(ret.transaction, result)
+    }
+
+    if (throwOnError && ret.thrownError) {
+      throw ret.thrownError
     }
 
     return ret

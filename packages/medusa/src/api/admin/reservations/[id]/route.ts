@@ -1,16 +1,18 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   AdminGetReservationParamsType,
   AdminUpdateReservationType,
 } from "../validators"
-import { MedusaError } from "@medusajs/utils"
-import { deleteReservationsWorkflow } from "@medusajs/core-flows"
-import { updateReservationsWorkflow } from "@medusajs/core-flows"
+import { MedusaError } from "@medusajs/framework/utils"
+import {
+  deleteReservationsWorkflow,
+  updateReservationsWorkflow,
+} from "@medusajs/core-flows"
 import { refetchReservation } from "../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<AdminGetReservationParamsType>,
@@ -21,7 +23,7 @@ export const GET = async (
   const reservation = await refetchReservation(
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!reservation) {
@@ -48,7 +50,7 @@ export const POST = async (
   const reservation = await refetchReservation(
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
   res.status(200).json({ reservation })
 }

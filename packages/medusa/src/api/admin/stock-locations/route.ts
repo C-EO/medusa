@@ -1,15 +1,15 @@
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 
 import { createStockLocationsWorkflow } from "@medusajs/core-flows"
 import { refetchStockLocation } from "./helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 // Create stock location
 export const POST = async (
@@ -23,7 +23,7 @@ export const POST = async (
   const stockLocation = await refetchStockLocation(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ stock_location: stockLocation })
@@ -40,9 +40,9 @@ export const GET = async (
       entryPoint: "stock_locations",
       variables: {
         filters: req.filterableFields,
-        ...req.remoteQueryConfig.pagination,
+        ...req.queryConfig.pagination,
       },
-      fields: req.remoteQueryConfig.fields,
+      fields: req.queryConfig.fields,
     })
   )
 

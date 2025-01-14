@@ -7,7 +7,7 @@ import {
   TokenInputProps,
   TokenOutputProps,
 } from "prism-react-renderer"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useMemo, useRef } from "react"
 import { CodeBlockCollapsibleLines } from "../../components/CodeBlock/Collapsible/Lines"
 import { useCollapsible } from "../use-collapsible"
 
@@ -22,7 +22,7 @@ export type CollapsibleCodeLines = {
     token: Token[][],
     highlightProps: HighlightProps,
     lineNumberOffset?: number
-  ) => React.ReactNode
+  ) => React.JSX.Element[]
 }
 
 export type CollapsedCodeLinesPosition = "start" | "end"
@@ -65,10 +65,12 @@ export const useCollapsibleCodeLines = ({
     return collapsedRange.start === 1 ? "start" : "end"
   }, [collapsedRange])
 
+  const ref = useRef(null)
   const collapsibleHookResult = useCollapsible({
     unmountOnExit: false,
     translateEnabled: false,
     heightAnimation: true,
+    childrenRef: ref,
   })
 
   const getCollapsedLinesElm = useCallback(

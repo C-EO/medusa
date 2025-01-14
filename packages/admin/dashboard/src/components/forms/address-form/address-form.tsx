@@ -2,11 +2,11 @@ import { Heading, Input, Select, clx } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { HttpTypes } from "@medusajs/types"
 import { Control } from "react-hook-form"
 import { AddressSchema } from "../../../lib/schemas"
 import { Form } from "../../common/form"
 import { CountrySelect } from "../../inputs/country-select"
-import { HttpTypes } from "@medusajs/types"
 
 type AddressFieldValues = z.infer<typeof AddressSchema>
 
@@ -187,14 +187,24 @@ export const AddressForm = ({
                           <Select.Value />
                         </Select.Trigger>
                         <Select.Content>
-                          {countries.map((country) => (
-                            <Select.Item
-                              key={country.iso_2}
-                              value={country.iso_2}
-                            >
-                              {country.display_name}
-                            </Select.Item>
-                          ))}
+                          {countries.map((country) => {
+                            /**
+                             * If a country does not have an ISO 2 code, it is not
+                             * a valid country and should not be selectable.
+                             */
+                            if (!country.iso_2) {
+                              return null
+                            }
+
+                            return (
+                              <Select.Item
+                                key={country.iso_2}
+                                value={country.iso_2}
+                              >
+                                {country.display_name}
+                              </Select.Item>
+                            )
+                          })}
                         </Select.Content>
                       </Select>
                     ) : (

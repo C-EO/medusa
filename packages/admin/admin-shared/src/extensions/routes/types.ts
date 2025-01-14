@@ -1,3 +1,3 @@
-import { ROUTE_IMPORTS } from "./constants"
+import { NESTED_ROUTE_POSITIONS } from "./constants"
 
-export type RouteImport = (typeof ROUTE_IMPORTS)[number]
+export type NestedRoutePosition = (typeof NESTED_ROUTE_POSITIONS)[number]

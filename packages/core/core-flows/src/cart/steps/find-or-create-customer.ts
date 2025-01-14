@@ -1,6 +1,6 @@
-import { CustomerDTO, ICustomerModuleService } from "@medusajs/types"
-import { Modules, validateEmail } from "@medusajs/utils"
-import { StepResponse, createStep } from "@medusajs/workflows-sdk"
+import { CustomerDTO, ICustomerModuleService } from "@medusajs/framework/types"
+import { isDefined, Modules, validateEmail } from "@medusajs/framework/utils"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 export interface FindOrCreateCustomerStepInput {
   customerId?: string | null
@@ -21,20 +21,20 @@ export const findOrCreateCustomerStepId = "find-or-create-customer"
 /**
  * This step either finds a customer matching the specified ID, or finds / create a customer
  * matching the specified email. If both ID and email are provided, ID takes precedence.
+ * If the customer is a guest, the email is updated to the provided email.
  */
 export const findOrCreateCustomerStep = createStep(
   findOrCreateCustomerStepId,
   async (data: FindOrCreateCustomerStepInput, { container }) => {
-    if (
-      typeof data.customerId === undefined &&
-      typeof data.email === undefined
-    ) {
+    if (!isDefined(data.customerId) && !isDefined(data.email)) {
       return new StepResponse(
         {
           customer: undefined,
           email: undefined,
         },
-        { customerWasCreated: false }
+        {
+          customerWasCreated: false,
+        }
       )
     }
 
@@ -44,37 +44,50 @@ export const findOrCreateCustomerStep = createStep(
       customer: null,
       email: null,
     }
+    let originalCustomer: CustomerDTO | null = null
     let customerWasCreated = false
 
     if (data.customerId) {
-      const customer = await service.retrieveCustomer(data.customerId)
-      customerData.customer = customer
-      customerData.email = customer.email
-
-      return new StepResponse(customerData, {
-        customerWasCreated,
-      })
+      originalCustomer = await service.retrieveCustomer(data.customerId)
+      customerData.customer = originalCustomer
+      customerData.email = originalCustomer.email
     }
 
     if (data.email) {
-      const validatedEmail = validateEmail(data.email)
+      const validatedEmail = (data.email && validateEmail(data.email)) as string
 
-      let [customer] = await service.listCustomers({
-        email: validatedEmail,
-        has_account: false,
-      })
+      let [customer] = originalCustomer
+        ? [originalCustomer]
+        : await service.listCustomers({
+            email: validatedEmail,
+          })
 
-      if (!customer) {
+      // if NOT a guest customer, return it
+      if (customer?.has_account) {
+        customerData.customer = customer
+        customerData.email = customer.email
+
+        return new StepResponse(customerData, {
+          customerWasCreated,
+        })
+      }
+
+      if (
+        !customer ||
+        (isDefined(data.email) && customer.email !== validatedEmail)
+      ) {
         customer = await service.createCustomers({ email: validatedEmail })
         customerWasCreated = true
       }
+
+      originalCustomer = customer
 
       customerData.customer = customer
       customerData.email = customer.email
     }
 
     return new StepResponse(customerData, {
-      customer: customerData.customer,
+      customer: originalCustomer,
       customerWasCreated,
     })
   },

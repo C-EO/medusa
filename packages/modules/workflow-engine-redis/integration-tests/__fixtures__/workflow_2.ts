@@ -1,8 +1,9 @@
 import {
-  StepResponse,
   createStep,
   createWorkflow,
-} from "@medusajs/workflows-sdk"
+  StepResponse,
+  WorkflowResponse,
+} from "@medusajs/framework/workflows-sdk"
 
 const step_1 = createStep(
   "step_1",
@@ -49,6 +50,14 @@ const step_3 = createStep(
   })
 )
 
+const broken_step_2 = createStep(
+  "broken_step_2",
+  jest.fn(() => {}),
+  jest.fn((_, context) => {
+    throw new Error("Broken compensation step")
+  })
+)
+
 createWorkflow(
   {
     name: "workflow_2",
@@ -65,5 +74,21 @@ createWorkflow(
     })
 
     return step_3(ret2)
+  }
+)
+
+createWorkflow(
+  {
+    name: "workflow_2_revert_fail",
+    retentionTime: 1000,
+  },
+  function (input) {
+    step_1(input)
+
+    broken_step_2().config({
+      async: true,
+    })
+
+    return new WorkflowResponse("done")
   }
 )

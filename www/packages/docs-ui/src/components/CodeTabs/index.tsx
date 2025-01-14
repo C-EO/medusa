@@ -10,10 +10,13 @@ import {
   useTabs,
 } from "../.."
 import clsx from "clsx"
+import { CodeBlockActions, CodeBlockActionsProps } from "../CodeBlock/Actions"
+import { CodeBlockHeaderWrapper } from "../CodeBlock/Header/Wrapper"
 
 type CodeTab = BaseTabType & {
   codeProps: CodeBlockProps
   codeBlock: React.ReactNode
+  children?: React.ReactNode
 }
 
 type CodeTabProps = {
@@ -31,36 +34,119 @@ export const CodeTabs = ({
   blockStyle = "loud",
 }: CodeTabProps) => {
   const { colorMode } = useColorMode()
+
+  const isCodeBlock = (
+    node: React.ReactNode
+  ): node is
+    | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>
+    | React.ReactPortal => {
+    if (!React.isValidElement(node)) {
+      return false
+    }
+
+    if (node.type === "pre") {
+      return true
+    }
+
+    const typedProps = node.props as Record<string, unknown>
+
+    return "source" in typedProps
+  }
+
+  const getCodeBlockProps = (
+    codeBlock: React.ReactElement<
+      unknown,
+      string | React.JSXElementConstructor<any>
+    >
+  ): CodeBlockProps | undefined => {
+    if (typeof codeBlock.props !== "object" || !codeBlock.props) {
+      return undefined
+    }
+
+    if ("source" in codeBlock.props) {
+      return codeBlock.props as CodeBlockProps
+    }
+
+    if (
+      "children" in codeBlock.props &&
+      typeof codeBlock.props.children === "object" &&
+      codeBlock.props.children
+    ) {
+      return getCodeBlockProps(
+        codeBlock.props.children as React.ReactElement<
+          unknown,
+          string | React.JSXElementConstructor<any>
+        >
+      )
+    }
+
+    return undefined
+  }
+
   const tabs: CodeTab[] = useMemo(() => {
     const tempTabs: CodeTab[] = []
     Children.forEach(children, (child) => {
+      if (!React.isValidElement(child)) {
+        return
+      }
+      const typedChildProps = child.props as CodeTab
       if (
         !React.isValidElement(child) ||
-        !child.props.label ||
-        !child.props.value ||
-        !React.isValidElement(child.props.children)
+        !typedChildProps.label ||
+        !typedChildProps.value ||
+        !React.isValidElement(typedChildProps.children)
       ) {
         return
       }
 
-      // extract child code block
-      const codeBlock =
-        child.props.children.type === "pre" &&
-        React.isValidElement(child.props.children.props.children)
-          ? child.props.children.props.children
-          : child.props.children
+      const codeBlock: React.ReactNode = isCodeBlock(typedChildProps.children)
+        ? typedChildProps.children
+        : undefined
+
+      if (!codeBlock) {
+        return
+      }
+
+      let codeBlockProps = codeBlock.props as CodeBlockProps
+
+      const commonProps = {
+        badgeLabel: undefined,
+        hasTabs: true,
+        className: clsx("!my-0", codeBlockProps.className),
+      }
+
+      if (
+        typeof codeBlock.type !== "string" &&
+        (("name" in codeBlock.type && codeBlock.type.name === "CodeBlock") ||
+          "source" in codeBlockProps)
+      ) {
+        codeBlockProps = {
+          ...codeBlockProps,
+          ...commonProps,
+        }
+      }
+
+      const modifiedProps: CodeBlockProps = {
+        ...(getCodeBlockProps(codeBlock) || {
+          source: "",
+        }),
+        ...commonProps,
+      }
 
       tempTabs.push({
-        label: child.props.label,
-        value: child.props.value,
-        codeProps: codeBlock.props,
+        label: typedChildProps.label,
+        value: typedChildProps.value,
+        codeProps: modifiedProps,
         codeBlock: {
           ...codeBlock,
           props: {
-            ...codeBlock.props,
-            badgeLabel: undefined,
-            hasTabs: true,
-            className: clsx("!my-0", codeBlock.props.className),
+            ...codeBlockProps,
+            children: {
+              ...(typeof codeBlockProps.children === "object"
+                ? codeBlockProps.children
+                : {}),
+              props: modifiedProps,
+            },
           },
         },
       })
@@ -132,6 +218,23 @@ export const CodeTabs = ({
     }
   }, [codeTabSelectorRef, tabRefs, changeTabSelectorCoordinates, selectedTab])
 
+  const actionsProps: CodeBlockActionsProps | undefined = useMemo(() => {
+    if (!selectedTab) {
+      return
+    }
+
+    return {
+      source: selectedTab?.codeProps.source,
+      blockStyle,
+      noReport: selectedTab?.codeProps.noReport,
+      noCopy: selectedTab?.codeProps.noCopy,
+      inInnerCode: true,
+      showGradientBg: false,
+      inHeader: true,
+      isCollapsed: false,
+    }
+  }, [selectedTab])
+
   return (
     <div
       className={clsx(
@@ -142,16 +245,7 @@ export const CodeTabs = ({
         className
       )}
     >
-      <div
-        className={clsx(
-          "flex gap-docs_0.75 relative",
-          "pt-[10px] px-docs_1 pb-px",
-          blockStyle === "loud" &&
-            selectedTab?.codeProps.title &&
-            "border border-solid border-b border-medusa-contrast-border-bot"
-        )}
-        ref={codeTabsWrapperRef}
-      >
+      <CodeBlockHeaderWrapper blockStyle={blockStyle} ref={codeTabsWrapperRef}>
         <span
           className={clsx(
             "xs:absolute xs:transition-all xs:duration-200 xs:ease-ease xs:bottom-0",
@@ -178,7 +272,7 @@ export const CodeTabs = ({
 
             return (
               <child.type
-                {...child.props}
+                {...(typeof child.props === "object" ? child.props : {})}
                 changeSelectedTab={changeSelectedTab}
                 pushRef={(tabButton: HTMLButtonElement | null) =>
                   tabRefs.push(tabButton)
@@ -187,7 +281,7 @@ export const CodeTabs = ({
                 isSelected={
                   !selectedTab
                     ? index === 0
-                    : selectedTab.value === child.props.value
+                    : selectedTab.value === (child.props as CodeTab).value
                 }
               />
             )
@@ -198,7 +292,8 @@ export const CodeTabs = ({
             {selectedTab.codeProps.badgeLabel}
           </Badge>
         )}
-      </div>
+        {actionsProps && <CodeBlockActions {...actionsProps} />}
+      </CodeBlockHeaderWrapper>
       {selectedTab?.codeBlock}
     </div>
   )

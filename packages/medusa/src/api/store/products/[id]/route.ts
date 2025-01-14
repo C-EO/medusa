@@ -1,24 +1,23 @@
-import { MedusaError, isPresent } from "@medusajs/utils"
-import { MedusaResponse } from "../../../../types/routing"
-import { wrapVariantsWithInventoryQuantity } from "../../../utils/middlewares"
+import { isPresent, MedusaError } from "@medusajs/framework/utils"
+import { MedusaResponse } from "@medusajs/framework/http"
+import { wrapVariantsWithInventoryQuantityForSalesChannel } from "../../../utils/middlewares"
 import {
-  RequestWithContext,
   refetchProduct,
+  RequestWithContext,
   wrapProductsWithTaxPrices,
 } from "../helpers"
-import { StoreGetProductParamsType } from "../validators"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
-  req: RequestWithContext<StoreGetProductParamsType>,
+  req: RequestWithContext<HttpTypes.StoreProductParams>,
   res: MedusaResponse<HttpTypes.StoreProductResponse>
 ) => {
-  const withInventoryQuantity = req.remoteQueryConfig.fields.some((field) =>
+  const withInventoryQuantity = req.queryConfig.fields.some((field) =>
     field.includes("variants.inventory_quantity")
   )
 
   if (withInventoryQuantity) {
-    req.remoteQueryConfig.fields = req.remoteQueryConfig.fields.filter(
+    req.queryConfig.fields = req.queryConfig.fields.filter(
       (field) => !field.includes("variants.inventory_quantity")
     )
   }
@@ -37,7 +36,7 @@ export const GET = async (
   const product = await refetchProduct(
     filters,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   if (!product) {
@@ -48,7 +47,10 @@ export const GET = async (
   }
 
   if (withInventoryQuantity) {
-    await wrapVariantsWithInventoryQuantity(req, product.variants || [])
+    await wrapVariantsWithInventoryQuantityForSalesChannel(
+      req,
+      product.variants || []
+    )
   }
 
   await wrapProductsWithTaxPrices(req, [product])

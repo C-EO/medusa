@@ -1,7 +1,8 @@
 import {
+  PricingRuleOperator,
   RuleOperator,
   ShippingOptionPriceType as ShippingOptionPriceTypeEnum,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { z } from "zod"
 import { booleanString } from "../../utils/common-validators"
 import {
@@ -83,11 +84,20 @@ export const AdminCreateShippingOptionTypeObject = z
   })
   .strict()
 
+const AdminPriceRules = z.array(
+  z.object({
+    attribute: z.literal("item_total"),
+    operator: z.nativeEnum(PricingRuleOperator),
+    value: z.number(),
+  })
+)
+
 // eslint-disable-next-line max-len
 export const AdminCreateShippingOptionPriceWithCurrency = z
   .object({
     currency_code: z.string(),
     amount: z.number(),
+    rules: AdminPriceRules.optional(),
   })
   .strict()
 
@@ -95,6 +105,7 @@ export const AdminCreateShippingOptionPriceWithRegion = z
   .object({
     region_id: z.string(),
     amount: z.number(),
+    rules: AdminPriceRules.optional(),
   })
   .strict()
 
@@ -103,6 +114,7 @@ export const AdminUpdateShippingOptionPriceWithCurrency = z
     id: z.string().optional(),
     currency_code: z.string().optional(),
     amount: z.number().optional(),
+    rules: AdminPriceRules.optional(),
   })
   .strict()
 
@@ -111,6 +123,7 @@ export const AdminUpdateShippingOptionPriceWithRegion = z
     id: z.string().optional(),
     region_id: z.string().optional(),
     amount: z.number().optional(),
+    rules: AdminPriceRules.optional(),
   })
   .strict()
 

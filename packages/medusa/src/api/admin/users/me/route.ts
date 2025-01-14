@@ -2,12 +2,12 @@ import {
   ContainerRegistrationKeys,
   MedusaError,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
-import { HttpTypes } from "@medusajs/types"
+} from "@medusajs/framework/http"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -23,7 +23,7 @@ export const GET = async (
   const query = remoteQueryObjectFromString({
     entryPoint: "user",
     variables: { id },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const [user] = await remoteQuery(query)

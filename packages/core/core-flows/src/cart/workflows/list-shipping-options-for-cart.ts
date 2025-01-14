@@ -1,12 +1,12 @@
-import { ListShippingOptionsForCartWorkflowInputDTO } from "@medusajs/types"
-import { deepFlatMap, isPresent, MedusaError } from "@medusajs/utils"
 import {
   createWorkflow,
   transform,
   WorkflowData,
   WorkflowResponse,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
+import { useQueryGraphStep, validatePresenceOfStep } from "../../common"
 import { useRemoteQueryStep } from "../../common/steps/use-remote-query"
+import { cartFieldsForPricingContext } from "../utils/fields"
 
 export const listShippingOptionsForCartWorkflowId =
   "list-shipping-options-for-cart"
@@ -15,101 +15,129 @@ export const listShippingOptionsForCartWorkflowId =
  */
 export const listShippingOptionsForCartWorkflow = createWorkflow(
   listShippingOptionsForCartWorkflowId,
-  (input: WorkflowData<ListShippingOptionsForCartWorkflowInputDTO>) => {
-    const scLocationFulfillmentSets = useRemoteQueryStep({
-      entry_point: "sales_channels",
-      fields: [
-        "stock_locations.fulfillment_sets.id",
-        "stock_locations.fulfillment_sets.name",
-        "stock_locations.fulfillment_sets.price_type",
-        "stock_locations.fulfillment_sets.service_zone_id",
-        "stock_locations.fulfillment_sets.shipping_profile_id",
-        "stock_locations.fulfillment_sets.provider_id",
-        "stock_locations.fulfillment_sets.data",
-        "stock_locations.fulfillment_sets.amount",
+  (
+    input: WorkflowData<{
+      cart_id: string
+      option_ids?: string[]
+      is_return?: boolean
+      enabled_in_store?: boolean
+    }>
+  ) => {
+    const cartQuery = useQueryGraphStep({
+      entity: "cart",
+      filters: { id: input.cart_id },
+      fields: cartFieldsForPricingContext,
+      options: { throwIfKeyNotFound: true },
+    }).config({ name: "get-cart" })
 
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.name",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.price_type",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.service_zone_id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.shipping_profile_id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.provider_id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.data",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.amount",
+    const cart = transform({ cartQuery }, ({ cartQuery }) => cartQuery.data[0])
 
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.type.id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.type.label",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.type.description",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.type.code",
-
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.provider.id",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.provider.is_enabled",
-
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.calculated_price.calculated_amount",
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.calculated_price.is_calculated_price_tax_inclusive",
-      ],
-      variables: {
-        id: input.sales_channel_id,
-        "stock_locations.fulfillment_sets.service_zones.shipping_options": {
-          context: {
-            is_return: "false",
-            enabled_in_store: "true",
-          },
-          filters: {
-            address: {
-              city: input.shipping_address?.city,
-              country_code: input.shipping_address?.country_code,
-              province_code: input.shipping_address?.province,
-            },
-          },
-        },
-        "stock_locations.fulfillment_sets.service_zones.shipping_options.calculated_price":
-          {
-            context: {
-              currency_code: input.currency_code,
-            },
-          },
-      },
+    validatePresenceOfStep({
+      entity: cart,
+      fields: ["sales_channel_id", "region_id", "currency_code"],
     })
 
-    const shippingOptionsWithPrice = transform(
-      { options: scLocationFulfillmentSets },
-      (data) => {
-        const optionsMissingPrices: string[] = []
+    const scFulfillmentSetQuery = useQueryGraphStep({
+      entity: "sales_channels",
+      filters: { id: cart.sales_channel_id },
+      fields: [
+        "stock_locations.fulfillment_sets.id",
+        "stock_locations.id",
+        "stock_locations.name",
+        "stock_locations.address.*",
+      ],
+    }).config({ name: "sales_channels-fulfillment-query" })
 
-        const options = deepFlatMap(
-          data.options,
-          "stock_locations.fulfillment_sets.service_zones.shipping_options.calculated_price",
-          ({ shipping_options }) => {
-            const { calculated_price, ...options } = shipping_options ?? {}
+    const scFulfillmentSets = transform(
+      { scFulfillmentSetQuery },
+      ({ scFulfillmentSetQuery }) => scFulfillmentSetQuery.data[0]
+    )
 
-            if (
-              options?.id &&
-              !isPresent(calculated_price?.calculated_amount)
-            ) {
-              optionsMissingPrices.push(options.id)
-            }
+    const { fulfillmentSetIds } = transform(
+      { scFulfillmentSets },
+      ({ scFulfillmentSets }) => {
+        const fulfillmentSetIds = new Set<string>()
 
-            return {
-              ...options,
-              amount: calculated_price?.calculated_amount,
-              is_tax_inclusive:
-                !!calculated_price?.is_calculated_price_tax_inclusive,
-            }
-          }
-        )
+        scFulfillmentSets.stock_locations.forEach((stockLocation) => {
+          stockLocation.fulfillment_sets.forEach((fulfillmentSet) => {
+            fulfillmentSetIds.add(fulfillmentSet.id)
+          })
+        })
 
-        if (optionsMissingPrices.length) {
-          throw new MedusaError(
-            MedusaError.Types.INVALID_DATA,
-            `Shipping options with IDs ${optionsMissingPrices.join(
-              ", "
-            )} do not have a price`
-          )
+        return {
+          fulfillmentSetIds: Array.from(fulfillmentSetIds),
         }
-
-        return options
       }
+    )
+
+    const queryVariables = transform(
+      { input, fulfillmentSetIds, cart },
+      ({ input, fulfillmentSetIds, cart }) => ({
+        id: input.option_ids,
+
+        context: {
+          is_return: input.is_return ?? false,
+          enabled_in_store: input.enabled_in_store ?? true,
+        },
+
+        filters: {
+          fulfillment_set_id: fulfillmentSetIds,
+
+          address: {
+            country_code: cart.shipping_address?.country_code,
+            province_code: cart.shipping_address?.province,
+            city: cart.shipping_address?.city,
+            postal_expression: cart.shipping_address?.postal_code,
+          },
+        },
+
+        calculated_price: { context: cart },
+      })
+    )
+
+    const shippingOptions = useRemoteQueryStep({
+      entry_point: "shipping_options",
+      fields: [
+        "id",
+        "name",
+        "price_type",
+        "service_zone_id",
+        "shipping_profile_id",
+        "provider_id",
+        "data",
+        "service_zone.fulfillment_set_id",
+
+        "type.id",
+        "type.label",
+        "type.description",
+        "type.code",
+
+        "provider.id",
+        "provider.is_enabled",
+
+        "rules.attribute",
+        "rules.value",
+        "rules.operator",
+
+        "calculated_price.*",
+        "prices.*",
+        "prices.price_rules.*",
+      ],
+      variables: queryVariables,
+    }).config({ name: "shipping-options-query" })
+
+    const shippingOptionsWithPrice = transform(
+      { shippingOptions },
+      ({ shippingOptions }) =>
+        shippingOptions.map((shippingOption) => {
+          const price = shippingOption.calculated_price
+
+          return {
+            ...shippingOption,
+            amount: price?.calculated_amount,
+            is_tax_inclusive: !!price?.is_calculated_price_tax_inclusive,
+          }
+        })
     )
 
     return new WorkflowResponse(shippingOptionsWithPrice)

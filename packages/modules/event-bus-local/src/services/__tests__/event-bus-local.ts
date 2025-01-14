@@ -22,7 +22,7 @@ describe("LocalEventBusService", () => {
       beforeEach(() => {
         jest.clearAllMocks()
 
-        eventBus = new LocalEventBusService(moduleDeps as any)
+        eventBus = new LocalEventBusService(moduleDeps as any, {}, {} as any)
         eventEmitter = (eventBus as any).eventEmitter_
       })
 
@@ -123,6 +123,7 @@ describe("LocalEventBusService", () => {
           data: { test: "1234" },
           metadata: { eventGroupId: "test" },
           name: "test-event",
+          options: {},
         })
 
         jest.clearAllMocks()

@@ -1,13 +1,13 @@
-import { IPromotionModuleService } from "@medusajs/types"
+import { IPromotionModuleService } from "@medusajs/framework/types"
 import {
   ApplicationMethodType,
   CampaignBudgetType,
   Module,
   Modules,
   PromotionType,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { PromotionModuleService } from "@services"
-import { SuiteOptions, moduleIntegrationTestRunner } from "medusa-test-utils"
+import { SuiteOptions, moduleIntegrationTestRunner } from "@medusajs/test-utils"
 import { createCampaigns } from "../../../__fixtures__/campaigns"
 import {
   createDefaultPromotion,
@@ -49,7 +49,7 @@ moduleIntegrationTestRunner({
               linkable: "promotion_id",
               entity: "Promotion",
               primaryKey: "id",
-              serviceName: "Promotion",
+              serviceName: "promotion",
               field: "promotion",
             },
           },
@@ -58,7 +58,7 @@ moduleIntegrationTestRunner({
               linkable: "campaign_id",
               entity: "Campaign",
               primaryKey: "id",
-              serviceName: "Promotion",
+              serviceName: "promotion",
               field: "campaign",
             },
           },
@@ -67,7 +67,7 @@ moduleIntegrationTestRunner({
               linkable: "promotion_rule_id",
               entity: "PromotionRule",
               primaryKey: "id",
-              serviceName: "Promotion",
+              serviceName: "promotion",
               field: "promotionRule",
             },
           },
@@ -508,7 +508,7 @@ moduleIntegrationTestRunner({
           )
         })
 
-        it("should create a buyget promotion with rules successfully", async () => {
+        it("should create a budget promotion with rules successfully", async () => {
           const createdPromotion = await createDefaultPromotion(service, {
             type: PromotionType.BUYGET,
             application_method: {
@@ -638,7 +638,7 @@ moduleIntegrationTestRunner({
               application_method: expect.objectContaining({
                 target_type: "order",
                 allocation: "across",
-                max_quantity: 0,
+                max_quantity: null,
               }),
             })
           )
@@ -854,6 +854,7 @@ moduleIntegrationTestRunner({
               code: "PROMOTION_1",
               application_method: {
                 id: expect.any(String),
+                promotion_id: expect.any(String),
                 type: "fixed",
               },
             },

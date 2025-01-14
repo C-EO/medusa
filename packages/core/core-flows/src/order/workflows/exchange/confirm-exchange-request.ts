@@ -7,14 +7,15 @@ import {
   OrderExchangeItemDTO,
   OrderPreviewDTO,
   OrderReturnItemDTO,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ChangeActionType,
   MedusaError,
   Modules,
   OrderChangeStatus,
+  OrderWorkflowEvents,
   ReturnStatus,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
   createStep,
@@ -22,10 +23,14 @@ import {
   parallelize,
   transform,
   when,
-} from "@medusajs/workflows-sdk"
+} from "@medusajs/framework/workflows-sdk"
 import { reserveInventoryStep } from "../../../cart/steps/reserve-inventory"
 import { prepareConfirmInventoryInput } from "../../../cart/utils/prepare-confirm-inventory-input"
-import { createRemoteLinkStep, useRemoteQueryStep } from "../../../common"
+import {
+  createRemoteLinkStep,
+  emitEventStep,
+  useRemoteQueryStep,
+} from "../../../common"
 import { createReturnFulfillmentWorkflow } from "../../../fulfillment/workflows/create-return-fulfillment"
 import { previewOrderChangeStep, updateReturnsStep } from "../../steps"
 import { confirmOrderChanges } from "../../steps/confirm-order-changes"
@@ -198,6 +203,18 @@ function extractShippingOption({ orderPreview, orderExchange, returnId }) {
   }
 }
 
+function getUpdateReturnData({ returnId }: { returnId: string }) {
+  return transform({ returnId }, ({ returnId }) => {
+    return [
+      {
+        id: returnId,
+        status: ReturnStatus.REQUESTED,
+        requested_at: new Date(),
+      },
+    ]
+  })
+}
+
 export const confirmExchangeRequestWorkflowId = "confirm-exchange-request"
 /**
  * This workflow confirms an exchange request.
@@ -234,6 +251,7 @@ export const confirmExchangeRequestWorkflow = createWorkflow(
       entry_point: "order_change",
       fields: [
         "id",
+        "status",
         "actions.id",
         "actions.exchange_id",
         "actions.return_id",
@@ -272,7 +290,11 @@ export const confirmExchangeRequestWorkflow = createWorkflow(
       returnItems: createdReturnItems,
     })
 
-    confirmOrderChanges({ changes: [orderChange], orderId: order.id })
+    confirmOrderChanges({
+      changes: [orderChange],
+      orderId: order.id,
+      confirmed_by: input.confirmed_by,
+    })
 
     const returnId = transform(
       { createdReturnItems },
@@ -284,13 +306,8 @@ export const confirmExchangeRequestWorkflow = createWorkflow(
     when({ returnId }, ({ returnId }) => {
       return !!returnId
     }).then(() => {
-      updateReturnsStep([
-        {
-          id: returnId,
-          status: ReturnStatus.REQUESTED,
-          requested_at: new Date(),
-        },
-      ])
+      const updateReturnData = getUpdateReturnData({ returnId })
+      updateReturnsStep(updateReturnData)
     })
 
     const exchangeId = transform(
@@ -418,6 +435,14 @@ export const confirmExchangeRequestWorkflow = createWorkflow(
     createOrUpdateOrderPaymentCollectionWorkflow.runAsStep({
       input: {
         order_id: order.id,
+      },
+    })
+
+    emitEventStep({
+      eventName: OrderWorkflowEvents.EXCHANGE_CREATED,
+      data: {
+        order_id: order.id,
+        exchange_id: orderExchange.id,
       },
     })
 

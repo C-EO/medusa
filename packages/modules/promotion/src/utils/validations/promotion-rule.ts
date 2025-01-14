@@ -2,7 +2,7 @@ import {
   ApplicationMethodTargetTypeValues,
   PromotionRuleDTO,
   PromotionRuleOperatorValues,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   ApplicationMethodTargetType,
   MedusaError,
@@ -10,7 +10,7 @@ import {
   isPresent,
   isString,
   pickValueFromObject,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { CreatePromotionRuleDTO } from "@types"
 
 export function validatePromotionRuleAttributes(
@@ -113,6 +113,10 @@ export function evaluateRuleValueCondition(
 ) {
   if (!Array.isArray(ruleValuesToCheck)) {
     ruleValuesToCheck = [ruleValuesToCheck]
+  }
+
+  if (!ruleValuesToCheck.length) {
+    return false
   }
 
   return ruleValuesToCheck.every((ruleValueToCheck: string) => {

@@ -20,7 +20,7 @@ export interface Attachment {
    */
   content_type?: string
   /**
-   * The disposition of the attachment, e.g., "inline" or "attachment".
+   * The disposition of the attachment, For example, "inline" or "attachment".
    */
   disposition?: string
   /**
@@ -175,4 +175,24 @@ export interface FilterableNotificationProps
    * Filters a notification based on when it was sent and created in the database
    */
   created_at?: OperatorMap<string>
+}
+
+/**
+ * @interface
+ *
+ * The structure for content passed to the notification provider.
+ */
+export interface NotificationContent {
+  /**
+   * the subject of the notification
+   */
+  subject?: string
+  /**
+   * the text content of the notification
+   */
+  text?: string
+  /**
+   * the html content of the notification
+   */
+  html?: string
 }

@@ -1,13 +1,13 @@
 import { createReturnReasonsWorkflow } from "@medusajs/core-flows"
-import { CreateOrderReturnReasonDTO, HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   remoteQueryObjectFromString,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminReturnReasonListParams>,
@@ -20,9 +20,9 @@ export const GET = async (
       filters: {
         ...req.filterableFields,
       },
-      ...req.remoteQueryConfig.pagination,
+      ...req.queryConfig.pagination,
     },
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const { rows: return_reasons, metadata } = await remoteQuery(queryObject)
@@ -36,7 +36,7 @@ export const GET = async (
 }
 
 export const POST = async (
-  req: AuthenticatedMedusaRequest<CreateOrderReturnReasonDTO>,
+  req: AuthenticatedMedusaRequest<HttpTypes.AdminCreateReturnReason>,
   res: MedusaResponse<HttpTypes.AdminReturnReasonResponse>
 ) => {
   const workflow = createReturnReasonsWorkflow(req.scope)
@@ -56,7 +56,7 @@ export const POST = async (
   const queryObject = remoteQueryObjectFromString({
     entryPoint: "return_reason",
     variables,
-    fields: req.remoteQueryConfig.fields,
+    fields: req.queryConfig.fields,
   })
 
   const remoteQuery = req.scope.resolve(ContainerRegistrationKeys.REMOTE_QUERY)

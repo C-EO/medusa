@@ -5,6 +5,10 @@ import { languages } from "../../i18n/languages"
 
 type I18nProviderProps = PropsWithChildren
 
+const formatLocaleCode = (code: string) => {
+  return code.replace(/([a-z])([A-Z])/g, "$1-$2")
+}
+
 export const I18nProvider = ({ children }: I18nProviderProps) => {
   const { i18n } = useTranslation()
 
@@ -12,5 +16,5 @@ export const I18nProvider = ({ children }: I18nProviderProps) => {
     languages.find((lan) => lan.code === i18n.language)?.code ||
     languages[0].code
 
-  return <Provider locale={locale}>{children}</Provider>
+  return <Provider locale={formatLocaleCode(locale)}>{children}</Provider>
 }

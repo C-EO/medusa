@@ -1,6 +1,12 @@
 import { join } from "path"
-import { ContainerRegistrationKeys, MedusaError } from "@medusajs/utils"
-import { LinkLoader, logger, MedusaAppLoader } from "@medusajs/framework"
+import {
+  ContainerRegistrationKeys,
+  MedusaError,
+  mergePluginModules,
+} from "@medusajs/framework/utils"
+import { LinkLoader } from "@medusajs/framework/links"
+import { logger } from "@medusajs/framework/logger"
+import { MedusaAppLoader } from "@medusajs/framework"
 
 import { ensureDbExists } from "../utils"
 import { initializeContainer } from "../../loaders"
@@ -21,7 +27,9 @@ const main = async function ({ directory, modules }) {
       ContainerRegistrationKeys.CONFIG_MODULE
     )
 
-    const plugins = getResolvedPlugins(directory, configModule, true) || []
+    const plugins = await getResolvedPlugins(directory, configModule, true)
+    mergePluginModules(configModule, plugins)
+
     const linksSourcePaths = plugins.map((plugin) =>
       join(plugin.resolve, "links")
     )

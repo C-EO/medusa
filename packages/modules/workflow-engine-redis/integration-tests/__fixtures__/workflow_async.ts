@@ -1,11 +1,10 @@
 import {
-  StepResponse,
-  WorkflowResponse,
   createStep,
   createWorkflow,
   parallelize,
-} from "@medusajs/workflows-sdk"
-import { setTimeout } from "timers/promises"
+  StepResponse,
+  WorkflowResponse,
+} from "@medusajs/framework/workflows-sdk"
 
 const step_1_background = createStep(
   {
@@ -13,8 +12,6 @@ const step_1_background = createStep(
     async: true,
   },
   jest.fn(async (input) => {
-    await setTimeout(Math.random() * 300)
-
     return new StepResponse(input)
   })
 )

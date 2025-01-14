@@ -1,11 +1,10 @@
 "use client"
 
 import { InformationCircleSolid } from "@medusajs/icons"
-import { Tooltip } from "@medusajs/ui"
 
 import { PropData, PropDataMap, PropSpecType } from "@/types/props"
 import { useCallback, useMemo } from "react"
-import { InlineCode, MarkdownContent, Table } from "docs-ui"
+import { InlineCode, MarkdownContent, Table, Tooltip } from "docs-ui"
 
 type PropTableProps = {
   props: PropDataMap
@@ -46,7 +45,10 @@ const Row = ({
   propData: { tsType: tsType, defaultValue, description },
 }: RowProps) => {
   const normalizeRaw = (str: string): string => {
-    return str.replace("\\|", "|")
+    return str
+      .replace("\\|", "|")
+      .replaceAll("&#60;", "<")
+      .replaceAll("&#62;", ">")
   }
   const getTypeRaw = useCallback((type: PropSpecType): string => {
     let raw = "raw" in type ? type.raw || type.name : type.name
@@ -75,9 +77,11 @@ const Row = ({
   }, [])
   const getTypeTooltipContent = useCallback(
     (type: PropSpecType): string | undefined => {
-      if (type?.name === "signature" && "type" in type) {
-        return getTypeRaw(type)
-      } else if (type?.name === "Array" && type.raw) {
+      if (
+        (type?.name === "signature" && "type" in type) ||
+        (type?.name === "Array" && type.raw) ||
+        ("raw" in type && type.raw)
+      ) {
         return getTypeRaw(type)
       }
 
@@ -108,6 +112,11 @@ const Row = ({
             text: element.value,
             canBeCopied: true,
           })
+        } else if ("raw" in element) {
+          typeNodes.push({
+            text: getTypeText(element),
+            tooltipContent: getTypeTooltipContent(element),
+          })
         } else {
           typeNodes.push({
             text: element.name,
@@ -133,7 +142,7 @@ const Row = ({
           <InlineCode>{propName}</InlineCode>
           {description && (
             <Tooltip
-              content={
+              tooltipChildren={
                 <MarkdownContent
                   allowedElements={["a", "code"]}
                   unwrapDisallowed={true}
@@ -154,7 +163,7 @@ const Row = ({
               {index > 0 && <span>|</span>}
               {typeNode.tooltipContent && (
                 <Tooltip
-                  content={<pre>{typeNode.tooltipContent}</pre>}
+                  tooltipChildren={<pre>{typeNode.tooltipContent}</pre>}
                   className="font-mono !max-w-none"
                 >
                   <div className="flex items-center gap-x-1">

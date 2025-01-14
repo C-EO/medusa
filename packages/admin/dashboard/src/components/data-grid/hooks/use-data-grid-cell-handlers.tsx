@@ -17,6 +17,7 @@ type UseDataGridCellHandlersOptions<TData, TFieldValues extends FieldValues> = {
   setDragEnd: (coords: DataGridCoordinates | null) => void
   setValue: UseFormSetValue<TFieldValues>
   execute: (command: DataGridUpdateCommand) => void
+  multiColumnSelection?: boolean
 }
 
 export const useDataGridCellHandlers = <
@@ -36,6 +37,7 @@ export const useDataGridCellHandlers = <
   setDragEnd,
   setValue,
   execute,
+  multiColumnSelection,
 }: UseDataGridCellHandlersOptions<TData, TFieldValues>) => {
   const getWrapperFocusHandler = useCallback(
     (coords: DataGridCoordinates) => {
@@ -74,9 +76,9 @@ export const useDataGridCellHandlers = <
       return (_e: MouseEvent<HTMLElement>) => {
         /**
          * If the column is not the same as the anchor col,
-         * we don't want to select the cell.
+         * we don't want to select the cell. Unless multiColumnSelection is true.
          */
-        if (anchor?.col !== coords.col) {
+        if (anchor?.col !== coords.col && !multiColumnSelection) {
           return
         }
 
@@ -87,7 +89,14 @@ export const useDataGridCellHandlers = <
         }
       }
     },
-    [anchor?.col, isDragging, isSelecting, setDragEnd, setRangeEnd]
+    [
+      anchor?.col,
+      isDragging,
+      isSelecting,
+      setDragEnd,
+      setRangeEnd,
+      multiColumnSelection,
+    ]
   )
 
   const getInputChangeHandler = useCallback(

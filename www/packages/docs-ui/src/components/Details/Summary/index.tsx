@@ -34,7 +34,7 @@ export const DetailsSummary = ({
         expandable && "cursor-pointer",
         !expandable &&
           "border-medusa-border-base border-y border-solid border-x-0",
-        (expandable || badge) && "gap-0.5",
+        (expandable || badge !== undefined) && "gap-0.5",
         "no-marker",
         className
       )}

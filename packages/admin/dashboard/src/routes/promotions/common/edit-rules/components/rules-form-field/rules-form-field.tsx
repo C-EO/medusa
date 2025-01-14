@@ -1,8 +1,13 @@
 import { XMarkMini } from "@medusajs/icons"
 import { PromotionDTO } from "@medusajs/types"
-import { Badge, Button, Heading, Select, Text } from "@medusajs/ui"
-import { Fragment, useEffect } from "react"
-import { useFieldArray, UseFormReturn, useWatch } from "react-hook-form"
+import { Badge, Button, Heading, IconButton, Select, Text } from "@medusajs/ui"
+import { forwardRef, Fragment, useEffect } from "react"
+import {
+  ControllerRenderProps,
+  useFieldArray,
+  UseFormReturn,
+  useWatch,
+} from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { Form } from "../../../../../../components/common/form"
 import {
@@ -102,7 +107,16 @@ export const RulesFormField = ({
 
       replace(generateRuleAttributes(rulesToAppend) as any)
     }
-  }, [promotionType, isLoading])
+  }, [
+    promotionType,
+    isLoading,
+    ruleType,
+    fields.length,
+    form,
+    replace,
+    rules,
+    promotion?.id,
+  ])
 
   return (
     <div className="flex flex-col">
@@ -116,24 +130,16 @@ export const RulesFormField = ({
 
       {fields.map((fieldRule: any, index) => {
         const identifier = fieldRule.id
-        const { ref: attributeRef, ...attributeField } = form.register(
-          `${scope}.${index}.attribute`
-        )
-        const { ref: operatorRef, ...operatorsField } = form.register(
-          `${scope}.${index}.operator`
-        )
-        const { ref: valuesRef, ...valuesField } = form.register(
-          `${scope}.${index}.values`
-        )
 
         return (
           <Fragment key={`${fieldRule.id}.${index}.${fieldRule.attribute}`}>
             <div className="bg-ui-bg-subtle border-ui-border-base flex flex-row gap-2 rounded-xl border px-2 py-2">
               <div className="grow">
                 <Form.Field
-                  key={`${identifier}.${scope}.${attributeField.name}`}
-                  {...attributeField}
-                  render={({ field: { onChange, ref, ...field } }) => {
+                  name={`${scope}.${index}.attribute`}
+                  render={({ field }) => {
+                    const { onChange, ref, ...fieldProps } = field
+
                     const existingAttributes =
                       fields?.map((field: any) => field.attribute) || []
                     const attributeOptions =
@@ -145,55 +151,71 @@ export const RulesFormField = ({
                         return !existingAttributes.includes(attr.value)
                       }) || []
 
+                    const disabled = !!fieldRule.required
+                    const onValueChange = (e: string) => {
+                      const currentAttributeOption = attributeOptions.find(
+                        (ao) => ao.id === e
+                      )
+
+                      update(index, {
+                        ...fieldRule,
+                        values: [],
+                        disguised: currentAttributeOption?.disguised || false,
+                      })
+                      onChange(e)
+                    }
+
                     return (
                       <Form.Item className="mb-2">
                         {fieldRule.required && (
-                          <p className="text text-ui-fg-muted txt-small">
-                            {t("promotions.form.required")}
-                          </p>
+                          <div className="flex items-center px-2">
+                            <p className="text text-ui-fg-muted txt-small">
+                              {t("promotions.form.required")}
+                            </p>
+                          </div>
                         )}
 
                         <Form.Control>
-                          <Select
-                            {...field}
-                            onValueChange={(e) => {
-                              const currentAttributeOption =
-                                attributeOptions.find((ao) => ao.id === e)
-
-                              update(index, {
-                                ...fieldRule,
-                                values: [],
-                                disguised:
-                                  currentAttributeOption?.disguised || false,
-                              })
-                              onChange(e)
-                            }}
-                            disabled={fieldRule.required}
-                          >
-                            <Select.Trigger
-                              ref={attributeRef}
-                              className="bg-ui-bg-base"
+                          {!disabled ? (
+                            <Select
+                              {...fieldProps}
+                              onValueChange={onValueChange}
+                              disabled={fieldRule.required}
                             >
-                              <Select.Value
-                                placeholder={t(
-                                  "promotions.form.selectAttribute"
-                                )}
-                              />
-                            </Select.Trigger>
+                              <Select.Trigger
+                                ref={ref}
+                                className="bg-ui-bg-base"
+                              >
+                                <Select.Value
+                                  placeholder={t(
+                                    "promotions.form.selectAttribute"
+                                  )}
+                                />
+                              </Select.Trigger>
 
-                            <Select.Content>
-                              {attributeOptions?.map((c, i) => (
-                                <Select.Item
-                                  key={`${identifier}-attribute-option-${i}`}
-                                  value={c.value}
-                                >
-                                  <span className="text-ui-fg-subtle">
-                                    {c.label}
-                                  </span>
-                                </Select.Item>
-                              ))}
-                            </Select.Content>
-                          </Select>
+                              <Select.Content>
+                                {attributeOptions?.map((c, i) => (
+                                  <Select.Item
+                                    key={`${identifier}-attribute-option-${i}`}
+                                    value={c.value}
+                                  >
+                                    <span className="text-ui-fg-subtle">
+                                      {c.label}
+                                    </span>
+                                  </Select.Item>
+                                ))}
+                              </Select.Content>
+                            </Select>
+                          ) : (
+                            <DisabledField
+                              label={
+                                attributeOptions?.find(
+                                  (ao) => ao.value === fieldRule.attribute
+                                )?.label || ""
+                              }
+                              field={field}
+                            />
+                          )}
                         </Form.Control>
                         <Form.ErrorMessage />
                       </Form.Item>
@@ -203,43 +225,60 @@ export const RulesFormField = ({
 
                 <div className="flex gap-2">
                   <Form.Field
-                    key={`${identifier}.${scope}.${operatorsField.name}`}
-                    {...operatorsField}
-                    render={({ field: { onChange, ref, ...field } }) => {
-                      const currentAttributeOption = attributes.find(
+                    name={`${scope}.${index}.operator`}
+                    render={({ field }) => {
+                      const { onChange, ref, ...fieldProps } = field
+
+                      const currentAttributeOption = attributes?.find(
                         (attr) => attr.value === fieldRule.attribute
                       )
+
+                      const options =
+                        currentAttributeOption?.operators?.map((o, idx) => ({
+                          label: o.label,
+                          value: o.value,
+                          key: `${identifier}-operator-option-${idx}`,
+                        })) || []
+
+                      const disabled =
+                        !!fieldRule.attribute && options?.length <= 1
 
                       return (
                         <Form.Item className="basis-1/2">
                           <Form.Control>
-                            <Select
-                              {...field}
-                              disabled={!fieldRule.attribute}
-                              onValueChange={onChange}
-                            >
-                              <Select.Trigger
-                                ref={operatorRef}
-                                className="bg-ui-bg-base"
+                            {!disabled ? (
+                              <Select
+                                {...fieldProps}
+                                disabled={!fieldRule.attribute}
+                                onValueChange={onChange}
                               >
-                                <Select.Value placeholder="Select Operator" />
-                              </Select.Trigger>
+                                <Select.Trigger
+                                  ref={ref}
+                                  className="bg-ui-bg-base"
+                                >
+                                  <Select.Value placeholder="Select Operator" />
+                                </Select.Trigger>
 
-                              <Select.Content>
-                                {currentAttributeOption?.operators?.map(
-                                  (c, i) => (
-                                    <Select.Item
-                                      key={`${identifier}-operator-option-${i}`}
-                                      value={c.value}
-                                    >
+                                <Select.Content>
+                                  {options?.map((c) => (
+                                    <Select.Item key={c.key} value={c.value}>
                                       <span className="text-ui-fg-subtle">
                                         {c.label}
                                       </span>
                                     </Select.Item>
-                                  )
-                                )}
-                              </Select.Content>
-                            </Select>
+                                  ))}
+                                </Select.Content>
+                              </Select>
+                            ) : (
+                              <DisabledField
+                                label={
+                                  options.find(
+                                    (o) => o.value === fieldProps.value
+                                  )?.label || ""
+                                }
+                                field={field}
+                              />
+                            )}
                           </Form.Control>
                           <Form.ErrorMessage />
                         </Form.Item>
@@ -251,9 +290,8 @@ export const RulesFormField = ({
                     form={form}
                     identifier={identifier}
                     scope={scope}
-                    valuesField={valuesField}
-                    operatorsField={operatorsField}
-                    valuesRef={valuesRef}
+                    name={`${scope}.${index}.values`}
+                    operator={`${scope}.${index}.operator`}
                     fieldRule={fieldRule}
                     attributes={attributes}
                     ruleType={ruleType}
@@ -261,20 +299,25 @@ export const RulesFormField = ({
                 </div>
               </div>
 
-              <div className="flex-none self-center px-1">
-                <XMarkMini
-                  className={`text-ui-fg-muted cursor-pointer ${
-                    fieldRule.required ? "invisible" : "visible"
-                  }`}
-                  onClick={() => {
-                    if (!fieldRule.required) {
-                      setRulesToRemove &&
-                        setRulesToRemove([...rulesToRemove, fieldRule])
+              <div className="size-7 flex-none self-center">
+                {!fieldRule.required && (
+                  <IconButton
+                    size="small"
+                    variant="transparent"
+                    className="text-ui-fg-muted"
+                    type="button"
+                    onClick={() => {
+                      if (!fieldRule.required) {
+                        setRulesToRemove &&
+                          setRulesToRemove([...rulesToRemove, fieldRule])
 
-                      remove(index)
-                    }
-                  }}
-                />
+                        remove(index)
+                      }
+                    }}
+                  >
+                    <XMarkMini />
+                  </IconButton>
+                )}
               </div>
             </div>
 
@@ -291,7 +334,7 @@ export const RulesFormField = ({
         )
       })}
 
-      <div className={!!fields.length ? "mt-6" : ""}>
+      <div className={fields.length ? "mt-6" : ""}>
         <Button
           type="button"
           variant="secondary"
@@ -330,3 +373,27 @@ export const RulesFormField = ({
     </div>
   )
 }
+
+type DisabledAttributeProps = {
+  label: string
+  field: ControllerRenderProps
+}
+
+/**
+ * Render this if an attribute is disabled, or
+ * if there is only one option available.
+ */
+const DisabledField = forwardRef<HTMLInputElement, DisabledAttributeProps>(
+  ({ label, field }, ref) => {
+    return (
+      <div>
+        <div className="txt-compact-small bg-ui-bg-component shadow-borders-base text-ui-fg-base h-8 rounded-md px-2 py-1.5">
+          {label}
+        </div>
+        <input {...field} ref={ref} disabled hidden />
+      </div>
+    )
+  }
+)
+
+DisabledField.displayName = "DisabledField"

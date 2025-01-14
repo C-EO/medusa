@@ -1,3 +1,10 @@
+---
+tags:
+  - product
+  - storefront
+  - pricing
+---
+
 import { CodeTabs, CodeTab, Table } from "docs-ui"
 
 export const metadata = {
@@ -30,7 +37,7 @@ const queryParams = new URLSearchParams({
 fetch(`http://localhost:9000/store/products/${id}?${queryParams.toString()}`, {
   credentials: "include",
   headers: {
-    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
   },
 })
 .then((res) => res.json())
@@ -98,7 +105,7 @@ If you pass the parameters mentioned above, each variant has a `calculated_price
     </Table.Row>
     <Table.Row>
       <Table.Cell>
-        `price_list_type`
+        `calculated_price.price_list_type`
       </Table.Cell>
       <Table.Cell>
          The type of the variant price.

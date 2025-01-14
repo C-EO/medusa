@@ -1,14 +1,14 @@
-import { IPricingModuleService } from "@medusajs/types"
+import { IPricingModuleService } from "@medusajs/framework/types"
 import {
   CommonEvents,
   composeMessage,
   Modules,
   PricingEvents,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
 import { createPriceLists } from "../../../__fixtures__/price-list"
 import { createPriceSets } from "../../../__fixtures__/price-set"
 
@@ -254,11 +254,14 @@ moduleIntegrationTestRunner<IPricingModuleService>({
               ends_at: "10/20/2030",
             },
           ])
-          expect(priceList).toEqual(
-            expect.objectContaining({
-              starts_at: new Date("10/10/2010").toISOString(),
-              ends_at: new Date("10/20/2030").toISOString(),
-            })
+
+          expect(priceList).toHaveProperty("starts_at")
+          expect(priceList).toHaveProperty("ends_at")
+          expect(priceList.starts_at?.toString()).toEqual(
+            new Date("10/10/2010").toISOString()
+          )
+          expect(priceList.ends_at?.toString()).toEqual(
+            new Date("10/20/2030").toISOString()
           )
         })
 
@@ -378,11 +381,14 @@ moduleIntegrationTestRunner<IPricingModuleService>({
               ends_at: "10/20/2030",
             },
           ])
-          expect(priceList).toEqual(
-            expect.objectContaining({
-              starts_at: new Date("10/10/2010").toISOString(),
-              ends_at: new Date("10/20/2030").toISOString(),
-            })
+
+          expect(priceList).toHaveProperty("starts_at")
+          expect(priceList).toHaveProperty("ends_at")
+          expect(priceList.starts_at?.toString()).toEqual(
+            new Date("10/10/2010").toString()
+          )
+          expect(priceList.ends_at?.toString()).toEqual(
+            new Date("10/20/2030").toString()
           )
         })
 
@@ -562,7 +568,6 @@ moduleIntegrationTestRunner<IPricingModuleService>({
                   currency_code: "EUR",
                 }),
                 expect.objectContaining({
-                  rules_count: 0,
                   price_rules: [],
                   amount: 600,
                   currency_code: "EUR",

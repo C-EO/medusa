@@ -11,14 +11,6 @@
  *     required: true
  *     schema:
  *       type: string
- *   - name: expand
- *     in: query
- *     description: Comma-separated relations that should be expanded in the returned data.
- *     required: false
- *     schema:
- *       type: string
- *       title: expand
- *       description: Comma-separated relations that should be expanded in the returned data.
  *   - name: fields
  *     in: query
  *     description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
@@ -29,6 +21,8 @@
  *       title: fields
  *       description: Comma-separated fields that should be included in the returned data. if a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default
  *         fields. without prefix it will replace the entire default fields.
+ *       externalDocs:
+ *         url: "#select-fields-and-relations"
  *   - name: offset
  *     in: query
  *     description: The number of items to skip when retrieving a list.
@@ -37,6 +31,8 @@
  *       type: number
  *       title: offset
  *       description: The number of items to skip when retrieving a list.
+ *       externalDocs:
+ *         url: "#pagination"
  *   - name: limit
  *     in: query
  *     description: Limit the number of items returned in the list.
@@ -45,6 +41,8 @@
  *       type: number
  *       title: limit
  *       description: Limit the number of items returned in the list.
+ *       externalDocs:
+ *         url: "#pagination"
  *   - name: order
  *     in: query
  *     description: The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
@@ -53,20 +51,6 @@
  *       type: string
  *       title: order
  *       description: The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
- *   - name: location_id
- *     in: query
- *     required: false
- *     schema:
- *       oneOf:
- *         - type: string
- *           title: location_id
- *           description: Filter by an associated location's ID.
- *         - type: array
- *           description: Filter by associated location IDs.
- *           items:
- *             type: string
- *             title: location_id
- *             description: An associated location ID.
  *   - name: $and
  *     in: query
  *     required: false
@@ -105,7 +89,7 @@
  *         schema:
  *           allOf:
  *             - type: object
- *               description: SUMMARY
+ *               description: The paginated list of inventory levels.
  *               required:
  *                 - limit
  *                 - offset
@@ -114,17 +98,17 @@
  *                 limit:
  *                   type: number
  *                   title: limit
- *                   description: The inventory item's limit.
+ *                   description: The maximum number of items returned.
  *                 offset:
  *                   type: number
  *                   title: offset
- *                   description: The inventory item's offset.
+ *                   description: The number of items skipped before retrieving the returned items.
  *                 count:
  *                   type: number
  *                   title: count
- *                   description: The inventory item's count.
+ *                   description: The total number of items.
  *             - type: object
- *               description: SUMMARY
+ *               description: The paginated list of inventory levels.
  *               required:
  *                 - inventory_levels
  *               properties:

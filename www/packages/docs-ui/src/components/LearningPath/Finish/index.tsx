@@ -32,7 +32,7 @@ export const LearningPathFinish = ({
       )}
       {type === "custom" && (
         <span className="text-compact-small text-medusa-fg-subtle">
-          {step.descriptionJSX}
+          {step.descriptionJSX as React.ReactNode}
         </span>
       )}
     </>

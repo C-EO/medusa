@@ -3,16 +3,11 @@ import {
   IDmlEntityConfig,
   RelationshipOptions,
 } from "@medusajs/types"
-import { DmlEntity } from "./entity"
-import {
-  createBigNumberProperties,
-  DMLSchemaWithBigNumber,
-} from "./helpers/entity-builder/create-big-number-properties"
-import {
-  createDefaultProperties,
-  DMLSchemaDefaults,
-} from "./helpers/entity-builder/create-default-properties"
+import { DmlEntity, DMLEntitySchemaBuilder } from "./entity"
+import { createBigNumberProperties } from "./helpers/entity-builder/create-big-number-properties"
+import { createDefaultProperties } from "./helpers/entity-builder/create-default-properties"
 import { ArrayProperty } from "./properties/array"
+import { AutoIncrementProperty } from "./properties/autoincrement"
 import { BigNumberProperty } from "./properties/big-number"
 import { BooleanProperty } from "./properties/boolean"
 import { DateTimeProperty } from "./properties/date-time"
@@ -24,7 +19,9 @@ import { TextProperty } from "./properties/text"
 import { BelongsTo } from "./relations/belongs-to"
 import { HasMany } from "./relations/has-many"
 import { HasOne } from "./relations/has-one"
+import { HasOneWithForeignKey } from "./relations/has-one-fk"
 import { ManyToMany } from "./relations/many-to-many"
+import { FloatProperty } from "./properties"
 
 /**
  * The implicit properties added by EntityBuilder in every schema
@@ -56,6 +53,14 @@ export type ManyToManyOptions = RelationshipOptions &
          * @ignore
          */
         pivotEntity?: never
+        /**
+         * The column name in the pivot table that for the current entity
+         */
+        joinColumn?: string | string[]
+        /**
+         * The column name in the pivot table for the opposite entity
+         */
+        inverseJoinColumn?: string | string[]
       }
     | {
         /**
@@ -68,6 +73,14 @@ export type ManyToManyOptions = RelationshipOptions &
          * database for this relationship.
          */
         pivotEntity?: () => DmlEntity<any, any>
+        /**
+         * The column name in the pivot table that for the current entity
+         */
+        joinColumn?: string | string[]
+        /**
+         * The column name in the pivot table for the opposite entity
+         */
+        inverseJoinColumn?: string | string[]
       }
   )
 
@@ -100,7 +113,7 @@ export class EntityBuilder {
    * @param {Schema} schema - The schema of the data model's properties.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   id: model.id(),
@@ -112,20 +125,14 @@ export class EntityBuilder {
   define<Schema extends DMLSchema, const TConfig extends IDmlEntityConfig>(
     nameOrConfig: TConfig,
     schema: Schema
-  ): DmlEntity<
-    Schema & DMLSchemaWithBigNumber<Schema> & DMLSchemaDefaults,
-    TConfig
-  > {
+  ): DmlEntity<DMLEntitySchemaBuilder<Schema>, TConfig> {
     this.#disallowImplicitProperties(schema)
 
     return new DmlEntity<Schema, TConfig>(nameOrConfig, {
       ...schema,
       ...createBigNumberProperties(schema),
       ...createDefaultProperties(),
-    }) as unknown as DmlEntity<
-      Schema & DMLSchemaWithBigNumber<Schema> & DMLSchemaDefaults,
-      TConfig
-    >
+    }) as unknown as DmlEntity<DMLEntitySchemaBuilder<Schema>, TConfig>
   }
 
   /**
@@ -135,7 +142,7 @@ export class EntityBuilder {
    * primary key.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const User = model.define("User", {
    *   id: model.id().primaryKey(),
@@ -154,7 +161,7 @@ export class EntityBuilder {
    * This method defines a string property.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   name: model.text(),
@@ -173,7 +180,7 @@ export class EntityBuilder {
    * This method defines a boolean property.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   hasAccount: model.boolean(),
@@ -192,7 +199,7 @@ export class EntityBuilder {
    * This method defines a number property.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   age: model.number(),
@@ -211,7 +218,7 @@ export class EntityBuilder {
    * This method defines a number property that expects large numbers, such as prices.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   price: model.bigNumber(),
@@ -232,10 +239,52 @@ export class EntityBuilder {
   }
 
   /**
+   * This method defines a float property that allows for
+   * values with decimal places
+   *
+   * @version 2.1.2
+   *
+   * @example
+   * import { model } from "@medusajs/framework/utils"
+   *
+   * const MyCustom = model.define("tax", {
+   *   tax_rate: model.float(),
+   *   // ...
+   * })
+   *
+   * export default MyCustom
+   *
+   * @customNamespace Property Types
+   */
+  float() {
+    return new FloatProperty()
+  }
+
+  /**
+   * This method defines an autoincrement property.
+   *
+   * @example
+   * import { model } from "@medusajs/framework/utils"
+   *
+   * const MyCustom = model.define("my_custom", {
+   *   serial_id: model.autoincrement(),
+   *   // ...
+   * })
+   *
+   * export default MyCustom
+   *
+   * @customNamespace Property
+   */
+
+  autoincrement() {
+    return new AutoIncrementProperty()
+  }
+
+  /**
    * This method defines an array of strings property.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   names: model.array(),
@@ -254,7 +303,7 @@ export class EntityBuilder {
    * This method defines a timestamp property.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   date_of_birth: model.dateTime(),
@@ -273,7 +322,7 @@ export class EntityBuilder {
    * This method defines a property whose value is a stringified JSON object.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   metadata: model.json(),
@@ -296,7 +345,7 @@ export class EntityBuilder {
    * @param {Values[]} values - An array of possible values.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const MyCustom = model.define("my_custom", {
    *   color: model.enum(["black", "white"]),
@@ -328,7 +377,7 @@ export class EntityBuilder {
    * @param {RelationshipOptions} options - The relationship's options.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const User = model.define("user", {
    *   id: model.id(),
@@ -337,7 +386,32 @@ export class EntityBuilder {
    *
    * @customNamespace Relationship Methods
    */
-  hasOne<T>(entityBuilder: T, options?: RelationshipOptions) {
+  hasOne<T, const ForeignKeyName extends string | undefined = undefined>(
+    entityBuilder: T,
+    options: RelationshipOptions & {
+      foreignKey: true
+      foreignKeyName?: ForeignKeyName
+    }
+  ): HasOneWithForeignKey<T, ForeignKeyName>
+  hasOne<T>(
+    entityBuilder: T,
+    options?: RelationshipOptions & {
+      foreignKey?: false
+    }
+  ): HasOne<T>
+  hasOne<T, const ForeignKeyName extends string | undefined = undefined>(
+    entityBuilder: T,
+    options?: RelationshipOptions & {
+      foreignKey?: boolean
+      foreignKeyName?: ForeignKeyName
+    }
+  ): HasOneWithForeignKey<T, ForeignKeyName> | HasOne<T> {
+    if (options?.foreignKey) {
+      return new HasOneWithForeignKey<T, ForeignKeyName>(
+        entityBuilder,
+        options || {}
+      )
+    }
     return new HasOne<T>(entityBuilder, options || {})
   }
 
@@ -353,6 +427,8 @@ export class EntityBuilder {
    * @param {RelationshipOptions} options - The relationship's options.
    *
    * @example
+   * import { model } from "@medusajs/framework/utils"
+   *
    * const Product = model.define("product", {
    *   id: model.id(),
    *   store: model.belongsTo(() => Store, {
@@ -362,8 +438,13 @@ export class EntityBuilder {
    *
    * @customNamespace Relationship Methods
    */
-  belongsTo<T>(entityBuilder: T, options?: RelationshipOptions) {
-    return new BelongsTo<T>(entityBuilder, options || {})
+  belongsTo<T, const ForeignKeyName extends string | undefined = undefined>(
+    entityBuilder: T,
+    options?: RelationshipOptions & {
+      foreignKeyName?: ForeignKeyName
+    }
+  ) {
+    return new BelongsTo<T, ForeignKeyName>(entityBuilder, options || {})
   }
 
   /**
@@ -380,7 +461,7 @@ export class EntityBuilder {
    * @param {RelationshipOptions} options - The relationship's options.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const Store = model.define("store", {
    *   id: model.id(),
@@ -407,7 +488,7 @@ export class EntityBuilder {
    * @param {RelationshipOptions} options - The relationship's options.
    *
    * @example
-   * import { model } from "@medusajs/utils"
+   * import { model } from "@medusajs/framework/utils"
    *
    * const Order = model.define("order", {
    *   id: model.id(),

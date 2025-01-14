@@ -12,7 +12,7 @@ const dmlOptions: FormattingOptionsType = {
   },
   "^modules/dml/page\\.mdx": {
     reflectionDescription:
-      "This section of the documentation provides an API reference to the property types and methods used to create a data model.",
+      "This section of the documentation to Medusa's Data Model Language (DML). Refer to it for all methods and options relevant to creating data models.",
     reflectionGroups: {
       Classes: false,
       Variables: false,
@@ -23,7 +23,7 @@ const dmlOptions: FormattingOptionsType = {
       slug: "/references/data-model",
     },
     reflectionTitle: {
-      fullReplacement: "Data Models API Reference",
+      fullReplacement: "Medusa Data Model Language Reference",
     },
     hideTocHeaders: true,
   },
@@ -32,7 +32,7 @@ const dmlOptions: FormattingOptionsType = {
       slug: "/references/data-model/define",
     },
     reflectionTitle: {
-      suffix: "Method - API Reference",
+      suffix: "Method - DML Reference",
     },
   },
   "^dml/.*Property_Types/page\\.mdx": {
@@ -42,7 +42,7 @@ const dmlOptions: FormattingOptionsType = {
     reflectionDescription:
       "The following methods are used to define the type of a property in a data model.",
     reflectionTitle: {
-      suffix: "- API Reference",
+      suffix: "- DML Reference",
     },
   },
   "^dml/Property_Types": {
@@ -51,7 +51,7 @@ const dmlOptions: FormattingOptionsType = {
       sidebar_label: "{{alias}}",
     },
     reflectionTitle: {
-      suffix: "Property Method - API Reference",
+      suffix: "Property Method - DML Reference",
     },
   },
   "^dml/.*Relationship_Methods/page\\.mdx": {
@@ -61,7 +61,7 @@ const dmlOptions: FormattingOptionsType = {
     reflectionDescription:
       "The following methods are used to define a relationship between two data models.",
     reflectionTitle: {
-      suffix: "- API Reference",
+      suffix: "- DML Reference",
     },
   },
   "^dml/Relationship_Methods": {
@@ -70,7 +70,7 @@ const dmlOptions: FormattingOptionsType = {
       sidebar_label: "{{alias}}",
     },
     reflectionTitle: {
-      suffix: "Relationship Method - API Reference",
+      suffix: "Relationship Method - DML Reference",
     },
   },
   "^dml/.*Model_Methods/page\\.mdx": {
@@ -80,7 +80,7 @@ const dmlOptions: FormattingOptionsType = {
     reflectionDescription:
       "The following methods are used on a module to configure it.",
     reflectionTitle: {
-      suffix: "- API Reference",
+      suffix: "- DML Reference",
     },
   },
   "^dml/Model_Methods": {
@@ -89,7 +89,7 @@ const dmlOptions: FormattingOptionsType = {
       sidebar_label: "{{alias}}",
     },
     reflectionTitle: {
-      suffix: "Method - API Reference",
+      suffix: "Method - DML Reference",
     },
   },
   "^dml/.*Property_Configuration_Methods/page\\.mdx": {
@@ -99,7 +99,7 @@ const dmlOptions: FormattingOptionsType = {
     reflectionDescription:
       "The following methods are used on a property to configure it.",
     reflectionTitle: {
-      suffix: "- API Reference",
+      suffix: "- DML Reference",
     },
   },
   "^dml/Property_Configuration_Methods": {
@@ -108,7 +108,7 @@ const dmlOptions: FormattingOptionsType = {
       sidebar_label: "{{alias}}",
     },
     reflectionTitle: {
-      suffix: "Method - API Reference",
+      suffix: "Method - DML Reference",
     },
   },
   "^dml/.*/types/.*": {

@@ -1,5 +1,16 @@
 import { TFunction } from "i18next"
 
+export const getCanceledOrderStatus = (
+  t: TFunction<"translation">,
+  status: string
+) => {
+  if (status === "canceled") {
+    return { label: t("orders.status.canceled"), color: "red" }
+  }
+
+  return
+}
+
 export const getOrderPaymentStatus = (
   t: TFunction<"translation">,
   status: string

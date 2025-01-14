@@ -1,8 +1,8 @@
-import { MedusaRequest, MedusaResponse } from "../../../../../types/routing"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
 import { refreshInviteTokensWorkflow } from "@medusajs/core-flows"
 import { refetchInvite } from "../../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
   req: MedusaRequest,
@@ -18,7 +18,7 @@ export const POST = async (
   const invite = await refetchInvite(
     result[0].id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ invite })

@@ -1,12 +1,15 @@
-import { MedusaModule } from "@medusajs/modules-sdk"
-import { ModuleJoinerConfig, ModuleJoinerRelationship } from "@medusajs/types"
+import { MedusaModule } from "@medusajs/framework/modules-sdk"
+import {
+  ModuleJoinerConfig,
+  ModuleJoinerRelationship,
+} from "@medusajs/framework/types"
 import {
   camelToSnakeCase,
   composeTableName,
   isString,
   lowerCaseFirst,
   toPascalCase,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 
 export function generateGraphQLSchema(
   joinerConfig: ModuleJoinerConfig,
@@ -43,11 +46,7 @@ export function generateGraphQLSchema(
       )
     }
 
-    /*    const extJoinerConfig = MedusaModule.getJoinerConfig(
-      extend.relationship.serviceName
-    )*/
-
-    const extendedEntityName =
+    let extendedEntityName =
       extendedModule[extend.serviceName].__joinerConfig.linkableKeys[
         extend.relationship.primaryKey
       ]
@@ -66,11 +65,28 @@ export function generateGraphQLSchema(
 
     let type = extend.relationship.isList ? `[${entityName}]` : entityName
     if (joinerConfig?.isReadOnlyLink) {
-      // TODO: In readonly, the relation ship of the extend should be applied on all entities in the module that have the relationshiop foregin key attribute
-      /*type = extend.relationship.isList
-        ? `[${extendedEntityName}]`
-        : extendedEntityName*/
-      continue
+      // TODO: In readonly links, the relationship of the extend where entity is undefined has to be applied on all entities in the module that have the relationshiop foreing key attribute (unkown in this context)
+      if (!extend.entity) {
+        continue
+      }
+
+      const rel = extend.relationship
+      const extendedService = MedusaModule.getModuleInstance(rel.serviceName)
+
+      const hasGraphqlSchema =
+        !!extendedService[rel.serviceName].__joinerConfig.schema
+      const relEntity = rel.entity
+        ? rel.entity
+        : extendedService[rel.serviceName].__joinerConfig.linkableKeys[
+            rel.primaryKey
+          ]
+
+      if (!relEntity || !hasGraphqlSchema) {
+        continue
+      }
+
+      type = rel.isList ? `[${relEntity}]` : relEntity!
+      extendedEntityName = extend.entity
     }
 
     /**
@@ -82,22 +98,6 @@ export function generateGraphQLSchema(
         const isList = isString(config)
           ? extend.relationship.isList
           : config.isList ?? extend.relationship.isList
-
-        const pathSegments = path.split(",").reverse()
-
-        /*const relationshipMarkerIndex = pathSegments.findIndex((segment) => {
-          return !!joinerConfig.relationships!.find(
-            (relation) => relation.alias === targetEntityAlias
-          )
-        })
-
-        if (relationshipMarkerIndex === -1) {
-          return
-        }*/
-
-        /*const relationshipPropertyPath = pathSegments
-          .slice(0, relationshipMarkerIndex + 1)
-          .reverse()*/
 
         const targetEntityAlias = path.split(".").pop()
 

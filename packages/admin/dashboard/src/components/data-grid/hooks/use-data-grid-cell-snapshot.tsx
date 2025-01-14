@@ -15,9 +15,8 @@ export const useDataGridCellSnapshot = <
   matrix,
   form,
 }: UseDataGridCellSnapshotOptions<TData, TFieldValues>) => {
-  const [snapshot, setSnapshot] = useState<DataGridCellSnapshot<TFieldValues> | null>(
-    null
-  )
+  const [snapshot, setSnapshot] =
+    useState<DataGridCellSnapshot<TFieldValues> | null>(null)
 
   const { getValues, setValue } = form
 
@@ -38,7 +37,18 @@ export const useDataGridCellSnapshot = <
 
       const value = getValues(field as Path<TFieldValues>)
 
-      setSnapshot({ field, value })
+      setSnapshot((curr) => {
+        /**
+         * If there already exists a snapshot for this field, we don't want to create a new one.
+         * A case where this happens is when the user presses the space key on a field. In that case
+         * we create a snapshot of the value before its destroyed by the space key.
+         */
+        if (curr?.field === field) {
+          return curr
+        }
+
+        return { field, value }
+      })
     },
     [getValues, matrix]
   )

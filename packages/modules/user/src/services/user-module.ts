@@ -1,21 +1,23 @@
 import {
   Context,
   DAL,
+  InferEntityType,
   InternalModuleDeclaration,
   ModulesSdkTypes,
   UserTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   arrayDifference,
   CommonEvents,
   EmitEvents,
+  generateEntityId,
   InjectManager,
   InjectTransactionManager,
   MedusaContext,
   MedusaError,
   MedusaService,
   UserEvents,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import crypto from "node:crypto"
 
@@ -27,8 +29,7 @@ type InjectedDependencies = {
   inviteService: ModulesSdkTypes.IMedusaInternalService<any>
 }
 
-// 1 day
-const DEFAULT_VALID_INVITE_DURATION = 60 * 60 * 24 * 1000
+const DEFAULT_VALID_INVITE_DURATION_SECONDS = 60 * 60 * 24
 export default class UserModuleService
   extends MedusaService<{
     User: {
@@ -42,8 +43,12 @@ export default class UserModuleService
 {
   protected baseRepository_: DAL.RepositoryService
 
-  protected readonly userService_: ModulesSdkTypes.IMedusaInternalService<User>
-  protected readonly inviteService_: ModulesSdkTypes.IMedusaInternalService<Invite>
+  protected readonly userService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof User>
+  >
+  protected readonly inviteService_: ModulesSdkTypes.IMedusaInternalService<
+    InferEntityType<typeof Invite>
+  >
   protected readonly config: { jwtSecret: string; expiresIn: number }
 
   constructor(
@@ -60,7 +65,7 @@ export default class UserModuleService
       jwtSecret: moduleDeclaration["jwt_secret"],
       expiresIn:
         parseInt(moduleDeclaration["valid_duration"]) ||
-        DEFAULT_VALID_INVITE_DURATION,
+        DEFAULT_VALID_INVITE_DURATION_SECONDS,
     }
 
     if (!this.config.jwtSecret) {
@@ -152,9 +157,7 @@ export default class UserModuleService
     const updates = invites.map((invite) => {
       return {
         id: invite.id,
-        expires_at: new Date().setMilliseconds(
-          new Date().getMilliseconds() + this.config.expiresIn
-        ),
+        expires_at: new Date(Date.now() + this.config.expiresIn * 1000),
         token: this.generateToken({ id: invite.id, email: invite.email }),
       }
     })
@@ -297,28 +300,31 @@ export default class UserModuleService
   private async createInvites_(
     data: UserTypes.CreateInviteDTO[],
     @MedusaContext() sharedContext: Context = {}
-  ): Promise<Invite[]> {
+  ): Promise<InferEntityType<typeof Invite>[]> {
+    const alreadyExistingUsers = await this.listUsers({
+      email: data.map((d) => d.email),
+    })
+
+    if (alreadyExistingUsers.length) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `User account for following email(s) already exist: ${alreadyExistingUsers
+          .map((u) => u.email)
+          .join(", ")}`
+      )
+    }
+
     const toCreate = data.map((invite) => {
+      const id = generateEntityId((invite as { id?: string }).id, "invite")
       return {
         ...invite,
-        expires_at: new Date(),
-        token: "placeholder",
+        id,
+        expires_at: new Date(Date.now() + this.config.expiresIn * 1000),
+        token: this.generateToken({ id, email: invite.email }),
       }
     })
 
-    const created = await this.inviteService_.create(toCreate, sharedContext)
-
-    const updates = created.map((invite) => {
-      return {
-        id: invite.id,
-        expires_at: new Date().setMilliseconds(
-          new Date().getMilliseconds() + this.config.expiresIn
-        ),
-        token: this.generateToken({ id: invite.id, email: invite.email }),
-      }
-    })
-
-    return await this.inviteService_.update(updates, sharedContext)
+    return await this.inviteService_.create(toCreate, sharedContext)
   }
 
   // @ts-ignore

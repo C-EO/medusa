@@ -68,7 +68,7 @@ export const NoteLayout = ({ type, title, children }: NoteLayoutProps) => {
 
     return {
       allStringChildren,
-      stringChildren: stringChildren.join(" "),
+      stringChildren: stringChildren.join(""),
     }
   }, [children])
 

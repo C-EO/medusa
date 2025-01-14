@@ -3,11 +3,11 @@ import {
   AdditionalData,
   CreateCartWorkflowInputDTO,
   HttpTypes,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchCart } from "./helpers"
 
 export const POST = async (
@@ -23,11 +23,7 @@ export const POST = async (
     input: workflowInput as CreateCartWorkflowInputDTO,
   })
 
-  const cart = await refetchCart(
-    result.id,
-    req.scope,
-    req.remoteQueryConfig.fields
-  )
+  const cart = await refetchCart(result.id, req.scope, req.queryConfig.fields)
 
   res.status(200).json({ cart })
 }

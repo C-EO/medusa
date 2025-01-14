@@ -1,11 +1,11 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { DeclarationReflection, ReflectionType } from "typedoc"
-import { MarkdownTheme } from "../../theme"
-import { parseParams } from "../../utils/params-utils"
-import { Parameter, ReflectionParameterType } from "../../types"
-import reflectionFormatter from "../../utils/reflection-formatter"
+import { MarkdownTheme } from "../../theme.js"
+import { parseParams } from "../../utils/params-utils.js"
+import { Parameter, ReflectionParameterType } from "../../types.js"
+import reflectionFormatter from "../../utils/reflection-formatter.js"
 import { escapeChars, stripLineBreaks } from "utils"
-import { formatParameterComponent } from "../../utils/format-parameter-component"
+import { formatParameterComponent } from "../../utils/format-parameter-component.js"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(

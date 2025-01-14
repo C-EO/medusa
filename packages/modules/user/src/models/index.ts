@@ -1,2 +1,2 @@
-export { default as User } from "./user"
-export { default as Invite } from "./invite"
+export { User } from "./user"
+export { Invite } from "./invite"

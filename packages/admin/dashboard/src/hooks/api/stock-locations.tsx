@@ -185,8 +185,8 @@ export const useUpdateStockLocationFulfillmentProviders = (
   >
 ) => {
   return useMutation({
-    mutationFn: (payload) =>
-      sdk.admin.stockLocation.updateFulfillmentProviders(id, payload),
+    mutationFn: async (payload) =>
+      await sdk.admin.stockLocation.updateFulfillmentProviders(id, payload),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({
         queryKey: stockLocationsQueryKeys.details(),

@@ -1,5 +1,9 @@
 import { SidebarSectionItems } from "./sidebar.js"
 
+export type BreadcrumbOptions = {
+  showCategories?: boolean
+}
+
 export declare type DocsConfig = {
   titleSuffix?: string
   baseUrl: string
@@ -7,4 +11,16 @@ export declare type DocsConfig = {
   sidebar: SidebarSectionItems
   filesBasePath?: string
   useNextLinks?: boolean
+  project: {
+    title: string
+    key: string
+  }
+  breadcrumbOptions?: BreadcrumbOptions
+  version: {
+    number: string
+    releaseUrl: string
+    hide?: boolean
+  }
+  reportIssueLink?: string
+  logo: string
 }

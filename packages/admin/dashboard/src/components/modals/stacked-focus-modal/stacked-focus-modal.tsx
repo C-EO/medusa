@@ -13,12 +13,20 @@ type StackedFocusModalProps = PropsWithChildren<{
    * when multiple stacked modals are registered to the same parent modal.
    */
   id: string
+  /**
+   * An optional callback that is called when the modal is opened or closed.
+   */
+  onOpenChangeCallback?: (open: boolean) => void
 }>
 
 /**
  * A stacked modal that can be rendered above a parent modal.
  */
-export const Root = ({ id, children }: StackedFocusModalProps) => {
+export const Root = ({
+  id,
+  onOpenChangeCallback,
+  children,
+}: StackedFocusModalProps) => {
   const { register, unregister, getIsOpen, setIsOpen } = useStackedModal()
 
   useEffect(() => {
@@ -28,11 +36,13 @@ export const Root = ({ id, children }: StackedFocusModalProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(id, open)
+    onOpenChangeCallback?.(open)
+  }
+
   return (
-    <FocusModal
-      open={getIsOpen(id)}
-      onOpenChange={(open) => setIsOpen(id, open)}
-    >
+    <FocusModal open={getIsOpen(id)} onOpenChange={handleOpenChange}>
       {children}
     </FocusModal>
   )

@@ -5,6 +5,13 @@ export const ContainerRegistrationKeys = {
   LOGGER: "logger",
   REMOTE_QUERY: "remoteQuery",
   QUERY: "query",
+  /**
+   * @deprecated use {@link ContainerRegistrationKeys.LINK} instead.
+   */
   REMOTE_LINK: "remoteLink",
+  /**
+   * @version 2.2.0
+   */
+  LINK: "link",
   FEATURE_FLAG_ROUTER: "featureFlagRouter",
 } as const

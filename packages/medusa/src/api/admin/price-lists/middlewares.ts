@@ -1,6 +1,9 @@
-import { MiddlewareRoute } from "@medusajs/framework"
-import { validateAndTransformBody } from "../../utils/validate-body"
-import { validateAndTransformQuery } from "../../utils/validate-query"
+import {
+  validateAndTransformBody,
+  validateAndTransformQuery,
+} from "@medusajs/framework"
+import { MiddlewareRoute } from "@medusajs/framework/http"
+import { DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT } from "../../../utils/middlewares"
 import { createBatchBody } from "../../utils/validators"
 import * as QueryConfig from "./query-config"
 import {
@@ -71,6 +74,9 @@ export const adminPriceListsRoutesMiddlewares: MiddlewareRoute[] = [
   {
     method: ["POST"],
     matcher: "/admin/price-lists/:id/prices/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
     middlewares: [
       validateAndTransformBody(
         createBatchBody(AdminCreatePriceListPrice, AdminUpdatePriceListPrice)

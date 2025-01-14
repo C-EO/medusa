@@ -1,12 +1,39 @@
 import {
+  AdminInventoryItem,
+  AdminProduct,
+  AdminStockLocation,
+  MedusaContainer,
+} from "@medusajs/types"
+import {
   adminHeaders,
   generatePublishableKey,
   generateStoreHeaders,
 } from "../../../helpers/create-admin-user"
 
-export async function createOrderSeeder({ api, container }) {
+export async function createOrderSeeder({
+  api,
+  container,
+  storeHeaderOverride,
+  productOverride,
+  additionalProducts,
+  stockChannelOverride,
+  inventoryItemOverride,
+}: {
+  api: any
+  container: MedusaContainer
+  storeHeaderOverride?: any
+  productOverride?: AdminProduct
+  stockChannelOverride?: AdminStockLocation
+  additionalProducts?: { variant_id: string; quantity: number }[]
+  inventoryItemOverride?: AdminInventoryItem
+}) {
   const publishableKey = await generatePublishableKey(container)
-  const storeHeaders = generateStoreHeaders({ publishableKey })
+
+  const storeHeaders =
+    storeHeaderOverride ??
+    generateStoreHeaders({
+      publishableKey,
+    })
 
   const region = (
     await api.post(
@@ -24,21 +51,25 @@ export async function createOrderSeeder({ api, container }) {
     )
   ).data.sales_channel
 
-  const stockLocation = (
-    await api.post(
-      `/admin/stock-locations`,
-      { name: "test location" },
-      adminHeaders
-    )
-  ).data.stock_location
+  const stockLocation =
+    stockChannelOverride ??
+    (
+      await api.post(
+        `/admin/stock-locations`,
+        { name: "test location" },
+        adminHeaders
+      )
+    ).data.stock_location
 
-  const inventoryItem = (
-    await api.post(
-      `/admin/inventory-items`,
-      { sku: "test-variant" },
-      adminHeaders
-    )
-  ).data.inventory_item
+  const inventoryItem =
+    inventoryItemOverride ??
+    (
+      await api.post(
+        `/admin/inventory-items`,
+        { sku: "test-variant" },
+        adminHeaders
+      )
+    ).data.inventory_item
 
   await api.post(
     `/admin/inventory-items/${inventoryItem.id}/location-levels`,
@@ -63,41 +94,43 @@ export async function createOrderSeeder({ api, container }) {
     )
   ).data.shipping_profile
 
-  const product = (
-    await api.post(
-      "/admin/products",
-      {
-        title: `Test fixture ${shippingProfile.id}`,
-        options: [
-          { title: "size", values: ["large", "small"] },
-          { title: "color", values: ["green"] },
-        ],
-        variants: [
-          {
-            title: "Test variant",
-            sku: "test-variant",
-            inventory_items: [
-              {
-                inventory_item_id: inventoryItem.id,
-                required_quantity: 1,
+  const product =
+    productOverride ??
+    (
+      await api.post(
+        "/admin/products",
+        {
+          title: `Test fixture ${shippingProfile.id}`,
+          options: [
+            { title: "size", values: ["large", "small"] },
+            { title: "color", values: ["green"] },
+          ],
+          variants: [
+            {
+              title: "Test variant",
+              sku: "test-variant",
+              inventory_items: [
+                {
+                  inventory_item_id: inventoryItem.id,
+                  required_quantity: 1,
+                },
+              ],
+              prices: [
+                {
+                  currency_code: "usd",
+                  amount: 100,
+                },
+              ],
+              options: {
+                size: "large",
+                color: "green",
               },
-            ],
-            prices: [
-              {
-                currency_code: "usd",
-                amount: 100,
-              },
-            ],
-            options: {
-              size: "large",
-              color: "green",
             },
-          },
-        ],
-      },
-      adminHeaders
-    )
-  ).data.product
+          ],
+        },
+        adminHeaders
+      )
+    ).data.product
 
   const fulfillmentSets = (
     await api.post(
@@ -166,8 +199,19 @@ export async function createOrderSeeder({ api, container }) {
           province: "ny",
           postal_code: "94016",
         },
+        billing_address: {
+          address_1: "test billing address 1",
+          address_2: "test billing address 2",
+          city: "ny",
+          country_code: "us",
+          province: "ny",
+          postal_code: "94016",
+        },
         sales_channel_id: salesChannel.id,
-        items: [{ quantity: 1, variant_id: product.variants[0].id }],
+        items: [
+          { quantity: 1, variant_id: product.variants[0].id },
+          ...(additionalProducts || []),
+        ],
       },
       storeHeaders
     )

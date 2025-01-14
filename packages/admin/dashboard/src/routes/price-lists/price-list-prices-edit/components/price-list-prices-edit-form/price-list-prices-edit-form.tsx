@@ -11,6 +11,7 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useBatchPriceListPrices } from "../../../../../hooks/api/price-lists"
 import { castNumber } from "../../../../../lib/cast-number"
 import { usePriceListGridColumns } from "../../../common/hooks/use-price-list-grid-columns"
@@ -89,7 +90,7 @@ export const PriceListPricesEditForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form onSubmit={handleSubmit} className="flex size-full flex-col">
+      <KeyboundForm onSubmit={handleSubmit} className="flex size-full flex-col">
         <RouteFocusModal.Header />
         <RouteFocusModal.Body className="flex flex-col overflow-hidden">
           <DataGrid
@@ -116,7 +117,7 @@ export const PriceListPricesEditForm = ({
             </Button>
           </div>
         </RouteFocusModal.Footer>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }
@@ -200,7 +201,10 @@ function convertToPriceArray(
       for (const [currencyCode, currencyPrice] of Object.entries(
         currencyPrices || {}
       )) {
-        if (currencyPrice?.amount) {
+        if (
+          currencyPrice?.amount !== "" &&
+          typeof currencyPrice?.amount !== "undefined"
+        ) {
           prices.push({
             variantId,
             currencyCode,
@@ -213,7 +217,10 @@ function convertToPriceArray(
       for (const [regionId, regionPrice] of Object.entries(
         regionPrices || {}
       )) {
-        if (regionPrice?.amount) {
+        if (
+          regionPrice?.amount !== "" &&
+          typeof regionPrice?.amount !== "undefined"
+        ) {
           prices.push({
             variantId,
             regionId,

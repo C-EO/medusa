@@ -1,27 +1,27 @@
-import { useTranslation } from "react-i18next"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { CurrencyDollar } from "@medusajs/icons"
+import { HttpTypes } from "@medusajs/types"
 import { Button, Container, Heading } from "@medusajs/ui"
-import { MoneyAmountDTO, ProductVariantDTO } from "@medusajs/types"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
-import { getLocaleAmount } from "../../../../../lib/money-amount-helpers"
 import { NoRecords } from "../../../../../components/common/empty-table-content"
+import { getLocaleAmount } from "../../../../../lib/money-amount-helpers"
 
 type VariantPricesSectionProps = {
-  variant: ProductVariantDTO & { prices: MoneyAmountDTO[] }
+  variant: HttpTypes.AdminProductVariant
 }
 
 export function VariantPricesSection({ variant }: VariantPricesSectionProps) {
   const { t } = useTranslation()
   const prices = variant.prices
-    .filter((p) => !Object.keys(p.rules || {}).length) // display just currency prices
+    ?.filter((p) => !Object.keys(p.rules || {}).length)
     .sort((p1, p2) => p1.currency_code?.localeCompare(p2.currency_code))
 
-  const hasPrices = !!prices.length
+  const hasPrices = !!prices?.length
   const [pageSize, setPageSize] = useState(3)
-  const displayPrices = prices.slice(0, pageSize)
+  const displayPrices = prices?.slice(0, pageSize)
 
   const onShowMore = () => {
     setPageSize(pageSize + 3)
@@ -46,7 +46,7 @@ export function VariantPricesSection({ variant }: VariantPricesSectionProps) {
         />
       </div>
       {!hasPrices && <NoRecords className="h-60" />}
-      {displayPrices.map((price) => {
+      {displayPrices?.map((price) => {
         return (
           <div
             key={price.id}

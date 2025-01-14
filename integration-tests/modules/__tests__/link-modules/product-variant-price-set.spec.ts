@@ -1,10 +1,10 @@
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { IPricingModuleService, IProductModuleService } from "@medusajs/types"
 import {
   ContainerRegistrationKeys,
   Modules,
   remoteQueryObjectFromString,
 } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
 
 jest.setTimeout(50000)
 
@@ -56,7 +56,7 @@ medusaIntegrationTestRunner({
                 amount: 5000,
                 currency_code: "eur",
                 rules: {
-                  customer_group_id: "vip",
+                  "customer.groups.id": "vip",
                 },
               },
             ],
@@ -75,7 +75,7 @@ medusaIntegrationTestRunner({
                 amount: 100,
                 currency_code: "usd",
                 rules: {
-                  customer_group_id: "vip",
+                  "customer.groups.id": "vip",
                 },
               },
             ],
@@ -107,7 +107,9 @@ medusaIntegrationTestRunner({
             "variants.calculated_price": {
               context: {
                 currency_code: "usd",
-                customer_group_id: "vip",
+                customer: {
+                  groups: [{ id: "vip" }],
+                },
               },
             },
           },

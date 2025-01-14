@@ -1,4 +1,11 @@
-import { MedusaError, MikroOrmBase, PriceListStatus } from "@medusajs/utils"
+import {
+  flattenObjectToKeyValuePairs,
+  isPresent,
+  MedusaError,
+  MikroOrmBase,
+  PriceListStatus,
+  promiseAll,
+} from "@medusajs/framework/utils"
 
 import {
   CalculatedPriceSetDTO,
@@ -6,8 +13,8 @@ import {
   PricingContext,
   PricingFilters,
   PricingRepositoryService,
-} from "@medusajs/types"
-import { SqlEntityManager } from "@mikro-orm/postgresql"
+} from "@medusajs/framework/types"
+import { Knex, SqlEntityManager } from "@mikro-orm/postgresql"
 
 export class PricingRepository
   extends MikroOrmBase
@@ -54,8 +61,41 @@ export class PricingRepository
       return []
     }
 
-    const date = new Date().toISOString()
-    // Gets all the price set money amounts where rules match for each of the contexts
+    // We query the rule tables to get all whitelisted rule attributes
+    // This will help cleanup the query and do a db query on only necessary rule attributes.
+    const priceRuleAttributesQuery = knex("price_rule")
+      .distinct("attribute")
+      .pluck("attribute")
+
+    const priceListRuleAttributesQuery = knex("price_list_rule")
+      .distinct("attribute")
+      .pluck("attribute")
+
+    const [ruleAttributes, priceListRuleAttributes] = await promiseAll([
+      priceRuleAttributesQuery,
+      priceListRuleAttributesQuery,
+    ])
+
+    const allowedRuleAttributes = [
+      ...ruleAttributes,
+      ...priceListRuleAttributes,
+    ]
+
+    const flattenedKeyValuePairs = flattenObjectToKeyValuePairs(context)
+
+    const flattenedContext = Object.entries(flattenedKeyValuePairs).filter(
+      ([key, value]) => {
+        const isValuePresent = !Array.isArray(value) && isPresent(value)
+        const isArrayPresent = Array.isArray(value) && value.flat(1).length
+
+        return (
+          allowedRuleAttributes.includes(key) &&
+          (isValuePresent || isArrayPresent)
+        )
+      }
+    )
+
+    // Gets all the prices where rules match for each of the contexts
     // that the price set is configured for
     const priceSubQueryKnex = knex({
       price: "price",
@@ -67,6 +107,7 @@ export class PricingRepository
         min_quantity: "price.min_quantity",
         max_quantity: "price.max_quantity",
         currency_code: "price.currency_code",
+        deleted_at: "price.deleted_at",
         price_set_id: "price.price_set_id",
         rules_count: "price.rules_count",
         price_list_id: "price.price_list_id",
@@ -87,7 +128,7 @@ export class PricingRepository
       .groupBy("price.id", "pl.id")
       .having(
         knex.raw(
-          "count(DISTINCT pr.attribute) = price.rules_count AND price.price_list_id IS NULL"
+          "count(pr.attribute) = price.rules_count AND price.price_list_id IS NULL"
         )
       )
       .orHaving(
@@ -96,31 +137,81 @@ export class PricingRepository
         )
       )
 
-    priceSubQueryKnex.orWhere((q) => {
-      for (const [key, value] of Object.entries(context)) {
-        q.orWhere({
-          "pr.attribute": key,
-          "pr.value": value,
+    const buildOperatorQueries = (
+      operatorGroupBuilder: Knex.QueryBuilder,
+      value
+    ) => {
+      operatorGroupBuilder
+        .where((operatorBuilder) => {
+          operatorBuilder
+            .where("pr.operator", "gte")
+            .whereRaw("? >= pr.value::numeric", [value])
         })
-      }
-      q.orWhere("price.rules_count", "=", 0)
-      q.whereNull("price.price_list_id")
+        .orWhere((operatorBuilder) => {
+          operatorBuilder
+            .where("pr.operator", "gt")
+            .whereRaw("? > pr.value::numeric", [value])
+        })
+        .orWhere((operatorBuilder) => {
+          operatorBuilder
+            .where("pr.operator", "lt")
+            .whereRaw("? < pr.value::numeric", [value])
+        })
+        .orWhere((operatorBuilder) => {
+          operatorBuilder
+            .where("pr.operator", "lte")
+            .whereRaw("? <= pr.value::numeric", [value])
+        })
+        .orWhere((operatorBuilder) => {
+          operatorBuilder
+            .where("pr.operator", "eq")
+            .whereRaw("? = pr.value::numeric", [value])
+        })
+    }
+
+    priceSubQueryKnex.orWhere((priceBuilder) => {
+      priceBuilder
+        .whereNull("price.price_list_id")
+        .andWhere((withoutPriceListBuilder) => {
+          for (const [key, value] of flattenedContext) {
+            withoutPriceListBuilder.orWhere((orBuilder) => {
+              orBuilder.where("pr.attribute", key)
+
+              if (typeof value === "number") {
+                buildOperatorQueries(orBuilder, value)
+              } else {
+                const normalizeValue = Array.isArray(value) ? value : [value]
+
+                orBuilder.whereIn("pr.value", normalizeValue)
+              }
+            })
+          }
+
+          withoutPriceListBuilder.orWhere("price.rules_count", "=", 0)
+        })
     })
 
     priceSubQueryKnex.orWhere((q) => {
       q.whereNotNull("price.price_list_id")
+        .whereNull("pl.deleted_at")
         .andWhere(function () {
-          this.whereNull("pl.starts_at").orWhere("pl.starts_at", "<=", date)
+          this.whereNull("pl.starts_at").orWhere(
+            "pl.starts_at",
+            "<=",
+            knex.fn.now()
+          )
         })
         .andWhere(function () {
-          this.whereNull("pl.ends_at").orWhere("pl.ends_at", ">=", date)
+          this.whereNull("pl.ends_at").orWhere(
+            "pl.ends_at",
+            ">=",
+            knex.fn.now()
+          )
         })
         .andWhere(function () {
           this.andWhere(function () {
-            for (const [key, value] of Object.entries(context)) {
-              this.orWhere({
-                "plr.attribute": key,
-              })
+            for (const [key, value] of flattenedContext) {
+              this.orWhere({ "plr.attribute": key })
               this.where(
                 "plr.value",
                 "@>",
@@ -132,14 +223,24 @@ export class PricingRepository
           })
 
           this.andWhere(function () {
-            this.andWhere(function () {
-              for (const [key, value] of Object.entries(context)) {
-                this.orWhere({
-                  "pr.attribute": key,
-                  "pr.value": value,
+            this.andWhere((contextBuilder) => {
+              for (const [key, value] of flattenedContext) {
+                contextBuilder.orWhere((orBuilder) => {
+                  orBuilder.where("pr.attribute", key)
+
+                  if (typeof value === "number") {
+                    buildOperatorQueries(orBuilder, value)
+                  } else {
+                    const normalizeValue = Array.isArray(value)
+                      ? value
+                      : [value]
+
+                    orBuilder.whereIn("pr.value", normalizeValue)
+                  }
                 })
               }
-              this.andWhere("price.rules_count", ">", 0)
+
+              contextBuilder.andWhere("price.rules_count", ">", 0)
             })
             this.orWhere("price.rules_count", "=", 0)
           })
@@ -168,7 +269,7 @@ export class PricingRepository
       .join(priceSubQueryKnex.as("price"), "price.price_set_id", "ps.id")
       .whereIn("ps.id", pricingFilters.id)
       .andWhere("price.currency_code", "=", currencyCode)
-
+      .whereNull("price.deleted_at")
       .orderBy([
         { column: "price.has_price_list", order: "asc" },
         { column: "all_rules_count", order: "desc" },

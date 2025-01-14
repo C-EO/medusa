@@ -1,1 +1,1 @@
-export { default as WorkflowExecution } from "./workflow-execution"
+export { WorkflowExecution } from "./workflow-execution"

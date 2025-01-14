@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Heading, Input, Switch } from "@medusajs/ui"
+import { Button, Heading, Input, Switch, toast } from "@medusajs/ui"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -9,10 +9,8 @@ import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { Combobox } from "../../../../../components/inputs/combobox"
 import { CountrySelect } from "../../../../../components/inputs/country-select"
-import {
-  RouteDrawer,
-  useRouteModal,
-} from "../../../../../components/modals"
+import { RouteDrawer, useRouteModal } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useUpdateProductVariant } from "../../../../../hooks/api/products"
 import {
   transformNullableFormData,
@@ -46,28 +44,27 @@ const ProductEditVariantSchema = z.object({
 
 // TODO: Either pass option ID or make the backend handle options constraints differently to handle the lack of IDs
 export const ProductEditVariantForm = ({
-  product,
   variant,
+  product,
 }: ProductEditVariantFormProps) => {
   const { t } = useTranslation()
   const { handleSuccess } = useRouteModal()
-  const defaultOptions = product.options.reduce((acc: any, option: any) => {
-    const varOpt = variant.options.find((o: any) => o.option_id === option.id)
+  const defaultOptions = product.options?.reduce((acc: any, option: any) => {
+    const varOpt = variant.options?.find((o: any) => o.option_id === option.id)
     acc[option.title] = varOpt?.value
     return acc
   }, {})
 
   const form = useForm<z.infer<typeof ProductEditVariantSchema>>({
     defaultValues: {
-      title: variant.title,
+      title: variant.title || "",
       material: variant.material || "",
       sku: variant.sku || "",
       ean: variant.ean || "",
       upc: variant.upc || "",
       barcode: variant.barcode || "",
-      inventory_quantity: variant.inventory_quantity || "",
-      manage_inventory: variant.manage_inventory,
-      allow_backorder: variant.allow_backorder,
+      manage_inventory: variant.manage_inventory || false,
+      allow_backorder: variant.allow_backorder || false,
       weight: variant.weight || "",
       height: variant.height || "",
       width: variant.width || "",
@@ -81,7 +78,7 @@ export const ProductEditVariantForm = ({
   })
 
   const { mutateAsync, isPending } = useUpdateProductVariant(
-    product.id,
+    variant.product_id!,
     variant.id
   )
 
@@ -115,7 +112,11 @@ export const ProductEditVariantForm = ({
       },
       {
         onSuccess: () => {
-          handleSuccess()
+          handleSuccess("../")
+          toast.success(t("products.variant.edit.success"))
+        },
+        onError: (error) => {
+          toast.error(error.message)
         },
       }
     )
@@ -123,7 +124,7 @@ export const ProductEditVariantForm = ({
 
   return (
     <RouteDrawer.Form form={form}>
-      <form
+      <KeyboundForm
         onSubmit={handleSubmit}
         className="flex size-full flex-col overflow-hidden"
       >
@@ -159,7 +160,7 @@ export const ProductEditVariantForm = ({
                 )
               }}
             />
-            {product.options.map((option: any) => {
+            {product.options?.map((option: any) => {
               return (
                 <Form.Field
                   key={option.id}
@@ -437,7 +438,7 @@ export const ProductEditVariantForm = ({
             </Button>
           </div>
         </RouteDrawer.Footer>
-      </form>
+      </KeyboundForm>
     </RouteDrawer.Form>
   )
 }

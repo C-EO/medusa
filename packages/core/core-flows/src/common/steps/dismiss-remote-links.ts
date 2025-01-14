@@ -1,8 +1,8 @@
-import { RemoteLink } from "@medusajs/modules-sdk"
-import { LinkDefinition } from "@medusajs/types"
-import { createStep, StepResponse } from "@medusajs/workflows-sdk"
+import { Link } from "@medusajs/framework/modules-sdk"
+import { LinkDefinition } from "@medusajs/framework/types"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
-import { ContainerRegistrationKeys } from "@medusajs/utils"
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 export type DismissRemoteLinksStepInput = LinkDefinition | LinkDefinition[]
 
@@ -11,18 +11,18 @@ export const dismissRemoteLinkStepId = "dismiss-remote-links"
 /**
  * This step removes remote links between two records of linked data models.
  *
- * Learn more in the [Remote Link documentation.](https://docs.medusajs.com/v2/advanced-development/modules/remote-link#dismiss-link).
+ * Learn more in the [Remote Link documentation.](https://docs.medusajs.com/learn/fundamentals/module-links/remote-link#dismiss-link).
  *
  * @example
  * import {
  *   createWorkflow
- * } from "@medusajs/workflows-sdk"
+ * } from "@medusajs/framework/workflows-sdk"
  * import {
  *   dismissRemoteLinkStep
- * } from "@medusajs/core-flows"
+ * } from "@medusajs/medusa/core-flows"
  * import {
  *   Modules
- * } from "@medusajs/utils"
+ * } from "@medusajs/framework/utils"
  *
  * const helloWorldWorkflow = createWorkflow(
  *   "hello-world",
@@ -47,9 +47,7 @@ export const dismissRemoteLinkStep = createStep(
       return new StepResponse([], [])
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     // Our current revert strategy for dismissed links are to recreate it again.
     // This works when its just the primary keys, but when you have additional data
@@ -67,9 +65,7 @@ export const dismissRemoteLinkStep = createStep(
       return
     }
 
-    const link = container.resolve<RemoteLink>(
-      ContainerRegistrationKeys.REMOTE_LINK
-    )
+    const link = container.resolve<Link>(ContainerRegistrationKeys.LINK)
 
     await link.create(dataBeforeDismiss)
   }

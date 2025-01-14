@@ -24,6 +24,7 @@ import {
   ShippingProfileDTO,
 } from "./common"
 import {
+  CalculateShippingOptionPriceDTO,
   CreateFulfillmentSetDTO,
   CreateGeoZoneDTO,
   CreateServiceZoneDTO,
@@ -44,6 +45,10 @@ import {
   CreateShippingProfileDTO,
   UpsertShippingProfileDTO,
 } from "./mutations/shipping-profile"
+import {
+  CalculatedShippingOptionPrice,
+  ValidateFulfillmentDataContext,
+} from "./provider"
 
 /**
  * The main service interface for the Fulfillment Module.
@@ -2458,6 +2463,18 @@ export interface IFulfillmentModuleService extends IModuleService {
   ): Promise<FulfillmentDTO>
 
   /**
+   * This method deletes fulfillment by IDs after cancelation.
+   *
+   * @param {string} id - The ID of the fulfillment.
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<void>} Resolves when the fulfillment set is deleted successfully.
+   *
+   * @example
+   * await fulfillmentModuleService.deleteFulfillment("ful_123")
+   */
+  deleteFulfillment(id: string, sharedContext?: Context): Promise<void>
+
+  /**
    * This method creates a fulfillment and call the provider to create a return.
    *
    * @param {CreateFulfillmentDTO} data - The fulfillment to be created.
@@ -2573,6 +2590,38 @@ export interface IFulfillmentModuleService extends IModuleService {
   ): Promise<boolean>
 
   /**
+   * This method validates fulfillment data with the provider it belongs to.
+   *   e.g. if the shipping option requires a drop point, the data you pass to create the
+   *   shipping method must contain a drop point ID. This method can be used to
+   *   validate that.
+   *
+   * @param {string} providerId - The fulfillment provider's ID.
+   * @param {Record<string, unknown>} optionData - The fulfillment option data to validate.
+   * @param {Record<string, unknown>} data - The fulfillment data to validate.
+   * @param {ValidateFulfillmentDataContext} context - The context to validate the fulfillment option data in.
+   * @returns {Promise<boolean>} Whether the fulfillment option data is valid with the specified provider.
+   *
+   * @example
+   * const isValid =
+   *   await fulfillmentModuleService.validateFulfillmentData(
+   *     "webshipper",
+   *     {
+   *       requires_drop_point: true,
+   *     },
+   *     {
+   *       drop_point_id: "dp_123",
+   *     },
+   *     {}
+   *   )
+   */
+  validateFulfillmentData(
+    providerId: string,
+    optionData: Record<string, unknown>,
+    data: Record<string, unknown>,
+    context: ValidateFulfillmentDataContext
+  ): Promise<Record<string, unknown>>
+
+  /**
    * This method checks whether a shipping option can be used for a specified context.
    *
    * @param {string} shippingOptionId - The shipping option's ID.
@@ -2592,6 +2641,55 @@ export interface IFulfillmentModuleService extends IModuleService {
     shippingOptionId: string,
     context: Record<string, unknown>
   ): Promise<boolean>
+
+  /**
+   * This method checks whether a shipping option can have calculated price.
+   *
+   * @param {FulfillmentTypes.CreateShippingOptionDTO[]} shippingOptionsData - The shipping options data to check.
+   * @returns {Promise<boolean[]>} Whether the shipping options can have calculated price.
+   *
+   * @example
+   * const isValid =
+   *   await fulfillmentModuleService.validateShippingOptionsForPriceCalculation(
+   *     [
+   *       {
+   *         provider_id: "webshipper",
+   *         price_type: "calculated",
+   *       },
+   *     ]
+   *   )
+   */
+  validateShippingOptionsForPriceCalculation(
+    shippingOptionsData: CreateShippingOptionDTO[],
+    sharedContext?: Context
+  ): Promise<boolean[]>
+
+  /**
+   * This method calculates the prices for one or more shipping options.
+   *
+   * @param {CalculateShippingOptionPriceDTO[]} shippingOptionsData - The shipping options data to calculate the prices for.
+   * @param {Context} sharedContext - A context used to share resources, such as transaction manager, between the application and the module.
+   * @returns {Promise<CalculatedShippingOptionPrice[]>} The calculated shipping option prices.
+   *
+   * @example
+   * const prices =
+   *   await fulfillmentModuleService.calculateShippingOptionsPrices(
+   *     [
+   *       {
+   *         provider_id: "webshipper",
+   *         data: {
+   *           cart: {
+   *             id: "cart_123",
+   *           },
+   *         },
+   *       },
+   *     ]
+   *   )
+   */
+  calculateShippingOptionsPrices(
+    shippingOptionsData: CalculateShippingOptionPriceDTO[],
+    sharedContext?: Context
+  ): Promise<CalculatedShippingOptionPrice[]>
 
   /**
    * This method retrieves a paginated list of fulfillment providers based on optional filters and configuration.

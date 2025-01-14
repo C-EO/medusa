@@ -1,10 +1,24 @@
+import { CodeTabs, CodeTab } from "docs-ui"
+
 export const metadata = {
   title: `Accept Payment Flow`,
 }
 
 # {metadata.title}
 
-In this document, you’ll learn how to implement an accept-payment flow.
+In this document, you’ll learn how to implement an accept-payment flow using workflows or the Payment Module's main service.
+
+<Note>
+
+It's highly recommended to use Medusa's workflows to implement this flow. Use the Payment Module's main service for more complex cases.
+
+</Note>
+
+<Note title="Tip">
+
+For a guide on how to implement this flow in the storefront, check out [this guide](../../../storefront-development/checkout/payment/page.mdx).
+
+</Note>
 
 ## Flow Overview
 
@@ -14,9 +28,28 @@ In this document, you’ll learn how to implement an accept-payment flow.
 
 ## 1. Create a Payment Collection
 
-The payment collection holds all details related to a resource’s payment operations. So, you start off by creating a payment collection.
+A payment collection holds all details related to a resource’s payment operations. So, you start off by creating a payment collection.
 
 For example:
+
+<CodeTabs group="workflow-service">
+  <CodeTab label="Using Workflow" value="workflow">
+
+```ts
+import { createPaymentCollectionForCartWorkflow } from "@medusajs/medusa/core-flows"
+
+// ...
+
+await createPaymentCollectionForCartWorkflow(req.scope)
+  .run({
+    input: {
+      cart_id: "cart_123",
+    },
+  })
+```
+
+  </CodeTab>
+  <CodeTab label="Using Service" value="service">
 
 ```ts
 const paymentCollection =
@@ -27,13 +60,8 @@ const paymentCollection =
   })
 ```
 
-You can then link the payment collection to another resource, such as a cart in the Cart Module.
-
-<Note>
-
-Learn more about the `createPaymentCollections` method in [this reference](/references/payment/createPaymentCollections).
-
-</Note>
+  </CodeTab>
+</CodeTabs>
 
 ---
 
@@ -44,6 +72,26 @@ The payment collection has one or more payment sessions, each being a payment am
 So, after creating the payment collection, create at least one payment session for a provider.
 
 For example:
+
+<CodeTabs group="workflow-service">
+  <CodeTab label="Using Workflow" value="workflow">
+
+```ts
+import { createPaymentSessionsWorkflow } from "@medusajs/medusa/core-flows"
+
+// ...
+
+const { result: paymentSesion } = await createPaymentSessionsWorkflow(req.scope)
+  .run({
+    input: {
+      payment_collection_id: "paycol_123",
+      provider_id: "stripe",
+    },
+  })
+```
+
+  </CodeTab>
+  <CodeTab label="Using Service" value="service">
 
 ```ts
 const paymentSession =
@@ -61,13 +109,8 @@ const paymentSession =
   )
 ```
 
-You can also create payment sessions for every supported payment provider to allow customers to choose from them.
-
-<Note>
-
-Learn more about the `createPaymentSession` method in [this reference](/references/payment/createPaymentSession).
-
-</Note>
+  </CodeTab>
+</CodeTabs>
 
 ---
 
@@ -77,27 +120,46 @@ Once the customer chooses a payment session, start the authorization process. Th
 
 For example:
 
+<CodeTabs group="workflow-service">
+  <CodeTab label="Using Step" value="workflow">
+
 ```ts
-const payment =
-  await paymentModuleService.authorizePaymentSession(
-    paymentSession.id,
-    {}
-  )
+import { authorizePaymentSessionStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+authorizePaymentSessionStep({
+  id: "payses_123",
+  context: {},
+})
 ```
+
+  </CodeTab>
+  <CodeTab label="Using Service" value="service">
+
+```ts
+const payment = authorizePaymentSessionStep({
+  id: "payses_123",
+  context: {},
+})
+```
+
+  </CodeTab>
+</CodeTabs>
 
 When the payment authorization is successful, a payment is created and returned.
 
+### Handling Additional Action
+
 <Note>
 
-Learn more about the `authorizePaymentSession` method in [this reference](/references/payment/authorizePaymentSession).
+If you used the `authorizePaymentSessionStep`, you don't need to implement this logic as it's implemented in the step.
 
 </Note>
 
-### Handling Additional Action
+If the payment authorization isn’t successful, whether because it requires additional action or for another reason, the method updates the payment session with the new status and throws an error.
 
-If the payment authorization isn’t successful, either because it requires additional action or for another reason, the method updates the payment session with the new status and throws an error.
-
-In that case, you can catch that error and, if there are required actions, handle them accordingly, then retry the authorization.
+In that case, you can catch that error and, if the session's `status` property is `requires_more`, handle the additional action, then retry the authorization.
 
 For example:
 
@@ -129,7 +191,10 @@ try {
 
 The payment flow is complete once the payment session is authorized and the payment is created.
 
-You can then use the payment to capture the amount using the [capturePayment method](/references/payment/capturePayment). You can also refund captured amounts using the [refundPayment method](/references/payment/refundPayment).
+You can then:
+
+- Capture the payment either using the [capturePaymentWorkflow](/references/medusa-workflows/capturePaymentWorkflow) or [capturePayment method](/references/payment/capturePayment). 
+- Refund captured amounts using the [refundPaymentWorkflow](/references/medusa-workflows/refundPaymentWorkflow) or [refundPayment method](/references/payment/refundPayment).
 
 <Note>
 

@@ -1,7 +1,7 @@
-import { IProductModuleService } from "@medusajs/types"
+import { IProductModuleService } from "@medusajs/framework/types"
 import { ProductType } from "@models"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
-import { Modules } from "@medusajs/utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
+import { Modules, toMikroORMEntity } from "@medusajs/framework/utils"
 
 jest.setTimeout(30000)
 
@@ -15,12 +15,12 @@ moduleIntegrationTestRunner<IProductModuleService>({
       beforeEach(async () => {
         const testManager = await MikroOrmWrapper.forkManager()
 
-        typeOne = testManager.create(ProductType, {
+        typeOne = testManager.create(toMikroORMEntity(ProductType), {
           id: "type-1",
           value: "type 1",
         })
 
-        typeTwo = testManager.create(ProductType, {
+        typeTwo = testManager.create(toMikroORMEntity(ProductType), {
           id: "type-2",
           value: "type",
         })

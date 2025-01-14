@@ -28,19 +28,17 @@
   ],
   "scripts": {
     "build": "yarn clean && tsc",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "watch": "tsc --watch"
   },
   "devDependencies": {
+    "@medusajs/icons": "^2.0.0",
     "@types/node": "^20.11.20",
-    "eslint-config-docs": "*",
     "rimraf": "^5.0.5",
     "tsconfig": "*",
     "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.17.0"
-  },
-  "dependencies": {
-    "@medusajs/icons": "^1.2.2"
   }
 }

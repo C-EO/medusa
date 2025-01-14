@@ -1,7 +1,7 @@
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import {
   deleteCollectionsWorkflow,
   updateCollectionsWorkflow,
@@ -9,8 +9,8 @@ import {
 
 import { AdminUpdateCollectionType } from "../validators"
 import { refetchCollection } from "../helpers"
-import { HttpTypes } from "@medusajs/types"
-import { MedusaError } from "@medusajs/utils"
+import { HttpTypes } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -19,7 +19,7 @@ export const GET = async (
   const collection = await refetchCollection(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ collection })
@@ -49,7 +49,7 @@ export const POST = async (
   const collection = await refetchCollection(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ collection })

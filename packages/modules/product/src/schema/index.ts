@@ -128,6 +128,7 @@ type ProductOption {
 type ProductImage {
   id: ID!
   url: String!
+  rank: Int!
   metadata: JSON
   created_at: DateTime!
   updated_at: DateTime!

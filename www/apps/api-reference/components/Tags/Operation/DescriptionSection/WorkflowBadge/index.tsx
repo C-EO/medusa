@@ -1,6 +1,5 @@
-import { Badge, DecisionProcessIcon } from "docs-ui"
+import { DecisionProcessIcon, SourceCodeLink } from "docs-ui"
 import { config } from "../../../../../config"
-import Link from "next/link"
 
 export type TagsOperationDescriptionSectionWorkflowBadgeProps = {
   workflow: string
@@ -12,21 +11,11 @@ const TagsOperationDescriptionSectionWorkflowBadge = ({
   return (
     <p className="my-1">
       Workflow{" "}
-      <Link
-        href={`${config.baseUrl}/v2/resources/references/medusa-workflows/${workflow}`}
-        className="align-middle"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <Badge
-          variant="neutral"
-          className="inline-flex hover:bg-medusa-tag-neutral-bg-hover cursor-pointer"
-          childrenWrapperClassName="inline-flex flex-row gap-[3px] items-center"
-        >
-          <DecisionProcessIcon />
-          <span>{workflow}</span>
-        </Badge>
-      </Link>{" "}
+      <SourceCodeLink
+        link={`${config.baseUrl}/resources/references/medusa-workflows/${workflow}`}
+        text={workflow}
+        icon={<DecisionProcessIcon />}
+      />{" "}
       is used in this API route.
     </p>
   )

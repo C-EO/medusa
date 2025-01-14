@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { TypeParameterReflection } from "typedoc"
-import reflectionFormatter from "../../utils/reflection-formatter"
+import reflectionFormatter from "../../utils/reflection-formatter.js"
 
 export default function () {
   Handlebars.registerHelper(

@@ -1,3 +1,9 @@
+---
+tags:
+  - product
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -21,11 +27,10 @@ Since a variant is a combination of the product options' values (for example, si
 For example, in a React-based storefront:
 
 export const highlights = [
-  ["12", "{ params: { id } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["17", "selectedOptions", "Store the options the customer selects."],
-  ["37", "selectedVariant", "Compute the selected variant based on the chosen option values combinations."],
-  ["66", "setSelectedOptions", "When an option's value is selected, add it to the selected options, which re-computes the selected variant."],
-  ["81", "selectedVariant", "Show the selected variant's ID, if computed."]
+  ["15", "selectedOptions", "Store the options the customer selects."],
+  ["35", "selectedVariant", "Compute the selected variant based on the chosen option values combinations."],
+  ["64", "setSelectedOptions", "When an option's value is selected, add it to the selected options, which re-computes the selected variant."],
+  ["79", "selectedVariant", "Show the selected variant's ID, if computed."]
 ]
 
 ```tsx highlights={highlights}
@@ -34,13 +39,11 @@ export const highlights = [
 import { useEffect, useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 
-type Params = {
-  params: {
-    id: string
-  }
+type Props = {
+  id: string
 }
 
-export default function Product({ params: { id } }: Params) {
+export default function Product({ id }: Props) {
   const [loading, setLoading] = useState(true)
   const [product, setProduct] = useState<
     HttpTypes.StoreProduct | undefined
@@ -55,7 +58,7 @@ export default function Product({ params: { id } }: Params) {
     fetch(`http://localhost:9000/store/products/${id}`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())
@@ -75,7 +78,7 @@ export default function Product({ params: { id } }: Params) {
     }
 
     return product.variants.find((variant) => variant.options?.every(
-      (optionValue) => optionValue.value === selectedOptions[optionValue.option_id!]
+      (optionValue) => optionValue.id === selectedOptions[optionValue.option_id!]
     ))
   }, [selectedOptions, product])
 

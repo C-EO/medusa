@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { XMarkMini } from "@medusajs/icons"
-import { AdminInventoryItem, AdminProductVariant } from "@medusajs/types"
+import { AdminProductVariant, HttpTypes } from "@medusajs/types"
 import { Button, Heading, IconButton, Input, Label, toast } from "@medusajs/ui"
 import i18next from "i18next"
 import { useFieldArray, useForm } from "react-hook-form"
@@ -13,35 +13,46 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useProductVariantsInventoryItemsBatch } from "../../../../../hooks/api/products"
 import { useComboboxData } from "../../../../../hooks/use-combobox-data"
+import { castNumber } from "../../../../../lib/cast-number"
 import { sdk } from "../../../../../lib/client"
 
 type ManageVariantInventoryItemsFormProps = {
   variant: AdminProductVariant & {
     inventory_items: {
-      inventory: AdminInventoryItem[]
+      inventory: HttpTypes.AdminInventoryItem
+      inventory_item_id: string
       required_quantity: number
-    }
+    }[]
   }
 }
 
 const ManageVariantInventoryItemsSchema = zod.object({
   inventory: zod.array(
-    zod.object({
-      inventory_item_id: zod
-        .string()
-        .min(1, i18next.t("products.variant.inventory.validation.itemId")),
-      required_quantity: zod
-        .number({
-          errorMap: () => ({
+    zod
+      .object({
+        inventory_item_id: zod
+          .string()
+          .min(1, i18next.t("products.variant.inventory.validation.itemId")),
+        required_quantity: zod.union([zod.number(), zod.string()]),
+      })
+      .superRefine((data, ctx) => {
+        const quantity = data.required_quantity
+          ? castNumber(data.required_quantity)
+          : 0
+
+        if (quantity < 1) {
+          ctx.addIssue({
+            code: zod.ZodIssueCode.custom,
             message: i18next.t(
               "products.variant.inventory.validation.quantity"
             ),
-          }),
-        })
-        .min(0, i18next.t("products.variant.inventory.validation.quantity")),
-    })
+            path: ["required_quantity"],
+          })
+        }
+      })
   ),
 })
 
@@ -80,18 +91,19 @@ export function ManageVariantInventoryItemsForm({
     queryFn: (params) => sdk.admin.inventoryItem.list(params),
     getOptions: (data) =>
       data.inventory_items.map((item) => ({
-        label: item.title,
-        value: item.id,
+        label: item.title || item.sku!,
+        value: item.id!,
       })),
+    defaultValue: variant.inventory_items?.[0]?.inventory_item_id,
   })
 
   const { mutateAsync, isPending } = useProductVariantsInventoryItemsBatch(
-    variant.product_id
+    variant?.product_id!
   )
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    const existingItems = {}
-    const selectedItems = {}
+    const existingItems: Record<string, number> = {}
+    const selectedItems: Record<string, boolean> = {}
 
     variant.inventory_items.forEach(
       (i) => (existingItems[i.inventory.id] = i.required_quantity)
@@ -99,24 +111,24 @@ export function ManageVariantInventoryItemsForm({
 
     values.inventory.forEach((i) => (selectedItems[i.inventory_item_id] = true))
 
-    const payload = {
-      create: [],
-      update: [],
-      delete: [],
-    }
+    const payload: HttpTypes.AdminBatchProductVariantInventoryItemRequest = {}
 
     values.inventory.forEach((v) => {
       if (v.inventory_item_id in existingItems) {
         if (v.required_quantity !== existingItems[v.inventory_item_id]) {
+          payload.update = payload.update || []
+
           payload.update.push({
-            required_quantity: v.required_quantity,
+            required_quantity: castNumber(v.required_quantity),
             inventory_item_id: v.inventory_item_id,
             variant_id: variant.id,
           })
         }
       } else {
+        payload.create = payload.create || []
+
         payload.create.push({
-          required_quantity: v.required_quantity,
+          required_quantity: castNumber(v.required_quantity),
           inventory_item_id: v.inventory_item_id,
           variant_id: variant.id,
         })
@@ -125,18 +137,14 @@ export function ManageVariantInventoryItemsForm({
 
     variant.inventory_items.forEach((i) => {
       if (!(i.inventory.id in selectedItems)) {
+        payload.delete = payload.delete || []
+
         payload.delete.push({
           inventory_item_id: i.inventory.id,
           variant_id: variant.id,
         })
       }
     })
-
-    for (const k in payload) {
-      if (!payload[k].length) {
-        delete payload[k]
-      }
-    }
 
     await mutateAsync(payload, {
       onSuccess: () => {
@@ -151,7 +159,7 @@ export function ManageVariantInventoryItemsForm({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form
+      <KeyboundForm
         className="flex h-full flex-col overflow-hidden"
         onSubmit={handleSubmit}
       >
@@ -267,15 +275,7 @@ export function ManageVariantInventoryItemsForm({
                                 className="bg-ui-bg-field-component"
                                 min={0}
                                 value={value}
-                                onChange={(e) => {
-                                  const value = e.target.value
-
-                                  if (value === "") {
-                                    onChange(null)
-                                  } else {
-                                    onChange(Number(value))
-                                  }
-                                }}
+                                onChange={onChange}
                                 {...field}
                                 placeholder={t(
                                   "products.create.inventory.quantityPlaceholder"
@@ -302,7 +302,7 @@ export function ManageVariantInventoryItemsForm({
             </div>
           </div>
         </RouteFocusModal.Body>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

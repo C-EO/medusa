@@ -1,2 +1,2 @@
-export { default as AuthIdentity } from "./auth-identity"
-export { default as ProviderIdentity } from "./provider-identity"
+export { AuthIdentity } from "./auth-identity"
+export { ProviderIdentity } from "./provider-identity"

@@ -6,13 +6,13 @@ import {
   SomeType,
   TypeParameterReflection,
 } from "typedoc"
-import * as Handlebars from "handlebars"
-import { Parameter } from "../types"
+import Handlebars from "handlebars"
+import { Parameter } from "../types.js"
 import {
   getDefaultValue,
   reflectionComponentFormatter,
-} from "./reflection-formatter"
-import { MarkdownTheme } from "../theme"
+} from "./reflection-formatter.js"
+import { MarkdownTheme } from "../theme.js"
 import { getProjectChild, getType, getTypeChildren } from "utils"
 
 export type GetReflectionTypeParametersParams = {

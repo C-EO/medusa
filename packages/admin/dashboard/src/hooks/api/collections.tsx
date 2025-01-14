@@ -37,7 +37,7 @@ export const useCollection = (
 }
 
 export const useCollections = (
-  query?: FindParams & HttpTypes.AdminCollectionFilters,
+  query?: FindParams & HttpTypes.AdminCollectionListParams,
   options?: Omit<
     UseQueryOptions<
       PaginatedResponse<{ collections: HttpTypes.AdminCollection[] }>,
@@ -60,7 +60,7 @@ export const useCollections = (
 export const useUpdateCollection = (
   id: string,
   options?: UseMutationOptions<
-    { collection: HttpTypes.AdminCollection },
+    HttpTypes.AdminCollectionResponse,
     FetchError,
     HttpTypes.AdminUpdateCollection
   >
@@ -82,7 +82,7 @@ export const useUpdateCollection = (
 export const useUpdateCollectionProducts = (
   id: string,
   options?: UseMutationOptions<
-    { collection: HttpTypes.AdminCollection },
+    HttpTypes.AdminCollectionResponse,
     FetchError,
     HttpTypes.AdminUpdateCollectionProducts
   >
@@ -110,7 +110,7 @@ export const useUpdateCollectionProducts = (
 
 export const useCreateCollection = (
   options?: UseMutationOptions<
-    { collection: HttpTypes.AdminCollection },
+    HttpTypes.AdminCollectionResponse,
     FetchError,
     HttpTypes.AdminCreateCollection
   >

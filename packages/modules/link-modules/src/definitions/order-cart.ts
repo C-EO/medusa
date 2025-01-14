@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const OrderCart: ModuleJoinerConfig = {
   serviceName: LINKS.OrderCart,
@@ -40,6 +40,7 @@ export const OrderCart: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.ORDER,
+      entity: "Order",
       fieldAlias: {
         cart: "cart_link.cart",
       },
@@ -52,6 +53,7 @@ export const OrderCart: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.CART,
+      entity: "Cart",
       fieldAlias: {
         order: "order_link.order",
       },

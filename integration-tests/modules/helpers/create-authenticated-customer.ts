@@ -1,43 +1,39 @@
-import { CreateCustomerDTO, MedusaContainer } from "@medusajs/types"
-import { Modules } from "@medusajs/utils"
-
-import jwt from "jsonwebtoken"
+import { CreateCustomerDTO } from "@medusajs/types"
 
 export const createAuthenticatedCustomer = async (
-  appContainer: MedusaContainer,
+  api: any,
+  storeHeaders: Record<any, any>,
   customerData: Partial<CreateCustomerDTO> = {}
 ) => {
-  const { http } = appContainer.resolve("configModule").projectConfig
-  const authService = appContainer.resolve(Modules.AUTH)
-  const customerModuleService = appContainer.resolve(Modules.CUSTOMER)
-
-  const customer = await customerModuleService.createCustomers({
-    first_name: "John",
-    last_name: "Doe",
-    email: "john@me.com",
-    ...customerData,
+  const email = customerData.email ?? "tony@start.com"
+  const signup = await api.post("/auth/customer/emailpass/register", {
+    email,
+    password: "secret_password",
   })
 
-  const authIdentity = await authService.createAuthIdentities({
-    provider_identities: [
-      {
-        entity_id: "store_user",
-        provider: "emailpass",
-      },
-    ],
-    app_metadata: {
-      customer_id: customer.id,
-    },
-  })
-
-  const token = jwt.sign(
+  const {
+    data: { customer },
+  } = await api.post(
+    "/store/customers",
     {
-      actor_id: customer.id,
-      actor_type: "customer",
-      auth_identity_id: authIdentity.id,
+      email,
+      first_name: "John",
+      last_name: "Doe",
+      metadata: {},
+      ...customerData,
     },
-    http.jwtSecret
+    {
+      headers: {
+        authorization: `Bearer ${signup.data.token}`,
+        ...storeHeaders.headers,
+      },
+    }
   )
 
-  return { customer, authIdentity, jwt: token }
+  const signin = await api.post("/auth/customer/emailpass", {
+    email,
+    password: "secret_password",
+  })
+
+  return { customer, jwt: signin.data.token }
 }

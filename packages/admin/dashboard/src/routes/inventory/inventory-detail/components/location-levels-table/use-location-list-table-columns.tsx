@@ -1,10 +1,10 @@
 import { InventoryTypes, StockLocationDTO } from "@medusajs/types"
 
-import { LocationActions } from "./location-actions"
-import { PlaceholderCell } from "../../../../../components/table/table-cells/common/placeholder-cell"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { PlaceholderCell } from "../../../../../components/table/table-cells/common/placeholder-cell"
+import { LocationActions } from "./location-actions"
 
 /**
  * Adds missing properties to the InventoryLevelDTO type.

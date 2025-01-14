@@ -1,6 +1,7 @@
 import React from "react"
 import clsx from "clsx"
 import { IconProps } from "@medusajs/icons/dist/types"
+import Image from "next/image"
 
 export type BorderedIconProps = {
   icon?: string
@@ -9,6 +10,8 @@ export type BorderedIconProps = {
   iconWrapperClassName?: string
   iconClassName?: string
   iconColorClassName?: string
+  iconWidth?: number
+  iconHeight?: number
 } & React.HTMLAttributes<HTMLSpanElement>
 
 export const BorderedIcon = ({
@@ -18,6 +21,8 @@ export const BorderedIcon = ({
   iconClassName,
   iconColorClassName = "",
   wrapperClassName,
+  iconWidth = 28,
+  iconHeight = 28,
 }: BorderedIconProps) => {
   return (
     <span
@@ -29,9 +34,11 @@ export const BorderedIcon = ({
     >
       <span className={clsx("rounded-docs_xs", wrapperClassName)}>
         {!IconComponent && (
-          <img
+          <Image
             src={icon || ""}
-            className={clsx(iconClassName, "bordered-icon")}
+            className={clsx(iconClassName, "bordered-icon rounded-docs_xs")}
+            width={iconWidth}
+            height={iconHeight}
             alt=""
           />
         )}

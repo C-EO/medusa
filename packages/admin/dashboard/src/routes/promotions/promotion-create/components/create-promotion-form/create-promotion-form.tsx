@@ -7,6 +7,7 @@ import {
   CurrencyInput,
   Heading,
   Input,
+  ProgressStatus,
   ProgressTabs,
   RadioGroup,
   Text,
@@ -31,10 +32,11 @@ import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCampaigns } from "../../../../../hooks/api/campaigns"
 import { useCreatePromotion } from "../../../../../hooks/api/promotions"
 import { getCurrencySymbol } from "../../../../../lib/data/currencies"
-import { defaultCampaignValues } from "../../../../campaigns/campaign-create/components/create-campaign-form"
+import { DEFAULT_CAMPAIGN_VALUES } from "../../../../campaigns/common/constants"
 import { RulesFormField } from "../../../common/edit-rules/components/rules-form-field"
 import { AddCampaignPromotionFields } from "../../../promotion-add-campaign/components/add-campaign-promotion-form"
 import { Tab } from "./constants"
@@ -60,9 +62,15 @@ const defaultValues = {
   campaign: undefined,
 }
 
+type TabState = Record<Tab, ProgressStatus>
+
 export const CreatePromotionForm = () => {
   const [tab, setTab] = useState<Tab>(Tab.TYPE)
-  const [detailsValidated, setDetailsValidated] = useState(false)
+  const [tabState, setTabState] = useState<TabState>({
+    [Tab.TYPE]: "in-progress",
+    [Tab.PROMOTION]: "not-started",
+    [Tab.CAMPAIGN]: "not-started",
+  })
 
   const { t } = useTranslation()
   const { handleSuccess } = useRouteModal()
@@ -71,15 +79,16 @@ export const CreatePromotionForm = () => {
     defaultValues,
     resolver: zodResolver(CreatePromotionSchema),
   })
+  const { setValue, reset, getValues } = form
 
   const { mutateAsync: createPromotion } = useCreatePromotion()
 
   const handleSubmit = form.handleSubmit(
     async (data) => {
       const {
-        campaign_choice,
+        campaign_choice: _campaignChoice,
         is_automatic,
-        template_id,
+        template_id: _templateId,
         application_method,
         rules,
         ...promotionData
@@ -142,7 +151,7 @@ export const CreatePromotionForm = () => {
               })
             )
 
-            handleSuccess()
+            handleSuccess(`/promotions/${promotion.id}`)
           },
           onError: (e) => {
             toast.error(e.message)
@@ -151,7 +160,7 @@ export const CreatePromotionForm = () => {
       )
     },
     async (error) => {
-      const { campaign, ...rest } = error || {}
+      const { campaign: _campaign, ...rest } = error || {}
       const errorInPromotionTab = !!Object.keys(rest || {}).length
 
       if (errorInPromotionTab) {
@@ -160,39 +169,64 @@ export const CreatePromotionForm = () => {
     }
   )
 
-  const handleContinue = async () => {
+  const handleTabChange = async (tab: Tab) => {
     switch (tab) {
       case Tab.TYPE:
-        setTab(Tab.PROMOTION)
+        setTabState((prev) => ({
+          ...prev,
+          [Tab.TYPE]: "in-progress",
+        }))
+        setTab(tab)
         break
       case Tab.PROMOTION:
+        setTabState((prev) => ({
+          ...prev,
+          [Tab.TYPE]: "completed",
+          [Tab.PROMOTION]: "in-progress",
+        }))
+        setTab(tab)
+        break
+      case Tab.CAMPAIGN: {
         const valid = await form.trigger()
 
-        if (valid) {
-          setTab(Tab.CAMPAIGN)
-        } else {
-          // TODO: Set errors on the root level
+        if (!valid) {
+          // If the promotion tab is not valid, we want to set the tab state to in-progress
+          // and set the tab to the promotion tab
+          setTabState({
+            [Tab.TYPE]: "completed",
+            [Tab.PROMOTION]: "in-progress",
+            [Tab.CAMPAIGN]: "not-started",
+          })
+          setTab(Tab.PROMOTION)
+          break
         }
 
+        setTabState((prev) => ({
+          ...prev,
+          [Tab.PROMOTION]: "completed",
+          [Tab.CAMPAIGN]: "in-progress",
+        }))
+        setTab(tab)
         break
-      case Tab.CAMPAIGN:
-        break
+      }
     }
   }
 
-  const handleTabChange = (tab: Tab) => {
+  const handleContinue = async () => {
     switch (tab) {
       case Tab.TYPE:
-        setDetailsValidated(false)
-        setTab(tab)
+        handleTabChange(Tab.PROMOTION)
         break
-      case Tab.PROMOTION:
-        setDetailsValidated(false)
-        setTab(tab)
+      case Tab.PROMOTION: {
+        const valid = await form.trigger()
+
+        if (valid) {
+          handleTabChange(Tab.CAMPAIGN)
+        }
+
         break
+      }
       case Tab.CAMPAIGN:
-        setDetailsValidated(false)
-        setTab(tab)
         break
     }
   }
@@ -211,20 +245,20 @@ export const CreatePromotionForm = () => {
       return
     }
 
-    form.reset({ ...defaultValues, template_id: watchTemplateId })
+    reset({ ...defaultValues, template_id: watchTemplateId })
 
     for (const [key, value] of Object.entries(currentTemplate.defaults)) {
       if (typeof value === "object") {
         for (const [subKey, subValue] of Object.entries(value)) {
-          form.setValue(`application_method.${subKey}`, subValue)
+          setValue(`application_method.${subKey}`, subValue)
         }
       } else {
-        form.setValue(key, value)
+        setValue(key, value)
       }
     }
 
     return currentTemplate
-  }, [watchTemplateId])
+  }, [watchTemplateId, setValue, reset])
 
   const watchValueType = useWatch({
     control: form.control,
@@ -239,9 +273,9 @@ export const CreatePromotionForm = () => {
 
   useEffect(() => {
     if (watchAllocation === "across") {
-      form.setValue("application_method.max_quantity", null)
+      setValue("application_method.max_quantity", null)
     }
-  }, [watchAllocation])
+  }, [watchAllocation, setValue])
 
   const watchType = useWatch({
     control: form.control,
@@ -268,42 +302,34 @@ export const CreatePromotionForm = () => {
 
   const { campaigns } = useCampaigns(campaignQuery)
 
-  const detailsProgress = useMemo(() => {
-    if (detailsValidated) {
-      return "completed"
-    }
-
-    return "not-started"
-  }, [detailsValidated])
-
   const watchCampaignChoice = useWatch({
     control: form.control,
     name: "campaign_choice",
   })
 
   useEffect(() => {
-    const formData = form.getValues()
+    const formData = getValues()
 
     if (watchCampaignChoice !== "existing") {
-      form.setValue("campaign_id", undefined)
+      setValue("campaign_id", undefined)
     }
 
     if (watchCampaignChoice !== "new") {
-      form.setValue("campaign", undefined)
+      setValue("campaign", undefined)
     }
 
     if (watchCampaignChoice === "new") {
       if (!formData.campaign || !formData.campaign?.budget?.type) {
-        form.setValue("campaign", {
-          ...defaultCampaignValues,
+        setValue("campaign", {
+          ...DEFAULT_CAMPAIGN_VALUES,
           budget: {
-            ...defaultCampaignValues.budget,
+            ...DEFAULT_CAMPAIGN_VALUES.budget,
             currency_code: formData.application_method.currency_code,
           },
         })
       }
     }
-  }, [watchCampaignChoice])
+  }, [watchCampaignChoice, getValues, setValue])
 
   const watchRules = useWatch({
     control: form.control,
@@ -326,7 +352,7 @@ export const CreatePromotionForm = () => {
 
   return (
     <RouteFocusModal.Form form={form}>
-      <form className="flex h-full flex-col" onSubmit={handleSubmit}>
+      <KeyboundForm className="flex h-full flex-col" onSubmit={handleSubmit}>
         <ProgressTabs
           value={tab}
           onValueChange={(tab) => handleTabChange(tab as Tab)}
@@ -339,7 +365,7 @@ export const CreatePromotionForm = () => {
                   <ProgressTabs.Trigger
                     className="w-full"
                     value={Tab.TYPE}
-                    status={detailsProgress}
+                    status={tabState[Tab.TYPE]}
                   >
                     {t("promotions.tabs.template")}
                   </ProgressTabs.Trigger>
@@ -347,11 +373,16 @@ export const CreatePromotionForm = () => {
                   <ProgressTabs.Trigger
                     className="w-full"
                     value={Tab.PROMOTION}
+                    status={tabState[Tab.PROMOTION]}
                   >
                     {t("promotions.tabs.details")}
                   </ProgressTabs.Trigger>
 
-                  <ProgressTabs.Trigger className="w-full" value={Tab.CAMPAIGN}>
+                  <ProgressTabs.Trigger
+                    className="w-full"
+                    value={Tab.CAMPAIGN}
+                    status={tabState[Tab.CAMPAIGN]}
+                  >
                     {t("promotions.tabs.campaign")}
                   </ProgressTabs.Trigger>
                 </ProgressTabs.List>
@@ -439,7 +470,9 @@ export const CreatePromotionForm = () => {
                     render={({ field }) => {
                       return (
                         <Form.Item>
-                          <Form.Label>Method</Form.Label>
+                          <Form.Label>
+                            {t("promotions.form.method.label")}
+                          </Form.Label>
 
                           <Form.Control>
                             <RadioGroup
@@ -844,7 +877,7 @@ export const CreatePromotionForm = () => {
             )}
           </div>
         </RouteFocusModal.Footer>
-      </form>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }

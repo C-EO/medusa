@@ -58,7 +58,11 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "enumItems": [
+            "publishable",
+            "secret"
+          ],
+          "mappedType": "enum"
         },
         "last_used_at": {
           "name": "last_used_at",
@@ -78,6 +82,25 @@
           "primary": false,
           "nullable": false,
           "mappedType": "text"
+        },
+        "revoked_by": {
+          "name": "revoked_by",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         },
         "created_at": {
           "name": "created_at",
@@ -101,17 +124,8 @@
           "default": "now()",
           "mappedType": "datetime"
         },
-        "revoked_by": {
-          "name": "revoked_by",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
-        "revoked_at": {
-          "name": "revoked_at",
+        "deleted_at": {
+          "name": "deleted_at",
           "type": "timestamptz",
           "unsigned": false,
           "autoincrement": false,
@@ -125,24 +139,28 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_api_key_token_unique",
-          "columnNames": [
-            "token"
-          ],
+          "keyName": "IDX_api_key_deleted_at",
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_api_key_token_unique\" ON \"api_key\" (token)"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_api_key_deleted_at\" ON \"api_key\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_api_key_token_unique",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_api_key_token_unique\" ON \"api_key\" (token) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_api_key_type",
-          "columnNames": [
-            "type"
-          ],
+          "columnNames": [],
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_api_key_type\" ON \"api_key\" (type)"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_api_key_type\" ON \"api_key\" (type) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "api_key_pkey",

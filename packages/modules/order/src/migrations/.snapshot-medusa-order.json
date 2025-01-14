@@ -498,6 +498,153 @@
           "nullable": false,
           "mappedType": "text"
         },
+        "order_id": {
+          "name": "order_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "reference": {
+          "name": "reference",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "decimal"
+        },
+        "raw_amount": {
+          "name": "raw_amount",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "order_credit_line",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "IDX_order_credit_line_order_id",
+          "columnNames": [
+            "order_id"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_order_credit_line_order_id\" ON \"order_credit_line\" (order_id) WHERE deleted_at IS NOT NULL"
+        },
+        {
+          "keyName": "IDX_order_credit_line_deleted_at",
+          "columnNames": [
+            "deleted_at"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_order_credit_line_deleted_at\" ON \"order_credit_line\" (deleted_at) WHERE deleted_at IS NOT NULL"
+        },
+        {
+          "keyName": "order_credit_line_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "order_credit_line_order_id_foreign": {
+          "constraintName": "order_credit_line_order_id_foreign",
+          "columnNames": [
+            "order_id"
+          ],
+          "localTableName": "public.order_credit_line",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.order",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -572,6 +719,15 @@
         },
         "product_type": {
           "name": "product_type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "product_type_id": {
+          "name": "product_type_id",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -772,6 +928,16 @@
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_order_line_item_product_id\" ON \"order_line_item\" (product_id) WHERE deleted_at IS NOT NULL"
         },
         {
+          "keyName": "IDX_line_item_product_type_id",
+          "columnNames": [
+            "product_type_id"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_line_item_product_type_id\" ON \"order_line_item\" (product_type_id) WHERE deleted_at IS NOT NULL AND product_type_id IS NOT NULL"
+        },
+        {
           "keyName": "IDX_order_line_item_deleted_at",
           "columnNames": [
             "deleted_at"
@@ -832,6 +998,42 @@
           "nullable": false,
           "mappedType": "text"
         },
+        "unit_price": {
+          "name": "unit_price",
+          "type": "numeric",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "decimal"
+        },
+        "raw_unit_price": {
+          "name": "raw_unit_price",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "compare_at_unit_price": {
+          "name": "compare_at_unit_price",
+          "type": "numeric",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "decimal"
+        },
+        "raw_compare_at_unit_price": {
+          "name": "raw_compare_at_unit_price",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
         "quantity": {
           "name": "quantity",
           "type": "numeric",
@@ -857,7 +1059,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_fulfilled_quantity": {
@@ -876,7 +1077,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_delivered_quantity": {
@@ -895,7 +1095,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_shipped_quantity": {
@@ -914,7 +1113,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_return_requested_quantity": {
@@ -933,7 +1131,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_return_received_quantity": {
@@ -952,7 +1149,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_return_dismissed_quantity": {
@@ -971,7 +1167,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "0",
           "mappedType": "decimal"
         },
         "raw_written_off_quantity": {

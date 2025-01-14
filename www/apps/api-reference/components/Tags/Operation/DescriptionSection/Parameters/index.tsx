@@ -18,6 +18,11 @@ const TagsOperationDescriptionSectionParameters = ({
     required: [],
     properties: {},
   }
+  const headerParameters: SchemaObject = {
+    type: "object",
+    required: [],
+    properties: {},
+  }
 
   parameters.forEach((parameter) => {
     const parameterObject = {
@@ -37,11 +42,27 @@ const TagsOperationDescriptionSectionParameters = ({
         queryParameters.required?.push(parameter.name)
       }
       queryParameters.properties[parameter.name] = parameterObject
+    } else if (parameter.in === "header") {
+      if (parameter.required) {
+        headerParameters.required?.push(parameter.name)
+      }
+      headerParameters.properties[parameter.name] = parameterObject
     }
   })
 
   return (
     <>
+      {Object.values(headerParameters.properties).length > 0 && (
+        <>
+          <h3 className="border-medusa-border-base border-b py-1.5">
+            Header Parameters
+          </h3>
+          <TagOperationParameters
+            schemaObject={headerParameters}
+            topLevel={true}
+          />
+        </>
+      )}
       {Object.values(pathParameters.properties).length > 0 && (
         <>
           <h3 className="border-medusa-border-base border-b py-1.5">

@@ -2,9 +2,9 @@ import { deleteTaxRateRulesWorkflow } from "@medusajs/core-flows"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchTaxRate } from "../../../helpers"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 
 export const DELETE = async (
   req: AuthenticatedMedusaRequest,
@@ -17,7 +17,7 @@ export const DELETE = async (
   const taxRate = await refetchTaxRate(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({

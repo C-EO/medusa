@@ -1,6 +1,6 @@
-import { CreateOrderDTO, IOrderModuleService } from "@medusajs/types"
-import { Modules } from "@medusajs/utils"
-import { moduleIntegrationTestRunner } from "medusa-test-utils"
+import { CreateOrderDTO, IOrderModuleService } from "@medusajs/framework/types"
+import { Modules } from "@medusajs/framework/utils"
+import { moduleIntegrationTestRunner } from "@medusajs/test-utils"
 
 jest.setTimeout(100000)
 
@@ -21,6 +21,7 @@ moduleIntegrationTestRunner<IOrderModuleService>({
             product_description: "Description 1",
             product_subtitle: "Product Subtitle 1",
             product_type: "Type 1",
+            product_type_id: "type_1",
             product_collection: "Collection 1",
             product_handle: "handle1",
             variant_id: "variant1",
@@ -384,7 +385,6 @@ moduleIntegrationTestRunner<IOrderModuleService>({
           {
             select: ["id"],
             relations: ["items"],
-            take: null,
           }
         )
         expect(orders.length).toEqual(1)
@@ -398,7 +398,6 @@ moduleIntegrationTestRunner<IOrderModuleService>({
           {
             select: ["items.quantity"],
             relations: ["items"],
-            take: null,
           }
         )
         expect(orders2.length).toEqual(0)
@@ -414,7 +413,6 @@ moduleIntegrationTestRunner<IOrderModuleService>({
           {
             select: ["id"],
             relations: ["items.detail"],
-            take: null,
           }
         )
         expect(orders3.length).toEqual(1)
@@ -430,7 +428,6 @@ moduleIntegrationTestRunner<IOrderModuleService>({
           {
             select: ["id"],
             relations: ["items.detail"],
-            take: null,
           }
         )
         expect(orders4.length).toEqual(0)

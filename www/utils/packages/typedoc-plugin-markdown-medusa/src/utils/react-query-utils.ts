@@ -6,11 +6,11 @@ import {
   SignatureReflection,
   SomeType,
 } from "typedoc"
-import { Parameter } from "../types"
+import { Parameter } from "../types.js"
 import {
   GetReflectionTypeParametersParams,
   getReflectionTypeParameters,
-} from "./reflection-type-parameters"
+} from "./reflection-type-parameters.js"
 
 const MUTATION_PARAM_TYPE_NAME = "UseMutationOptions"
 const MUTATION_RETURN_TYPE_NAME = "UseMutationResult"

@@ -1,4 +1,4 @@
-import { PromotionDTO } from "@medusajs/types"
+import { InferEntityType, PromotionDTO } from "@medusajs/framework/types"
 import { Promotion } from "@models"
 
 export interface CreateCampaignDTO {
@@ -7,7 +7,7 @@ export interface CreateCampaignDTO {
   campaign_identifier: string
   starts_at?: Date | null
   ends_at?: Date | null
-  promotions?: (PromotionDTO | Promotion)[]
+  promotions?: (PromotionDTO | InferEntityType<typeof Promotion>)[]
 }
 
 export interface UpdateCampaignDTO {
@@ -17,5 +17,5 @@ export interface UpdateCampaignDTO {
   campaign_identifier?: string
   starts_at?: Date | null
   ends_at?: Date | null
-  promotions?: (PromotionDTO | Promotion)[]
+  promotions?: (PromotionDTO | InferEntityType<typeof Promotion>)[]
 }

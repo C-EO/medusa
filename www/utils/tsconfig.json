@@ -1,17 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es2021",
-    "module": "commonjs",
     "outDir": "./dist",
     "isolatedModules": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
     "sourceMap": true,
-    "skipLibCheck": true,
     "rootDir": ".",
     "allowJs": true,
-    "typeRoots": ["node_modules/@types", "./packages/types"]
+    "typeRoots": ["node_modules/@types", "./packages/types"],
+    "tsBuildInfoFile": "./dist/.tsbuildinfo-client",
+    "noEmit": false,
+    "lib": ["es2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "incremental": true
   },
   "include": ["**/*.ts", "**/*.js"],
   "exclude": ["**/node_modules/**", "dist"]

@@ -24,23 +24,18 @@
   ],
   "scripts": {
     "build": "yarn clean && tsc",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "watch": "tsc --watch"
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.17.0",
-    "remark-frontmatter": "^5.0.0",
-    "remark-parse": "^11.0.0",
-    "remark-stringify": "^11.0.0",
-    "to-vfile": "^8.0.0",
+    "docs-utils": "*",
     "unified": "^11.0.4",
     "unist-builder": "3.0.0",
-    "unist-util-visit": "4.1.2",
-    "vfile-matter": "^5.0.0"
+    "unist-util-visit": "4.1.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.20",
-    "docs-ui": "*",
-    "eslint-config-docs": "*",
     "rimraf": "^5.0.5",
     "tsconfig": "*",
     "types": "*",

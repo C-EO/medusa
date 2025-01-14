@@ -52,7 +52,7 @@ function resolveDocumentation(
       // set type if missing
       if (!propDescriptor.tsType && typedocManager) {
         const typeAnnotation = utils.getTypeAnnotation(path)
-        if (typeAnnotation?.isTSTypeReference) {
+        if (typeAnnotation?.isTSTypeReference()) {
           const typeName = typeAnnotation.get("typeName")
           if (
             !Array.isArray(typeName) &&

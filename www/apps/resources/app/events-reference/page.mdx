@@ -1,4 +1,21 @@
 import { Table } from "docs-ui"
+import AuthEvents from "../commerce-modules/auth/events/_content.mdx"
+import CartEvents from "../commerce-modules/cart/events/_content.mdx"
+import CustomerEvents from "../commerce-modules/customer/events/_content.mdx"
+import FulfillmentEvents from "../commerce-modules/fulfillment/events/_content.mdx"
+import InviteEvents from "../commerce-modules/user/events/_content/invite.mdx"
+import OrderEvents from "../commerce-modules/order/events/_content.mdx"
+import PaymentEvents from "../commerce-modules/payment/events/page.mdx"
+import ProductEvents from "../commerce-modules/product/events/_content/product.mdx"
+import ProductCategoryEvents from "../commerce-modules/product/events/_content/product-category.mdx"
+import ProductCollectionEvents from "../commerce-modules/product/events/_content/product-collection.mdx"
+import ProductOptionEvents from "../commerce-modules/product/events/_content/product-option.mdx"
+import ProductTagEvents from "../commerce-modules/product/events/_content/product-tag.mdx"
+import ProductTypeEvents from "../commerce-modules/product/events/_content/product-type.mdx"
+import ProductVariantEvents from "../commerce-modules/product/events/_content/product-variant.mdx"
+import RegionEvents from "../commerce-modules/region/events/_content.mdx"
+import SalesChannelEvents from "../commerce-modules/sales-channel/events/_content.mdx"
+import UserEvents from "../commerce-modules/user/events/_content/user.mdx"
 
 export const metadata = {
   title: `Events Reference`,
@@ -6,1052 +23,104 @@ export const metadata = {
 
 # {metadata.title}
 
-This documentation page includes the list of all events emitted by Medusa's workflows.
-
-<Note type="soon" title="In Development">
-
-Events are still in development and may change.
-
-</Note>
+This documentation page includes the list of all events emitted by [Medusa's workflows](../medusa-workflows-reference/page.mdx).
 
 ## Auth Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
+<AuthEvents />
 
-      `auth.password_reset`
+---
 
-      </Table.Cell>
-      <Table.Cell>
+## Cart Events
 
-      Emitted when a password of a user, customer, or other actor types is reset.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-{
-  entityId, // The ID of the user
-  token, // The reset token
-}
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<CartEvents />
 
 ---
 
 ## Customer Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
+<CustomerEvents />
 
-      `customer.created`
+---
 
-      </Table.Cell>
-      <Table.Cell>
+## Fulfillment Events
 
-      Emitted when customers are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the customer
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `customer.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when customers are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the customer
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `customer.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when customers are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the customer
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<FulfillmentEvents />
 
 ---
 
 ## Invite Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `invite.accepted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when an invite is accepted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-{
-  id, // The ID of the invite
-}
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `invite.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when invites are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the invite
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `invite.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when invites are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the invite
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `invite.resent`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when invites are resent.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the invite
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<InviteEvents />
 
 ---
 
 ## Order Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
+<OrderEvents />
 
-      `order.placed`
+---
 
-      </Table.Cell>
-      <Table.Cell>
+## Payment Events
 
-      Emitted when the customer completes a cart and an order is placed.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-{
-  id, // The ID of the order
-}
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<PaymentEvents />
 
 ---
 
 ## Product Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when products are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the product
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when products are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the product
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when products are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the product
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductEvents />
 
 ---
 
 ## Product Category Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-category.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product categories are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the category
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-category.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product categories are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the category
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-category.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product categories are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the category
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductCategoryEvents />
 
 ---
 
 ## Product Collection Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-collection.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product collections are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the collection
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-collection.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product collections are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the collection
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-collection.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product collections are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the collection
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductCollectionEvents />
 
 ---
 
 ## Product Option Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-option.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product options are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the option
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-option.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product options are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the option
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-option.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product options are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the option
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductOptionEvents />
 
 ---
 
 ## Product Tag Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-tag.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product tags are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the tag
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-tag.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product tags are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the tag
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-tag.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product tags are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the tag
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductTagEvents />
 
 ---
 
 ## Product Type Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-type.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product types are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the type
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-type.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product types are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the type
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-type.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product types are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the type
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductTypeEvents />
 
 ---
 
 ## Product Variant Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-variant.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product variants are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the variant
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-variant.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product variants are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the variant
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `product-variant.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when product variants are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the variant
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<ProductVariantEvents />
 
 ---
 
 ## Region Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `region.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when regions are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the region
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `region.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when regions are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the region
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `region.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when regions are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the region
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<RegionEvents />
 
 ---
 
 ## Sales Channel Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `sales-channel.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when sales channels are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the sales channel
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `sales-channel.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when sales channels are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the sales channel
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `sales-channel.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when sales channels are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the sales channel
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<SalesChannelEvents />
 
 ---
 
 ## User Events
 
-<Table>
-  <Table.Header>
-    <Table.Row>
-      <Table.HeaderCell>Event Name</Table.HeaderCell>
-      <Table.HeaderCell>Description</Table.HeaderCell>
-      <Table.HeaderCell className="w-1/3">Payload</Table.HeaderCell>
-    </Table.Row>
-  </Table.Header>
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell>
-
-      `user.created`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when users are created.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the user
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `user.updated`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when users are updated.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the user
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-    <Table.Row>
-      <Table.Cell>
-
-      `user.deleted`
-
-      </Table.Cell>
-      <Table.Cell>
-
-      Emitted when users are deleted.
-
-      </Table.Cell>
-      <Table.Cell>
-
-```ts blockStyle="inline"
-[{
-  id, // The ID of the user
-}]
-```
-
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-</Table>
+<UserEvents />

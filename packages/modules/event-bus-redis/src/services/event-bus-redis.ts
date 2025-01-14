@@ -3,12 +3,12 @@ import {
   InternalModuleDeclaration,
   Logger,
   Message,
-} from "@medusajs/types"
+} from "@medusajs/framework/types"
 import {
   AbstractEventBusModuleService,
   isPresent,
   promiseAll,
-} from "@medusajs/utils"
+} from "@medusajs/framework/utils"
 import { BulkJobOptions, Queue, Worker } from "bullmq"
 import { Redis } from "ioredis"
 import { BullJob, EventBusRedisModuleOptions, Options } from "../types"
@@ -60,8 +60,7 @@ export default class RedisEventBusService extends AbstractEventBusModuleService 
     })
 
     // Register our worker to handle emit calls
-    const shouldStartWorker = moduleDeclaration.worker_mode !== "server"
-    if (shouldStartWorker) {
+    if (this.isWorkerMode) {
       this.bullWorker_ = new Worker(
         moduleOptions.queueName ?? "events-queue",
         this.worker_,
@@ -69,12 +68,16 @@ export default class RedisEventBusService extends AbstractEventBusModuleService 
           prefix: `${this.constructor.name}`,
           ...(moduleOptions.workerOptions ?? {}),
           connection: eventBusRedisConnection,
+          autorun: false,
         }
       )
     }
   }
 
   __hooks = {
+    onApplicationStart: async () => {
+      await this.bullWorker_?.run()
+    },
     onApplicationShutdown: async () => {
       await this.queue_.close()
       // eslint-disable-next-line max-len
@@ -116,7 +119,7 @@ export default class RedisEventBusService extends AbstractEventBusModuleService 
           // options for a particular event
           ...eventData.options,
         },
-      }
+      } as any
     })
   }
 
@@ -277,18 +280,18 @@ export default class RedisEventBusService extends AbstractEventBusModuleService 
           metadata: data.metadata,
         }
 
-        return await subscriber(event)
-          .then(async (data) => {
+        try {
+          return await subscriber(event).then((data) => {
             // For every subscriber that completes successfully, add their id to the list of completed subscribers
             completedSubscribersInCurrentAttempt.push(id)
             return data
           })
-          .catch((err) => {
-            this.logger_.warn(
-              `An error occurred while processing ${name}: ${err}`
-            )
-            return err
-          })
+        } catch (err) {
+          this.logger_?.warn(`An error occurred while processing ${name}:`)
+          this.logger_?.warn(err)
+
+          return err
+        }
       })
     )
 

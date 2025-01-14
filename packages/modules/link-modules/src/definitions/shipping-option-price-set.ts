@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const ShippingOptionPriceSet: ModuleJoinerConfig = {
   serviceName: LINKS.ShippingOptionPriceSet,
@@ -41,6 +41,7 @@ export const ShippingOptionPriceSet: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.FULFILLMENT,
+      entity: "ShippingOption",
       fieldAlias: {
         prices: {
           path: "price_set_link.price_set.prices",
@@ -60,6 +61,7 @@ export const ShippingOptionPriceSet: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.PRICING,
+      entity: "PriceSet",
       relationship: {
         serviceName: LINKS.ShippingOptionPriceSet,
         primaryKey: "price_set_id",

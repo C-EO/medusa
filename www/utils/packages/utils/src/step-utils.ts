@@ -3,9 +3,16 @@ import { ArrayType, SignatureReflection, SomeType, UnionType } from "typedoc"
 const disallowedIntrinsicTypeNames = ["unknown", "void", "any", "never"]
 
 export function isWorkflowStep(reflection: SignatureReflection): boolean {
-  return (
-    reflection.parent?.children?.some((child) => child.name === "__step__") ||
-    false
+  if (reflection.parent?.children?.some((child) => child.name === "__step__")) {
+    return true
+  }
+  if (reflection.type?.type !== "intersection") {
+    return false
+  }
+  return reflection.type.types.some(
+    (refType) =>
+      refType.type === "reference" &&
+      refType.name === "StepFunctionReturnConfig"
   )
 }
 

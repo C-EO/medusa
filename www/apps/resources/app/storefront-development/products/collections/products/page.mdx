@@ -1,3 +1,10 @@
+---
+tags:
+  - product
+  - product collection
+  - storefront
+---
+
 import { CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
@@ -25,7 +32,7 @@ export const fetchHighlights = [
   fetch(`http://localhost:9000/store/products?${searchParams.toString()}`, {
     credentials: "include",
     headers: {
-      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
     },
   })
   .then((res) => res.json())
@@ -39,12 +46,11 @@ export const fetchHighlights = [
   <CodeTab label="React" value="react">
 
 export const highlights = [
-  ["13", "params: { collectionId }", "This is based on Next.js which passes the path parameters as a prop."],
-  ["33", "", "Pass the collection ID as a query parameter."],
-  ["36"], ["37"], ["38"], 
-  ["39", "process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY", "Pass the Publishable API key to retrieve products of associated sales channel(s)."], 
-  ["40"], ["41"], ["42"], ["43"], ["44"], ["45"], ["46"], ["47"], ["48"], ["49"], ["50"], ["51"], ["52"], ["53"], ["54"],
-  ["55"], ["56"], ["57"], ["58"]
+  ["31", "collectionId", "Pass the collection ID as a query parameter."],
+  ["34"], ["35"], ["36"], 
+  ["37", "process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY", "Pass the Publishable API key to retrieve products of associated sales channel(s)."], 
+  ["38"], ["39"], ["40"], ["41"], ["42"], ["43"], ["44"], ["45"], ["46"], ["47"], ["48"], ["49"], ["50"], ["51"], ["52"],
+  ["53"], ["54"], ["55"], ["56"]
 ]
 
   ```tsx highlights={highlights}
@@ -53,15 +59,13 @@ export const highlights = [
   import { useEffect, useState } from "react"
   import { HttpTypes } from "@medusajs/types"
 
-  type Params = {
-    params: {
-      collectionId: string
-    }
+  type Props = {
+    collectionId: string
   }
 
   export default function CollectionProducts({
-    params: { collectionId },
-  }: Params) {
+    collectionId,
+  }: Props) {
     const [loading, setLoading] = useState(true)
     const [products, setProducts] = useState<
       HttpTypes.StoreProduct[]
@@ -88,7 +92,7 @@ export const highlights = [
       }`, {
         credentials: "include",
         headers: {
-          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
         },
       })
       .then((res) => res.json())

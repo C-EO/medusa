@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const OrderFulfillment: ModuleJoinerConfig = {
   serviceName: LINKS.OrderFulfillment,
@@ -40,6 +40,7 @@ export const OrderFulfillment: ModuleJoinerConfig = {
   extends: [
     {
       serviceName: Modules.ORDER,
+      entity: "Order",
       fieldAlias: {
         fulfillments: {
           path: "fulfillment_link.fulfillments",
@@ -56,6 +57,7 @@ export const OrderFulfillment: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.FULFILLMENT,
+      entity: "Fulfillment",
       fieldAlias: {
         order: "order_link.order",
       },

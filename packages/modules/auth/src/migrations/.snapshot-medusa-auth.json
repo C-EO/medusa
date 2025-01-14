@@ -45,11 +45,29 @@
           "length": 6,
           "default": "now()",
           "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "auth_identity",
       "schema": "public",
       "indexes": [
+        {
+          "keyName": "IDX_auth_identity_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_auth_identity_deleted_at\" ON \"auth_identity\" (deleted_at) WHERE deleted_at IS NULL"
+        },
         {
           "keyName": "auth_identity_pkey",
           "columnNames": [
@@ -140,6 +158,16 @@
           "length": 6,
           "default": "now()",
           "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "provider_identity",
@@ -151,7 +179,15 @@
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_provider_identity_auth_identity_id\" ON \"provider_identity\" (auth_identity_id)"
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_provider_identity_auth_identity_id\" ON \"provider_identity\" (auth_identity_id) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_provider_identity_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_provider_identity_deleted_at\" ON \"provider_identity\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "IDX_provider_identity_provider_entity_id",
@@ -159,7 +195,7 @@
           "composite": false,
           "primary": false,
           "unique": false,
-          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_provider_identity_provider_entity_id\" ON \"provider_identity\" (entity_id, provider)"
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_provider_identity_provider_entity_id\" ON \"provider_identity\" (entity_id, provider) WHERE deleted_at IS NULL"
         },
         {
           "keyName": "provider_identity_pkey",

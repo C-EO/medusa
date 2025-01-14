@@ -1,6 +1,6 @@
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { IOrderModuleService } from "@medusajs/types"
 import { Modules } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
 import {
   adminHeaders,
   createAdminUser,
@@ -30,6 +30,9 @@ medusaIntegrationTestRunner({
         const created = await orderModule.createOrders({
           region_id: "test_region_id",
           email: "foo@bar.com",
+          metadata: {
+            foo: "bar",
+          },
           items: [
             {
               title: "Custom Item 2",
@@ -108,6 +111,9 @@ medusaIntegrationTestRunner({
           payment_status: "not_paid",
           region_id: "test_region_id",
           fulfillments: [],
+          metadata: {
+            foo: "bar",
+          },
           fulfillment_status: "not_fulfilled",
           summary: expect.objectContaining({
             // TODO: add all summary fields
@@ -157,6 +163,7 @@ medusaIntegrationTestRunner({
               product_description: null,
               product_subtitle: null,
               product_type: null,
+              product_type_id: null,
               product_collection: null,
               product_handle: null,
               variant_sku: null,

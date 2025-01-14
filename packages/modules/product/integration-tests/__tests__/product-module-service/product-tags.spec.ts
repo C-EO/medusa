@@ -1,16 +1,17 @@
-import { IProductModuleService } from "@medusajs/types"
+import { IProductModuleService } from "@medusajs/framework/types"
 import {
   CommonEvents,
   composeMessage,
   Modules,
   ProductEvents,
   ProductStatus,
-} from "@medusajs/utils"
+  toMikroORMEntity,
+} from "@medusajs/framework/utils"
 import { Product, ProductTag } from "@models"
 import {
   MockEventBusService,
   moduleIntegrationTestRunner,
-} from "medusa-test-utils"
+} from "@medusajs/test-utils"
 
 jest.setTimeout(30000)
 
@@ -35,25 +36,27 @@ moduleIntegrationTestRunner<IProductModuleService>({
 
       beforeEach(async () => {
         const testManager = await MikroOrmWrapper.forkManager()
-        productOne = testManager.create(Product, {
+        productOne = testManager.create(toMikroORMEntity(Product), {
           id: "product-1",
           title: "product 1",
+          handle: "product-1",
           status: ProductStatus.PUBLISHED,
         })
 
-        productTwo = testManager.create(Product, {
+        productTwo = testManager.create(toMikroORMEntity(Product), {
           id: "product-2",
           title: "product 2",
+          handle: "product-2",
           status: ProductStatus.PUBLISHED,
         })
 
-        tagOne = testManager.create(ProductTag, {
+        tagOne = testManager.create(toMikroORMEntity(ProductTag), {
           id: "tag-1",
           value: "tag 1",
           products: [productOne],
         })
 
-        tagTwo = testManager.create(ProductTag, {
+        tagTwo = testManager.create(toMikroORMEntity(ProductTag), {
           id: "tag-2",
           value: "tag",
           products: [productTwo],
@@ -118,8 +121,33 @@ moduleIntegrationTestRunner<IProductModuleService>({
               value: tagOne.value,
               products: [
                 {
+                  id: productOne.id,
+                },
+              ],
+            },
+          ])
+        })
+
+        it("should set foreign key to null when relation is select and is null", async () => {
+          const tags = await service.listProductTags(
+            {
+              id: tagOne.id,
+            },
+            {
+              select: ["value", "products.id"],
+              relations: ["products.collection"],
+              take: 1,
+            }
+          )
+
+          expect(tags).toEqual([
+            {
+              id: tagOne.id,
+              value: tagOne.value,
+              products: [
+                {
+                  collection: null,
                   collection_id: null,
-                  type_id: null,
                   id: productOne.id,
                 },
               ],
@@ -196,8 +224,6 @@ moduleIntegrationTestRunner<IProductModuleService>({
               value: tagOne.value,
               products: [
                 {
-                  collection_id: null,
-                  type_id: null,
                   id: productOne.id,
                 },
               ],

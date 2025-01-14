@@ -5,17 +5,17 @@ import {
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { remapKeysForProduct, remapProductResponse } from "../helpers"
-import { MedusaError } from "@medusajs/utils"
-import { AdditionalData, HttpTypes } from "@medusajs/types"
-import { refetchEntity } from "../../../utils/refetch-entity"
+import { MedusaError } from "@medusajs/framework/utils"
+import { AdditionalData, HttpTypes } from "@medusajs/framework/types"
+import { refetchEntity } from "@medusajs/framework/http"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
   res: MedusaResponse<HttpTypes.AdminProductResponse>
 ) => {
-  const selectFields = remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+  const selectFields = remapKeysForProduct(req.queryConfig.fields ?? [])
   const product = await refetchEntity(
     "product",
     req.params.id,
@@ -66,7 +66,7 @@ export const POST = async (
     "product",
     result[0].id,
     req.scope,
-    remapKeysForProduct(req.remoteQueryConfig.fields ?? [])
+    remapKeysForProduct(req.queryConfig.fields ?? [])
   )
 
   res.status(200).json({ product: remapProductResponse(product) })

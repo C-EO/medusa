@@ -2,12 +2,12 @@ import {
   deleteShippingProfileWorkflow,
   updateShippingProfilesWorkflow,
 } from "@medusajs/core-flows"
-import { HttpTypes, IFulfillmentModuleService } from "@medusajs/types"
-import { Modules } from "@medusajs/utils"
+import { HttpTypes, IFulfillmentModuleService } from "@medusajs/framework/types"
+import { Modules } from "@medusajs/framework/utils"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../types/routing"
+} from "@medusajs/framework/http"
 import { refetchShippingProfile } from "../helpers"
 import {
   AdminGetShippingProfileParamsType,
@@ -21,7 +21,7 @@ export const GET = async (
   const shippingProfile = await refetchShippingProfile(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ shipping_profile: shippingProfile })
@@ -64,7 +64,7 @@ export const POST = async (
   const shippingProfile = await refetchShippingProfile(
     req.params.id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({

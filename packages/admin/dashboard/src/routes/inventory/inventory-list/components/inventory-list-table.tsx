@@ -1,19 +1,25 @@
-import { Button, Container, Heading, Text } from "@medusajs/ui"
 import { InventoryTypes } from "@medusajs/types"
+import { Button, Container, Heading, Text } from "@medusajs/ui"
 
+import { RowSelectionState } from "@tanstack/react-table"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Link, useNavigate } from "react-router-dom"
 import { DataTable } from "../../../../components/table/data-table"
-import { useDataTable } from "../../../../hooks/use-data-table"
 import { useInventoryItems } from "../../../../hooks/api/inventory"
+import { useDataTable } from "../../../../hooks/use-data-table"
+import { INVENTORY_ITEM_IDS_KEY } from "../../common/constants"
 import { useInventoryTableColumns } from "./use-inventory-table-columns"
 import { useInventoryTableFilters } from "./use-inventory-table-filters"
 import { useInventoryTableQuery } from "./use-inventory-table-query"
-import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
 
 const PAGE_SIZE = 20
 
 export const InventoryListTable = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+
+  const [selection, setSelection] = useState<RowSelectionState>({})
 
   const { searchParams, raw } = useInventoryTableQuery({
     pageSize: PAGE_SIZE,
@@ -39,6 +45,11 @@ export const InventoryListTable = () => {
     enablePagination: true,
     getRowId: (row) => row.id,
     pageSize: PAGE_SIZE,
+    enableRowSelection: true,
+    rowSelection: {
+      state: selection,
+      updater: setSelection,
+    },
   })
 
   if (isError) {
@@ -68,8 +79,26 @@ export const InventoryListTable = () => {
         search
         filters={filters}
         queryObject={raw}
-        orderBy={["title", "sku", "stocked_quantity", "reserved_quantity"]}
+        orderBy={[
+          { key: "title", label: t("fields.title") },
+          { key: "sku", label: t("fields.sku") },
+          { key: "stocked_quantity", label: t("fields.inStock") },
+          { key: "reserved_quantity", label: t("inventory.reserved") },
+        ]}
         navigateTo={(row) => `${row.id}`}
+        commands={[
+          {
+            action: async (selection) => {
+              navigate(
+                `stock?${INVENTORY_ITEM_IDS_KEY}=${Object.keys(selection).join(
+                  ","
+                )}`
+              )
+            },
+            label: t("inventory.stock.action"),
+            shortcut: "i",
+          },
+        ]}
       />
     </Container>
   )

@@ -126,128 +126,140 @@ export default class TypedocManager {
       reflection.type.reflection instanceof DeclarationReflection &&
       reflection.type.reflection.signatures?.length
 
-    // If the original reflection in the reference type has a signature
-    // use that signature. Else, try to get the signature from the mapping.
-    const signature = doesReflectionHaveSignature
-      ? (
-          (reflection.type! as ReferenceType)
-            .reflection as DeclarationReflection
-        ).signatures![0]
-      : reflection.sources?.length
+    let signature: SignatureReflection | undefined
+    let props: DeclarationReflection[] = []
+    if (doesReflectionHaveSignature) {
+      signature = (
+        (reflection.type! as ReferenceType).reflection as DeclarationReflection
+      ).signatures![0]
+      props =
+        signature?.parameters?.length && signature.parameters[0].type
+          ? getTypeChildren({
+              reflectionType: signature.parameters![0].type!,
+              project: this.project,
+            })
+          : []
+    }
+
+    if (!signature || !props.length) {
+      signature = reflection.sources?.length
         ? this.getMappedSignatureFromSource(reflection.sources[0])
             ?.signatures[0]
         : undefined
+      props =
+        signature?.parameters?.length && signature.parameters[0].type
+          ? getTypeChildren({
+              reflectionType: signature.parameters![0].type!,
+              project: this.project,
+            })
+          : []
+    }
 
-    if (signature?.parameters?.length && signature.parameters[0].type) {
-      // get the props of the component from the
-      // first parameter in the signature.
-      const props = getTypeChildren({
-        reflectionType: signature.parameters![0].type!,
-        project: this.project,
-      })
+    if (!signature || !props.length) {
+      return spec
+    }
 
-      // this stores props that should be removed from the
-      // spec
-      const propsToRemove = new Set<string>()
+    // this stores props that should be removed from the
+    // spec
+    const propsToRemove = new Set<string>()
 
-      // loop over props in the spec to either add missing descriptions or
-      // push a prop into the `propsToRemove` set.
-      Object.entries(spec.props!).forEach(([propName, propDetails]) => {
-        // retrieve the reflection of the prop
-        const reflectionProp = props.find(
-          (propType) => propType.name === propName
-        )
-        if (!reflectionProp) {
-          // if the reflection doesn't exist and the
-          // prop doesn't have a description, it should
-          // be removed.
-          if (!propDetails.description) {
-            propsToRemove.add(propName)
-          }
-          return
-        }
-        // if the component has the `@excludeExternal` tag,
-        // the prop is external, and it doesn't have the
-        // `@keep` tag, the prop is removed.
-        if (
-          this.shouldExcludeExternal({
-            parentReflection: reflection,
-            childReflection: reflectionProp,
-            propDescription: propDetails.description,
-            signature,
-          })
-        ) {
-          propsToRemove.add(propName)
-          return
-        }
-
-        // if the prop doesn't have a default value, try to retrieve it
-        if (!propDetails.defaultValue) {
-          propDetails.defaultValue = this.getReflectionDefaultValue(
-            reflectionProp,
-            propDetails.description
-          )
-        }
-
-        // if the prop doesn't have description, retrieve it using Typedoc
-        propDetails.description =
-          propDetails.description || this.getDescription(reflectionProp)
-        // if the prop still doesn't have description, remove it.
+    // loop over props in the spec to either add missing descriptions or
+    // push a prop into the `propsToRemove` set.
+    Object.entries(spec.props!).forEach(([propName, propDetails]) => {
+      // retrieve the reflection of the prop
+      const reflectionProp = props.find(
+        (propType) => propType.name === propName
+      )
+      if (!reflectionProp) {
+        // if the reflection doesn't exist and the
+        // prop doesn't have a description, it should
+        // be removed.
         if (!propDetails.description) {
           propsToRemove.add(propName)
-        } else {
-          propDetails.description = this.normalizeDescription(
-            propDetails.description
-          )
+        }
+        return
+      }
+      // if the component has the `@excludeExternal` tag,
+      // the prop is external, and it doesn't have the
+      // `@keep` tag, the prop is removed.
+      if (
+        this.shouldExcludeExternal({
+          parentReflection: reflection,
+          childReflection: reflectionProp,
+          propDescription: propDetails.description,
+          signature,
+        })
+      ) {
+        propsToRemove.add(propName)
+        return
+      }
+
+      // if the prop doesn't have a default value, try to retrieve it
+      if (!propDetails.defaultValue) {
+        propDetails.defaultValue = this.getReflectionDefaultValue(
+          reflectionProp,
+          propDetails.description
+        )
+      }
+
+      // if the prop doesn't have description, retrieve it using Typedoc
+      propDetails.description =
+        propDetails.description || this.getDescription(reflectionProp)
+      // if the prop still doesn't have description, remove it.
+      if (!propDetails.description) {
+        propsToRemove.add(propName)
+      } else {
+        propDetails.description = this.normalizeDescription(
+          propDetails.description
+        )
+      }
+    })
+
+    // delete props in the `propsToRemove` set from the specs.
+    propsToRemove.forEach((prop) => delete spec.props![prop])
+
+    // try to add missing props
+    props
+      .filter(
+        (prop) =>
+          // Filter out props that are already in the
+          // specs, are already in the `propsToRemove` set
+          // (meaning they've been removed), don't have a
+          // comment, are React props, and are external props (if
+          // the component excludes them).
+          !Object.hasOwn(spec.props!, prop.name) &&
+          !propsToRemove.has(prop.name) &&
+          this.getReflectionComment(prop) &&
+          !this.isFromReact(prop) &&
+          !this.shouldExcludeExternal({
+            parentReflection: reflection,
+            childReflection: prop,
+            signature,
+          })
+      )
+      .forEach((prop) => {
+        // If the prop has description (retrieved)
+        // through Typedoc, it's added into the spec.
+        const rawDescription = this.getDescription(prop)
+        const description = this.normalizeDescription(rawDescription)
+        if (!description) {
+          return
+        }
+        spec.props![prop.name] = {
+          description,
+          required: !prop.flags.isOptional,
+          defaultValue: this.getReflectionDefaultValue(prop, rawDescription),
+          tsType: prop.type
+            ? this.getTsType(prop.type)
+            : prop.signatures?.length
+              ? this.getFunctionTsType(prop.signatures[0])
+              : undefined,
+        }
+
+        if (!spec.props![prop.name].tsType) {
+          delete spec.props![prop.name].tsType
         }
       })
-
-      // delete props in the `propsToRemove` set from the specs.
-      propsToRemove.forEach((prop) => delete spec.props![prop])
-
-      // try to add missing props
-      props
-        .filter(
-          (prop) =>
-            // Filter out props that are already in the
-            // specs, are already in the `propsToRemove` set
-            // (meaning they've been removed), don't have a
-            // comment, are React props, and are external props (if
-            // the component excludes them).
-            !Object.hasOwn(spec.props!, prop.name) &&
-            !propsToRemove.has(prop.name) &&
-            this.getReflectionComment(prop) &&
-            !this.isFromReact(prop) &&
-            !this.shouldExcludeExternal({
-              parentReflection: reflection,
-              childReflection: prop,
-              signature,
-            })
-        )
-        .forEach((prop) => {
-          // If the prop has description (retrieved)
-          // through Typedoc, it's added into the spec.
-          const rawDescription = this.getDescription(prop)
-          const description = this.normalizeDescription(rawDescription)
-          if (!description) {
-            return
-          }
-          spec.props![prop.name] = {
-            description,
-            required: !prop.flags.isOptional,
-            defaultValue: this.getReflectionDefaultValue(prop, rawDescription),
-            tsType: prop.type
-              ? this.getTsType(prop.type)
-              : prop.signatures?.length
-                ? this.getFunctionTsType(prop.signatures[0])
-                : undefined,
-          }
-
-          if (!spec.props![prop.name].tsType) {
-            delete spec.props![prop.name].tsType
-          }
-        })
-    }
 
     return spec
   }

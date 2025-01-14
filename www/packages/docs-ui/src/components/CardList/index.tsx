@@ -5,13 +5,22 @@ import clsx from "clsx"
 type CardListProps = {
   items: CardProps[]
   itemsPerRow?: number
+  defaultItemsPerRow?: number
   className?: string
 }
 
-export const CardList = ({ items, itemsPerRow, className }: CardListProps) => {
+export const CardList = ({
+  items,
+  itemsPerRow,
+  className,
+  defaultItemsPerRow,
+}: CardListProps) => {
   if (!itemsPerRow) {
     // if length of items is even, set to `2`, else set to `3`
-    itemsPerRow = items.length === 1 ? 0 : items.length % 2 === 0 ? 2 : 3
+    itemsPerRow =
+      items.length === 1
+        ? 1
+        : defaultItemsPerRow || (items.length % 2 === 0 ? 2 : 3)
   }
   return (
     <section

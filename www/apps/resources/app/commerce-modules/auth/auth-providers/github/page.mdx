@@ -8,7 +8,7 @@ export const metadata = {
 
 In this document, you’ll learn about the GitHub Auth Module Provider and how to install and use it in the Auth Module.
 
-The Github Auth Module Provider handles authenticating users with their GitHub account.
+The Github Auth Module Provider authenticates users with their GitHub account.
 
 <Note title="Tip">
 
@@ -18,7 +18,7 @@ Learn about the authentication flow in [this guide](../../authentication-route/p
 
 ---
 
-## Install the Github Auth Module Provider
+## Register the Github Auth Module Provider
 
 <Prerequisites
   items={[
@@ -33,39 +33,36 @@ Learn about the authentication flow in [this guide](../../authentication-route/p
   ]}
 />
 
-To install the GitHub auth module provider, run the following command in the directory of your Medusa application:
+Add the module to the array of providers passed to the Auth Module:
 
-```bash npm2yarn
-npm install @medusajs/auth-github@preview
-```
-
-Next, add the module to the array of providers passed to the Auth Module:
-
-```js title="medusa-config.js"
-const { Modules } = require("@medusajs/utils")
+```ts title="medusa-config.ts"
+import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 // ...
 
-const modules = {
+module.exports = defineConfig({
   // ...
-  [Modules.AUTH]: {
-    resolve: "@medusajs/auth",
-    options: {
-      providers: [
-        // other providers...
-        {
-          resolve: "@medusajs/auth-github",
-          id: "github",
-          options: {
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callbackUrl: process.env.GITHUB_CALLBACK_URL,
+  modules: [
+    {
+      resolve: "@medusajs/medusa/auth",
+      dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
+      options: {
+        providers: [
+          // other providers...
+          {
+            resolve: "@medusajs/medusa/auth-github",
+            id: "github",
+            options: {
+              clientId: process.env.GITHUB_CLIENT_ID,
+              clientSecret: process.env.GITHUB_CLIENT_SECRET,
+              callbackUrl: process.env.GITHUB_CALLBACK_URL,
+            },
           },
-        },
-      ],
+        ],
+      },
     },
-  },
-}
+  ],
+})
 ```
 
 ### Environment Variables
@@ -144,6 +141,14 @@ GITHUB_CALLBACK_URL=<YOUR_GITHUB_CALLBACK_URL>
     </Table.Row>
   </Table.Body>
 </Table>
+
+---
+
+## Override Callback URL During Authentication
+
+In many cases, you may have different callback URL for actor types. For example, you may redirect admin users to a different URL than customers after authentication.
+
+The [Authenticate or Login API Route](../../authentication-route/page.mdx#login-route) can accept a `callback_url` body parameter to override the provider's `callbackUrl` option. Learn more in [this documentation](../../authentication-route/page.mdx#login-route).
 
 ---
 

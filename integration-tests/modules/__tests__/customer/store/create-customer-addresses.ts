@@ -1,6 +1,6 @@
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ICustomerModuleService } from "@medusajs/types"
 import { Modules } from "@medusajs/utils"
-import { medusaIntegrationTestRunner } from "medusa-test-utils"
 import {
   generatePublishableKey,
   generateStoreHeaders,
@@ -31,7 +31,8 @@ medusaIntegrationTestRunner({
 
       it("should create a customer address", async () => {
         const { customer, jwt } = await createAuthenticatedCustomer(
-          appContainer
+          api,
+          storeHeaders
         )
 
         const response = await api.post(

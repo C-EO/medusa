@@ -5,19 +5,19 @@
  * x-schemaName: AdminOrder
  * required:
  *   - payment_collections
+ *   - items
+ *   - shipping_methods
+ *   - status
+ *   - currency_code
  *   - id
  *   - version
  *   - region_id
  *   - customer_id
  *   - sales_channel_id
  *   - email
- *   - currency_code
- *   - items
- *   - shipping_methods
  *   - payment_status
  *   - fulfillment_status
  *   - summary
- *   - metadata
  *   - created_at
  *   - updated_at
  *   - original_item_total
@@ -52,7 +52,7 @@
  *     type: array
  *     description: The order's fulfillments.
  *     items:
- *       $ref: "#/components/schemas/BaseOrderFulfillment"
+ *       $ref: "#/components/schemas/AdminOrderFulfillment"
  *   sales_channel:
  *     $ref: "#/components/schemas/AdminSalesChannel"
  *   customer:
@@ -98,12 +98,12 @@
  *     type: array
  *     description: The order's items.
  *     items:
- *       $ref: "#/components/schemas/BaseOrderLineItem"
+ *       $ref: "#/components/schemas/AdminOrderLineItem"
  *   shipping_methods:
  *     type: array
  *     description: The order's shipping methods.
  *     items:
- *       $ref: "#/components/schemas/BaseOrderShippingMethod"
+ *       $ref: "#/components/schemas/AdminOrderShippingMethod"
  *   payment_status:
  *     type: string
  *     description: The order's payment status.
@@ -238,6 +238,10 @@
  *     type: number
  *     title: original_shipping_tax_total
  *     description: The tax total of the order's shipping excluding promotions.
+ *   status:
+ *     type: string
+ *     title: status
+ *     description: The order's status.
  * 
 */
 

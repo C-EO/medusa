@@ -1,15 +1,15 @@
-import { useMemo, useState } from "react"
 import { AdminOrder, AdminOrderPreview } from "@medusajs/types"
 import { Button, Heading, Input, toast } from "@medusajs/ui"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
   RouteFocusModal,
   StackedFocusModal,
   useStackedModal,
 } from "../../../../../components/modals"
+import { useAddOrderEditItems } from "../../../../../hooks/api/order-edits"
 import { AddOrderEditItemsTable } from "../add-order-edit-items-table"
 import { OrderEditItem } from "./order-edit-item"
-import { useAddOrderEditItems } from "../../../../../hooks/api/order-edits"
 
 type ExchangeInboundSectionProps = {
   order: AdminOrder
@@ -39,16 +39,19 @@ export const OrderEditItemsSection = ({
    * CALLBACKS
    */
   const onItemsSelected = async () => {
-    try {
-      await addItems({
+    await addItems(
+      {
         items: addedVariants.map((i) => ({
           variant_id: i,
           quantity: 1,
         })),
-      })
-    } catch (e) {
-      toast.error(e.message)
-    }
+      },
+      {
+        onError: (e) => {
+          toast.error(e.message)
+        },
+      }
+    )
 
     setIsOpen("inbound-items", false)
   }

@@ -1,5 +1,5 @@
-import { ModuleJoinerConfig } from "@medusajs/types"
-import { LINKS, Modules } from "@medusajs/utils"
+import { ModuleJoinerConfig } from "@medusajs/framework/types"
+import { LINKS, Modules } from "@medusajs/framework/utils"
 
 export const ProductVariantInventoryItem: ModuleJoinerConfig = {
   serviceName: LINKS.ProductVariantInventoryItem,
@@ -44,12 +44,12 @@ export const ProductVariantInventoryItem: ModuleJoinerConfig = {
       args: {
         methodSuffix: "InventoryItems",
       },
-      deleteCascade: true,
     },
   ],
   extends: [
     {
       serviceName: Modules.PRODUCT,
+      entity: "ProductVariant",
       fieldAlias: {
         inventory: "inventory_items.inventory",
       },
@@ -63,6 +63,7 @@ export const ProductVariantInventoryItem: ModuleJoinerConfig = {
     },
     {
       serviceName: Modules.INVENTORY,
+      entity: "InventoryItem",
       fieldAlias: {
         variants: {
           path: "variant_link.variant",

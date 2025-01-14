@@ -41,9 +41,15 @@ export function createBigNumberProperties<Schema extends DMLSchema>(
         continue
       }
 
-      const jsonProperty = parsed.nullable
+      let jsonProperty = parsed.nullable
         ? new JSONProperty().nullable()
         : new JSONProperty()
+
+      if (parsed.computed) {
+        jsonProperty = jsonProperty.computed() as unknown as
+          | JSONProperty
+          | NullableModifier<Record<string, unknown>, JSONProperty>
+      }
 
       schemaWithBigNumber[`raw_${key}`] = jsonProperty
     }

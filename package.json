@@ -4,6 +4,7 @@
   "workspaces": {
     "packages": [
       "packages/medusa",
+      "packages/medusa-test-utils",
       "packages/modules/*",
       "packages/modules/providers/*",
       "packages/core/*",
@@ -34,7 +35,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "express": "^4.17.1",
     "get-port": "^5.1.1",
-    "husky": "^7.0.4",
+    "glob": "^11.0.0",
     "import-from": "^3.0.0",
     "jest": "^29.7.0",
     "lint-staged": "^11.2.6",
@@ -52,8 +53,6 @@
     "*.{md,yaml,yml}": "prettier --write"
   },
   "scripts": {
-    "hooks:install": "husky install",
-    "hooks:uninstall": "husky uninstall",
     "build": "turbo run build --concurrency=50% --no-daemon",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts,.tsx .",
     "lint:path": "eslint --ignore-path .eslintignore --ext .js,.ts,.tsx",

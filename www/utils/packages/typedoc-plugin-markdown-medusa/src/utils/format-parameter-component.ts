@@ -1,4 +1,4 @@
-import { Parameter } from "../types"
+import { Parameter } from "../types.js"
 
 type FormatParameterComponentProps = {
   parameterComponent: string | undefined
@@ -48,9 +48,11 @@ export function formatParameterComponent({
 }: FormatParameterComponentProps): string {
   let extraPropsArr: string[] = []
   if (extraProps) {
-    extraPropsArr = Object.entries(extraProps).map(
-      ([key, value]) => `${key}=${JSON.stringify(value)}`
-    )
+    extraPropsArr = Object.entries(extraProps).map(([key, value]) => {
+      const valueJSON = JSON.stringify(value)
+      const valueStr = typeof value !== "string" ? `{${valueJSON}}` : valueJSON
+      return `${key}=${valueStr}`
+    })
   }
   // reorder component items to show required items first
   componentItems = sortComponentItems(componentItems)

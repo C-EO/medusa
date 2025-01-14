@@ -1,6 +1,10 @@
 ---
 sidebar_position: 2
 sidebar_label: "Example: Show Sale Price"
+tags:
+  - product
+  - storefront
+  - pricing
 ---
 
 export const metadata = {
@@ -27,6 +31,12 @@ Where `selectedVariantPrice` is either the variant the customer selected or the 
 
 If the price is a sale price, the original price is in the variant's `calculated_price.original_amount` field:
 
+<Note title="Tip">
+
+Find the implementation of the `formatPrice` function in [this guide](../show-price/page.mdx#price-formatting).
+
+</Note>
+
 ```ts
 const salePrice = formatPrice(selectedVariantPrice.calculated_price.calculated_amount)
 const originalPrice = formatPrice(selectedVariantPrice.calculated_price.original_amount)
@@ -37,12 +47,6 @@ const discountedAmount = formatPrice(
 ```
 
 You can use the original price either to display it or calculate and display the discounted amount.
-
-<Note title="Tip">
-
-Learn more about the `formatPrice` function in [this guide](../show-price/page.mdx#price-formatting)
-
-</Note>
 
 ---
 
@@ -58,11 +62,10 @@ The example only passes the `region_id` query parameter for pricing. Learn how t
 
 export const saleHighlights = [
   ["5", "useRegion", "The `useRegion` hook is implemented in the Region React Context guide."],
-  ["13", "{ params: { id } }: Params", "This is based on Next.js which passes the path parameters as a prop."],
-  ["19", "region", "Access the region using the `useRegion` hook."],
-  ["88", "isSale", "Determine whether the price is a sale price based on the value of the variant's `calculated_price.calculated_price.price_list_type` field."],
-  ["97", "originalPrice", "Retrieve the original price from the variant's `calculated_price.original_amount` field if the price is a sale price."],
-  ["143", "", "If the price is a sale price, show that to the customer along with the original price."]
+  ["17", "region", "Access the region using the `useRegion` hook."],
+  ["86", "isSale", "Determine whether the price is a sale price based on the value of the variant's `calculated_price.calculated_price.price_list_type` field."],
+  ["95", "originalPrice", "Retrieve the original price from the variant's `calculated_price.original_amount` field if the price is a sale price."],
+  ["141", "", "If the price is a sale price, show that to the customer along with the original price."]
 ]
 
 ```tsx highlights={saleHighlights}
@@ -72,13 +75,11 @@ import { useEffect, useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { useRegion } from "../providers/region"
 
-type Params = {
-  params: {
-    id: string
-  }
+type Props = {
+  id: string
 }
 
-export default function Product({ params: { id } }: Params) {
+export default function Product({ id }: Props) {
   const [loading, setLoading] = useState(true)
   const [product, setProduct] = useState<
     HttpTypes.StoreProduct | undefined
@@ -99,7 +100,7 @@ export default function Product({ params: { id } }: Params) {
     fetch(`http://localhost:9000/store/products/${id}?${queryParams.toString()}`, {
       credentials: "include",
       headers: {
-        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+        "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
       },
     })
     .then((res) => res.json())

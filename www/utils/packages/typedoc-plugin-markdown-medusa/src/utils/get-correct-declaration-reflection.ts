@@ -1,5 +1,5 @@
 import { DeclarationReflection } from "typedoc"
-import { MarkdownTheme } from "../theme"
+import { MarkdownTheme } from "../theme.js"
 
 /**
  * Some reflections are loaded as objects rather than instances

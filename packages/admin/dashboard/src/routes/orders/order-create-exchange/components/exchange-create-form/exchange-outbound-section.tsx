@@ -244,7 +244,7 @@ export const ExchangeOutboundSection = ({
           return true
         }
 
-        if (!item.variant.manage_inventory) {
+        if (!item.variant?.manage_inventory) {
           return true
         }
 

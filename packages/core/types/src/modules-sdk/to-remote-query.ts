@@ -21,7 +21,7 @@ type ExtractFiltersOperators<
     : Key extends ExcludedProps
     ? never
     : T[Key] extends string | number | boolean | Date
-    ? T[Key] | OperatorMap<T[Key] | T[Key][]>
+    ? T[Key] | T[Key][] | OperatorMap<T[Key] | T[Key][]>
     : T[Key] extends Array<infer R>
     ? TypeOnly<R> extends { __typename: any }
       ? RemoteQueryFilters<

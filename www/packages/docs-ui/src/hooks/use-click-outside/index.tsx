@@ -4,7 +4,7 @@ import React, { useCallback, useEffect } from "react"
 import { useIsBrowser } from "../.."
 
 export type UseClickOutsideProps = {
-  elmRef: React.RefObject<HTMLElement>
+  elmRef: React.RefObject<HTMLElement | null>
   onClickOutside: (e: MouseEvent) => void
 }
 
@@ -12,7 +12,7 @@ export const useClickOutside = ({
   elmRef,
   onClickOutside,
 }: UseClickOutsideProps) => {
-  const isBrowser = useIsBrowser()
+  const { isBrowser } = useIsBrowser()
 
   const checkClickOutside = useCallback(
     (e: MouseEvent) => {

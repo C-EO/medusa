@@ -1,128 +1,53 @@
 import {
-  createPsqlIndexStatementHelper,
-  DALUtils,
-  generateEntityId,
+  BelongsTo,
+  DmlEntity,
+  DMLEntitySchemaBuilder,
   GeoZoneType,
-} from "@medusajs/utils"
+  IdProperty,
+  JSONProperty,
+  model,
+  NullableModifier,
+  PrimaryKeyModifier,
+  TextProperty,
+} from "@medusajs/framework/utils"
 
-import { DAL } from "@medusajs/types"
-import {
-  BeforeCreate,
-  Entity,
-  Enum,
-  Filter,
-  ManyToOne,
-  OnInit,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-  Rel,
-} from "@mikro-orm/core"
-import ServiceZone from "./service-zone"
+import { ServiceZone } from "./service-zone"
 
-type GeoZoneOptionalProps = DAL.SoftDeletableModelDateColumns
-
-const DeletedAtIndex = createPsqlIndexStatementHelper({
-  tableName: "geo_zone",
-  columns: "deleted_at",
-  where: "deleted_at IS NOT NULL",
-})
-
-const CountryCodeIndex = createPsqlIndexStatementHelper({
-  tableName: "geo_zone",
-  columns: "country_code",
-  where: "deleted_at IS NULL",
-})
-
-const ProvinceCodeIndex = createPsqlIndexStatementHelper({
-  tableName: "geo_zone",
-  columns: "province_code",
-  where: "deleted_at IS NULL AND province_code IS NOT NULL",
-})
-
-const CityIndex = createPsqlIndexStatementHelper({
-  tableName: "geo_zone",
-  columns: "city",
-  where: "deleted_at IS NULL AND city IS NOT NULL",
-})
-
-const ServiceZoneIdIndex = createPsqlIndexStatementHelper({
-  tableName: "geo_zone",
-  columns: "service_zone_id",
-  where: "deleted_at IS NULL",
-})
-
-@Entity()
-@Filter(DALUtils.mikroOrmSoftDeletableFilterOptions)
-export default class GeoZone {
-  [OptionalProps]?: GeoZoneOptionalProps
-
-  @PrimaryKey({ columnType: "text" })
-  id: string
-
-  @Enum({ items: () => GeoZoneType, default: GeoZoneType.COUNTRY })
-  type: GeoZoneType
-
-  @CountryCodeIndex.MikroORMIndex()
-  @Property({ columnType: "text" })
-  country_code: string
-
-  @ProvinceCodeIndex.MikroORMIndex()
-  @Property({ columnType: "text", nullable: true })
-  province_code: string | null = null
-
-  @CityIndex.MikroORMIndex()
-  @Property({ columnType: "text", nullable: true })
-  city: string | null = null
-
-  @ManyToOne(() => ServiceZone, {
-    type: "text",
-    mapToPk: true,
-    fieldName: "service_zone_id",
-    onDelete: "cascade",
-  })
-  @ServiceZoneIdIndex.MikroORMIndex()
-  service_zone_id: string
-
-  @Property({ columnType: "jsonb", nullable: true })
-  postal_expression: Record<string, unknown> | null = null
-
-  @Property({ columnType: "jsonb", nullable: true })
-  metadata: Record<string, unknown> | null = null
-
-  @ManyToOne(() => ServiceZone, {
-    persist: false,
-  })
-  service_zone: Rel<ServiceZone>
-
-  @Property({
-    onCreate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  created_at: Date
-
-  @Property({
-    onCreate: () => new Date(),
-    onUpdate: () => new Date(),
-    columnType: "timestamptz",
-    defaultRaw: "now()",
-  })
-  updated_at: Date
-
-  @DeletedAtIndex.MikroORMIndex()
-  @Property({ columnType: "timestamptz", nullable: true })
-  deleted_at: Date | null = null
-
-  @BeforeCreate()
-  onCreate() {
-    this.id = generateEntityId(this.id, "fgz")
-    this.service_zone_id ??= this.service_zone?.id
-  }
-
-  @OnInit()
-  onInit() {
-    this.id = generateEntityId(this.id, "fgz")
-    this.service_zone_id ??= this.service_zone?.id
-  }
+export type GeoZoneSchema = {
+  id: PrimaryKeyModifier<string, IdProperty>
+  type: TextProperty
+  country_code: TextProperty
+  province_code?: NullableModifier<string, TextProperty>
+  city?: NullableModifier<string, TextProperty>
+  postal_expression?: NullableModifier<Record<string, unknown>, JSONProperty>
+  service_zone: BelongsTo<() => typeof ServiceZone>
+  metadata?: NullableModifier<Record<string, unknown>, JSONProperty>
 }
+
+export const GeoZone = model
+  .define("geo_zone", {
+    id: model.id({ prefix: "fgz" }).primaryKey(),
+    type: model.enum(GeoZoneType).default(GeoZoneType.COUNTRY),
+    country_code: model.text(),
+    province_code: model.text().nullable(),
+    city: model.text().nullable(),
+    postal_expression: model.json().nullable(),
+    service_zone: model.belongsTo<() => typeof ServiceZone>(() => ServiceZone, {
+      mappedBy: "geo_zones",
+    }),
+    metadata: model.json().nullable(),
+  })
+  .indexes([
+    {
+      on: ["country_code"],
+      where: "deleted_at IS NULL",
+    },
+    {
+      on: ["province_code"],
+      where: "deleted_at IS NULL",
+    },
+    {
+      on: ["city"],
+      where: "deleted_at IS NULL",
+    },
+  ]) as unknown as DmlEntity<DMLEntitySchemaBuilder<GeoZoneSchema>, "GeoZone">

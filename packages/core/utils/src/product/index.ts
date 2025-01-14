@@ -6,3 +6,4 @@ export enum ProductStatus {
 }
 
 export * from "./events"
+export * from "./get-variant-availability"

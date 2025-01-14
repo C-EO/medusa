@@ -23,7 +23,16 @@ const Checkbox = React.forwardRef<
         className
       )}
     >
-      <div className="text-ui-fg-on-inverted bg-ui-bg-base shadow-borders-base group-hover:bg-ui-bg-base-hover group-focus-visible:!shadow-borders-interactive-with-focus group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive-with-shadow group-data-[state=indeterminate]:bg-ui-bg-interactive group-data-[state=indeterminate]:shadow-borders-interactive-with-shadow [&_path]:shadow-details-contrast-on-bg-interactive group-disabled:text-ui-fg-disabled group-disabled:!bg-ui-bg-disabled group-disabled:!shadow-borders-base transition-fg h-[14px] w-[14px] rounded-[3px]">
+      <div
+        className={clx(
+          "text-ui-fg-on-inverted bg-ui-bg-base shadow-borders-base [&_path]:shadow-details-contrast-on-bg-interactive transition-fg h-[14px] w-[14px] rounded-[3px]",
+          "group-disabled:cursor-not-allowed group-disabled:opacity-50",
+          "group-focus-visible:!shadow-borders-interactive-with-focus",
+          "group-hover:group-enabled:group-data-[state=unchecked]:bg-ui-bg-base-hover",
+          "group-data-[state=checked]:bg-ui-bg-interactive group-data-[state=checked]:shadow-borders-interactive-with-shadow",
+          "group-data-[state=indeterminate]:bg-ui-bg-interactive group-data-[state=indeterminate]:shadow-borders-interactive-with-shadow"
+        )}
+      >
         <Primitives.Indicator className="absolute inset-0 flex items-center justify-center">
           {checked === "indeterminate" ? <MinusMini /> : <CheckMini />}
         </Primitives.Indicator>

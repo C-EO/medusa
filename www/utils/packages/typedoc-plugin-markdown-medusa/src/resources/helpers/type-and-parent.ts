@@ -1,6 +1,6 @@
-import * as Handlebars from "handlebars"
+import Handlebars from "handlebars"
 import { SignatureReflection } from "typedoc"
-import { ArrayType, ReferenceType } from "typedoc/dist/lib/models/types"
+import { ArrayType, ReferenceType } from "typedoc"
 import { escapeChars } from "utils"
 
 export default function () {

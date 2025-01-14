@@ -1,10 +1,10 @@
 import { markPaymentCollectionAsPaid } from "@medusajs/core-flows"
-import { HttpTypes } from "@medusajs/types"
+import { HttpTypes } from "@medusajs/framework/types"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
-} from "../../../../../types/routing"
-import { refetchEntity } from "../../../../utils/refetch-entity"
+  refetchEntity,
+} from "@medusajs/framework/http"
 import { AdminMarkPaymentCollectionPaidType } from "../../validators"
 
 export const POST = async (
@@ -25,7 +25,7 @@ export const POST = async (
     "payment_collection",
     id,
     req.scope,
-    req.remoteQueryConfig.fields
+    req.queryConfig.fields
   )
 
   res.status(200).json({ payment_collection: paymentCollection })

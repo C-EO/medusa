@@ -1,11 +1,12 @@
 import boxen from "boxen"
 import { ChildProcess, execSync, fork } from "child_process"
 import chokidar, { FSWatcher } from "chokidar"
-import { Store } from "medusa-telemetry"
+import { Store } from "@medusajs/telemetry"
 import { EOL } from "os"
 import path from "path"
 
-import { logger, MEDUSA_CLI_PATH } from "@medusajs/framework"
+import { logger } from "@medusajs/framework/logger"
+import { MEDUSA_CLI_PATH } from "@medusajs/framework"
 
 const defaultConfig = {
   padding: 5,
@@ -74,8 +75,9 @@ export default async function ({ types, directory }) {
         this.childProcess.removeAllListeners()
         if (process.platform === "win32") {
           execSync(`taskkill /PID ${this.childProcess.pid} /F /T`)
+        } else {
+          this.childProcess.kill("SIGINT")
         }
-        this.childProcess.kill("SIGINT")
       }
       this.start()
     },

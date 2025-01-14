@@ -1,8 +1,11 @@
+import { CartWorkflowEvents, MedusaError } from "@medusajs/framework/utils"
 import {
-  WorkflowData,
   createWorkflow,
+  parallelize,
   transform,
-} from "@medusajs/workflows-sdk"
+  WorkflowData,
+} from "@medusajs/framework/workflows-sdk"
+import { emitEventStep } from "../../common/steps/emit-event"
 import { useRemoteQueryStep } from "../../common/steps/use-remote-query"
 import {
   addShippingMethodToCartStep,
@@ -10,9 +13,11 @@ import {
   validateCartShippingOptionsStep,
 } from "../steps"
 import { validateCartStep } from "../steps/validate-cart"
+import { validateAndReturnShippingMethodsDataStep } from "../steps/validate-shipping-methods-data"
+import { validateCartShippingOptionsPriceStep } from "../steps/validate-shipping-options-price"
 import { cartFieldsForRefreshSteps } from "../utils/fields"
-import { updateCartPromotionsWorkflow } from "./update-cart-promotions"
-import { updateTaxLinesWorkflow } from "./update-tax-lines"
+import { listShippingOptionsForCartWithPricingWorkflow } from "./list-shipping-options-for-cart-with-pricing"
+import { refreshCartItemsWorkflow } from "./refresh-cart-items"
 
 export interface AddShippingMethodToCartWorkflowInput {
   cart_id: string
@@ -26,7 +31,7 @@ export const addShippingMethodToCartWorkflowId = "add-shipping-method-to-cart"
 /**
  * This workflow adds shipping methods to a cart.
  */
-export const addShippingMethodToWorkflow = createWorkflow(
+export const addShippingMethodToCartWorkflow = createWorkflow(
   addShippingMethodToCartWorkflowId,
   (
     input: WorkflowData<AddShippingMethodToCartWorkflowInput>
@@ -50,29 +55,65 @@ export const addShippingMethodToWorkflow = createWorkflow(
       shippingOptionsContext: { is_return: "false", enabled_in_store: "true" },
     })
 
-    const shippingOptions = useRemoteQueryStep({
-      entry_point: "shipping_option",
-      fields: [
-        "id",
-        "name",
-        "calculated_price.calculated_amount",
-        "calculated_price.is_calculated_price_tax_inclusive",
-      ],
-      variables: {
-        id: optionIds,
-        calculated_price: {
-          context: { currency_code: cart.currency_code },
+    const shippingOptions =
+      listShippingOptionsForCartWithPricingWorkflow.runAsStep({
+        input: {
+          options: input.options,
+          cart_id: cart.id,
+          is_return: false,
         },
-      },
-    }).config({ name: "fetch-shipping-option" })
+      })
+
+    validateCartShippingOptionsPriceStep({ shippingOptions })
+
+    const validateShippingMethodsDataInput = transform(
+      { input, shippingOptions, cart },
+      ({ input, shippingOptions, cart }) => {
+        return input.options.map((inputOption) => {
+          const shippingOption = shippingOptions.find(
+            (so) => so.id === inputOption.id
+          )
+
+          return {
+            id: inputOption.id,
+            provider_id: shippingOption?.provider_id,
+            option_data: shippingOption?.data ?? {},
+            method_data: inputOption.data ?? {},
+            context: {
+              ...cart,
+              from_location: shippingOption?.stock_location ?? {},
+            },
+          }
+        })
+      }
+    )
+
+    const validatedMethodData = validateAndReturnShippingMethodsDataStep(
+      validateShippingMethodsDataInput
+    )
 
     const shippingMethodInput = transform(
-      { input, shippingOptions },
+      {
+        input,
+        shippingOptions,
+        validatedMethodData,
+      },
       (data) => {
         const options = (data.input.options ?? []).map((option) => {
           const shippingOption = data.shippingOptions.find(
             (so) => so.id === option.id
           )!
+
+          if (!shippingOption?.calculated_price) {
+            throw new MedusaError(
+              MedusaError.Types.INVALID_DATA,
+              `Shipping option with ID ${shippingOption.id} do not have a price`
+            )
+          }
+
+          const methodData = data.validatedMethodData?.find((methodData) => {
+            return methodData?.[option.id]
+          })
 
           return {
             shipping_option_id: shippingOption.id,
@@ -80,7 +121,7 @@ export const addShippingMethodToWorkflow = createWorkflow(
             is_tax_inclusive:
               !!shippingOption.calculated_price
                 .is_calculated_price_tax_inclusive,
-            data: option.data ?? {},
+            data: methodData?.[option.id] ?? {},
             name: shippingOption.name,
             cart_id: data.input.cart_id,
           }
@@ -90,29 +131,25 @@ export const addShippingMethodToWorkflow = createWorkflow(
       }
     )
 
-    const currentShippingMethods = transform({ cart }, ({ cart }) => {
-      return cart.shipping_methods.map((sm) => sm.id)
-    })
+    const currentShippingMethods = transform({ cart }, ({ cart }) =>
+      cart.shipping_methods.map((sm) => sm.id)
+    )
 
-    removeShippingMethodFromCartStep({
-      shipping_method_ids: currentShippingMethods,
-    })
+    parallelize(
+      removeShippingMethodFromCartStep({
+        shipping_method_ids: currentShippingMethods,
+      }),
+      addShippingMethodToCartStep({
+        shipping_methods: shippingMethodInput,
+      }),
+      emitEventStep({
+        eventName: CartWorkflowEvents.UPDATED,
+        data: { id: input.cart_id },
+      })
+    )
 
-    const shippingMethodsToAdd = addShippingMethodToCartStep({
-      shipping_methods: shippingMethodInput,
-    })
-
-    updateTaxLinesWorkflow.runAsStep({
-      input: {
-        cart_or_cart_id: input.cart_id,
-        shipping_methods: shippingMethodsToAdd,
-      },
-    })
-
-    updateCartPromotionsWorkflow.runAsStep({
-      input: {
-        cart_id: input.cart_id,
-      },
+    refreshCartItemsWorkflow.runAsStep({
+      input: { cart_id: cart.id },
     })
   }
 )

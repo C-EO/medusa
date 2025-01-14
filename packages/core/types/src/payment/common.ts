@@ -472,6 +472,11 @@ export interface CaptureDTO {
   amount: BigNumberValue
 
   /**
+   * The raw captured amount.
+   */
+  raw_amount?: BigNumberValue
+
+  /**
    * The creation date of the capture.
    */
   created_at: Date
@@ -501,6 +506,11 @@ export interface RefundDTO {
    * The refunded amount.
    */
   amount: BigNumberValue
+
+  /**
+   * The raw refunded amount.
+   */
+  raw_amount?: BigNumberValue
 
   /**
    * The id of the refund_reason that is associated with the refund
@@ -610,7 +620,7 @@ export interface PaymentProviderDTO {
   /**
    * Whether the payment provider is enabled.
    */
-  is_enabled: string
+  is_enabled: boolean
 }
 
 /**
@@ -635,6 +645,16 @@ export interface FilterableRefundReasonProps
    * The IDs to filter the refund reasons by.
    */
   id?: string | string[]
+
+  /**
+   * Filter by the description of the refund reason
+   */
+  description?: string | string[]
+
+  /**
+   * Filter by the refund reason label
+   */
+  label?: string | string[]
 }
 
 export interface RefundReasonDTO {

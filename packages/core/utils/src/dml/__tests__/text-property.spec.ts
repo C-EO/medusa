@@ -13,6 +13,7 @@ describe("Text property", () => {
         options: { searchable: false },
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
     })
@@ -29,6 +30,7 @@ describe("Text property", () => {
         options: { searchable: false },
       },
       nullable: false,
+      computed: false,
       indexes: [],
       relationships: [],
       primaryKey: true,

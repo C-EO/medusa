@@ -1,7 +1,8 @@
-import { CreateCampaignDTO } from "@medusajs/types"
+import { CreateCampaignDTO } from "@medusajs/framework/types"
 import { SqlEntityManager } from "@mikro-orm/postgresql"
 import { Campaign } from "@models"
 import { defaultCampaignsData } from "./data"
+import { toMikroORMEntity } from "@medusajs/framework/utils"
 
 export * from "./data"
 
@@ -12,7 +13,7 @@ export async function createCampaigns(
   const campaigns: Campaign[] = []
 
   for (let campaignData of campaignsData) {
-    let campaign = manager.create(Campaign, campaignData)
+    let campaign = manager.create(toMikroORMEntity(Campaign), campaignData)
 
     manager.persist(campaign)
 

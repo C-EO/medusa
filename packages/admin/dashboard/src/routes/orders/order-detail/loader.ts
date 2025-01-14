@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs } from "react-router-dom"
 
-import { HttpTypes } from "@medusajs/types"
 import { ordersQueryKeys } from "../../../hooks/api/orders"
 import { sdk } from "../../../lib/client"
 import { queryClient } from "../../../lib/query-client"
@@ -18,8 +17,5 @@ export const orderLoader = async ({ params }: LoaderFunctionArgs) => {
   const id = params.id
   const query = orderDetailQuery(id!)
 
-  return (
-    queryClient.getQueryData<HttpTypes.AdminOrderResponse>(query.queryKey) ??
-    (await queryClient.fetchQuery(query))
-  )
+  return queryClient.ensureQueryData(query)
 }

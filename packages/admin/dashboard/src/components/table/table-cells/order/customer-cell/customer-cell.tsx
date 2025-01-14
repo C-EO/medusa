@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 export const CustomerCell = ({
   customer,
 }: {
-  customer: HttpTypes.AdminCustomer | null
+  customer?: HttpTypes.AdminCustomer | null
 }) => {
   if (!customer) {
     return <span className="text-ui-fg-muted">-</span>
