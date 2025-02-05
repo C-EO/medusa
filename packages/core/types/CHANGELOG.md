@@ -1,5 +1,15 @@
 # @medusajs/types
 
+## 2.4.1
+
+### Patch Changes
+
+- [#11263](https://github.com/medusajs/medusa/pull/11263) [`65fae943c9d919f658c8660e5b46626c1b302e31`](https://github.com/medusajs/medusa/commit/65fae943c9d919f658c8660e5b46626c1b302e31) Thanks [@carlos-r-l-rodrigues](https://github.com/carlos-r-l-rodrigues)! - feat(orchestration): hydrate resultset
+
+- [#11285](https://github.com/medusajs/medusa/pull/11285) [`f07af7b93c86673e730dc4e5eba8df2572013f9f`](https://github.com/medusajs/medusa/commit/f07af7b93c86673e730dc4e5eba8df2572013f9f) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard,core-flows,types,medusa): Allow editing Order metadata
+
+- [#11295](https://github.com/medusajs/medusa/pull/11295) [`3c51709daf07dcdd5563fa08fec2446a42cc8058`](https://github.com/medusajs/medusa/commit/3c51709daf07dcdd5563fa08fec2446a42cc8058) Thanks [@thetutlage](https://github.com/thetutlage)! - feat: map container types for core services to interface
+
 ## 2.4.0
 
 ### Minor Changes

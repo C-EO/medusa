@@ -1,5 +1,7 @@
 # @medusajs/event-bus-redis
 
+## 2.4.1
+
 ## 2.4.0
 
 ### Patch Changes

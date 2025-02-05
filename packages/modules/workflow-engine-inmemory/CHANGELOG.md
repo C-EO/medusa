@@ -1,5 +1,11 @@
 # @medusajs/workflow-engine-inmemory
 
+## 2.4.1
+
+### Patch Changes
+
+- [#11200](https://github.com/medusajs/medusa/pull/11200) [`c8376a9f15ba728506411e567ed4389c7b64406f`](https://github.com/medusajs/medusa/commit/c8376a9f15ba728506411e567ed4389c7b64406f) Thanks [@carlos-r-l-rodrigues](https://github.com/carlos-r-l-rodrigues)! - chore(medusa): remove expired workflow executions
+
 ## 2.4.0
 
 ### Minor Changes
