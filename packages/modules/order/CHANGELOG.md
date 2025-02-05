@@ -1,5 +1,13 @@
 # @medusajs/order
 
+## 2.4.1
+
+### Patch Changes
+
+- [#11216](https://github.com/medusajs/medusa/pull/11216) [`016e332e9b98f316cded6eb999927fc942ce56c5`](https://github.com/medusajs/medusa/commit/016e332e9b98f316cded6eb999927fc942ce56c5) Thanks [@thetutlage](https://github.com/thetutlage)! - feat: make AbstractModuleService create method type-safe
+
+- [#11181](https://github.com/medusajs/medusa/pull/11181) [`16fe43f214ecd1fb7fe6622c0c6e825e998c1be9`](https://github.com/medusajs/medusa/commit/16fe43f214ecd1fb7fe6622c0c6e825e998c1be9) Thanks [@shahednasser](https://github.com/shahednasser)! - fix(order): add data model name in define schema
+
 ## 2.4.0
 
 ### Minor Changes

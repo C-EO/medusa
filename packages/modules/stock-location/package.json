@@ -1,6 +1,6 @@
 {
   "name": "@medusajs/stock-location",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Stock Location Module for Medusa",
   "main": "dist/index.js",
   "repository": {
@@ -23,8 +23,8 @@
   "author": "Medusa",
   "license": "MIT",
   "devDependencies": {
-    "@medusajs/framework": "~2.4.0",
-    "@medusajs/test-utils": "~2.4.0",
+    "@medusajs/framework": "~2.4.1",
+    "@medusajs/test-utils": "~2.4.1",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/migrations": "6.4.3",
