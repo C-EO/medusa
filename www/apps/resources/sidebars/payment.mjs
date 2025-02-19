@@ -45,6 +45,11 @@ export const paymentSidebar = [
           },
           {
             type: "link",
+            path: "/commerce-modules/payment/account-holder",
+            title: "Account Holder",
+          },
+          {
+            type: "link",
             path: "/commerce-modules/payment/webhook-events",
             title: "Webhook Events",
           },

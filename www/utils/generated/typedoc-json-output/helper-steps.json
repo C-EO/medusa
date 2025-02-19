@@ -1,12 +1,12 @@
 {
-	"id": 38629,
+	"id": 38732,
 	"name": "helper-steps",
 	"variant": "project",
 	"kind": 1,
 	"flags": {},
 	"children": [
 		{
-			"id": 38630,
+			"id": 38733,
 			"name": "createLinksStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -18,7 +18,7 @@
 					"fileName": "core-flows/src/common/steps/create-remote-links.ts",
 					"line": 6,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/create-remote-links.ts#L6"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/create-remote-links.ts#L6"
 				}
 			],
 			"type": {
@@ -28,7 +28,7 @@
 			"defaultValue": "\"create-remote-links\""
 		},
 		{
-			"id": 38631,
+			"id": 38734,
 			"name": "createRemoteLinkStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -54,7 +54,7 @@
 			},
 			"children": [
 				{
-					"id": 38640,
+					"id": 38743,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -72,7 +72,7 @@
 					}
 				},
 				{
-					"id": 38641,
+					"id": 38744,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -94,8 +94,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38640,
-						38641
+						38743,
+						38744
 					]
 				}
 			],
@@ -104,12 +104,12 @@
 					"fileName": "core-flows/src/common/steps/create-remote-links.ts",
 					"line": 22,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/create-remote-links.ts#L22"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/create-remote-links.ts#L22"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38632,
+					"id": 38735,
 					"name": "createRemoteLinkStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -119,12 +119,12 @@
 							"fileName": "core-flows/src/common/steps/create-remote-links.ts",
 							"line": 22,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/create-remote-links.ts#L22"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/create-remote-links.ts#L22"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38633,
+							"id": 38736,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -249,14 +249,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38634,
+									"id": 38737,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38635,
+											"id": 38738,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -270,7 +270,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38636,
+													"id": 38739,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -284,7 +284,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38637,
+															"id": 38740,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -295,14 +295,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38638,
+																			"id": 38741,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38639,
+																					"id": 38742,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -326,7 +326,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38639
+																						38742
 																					]
 																				}
 																			],
@@ -411,7 +411,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38635
+												38738
 											]
 										}
 									],
@@ -453,7 +453,7 @@
 			]
 		},
 		{
-			"id": 38642,
+			"id": 38745,
 			"name": "DismissRemoteLinksStepInput",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -463,7 +463,7 @@
 					"fileName": "core-flows/src/common/steps/dismiss-remote-links.ts",
 					"line": 7,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L7"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L7"
 				}
 			],
 			"type": {
@@ -494,7 +494,7 @@
 			}
 		},
 		{
-			"id": 38643,
+			"id": 38746,
 			"name": "dismissRemoteLinkStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -506,7 +506,7 @@
 					"fileName": "core-flows/src/common/steps/dismiss-remote-links.ts",
 					"line": 10,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L10"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L10"
 				}
 			],
 			"type": {
@@ -516,7 +516,7 @@
 			"defaultValue": "\"dismiss-remote-links\""
 		},
 		{
-			"id": 38644,
+			"id": 38747,
 			"name": "dismissRemoteLinkStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -542,7 +542,7 @@
 			},
 			"children": [
 				{
-					"id": 38653,
+					"id": 38756,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -560,7 +560,7 @@
 					}
 				},
 				{
-					"id": 38654,
+					"id": 38757,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -582,8 +582,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38653,
-						38654
+						38756,
+						38757
 					]
 				}
 			],
@@ -592,12 +592,12 @@
 					"fileName": "core-flows/src/common/steps/dismiss-remote-links.ts",
 					"line": 26,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L26"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L26"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38645,
+					"id": 38748,
 					"name": "dismissRemoteLinkStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -607,12 +607,12 @@
 							"fileName": "core-flows/src/common/steps/dismiss-remote-links.ts",
 							"line": 26,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L26"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/dismiss-remote-links.ts#L26"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38646,
+							"id": 38749,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -622,7 +622,7 @@
 								"types": [
 									{
 										"type": "reference",
-										"target": 38642,
+										"target": 38745,
 										"name": "DismissRemoteLinksStepInput",
 										"package": "@medusajs/core-flows"
 									},
@@ -635,7 +635,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 38642,
+												"target": 38745,
 												"name": "DismissRemoteLinksStepInput",
 												"package": "@medusajs/core-flows"
 											}
@@ -725,14 +725,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38647,
+									"id": 38750,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38648,
+											"id": 38751,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -746,7 +746,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38649,
+													"id": 38752,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -760,7 +760,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38650,
+															"id": 38753,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -771,14 +771,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38651,
+																			"id": 38754,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38652,
+																					"id": 38755,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -802,7 +802,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38652
+																						38755
 																					]
 																				}
 																			],
@@ -887,7 +887,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38648
+												38751
 											]
 										}
 									],
@@ -929,7 +929,7 @@
 			]
 		},
 		{
-			"id": 38655,
+			"id": 38758,
 			"name": "emitEventStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -941,7 +941,7 @@
 					"fileName": "core-flows/src/common/steps/emit-event.ts",
 					"line": 38,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/emit-event.ts#L38"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/emit-event.ts#L38"
 				}
 			],
 			"type": {
@@ -951,7 +951,7 @@
 			"defaultValue": "\"emit-event-step\""
 		},
 		{
-			"id": 38656,
+			"id": 38759,
 			"name": "emitEventStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -977,7 +977,7 @@
 			},
 			"children": [
 				{
-					"id": 38665,
+					"id": 38768,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -995,7 +995,7 @@
 					}
 				},
 				{
-					"id": 38666,
+					"id": 38769,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1017,8 +1017,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38665,
-						38666
+						38768,
+						38769
 					]
 				}
 			],
@@ -1027,12 +1027,12 @@
 					"fileName": "core-flows/src/common/steps/emit-event.ts",
 					"line": 51,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/emit-event.ts#L51"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/emit-event.ts#L51"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38657,
+					"id": 38760,
 					"name": "emitEventStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -1042,12 +1042,12 @@
 							"fileName": "core-flows/src/common/steps/emit-event.ts",
 							"line": 51,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/emit-event.ts#L51"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/emit-event.ts#L51"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38658,
+							"id": 38761,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -1109,14 +1109,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38659,
+									"id": 38762,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38660,
+											"id": 38763,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -1130,7 +1130,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38661,
+													"id": 38764,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -1144,7 +1144,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38662,
+															"id": 38765,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -1155,14 +1155,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38663,
+																			"id": 38766,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38664,
+																					"id": 38767,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -1186,7 +1186,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38664
+																						38767
 																					]
 																				}
 																			],
@@ -1263,7 +1263,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38660
+												38763
 											]
 										}
 									],
@@ -1297,7 +1297,7 @@
 			]
 		},
 		{
-			"id": 38667,
+			"id": 38770,
 			"name": "removeRemoteLinkStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -1309,7 +1309,7 @@
 					"fileName": "core-flows/src/common/steps/remove-remote-links.ts",
 					"line": 8,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L8"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L8"
 				}
 			],
 			"type": {
@@ -1319,7 +1319,7 @@
 			"defaultValue": "\"remove-remote-links\""
 		},
 		{
-			"id": 38668,
+			"id": 38771,
 			"name": "removeRemoteLinkStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -1345,7 +1345,7 @@
 			},
 			"children": [
 				{
-					"id": 38680,
+					"id": 38783,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1363,7 +1363,7 @@
 					}
 				},
 				{
-					"id": 38681,
+					"id": 38784,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1385,8 +1385,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38680,
-						38681
+						38783,
+						38784
 					]
 				}
 			],
@@ -1395,12 +1395,12 @@
 					"fileName": "core-flows/src/common/steps/remove-remote-links.ts",
 					"line": 21,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L21"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L21"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38669,
+					"id": 38772,
 					"name": "removeRemoteLinkStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -1410,12 +1410,12 @@
 							"fileName": "core-flows/src/common/steps/remove-remote-links.ts",
 							"line": 21,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L21"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/remove-remote-links.ts#L21"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38670,
+							"id": 38773,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -1462,7 +1462,7 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38671,
+									"id": 38774,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
@@ -1476,14 +1476,14 @@
 									],
 									"indexSignatures": [
 										{
-											"id": 38672,
+											"id": 38775,
 											"name": "__index",
 											"variant": "signature",
 											"kind": 8192,
 											"flags": {},
 											"parameters": [
 												{
-													"id": 38673,
+													"id": 38776,
 													"name": "key",
 													"variant": "param",
 													"kind": 32768,
@@ -1617,14 +1617,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38674,
+									"id": 38777,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38675,
+											"id": 38778,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -1638,7 +1638,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38676,
+													"id": 38779,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -1652,7 +1652,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38677,
+															"id": 38780,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -1663,14 +1663,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38678,
+																			"id": 38781,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38679,
+																					"id": 38782,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -1694,7 +1694,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38679
+																						38782
 																					]
 																				}
 																			],
@@ -1785,7 +1785,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38675
+												38778
 											]
 										}
 									],
@@ -1833,7 +1833,7 @@
 			]
 		},
 		{
-			"id": 38682,
+			"id": 38785,
 			"name": "updateRemoteLinksStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -1845,7 +1845,7 @@
 					"fileName": "core-flows/src/common/steps/update-remote-links.ts",
 					"line": 9,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/update-remote-links.ts#L9"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/update-remote-links.ts#L9"
 				}
 			],
 			"type": {
@@ -1855,7 +1855,7 @@
 			"defaultValue": "\"update-remote-links-step\""
 		},
 		{
-			"id": 38683,
+			"id": 38786,
 			"name": "updateRemoteLinksStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -1881,7 +1881,7 @@
 			},
 			"children": [
 				{
-					"id": 38692,
+					"id": 38795,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1899,7 +1899,7 @@
 					}
 				},
 				{
-					"id": 38693,
+					"id": 38796,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1921,8 +1921,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38692,
-						38693
+						38795,
+						38796
 					]
 				}
 			],
@@ -1931,12 +1931,12 @@
 					"fileName": "core-flows/src/common/steps/update-remote-links.ts",
 					"line": 32,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/update-remote-links.ts#L32"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/update-remote-links.ts#L32"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38684,
+					"id": 38787,
 					"name": "updateRemoteLinksStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -1946,12 +1946,12 @@
 							"fileName": "core-flows/src/common/steps/update-remote-links.ts",
 							"line": 32,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/update-remote-links.ts#L32"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/update-remote-links.ts#L32"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38685,
+							"id": 38788,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -2076,14 +2076,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38686,
+									"id": 38789,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38687,
+											"id": 38790,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -2097,7 +2097,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38688,
+													"id": 38791,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -2111,7 +2111,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38689,
+															"id": 38792,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -2122,14 +2122,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38690,
+																			"id": 38793,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38691,
+																					"id": 38794,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -2153,7 +2153,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38691
+																						38794
 																					]
 																				}
 																			],
@@ -2238,7 +2238,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38687
+												38790
 											]
 										}
 									],
@@ -2280,7 +2280,7 @@
 			]
 		},
 		{
-			"id": 38694,
+			"id": 38797,
 			"name": "UseQueryGraphStepInput",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -2290,12 +2290,12 @@
 					"fileName": "core-flows/src/common/steps/use-query-graph.ts",
 					"line": 10,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-query-graph.ts#L10"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-query-graph.ts#L10"
 				}
 			],
 			"typeParameters": [
 				{
-					"id": 38697,
+					"id": 38800,
 					"name": "TEntry",
 					"variant": "typeParam",
 					"kind": 131072,
@@ -2318,7 +2318,7 @@
 						"typeArguments": [
 							{
 								"type": "reference",
-								"target": 38697,
+								"target": 38800,
 								"name": "TEntry",
 								"package": "@medusajs/core-flows",
 								"refersToTypeParameter": true
@@ -2330,14 +2330,14 @@
 					{
 						"type": "reflection",
 						"declaration": {
-							"id": 38695,
+							"id": 38798,
 							"name": "__type",
 							"variant": "declaration",
 							"kind": 65536,
 							"flags": {},
 							"children": [
 								{
-									"id": 38696,
+									"id": 38799,
 									"name": "options",
 									"variant": "declaration",
 									"kind": 1024,
@@ -2349,7 +2349,7 @@
 											"fileName": "core-flows/src/common/steps/use-query-graph.ts",
 											"line": 11,
 											"character": 2,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-query-graph.ts#L11"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-query-graph.ts#L11"
 										}
 									],
 									"type": {
@@ -2367,7 +2367,7 @@
 								{
 									"title": "Properties",
 									"children": [
-										38696
+										38799
 									]
 								}
 							],
@@ -2376,7 +2376,7 @@
 									"fileName": "core-flows/src/common/steps/use-query-graph.ts",
 									"line": 10,
 									"character": 87,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-query-graph.ts#L10"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-query-graph.ts#L10"
 								}
 							]
 						}
@@ -2385,7 +2385,7 @@
 			}
 		},
 		{
-			"id": 38698,
+			"id": 38801,
 			"name": "useQueryGraphStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -2442,12 +2442,12 @@
 					"fileName": "core-flows/src/common/steps/use-query-graph.ts",
 					"line": 102,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-query-graph.ts#L102"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-query-graph.ts#L102"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38699,
+					"id": 38802,
 					"name": "useQueryGraphStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -2457,12 +2457,12 @@
 							"fileName": "core-flows/src/common/steps/use-query-graph.ts",
 							"line": 102,
 							"character": 33,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-query-graph.ts#L102"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-query-graph.ts#L102"
 						}
 					],
 					"typeParameters": [
 						{
-							"id": 38700,
+							"id": 38803,
 							"name": "TEntry",
 							"variant": "typeParam",
 							"kind": 131072,
@@ -2477,18 +2477,18 @@
 					],
 					"parameters": [
 						{
-							"id": 38701,
+							"id": 38804,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
 							"flags": {},
 							"type": {
 								"type": "reference",
-								"target": 38694,
+								"target": 38797,
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 38700,
+										"target": 38803,
 										"name": "TEntry",
 										"package": "@medusajs/core-flows",
 										"refersToTypeParameter": true
@@ -2505,14 +2505,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38702,
+									"id": 38805,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38703,
+											"id": 38806,
 											"name": "data",
 											"variant": "declaration",
 											"kind": 1024,
@@ -2531,7 +2531,7 @@
 														"type": "conditional",
 														"checkType": {
 															"type": "reference",
-															"target": 38700,
+															"target": 38803,
 															"name": "TEntry",
 															"package": "@medusajs/core-flows",
 															"refersToTypeParameter": true
@@ -2546,11 +2546,11 @@
 																"type": "indexedAccess",
 																"indexType": {
 																	"type": "reference",
-																	"target": 38700,
+																	"target": 38803,
 																	"typeArguments": [
 																		{
 																			"type": "reference",
-																			"target": 38700,
+																			"target": 38803,
 																			"name": "TEntry",
 																			"package": "@medusajs/core-flows",
 																			"refersToTypeParameter": true
@@ -2590,7 +2590,7 @@
 																"type": "conditional",
 																"checkType": {
 																	"type": "reference",
-																	"target": 38700,
+																	"target": 38803,
 																	"name": "TEntry",
 																	"package": "@medusajs/core-flows",
 																	"refersToTypeParameter": true
@@ -2605,11 +2605,11 @@
 																		"type": "indexedAccess",
 																		"indexType": {
 																			"type": "reference",
-																			"target": 38700,
+																			"target": 38803,
 																			"typeArguments": [
 																				{
 																					"type": "reference",
-																					"target": 38700,
+																					"target": 38803,
 																					"name": "TEntry",
 																					"package": "@medusajs/core-flows",
 																					"refersToTypeParameter": true
@@ -2646,7 +2646,7 @@
 											}
 										},
 										{
-											"id": 38704,
+											"id": 38807,
 											"name": "metadata",
 											"variant": "declaration",
 											"kind": 1024,
@@ -2709,8 +2709,8 @@
 										{
 											"title": "Properties",
 											"children": [
-												38703,
-												38704
+												38806,
+												38807
 											]
 										}
 									],
@@ -2732,7 +2732,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 38700,
+										"target": 38803,
 										"name": "TEntry",
 										"package": "@medusajs/core-flows",
 										"refersToTypeParameter": true
@@ -2757,7 +2757,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 38700,
+												"target": 38803,
 												"name": "TEntry",
 												"package": "@medusajs/core-flows",
 												"refersToTypeParameter": true
@@ -2773,14 +2773,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38705,
+									"id": 38808,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38706,
+											"id": 38809,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -2794,7 +2794,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38707,
+													"id": 38810,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -2808,7 +2808,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38708,
+															"id": 38811,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -2819,14 +2819,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38709,
+																			"id": 38812,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38710,
+																					"id": 38813,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -2850,7 +2850,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38710
+																						38813
 																					]
 																				}
 																			],
@@ -2920,7 +2920,7 @@
 																"typeArguments": [
 																	{
 																		"type": "reference",
-																		"target": 38700,
+																		"target": 38803,
 																		"name": "TEntry",
 																		"package": "@medusajs/core-flows",
 																		"refersToTypeParameter": true
@@ -2941,7 +2941,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38706
+												38809
 											]
 										}
 									],
@@ -2970,7 +2970,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 38700,
+												"target": 38803,
 												"name": "TEntry",
 												"package": "@medusajs/core-flows",
 												"refersToTypeParameter": true
@@ -2989,7 +2989,7 @@
 			]
 		},
 		{
-			"id": 38711,
+			"id": 38814,
 			"name": "RemoteStepInput",
 			"variant": "declaration",
 			"kind": 256,
@@ -3004,7 +3004,7 @@
 			},
 			"children": [
 				{
-					"id": 38712,
+					"id": 38815,
 					"name": "fields",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3022,7 +3022,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 14,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
 						}
 					],
 					"type": {
@@ -3034,7 +3034,7 @@
 					}
 				},
 				{
-					"id": 38713,
+					"id": 38816,
 					"name": "variables",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3054,7 +3054,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 18,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
 						}
 					],
 					"type": {
@@ -3078,7 +3078,7 @@
 					}
 				},
 				{
-					"id": 38714,
+					"id": 38817,
 					"name": "throw_if_key_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3098,7 +3098,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 22,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
 						}
 					],
 					"type": {
@@ -3107,7 +3107,7 @@
 					}
 				},
 				{
-					"id": 38715,
+					"id": 38818,
 					"name": "throw_if_relation_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3127,7 +3127,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 26,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
 						}
 					],
 					"type": {
@@ -3148,7 +3148,7 @@
 					}
 				},
 				{
-					"id": 38716,
+					"id": 38819,
 					"name": "list",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3179,7 +3179,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 32,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
 						}
 					],
 					"type": {
@@ -3192,11 +3192,11 @@
 				{
 					"title": "Properties",
 					"children": [
-						38712,
-						38713,
-						38714,
-						38715,
-						38716
+						38815,
+						38816,
+						38817,
+						38818,
+						38819
 					]
 				}
 			],
@@ -3205,24 +3205,24 @@
 					"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 					"line": 10,
 					"character": 17,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L10"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L10"
 				}
 			],
 			"extendedBy": [
 				{
 					"type": "reference",
-					"target": 38717,
+					"target": 38820,
 					"name": "EntryStepInput"
 				},
 				{
 					"type": "reference",
-					"target": 38724,
+					"target": 38827,
 					"name": "ServiceStepInput"
 				}
 			]
 		},
 		{
-			"id": 38717,
+			"id": 38820,
 			"name": "EntryStepInput",
 			"variant": "declaration",
 			"kind": 256,
@@ -3237,7 +3237,7 @@
 			},
 			"children": [
 				{
-					"id": 38719,
+					"id": 38822,
 					"name": "fields",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3257,7 +3257,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 14,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
 						}
 					],
 					"type": {
@@ -3269,12 +3269,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38712,
+						"target": 38815,
 						"name": "RemoteStepInput.fields"
 					}
 				},
 				{
-					"id": 38720,
+					"id": 38823,
 					"name": "variables",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3295,7 +3295,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 18,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
 						}
 					],
 					"type": {
@@ -3319,12 +3319,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38713,
+						"target": 38816,
 						"name": "RemoteStepInput.variables"
 					}
 				},
 				{
-					"id": 38721,
+					"id": 38824,
 					"name": "throw_if_key_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3345,7 +3345,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 22,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
 						}
 					],
 					"type": {
@@ -3354,12 +3354,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38714,
+						"target": 38817,
 						"name": "RemoteStepInput.throw_if_key_not_found"
 					}
 				},
 				{
-					"id": 38722,
+					"id": 38825,
 					"name": "throw_if_relation_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3380,7 +3380,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 26,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
 						}
 					],
 					"type": {
@@ -3401,12 +3401,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38715,
+						"target": 38818,
 						"name": "RemoteStepInput.throw_if_relation_not_found"
 					}
 				},
 				{
-					"id": 38723,
+					"id": 38826,
 					"name": "list",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3438,7 +3438,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 32,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
 						}
 					],
 					"type": {
@@ -3447,12 +3447,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38716,
+						"target": 38819,
 						"name": "RemoteStepInput.list"
 					}
 				},
 				{
-					"id": 38718,
+					"id": 38821,
 					"name": "entry_point",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3470,7 +3470,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 39,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L39"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L39"
 						}
 					],
 					"type": {
@@ -3483,12 +3483,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						38719,
-						38720,
-						38721,
-						38722,
-						38723,
-						38718
+						38822,
+						38823,
+						38824,
+						38825,
+						38826,
+						38821
 					]
 				}
 			],
@@ -3497,20 +3497,20 @@
 					"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 					"line": 35,
 					"character": 17,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L35"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L35"
 				}
 			],
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"target": 38711,
+					"target": 38814,
 					"name": "RemoteStepInput",
 					"package": "@medusajs/core-flows"
 				}
 			]
 		},
 		{
-			"id": 38724,
+			"id": 38827,
 			"name": "ServiceStepInput",
 			"variant": "declaration",
 			"kind": 256,
@@ -3525,7 +3525,7 @@
 			},
 			"children": [
 				{
-					"id": 38726,
+					"id": 38829,
 					"name": "fields",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3545,7 +3545,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 14,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L14"
 						}
 					],
 					"type": {
@@ -3557,12 +3557,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38712,
+						"target": 38815,
 						"name": "RemoteStepInput.fields"
 					}
 				},
 				{
-					"id": 38727,
+					"id": 38830,
 					"name": "variables",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3583,7 +3583,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 18,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L18"
 						}
 					],
 					"type": {
@@ -3607,12 +3607,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38713,
+						"target": 38816,
 						"name": "RemoteStepInput.variables"
 					}
 				},
 				{
-					"id": 38728,
+					"id": 38831,
 					"name": "throw_if_key_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3633,7 +3633,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 22,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L22"
 						}
 					],
 					"type": {
@@ -3642,12 +3642,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38714,
+						"target": 38817,
 						"name": "RemoteStepInput.throw_if_key_not_found"
 					}
 				},
 				{
-					"id": 38729,
+					"id": 38832,
 					"name": "throw_if_relation_not_found",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3668,7 +3668,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 26,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L26"
 						}
 					],
 					"type": {
@@ -3689,12 +3689,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38715,
+						"target": 38818,
 						"name": "RemoteStepInput.throw_if_relation_not_found"
 					}
 				},
 				{
-					"id": 38730,
+					"id": 38833,
 					"name": "list",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3726,7 +3726,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 32,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L32"
 						}
 					],
 					"type": {
@@ -3735,12 +3735,12 @@
 					},
 					"inheritedFrom": {
 						"type": "reference",
-						"target": 38716,
+						"target": 38819,
 						"name": "RemoteStepInput.list"
 					}
 				},
 				{
-					"id": 38725,
+					"id": 38828,
 					"name": "service",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3758,7 +3758,7 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 46,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L46"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L46"
 						}
 					],
 					"type": {
@@ -3771,12 +3771,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						38726,
-						38727,
-						38728,
-						38729,
-						38730,
-						38725
+						38829,
+						38830,
+						38831,
+						38832,
+						38833,
+						38828
 					]
 				}
 			],
@@ -3785,20 +3785,20 @@
 					"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 					"line": 42,
 					"character": 17,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L42"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L42"
 				}
 			],
 			"extendedTypes": [
 				{
 					"type": "reference",
-					"target": 38711,
+					"target": 38814,
 					"name": "RemoteStepInput",
 					"package": "@medusajs/core-flows"
 				}
 			]
 		},
 		{
-			"id": 38731,
+			"id": 38834,
 			"name": "useRemoteQueryStepId",
 			"variant": "declaration",
 			"kind": 32,
@@ -3810,7 +3810,7 @@
 					"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 					"line": 49,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L49"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L49"
 				}
 			],
 			"type": {
@@ -3820,7 +3820,7 @@
 			"defaultValue": "\"use-remote-query\""
 		},
 		{
-			"id": 38732,
+			"id": 38835,
 			"name": "useRemoteQueryStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -3835,7 +3835,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "useQueryGraphStep",
-						"target": 38698
+						"target": 38801
 					},
 					{
 						"kind": "text",
@@ -3876,7 +3876,7 @@
 			},
 			"children": [
 				{
-					"id": 38735,
+					"id": 38838,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3894,7 +3894,7 @@
 					}
 				},
 				{
-					"id": 38736,
+					"id": 38839,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -3916,8 +3916,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38735,
-						38736
+						38838,
+						38839
 					]
 				}
 			],
@@ -3926,12 +3926,12 @@
 					"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 					"line": 112,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L112"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L112"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38733,
+					"id": 38836,
 					"name": "useRemoteQueryStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -3941,12 +3941,12 @@
 							"fileName": "core-flows/src/common/steps/use-remote-query.ts",
 							"line": 112,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/use-remote-query.ts#L112"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/use-remote-query.ts#L112"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38734,
+							"id": 38837,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -3956,13 +3956,13 @@
 								"types": [
 									{
 										"type": "reference",
-										"target": 38717,
+										"target": 38820,
 										"name": "EntryStepInput",
 										"package": "@medusajs/core-flows"
 									},
 									{
 										"type": "reference",
-										"target": 38724,
+										"target": 38827,
 										"name": "ServiceStepInput",
 										"package": "@medusajs/core-flows"
 									},
@@ -3978,13 +3978,13 @@
 												"types": [
 													{
 														"type": "reference",
-														"target": 38717,
+														"target": 38820,
 														"name": "EntryStepInput",
 														"package": "@medusajs/core-flows"
 													},
 													{
 														"type": "reference",
-														"target": 38724,
+														"target": 38827,
 														"name": "ServiceStepInput",
 														"package": "@medusajs/core-flows"
 													}
@@ -4006,7 +4006,7 @@
 			]
 		},
 		{
-			"id": 38737,
+			"id": 38840,
 			"name": "validatePresenceOfStep",
 			"variant": "declaration",
 			"kind": 64,
@@ -4021,7 +4021,7 @@
 			},
 			"children": [
 				{
-					"id": 38752,
+					"id": 38855,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -4039,7 +4039,7 @@
 					}
 				},
 				{
-					"id": 38753,
+					"id": 38856,
 					"name": "__step__",
 					"variant": "declaration",
 					"kind": 1024,
@@ -4061,8 +4061,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						38752,
-						38753
+						38855,
+						38856
 					]
 				}
 			],
@@ -4071,12 +4071,12 @@
 					"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 					"line": 7,
 					"character": 13,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L7"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L7"
 				}
 			],
 			"signatures": [
 				{
-					"id": 38738,
+					"id": 38841,
 					"name": "validatePresenceOfStep",
 					"variant": "signature",
 					"kind": 4096,
@@ -4086,12 +4086,12 @@
 							"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 							"line": 7,
 							"character": 13,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L7"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L7"
 						}
 					],
 					"parameters": [
 						{
-							"id": 38739,
+							"id": 38842,
 							"name": "input",
 							"variant": "param",
 							"kind": 32768,
@@ -4102,14 +4102,14 @@
 									{
 										"type": "reflection",
 										"declaration": {
-											"id": 38740,
+											"id": 38843,
 											"name": "__type",
 											"variant": "declaration",
 											"kind": 65536,
 											"flags": {},
 											"children": [
 												{
-													"id": 38741,
+													"id": 38844,
 													"name": "entity",
 													"variant": "declaration",
 													"kind": 1024,
@@ -4119,7 +4119,7 @@
 															"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 															"line": 13,
 															"character": 4,
-															"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L13"
+															"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L13"
 														}
 													],
 													"type": {
@@ -4143,7 +4143,7 @@
 													}
 												},
 												{
-													"id": 38742,
+													"id": 38845,
 													"name": "fields",
 													"variant": "declaration",
 													"kind": 1024,
@@ -4153,7 +4153,7 @@
 															"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 															"line": 14,
 															"character": 4,
-															"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L14"
+															"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L14"
 														}
 													],
 													"type": {
@@ -4169,8 +4169,8 @@
 												{
 													"title": "Properties",
 													"children": [
-														38741,
-														38742
+														38844,
+														38845
 													]
 												}
 											],
@@ -4179,7 +4179,7 @@
 													"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 													"line": 12,
 													"character": 5,
-													"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L12"
+													"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L12"
 												}
 											]
 										}
@@ -4194,14 +4194,14 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 38743,
+													"id": 38846,
 													"name": "__type",
 													"variant": "declaration",
 													"kind": 65536,
 													"flags": {},
 													"children": [
 														{
-															"id": 38744,
+															"id": 38847,
 															"name": "entity",
 															"variant": "declaration",
 															"kind": 1024,
@@ -4211,7 +4211,7 @@
 																	"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 																	"line": 13,
 																	"character": 4,
-																	"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L13"
+																	"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L13"
 																}
 															],
 															"type": {
@@ -4235,7 +4235,7 @@
 															}
 														},
 														{
-															"id": 38745,
+															"id": 38848,
 															"name": "fields",
 															"variant": "declaration",
 															"kind": 1024,
@@ -4245,7 +4245,7 @@
 																	"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 																	"line": 14,
 																	"character": 4,
-																	"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L14"
+																	"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L14"
 																}
 															],
 															"type": {
@@ -4261,8 +4261,8 @@
 														{
 															"title": "Properties",
 															"children": [
-																38744,
-																38745
+																38847,
+																38848
 															]
 														}
 													],
@@ -4271,7 +4271,7 @@
 															"fileName": "core-flows/src/common/steps/validate-presence-of.ts",
 															"line": 12,
 															"character": 5,
-															"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L12"
+															"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/core-flows/src/common/steps/validate-presence-of.ts#L12"
 														}
 													]
 												}
@@ -4305,14 +4305,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 38746,
+									"id": 38849,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 38747,
+											"id": 38850,
 											"name": "config",
 											"variant": "declaration",
 											"kind": 2048,
@@ -4326,7 +4326,7 @@
 											],
 											"signatures": [
 												{
-													"id": 38748,
+													"id": 38851,
 													"name": "config",
 													"variant": "signature",
 													"kind": 4096,
@@ -4340,7 +4340,7 @@
 													],
 													"parameters": [
 														{
-															"id": 38749,
+															"id": 38852,
 															"name": "config",
 															"variant": "param",
 															"kind": 32768,
@@ -4351,14 +4351,14 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 38750,
+																			"id": 38853,
 																			"name": "__type",
 																			"variant": "declaration",
 																			"kind": 65536,
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 38751,
+																					"id": 38854,
 																					"name": "name",
 																					"variant": "declaration",
 																					"kind": 1024,
@@ -4382,7 +4382,7 @@
 																				{
 																					"title": "Properties",
 																					"children": [
-																						38751
+																						38854
 																					]
 																				}
 																			],
@@ -4459,7 +4459,7 @@
 										{
 											"title": "Methods",
 											"children": [
-												38747
+												38850
 											]
 										}
 									],
@@ -4497,520 +4497,116 @@
 		{
 			"title": "Interfaces",
 			"children": [
-				38711,
-				38717,
-				38724
+				38814,
+				38820,
+				38827
 			]
 		},
 		{
 			"title": "Type Aliases",
 			"children": [
-				38642,
-				38694
+				38745,
+				38797
 			]
 		},
 		{
 			"title": "Variables",
 			"children": [
-				38630,
-				38643,
-				38655,
-				38667,
-				38682,
-				38731
+				38733,
+				38746,
+				38758,
+				38770,
+				38785,
+				38834
 			]
 		},
 		{
 			"title": "Functions",
 			"children": [
-				38631,
-				38644,
-				38656,
-				38668,
-				38683,
-				38698,
-				38732,
-				38737
+				38734,
+				38747,
+				38759,
+				38771,
+				38786,
+				38801,
+				38835,
+				38840
 			]
 		}
 	],
 	"packageName": "@medusajs/core-flows",
 	"symbolIdMap": {
-		"38629": {
+		"38732": {
 			"sourceFileName": "../../../../packages/core/core-flows/src/common/index.ts",
 			"qualifiedName": ""
 		},
-		"38630": {
+		"38733": {
 			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/create-remote-links.ts",
 			"qualifiedName": "createLinksStepId"
 		},
-		"38631": {
+		"38734": {
 			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/create-remote-links.ts",
 			"qualifiedName": "createRemoteLinkStep"
 		},
-		"38632": {
+		"38735": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
 			"qualifiedName": "createRemoteLinkStep"
 		},
-		"38633": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38634": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38635": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38636": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38637": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38638": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38639": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38640": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
-		"38641": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
-		},
-		"38642": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
-			"qualifiedName": "DismissRemoteLinksStepInput"
-		},
-		"38643": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
-			"qualifiedName": "dismissRemoteLinkStepId"
-		},
-		"38644": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
-			"qualifiedName": "dismissRemoteLinkStep"
-		},
-		"38645": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "dismissRemoteLinkStep"
-		},
-		"38646": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38647": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38648": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38649": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38650": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38651": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38652": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38653": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
-		"38654": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
-		},
-		"38655": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/emit-event.ts",
-			"qualifiedName": "emitEventStepId"
-		},
-		"38656": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/emit-event.ts",
-			"qualifiedName": "emitEventStep"
-		},
-		"38657": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "emitEventStep"
-		},
-		"38658": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38659": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38660": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38661": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38662": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38663": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38664": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38665": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
-		"38666": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
-		},
-		"38667": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/remove-remote-links.ts",
-			"qualifiedName": "removeRemoteLinkStepId"
-		},
-		"38668": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/remove-remote-links.ts",
-			"qualifiedName": "removeRemoteLinkStep"
-		},
-		"38669": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "removeRemoteLinkStep"
-		},
-		"38670": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38671": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38674": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38675": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38676": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38677": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38678": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38679": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38680": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
-		"38681": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
-		},
-		"38682": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/update-remote-links.ts",
-			"qualifiedName": "updateRemoteLinksStepId"
-		},
-		"38683": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/update-remote-links.ts",
-			"qualifiedName": "updateRemoteLinksStep"
-		},
-		"38684": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "updateRemoteLinksStep"
-		},
-		"38685": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38686": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38687": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38688": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38689": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38690": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38691": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38692": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
-		"38693": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
-		},
-		"38694": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "UseQueryGraphStepInput"
-		},
-		"38695": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "__type"
-		},
-		"38696": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "__type.options"
-		},
-		"38697": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "TEntry"
-		},
-		"38698": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "useQueryGraphStep"
-		},
-		"38699": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "useQueryGraphStep"
-		},
-		"38700": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "TEntry"
-		},
-		"38701": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
-			"qualifiedName": "input"
-		},
-		"38702": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38703": {
-			"sourceFileName": "../../../../packages/core/types/src/modules-sdk/remote-query.ts",
-			"qualifiedName": "data"
-		},
-		"38704": {
-			"sourceFileName": "../../../../packages/core/types/src/modules-sdk/remote-query.ts",
-			"qualifiedName": "metadata"
-		},
-		"38705": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38706": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38707": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
-		},
-		"38708": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
-		},
-		"38709": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
-		},
-		"38710": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
-		},
-		"38711": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput"
-		},
-		"38712": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.fields"
-		},
-		"38713": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.variables"
-		},
-		"38714": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
-		},
-		"38715": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
-		},
-		"38716": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.list"
-		},
-		"38717": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "EntryStepInput"
-		},
-		"38718": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "EntryStepInput.entry_point"
-		},
-		"38719": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.fields"
-		},
-		"38720": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.variables"
-		},
-		"38721": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
-		},
-		"38722": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
-		},
-		"38723": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.list"
-		},
-		"38724": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "ServiceStepInput"
-		},
-		"38725": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "ServiceStepInput.service"
-		},
-		"38726": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.fields"
-		},
-		"38727": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.variables"
-		},
-		"38728": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
-		},
-		"38729": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
-		},
-		"38730": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "RemoteStepInput.list"
-		},
-		"38731": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "useRemoteQueryStepId"
-		},
-		"38732": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
-			"qualifiedName": "useRemoteQueryStep"
-		},
-		"38733": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "useRemoteQueryStep"
-		},
-		"38734": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
-		},
-		"38735": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
-		},
 		"38736": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__step__"
+			"qualifiedName": "input"
 		},
 		"38737": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "validatePresenceOfStep"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
 		},
 		"38738": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "validatePresenceOfStep"
+			"qualifiedName": "__type.config"
 		},
 		"38739": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "input"
+			"qualifiedName": "__type.config"
 		},
 		"38740": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
 		},
 		"38741": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type.entity"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
 		},
 		"38742": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type.fields"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
 		},
 		"38743": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
 		},
 		"38744": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type.entity"
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
 		},
 		"38745": {
-			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
-			"qualifiedName": "__type.fields"
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
+			"qualifiedName": "DismissRemoteLinksStepInput"
 		},
 		"38746": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type"
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
+			"qualifiedName": "dismissRemoteLinkStepId"
 		},
 		"38747": {
-			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/dismiss-remote-links.ts",
+			"qualifiedName": "dismissRemoteLinkStep"
 		},
 		"38748": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.config"
+			"qualifiedName": "dismissRemoteLinkStep"
 		},
 		"38749": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "config"
+			"qualifiedName": "input"
 		},
 		"38750": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
@@ -5018,13 +4614,417 @@
 		},
 		"38751": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.name"
+			"qualifiedName": "__type.config"
 		},
 		"38752": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
-			"qualifiedName": "__type.__type"
+			"qualifiedName": "__type.config"
 		},
 		"38753": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38754": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38755": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38756": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38757": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
+		},
+		"38758": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/emit-event.ts",
+			"qualifiedName": "emitEventStepId"
+		},
+		"38759": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/emit-event.ts",
+			"qualifiedName": "emitEventStep"
+		},
+		"38760": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "emitEventStep"
+		},
+		"38761": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "input"
+		},
+		"38762": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38763": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38764": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38765": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38766": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38767": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38768": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38769": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
+		},
+		"38770": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/remove-remote-links.ts",
+			"qualifiedName": "removeRemoteLinkStepId"
+		},
+		"38771": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/remove-remote-links.ts",
+			"qualifiedName": "removeRemoteLinkStep"
+		},
+		"38772": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "removeRemoteLinkStep"
+		},
+		"38773": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "input"
+		},
+		"38774": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38777": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38778": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38779": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38780": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38781": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38782": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38783": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38784": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
+		},
+		"38785": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/update-remote-links.ts",
+			"qualifiedName": "updateRemoteLinksStepId"
+		},
+		"38786": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/update-remote-links.ts",
+			"qualifiedName": "updateRemoteLinksStep"
+		},
+		"38787": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "updateRemoteLinksStep"
+		},
+		"38788": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "input"
+		},
+		"38789": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38790": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38791": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38792": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38793": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38794": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38795": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38796": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
+		},
+		"38797": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "UseQueryGraphStepInput"
+		},
+		"38798": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "__type"
+		},
+		"38799": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "__type.options"
+		},
+		"38800": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "TEntry"
+		},
+		"38801": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "useQueryGraphStep"
+		},
+		"38802": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "useQueryGraphStep"
+		},
+		"38803": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "TEntry"
+		},
+		"38804": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-query-graph.ts",
+			"qualifiedName": "input"
+		},
+		"38805": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38806": {
+			"sourceFileName": "../../../../packages/core/types/src/modules-sdk/remote-query.ts",
+			"qualifiedName": "data"
+		},
+		"38807": {
+			"sourceFileName": "../../../../packages/core/types/src/modules-sdk/remote-query.ts",
+			"qualifiedName": "metadata"
+		},
+		"38808": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38809": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38810": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38811": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38812": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38813": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38814": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput"
+		},
+		"38815": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.fields"
+		},
+		"38816": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.variables"
+		},
+		"38817": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
+		},
+		"38818": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
+		},
+		"38819": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.list"
+		},
+		"38820": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "EntryStepInput"
+		},
+		"38821": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "EntryStepInput.entry_point"
+		},
+		"38822": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.fields"
+		},
+		"38823": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.variables"
+		},
+		"38824": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
+		},
+		"38825": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
+		},
+		"38826": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.list"
+		},
+		"38827": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "ServiceStepInput"
+		},
+		"38828": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "ServiceStepInput.service"
+		},
+		"38829": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.fields"
+		},
+		"38830": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.variables"
+		},
+		"38831": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_key_not_found"
+		},
+		"38832": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.throw_if_relation_not_found"
+		},
+		"38833": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "RemoteStepInput.list"
+		},
+		"38834": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "useRemoteQueryStepId"
+		},
+		"38835": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/use-remote-query.ts",
+			"qualifiedName": "useRemoteQueryStep"
+		},
+		"38836": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "useRemoteQueryStep"
+		},
+		"38837": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "input"
+		},
+		"38838": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38839": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__step__"
+		},
+		"38840": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "validatePresenceOfStep"
+		},
+		"38841": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "validatePresenceOfStep"
+		},
+		"38842": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "input"
+		},
+		"38843": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type"
+		},
+		"38844": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type.entity"
+		},
+		"38845": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type.fields"
+		},
+		"38846": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type"
+		},
+		"38847": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type.entity"
+		},
+		"38848": {
+			"sourceFileName": "../../../../packages/core/core-flows/src/common/steps/validate-presence-of.ts",
+			"qualifiedName": "__type.fields"
+		},
+		"38849": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38850": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38851": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.config"
+		},
+		"38852": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "config"
+		},
+		"38853": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type"
+		},
+		"38854": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.name"
+		},
+		"38855": {
+			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
+			"qualifiedName": "__type.__type"
+		},
+		"38856": {
 			"sourceFileName": "../../../../packages/core/workflows-sdk/src/utils/composer/type.ts",
 			"qualifiedName": "__type.__step__"
 		}
@@ -5034,7 +5034,7 @@
 			"1": "../../../../packages/core/core-flows/src/common/index.ts"
 		},
 		"reflections": {
-			"1": 38629
+			"1": 38732
 		}
 	}
 }

@@ -4,6 +4,7 @@ import {
 } from "@medusajs/types"
 
 import type { RedisOptions } from "ioredis"
+import { ConnectionOptions } from "node:tls"
 // @ts-expect-error
 import type { InlineConfig } from "vite"
 
@@ -87,14 +88,32 @@ export type AdminOptions = {
    */
   backendUrl?: string
   /**
+   * The URL of your Medusa storefront application. This URL is used as a prefix to some
+   * links in the admin that require performing actions in the storefront. For example,
+   * this URL is used as a prefix to shareable payment links for orders with
+   * outstanding amounts.
+   *
+   * @example
+   * ```js title="medusa-config.js"
+   * module.exports = defineConfig({
+   *   admin: {
+   *     storefrontUrl: process.env.MEDUSA_STOREFRONT_URL ||
+   *       "http://localhost:8000"
+   *   },
+   *   // ...
+   * })
+   * ```
+   */
+  storefrontUrl?: string
+  /**
    * Configure the Vite configuration for the admin dashboard. This function receives the default Vite configuration
    * and returns the modified configuration. The default value is `undefined`.
-   * 
+   *
    * Learn about configurations you can pass to Vite in [Vite's documentation](https://vite.dev/config/).
    *
    * @example
    * For example, if you're using a third-party library that isn't ESM-compatible, add it to Vite's `optimizeDeps` configuration:
-   * 
+   *
    * ```ts title="medusa-config.ts"
    * module.exports = defineConfig({
    *   admin: {
@@ -304,12 +323,7 @@ export type ProjectConfigOptions = {
       /**
        * Configure support for TLS/SSL connection
        */
-      ssl?: {
-        /**
-         * Whether to fail connection if the server certificate is verified against the list of supplied CAs and the hostname and no match is found.
-         */
-        rejectUnauthorized?: false
-      }
+      ssl?: boolean | ConnectionOptions
     }
   }
 
@@ -775,7 +789,13 @@ export type ProjectConfigOptions = {
 /**
  * @interface
  *
- * The configurations for your Medusa application are in `medusa-config.ts` located in the root of your Medusa project. The configurations include configurations for database, modules, and more.
+ * The configurations for your Medusa application are set in `medusa-config.ts` located in the root of your Medusa project. The configurations include configurations for database, modules, and more.
+ * 
+ * :::note
+ * 
+ * Some Medusa configurations are set through environment variables, which you can find in [this documentation](https://docs.medusajs.com/learn/fundamentals/environment-variables#predefined-medusa-environment-variables).
+ * 
+ * :::
  *
  * `medusa-config.ts` exports the value returned by the `defineConfig` utility function imported from `@medusajs/framework/utils`.
  *
@@ -851,7 +871,7 @@ export type ConfigModule = {
    * - An object having the following properties:
    *     - `resolve`: The name of the plugin's package as specified in the plugin's `package.json` file.
    *     - `options`: An object that includes options to be passed to the modules within the plugin. Learn more in [this documentation](https://docs.medusajs.com/learn/fundamentals/modules/options).
-   * 
+   *
    * Learn how to create a plugin in [this documentation](https://docs.medusajs.com/learn/fundamentals/plugins/create).
    *
    * @example
@@ -874,9 +894,9 @@ export type ConfigModule = {
    */
   plugins: (
     | {
-      /**
-       * The name of the plugin's package as specified in the plugin's `package.json` file.
-       */
+        /**
+         * The name of the plugin's package as specified in the plugin's `package.json` file.
+         */
         resolve: string
         /**
          * An object that includes options to be passed to the modules within the plugin.

@@ -2,40 +2,190 @@
 sidebar_position: 1
 ---
 
-import { EllipsisHorizontal } from "@medusajs/icons"
+import { EllipsisHorizontal, ArrowUpRightOnBox, EllipsisVertical } from "@medusajs/icons"
 
 export const metadata = {
-  title: `Manage Inventory`,
+  title: `Manage Inventory Items`,
 }
 
 # {metadata.title}
 
-In this document, you’ll learn how to manage inventory in the Medusa Admin.
+In this guide, you’ll learn how to manage inventory items in the Medusa Admin.
 
-## Check Inventory
+<Note>
 
-To check your store’s inventory, go to the Inventory page. Here, you’ll see the all available inventory of product variants.
+This guide covers how to manage inventory items in the Inventory domain of the Medusa Admin. You can alternatively manage the inventory of a product's variants from the [product's details page](../../products/variants/page.mdx#manage-product-variant-inventory).
 
-### Filter by Location
+</Note>
 
-To filter the shown results by location:
+## Create Inventory Item
 
-1. Click on the "Add filter" button.
-2. Select Location from the dropdown.
-3. Select the location(s) to filter ther results by.
+To create an inventory item:
+
+1. Go to the Inventory page from the sidebar.
+2. Click on the Create button at the top right.
+3. The form that opens has two steps:
+    1. Details step:
+        - Enter the inventory item's title and SKU in their respective fields.
+        - Optionally enter a description.
+        - If the inventory item shouldn't be shipped when its variant is purchased, toggle off the "Requires shipping" option. This is useful when the inventory item is a digital product, for example.
+        - Optionally add the inventory item's attributes, including width, length, height, weight, MID code, HS code, country of origin, and material.
+        - Once you're done, click the Next button.
+    2. Availability step using the [Bulk Editor](../../tips/bulk-editor/page.mdx):
+        - If you have locations in your store, which you can create in [Settings](../../settings/locations/page.mdx), you can specify the inventory item's quantity in each location.
+4. Once you're done, click the Save button.
+
+![Create Inventory Item Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739882517/User%20Guide/Screenshot_2025-02-18_at_2.39.03_PM_jsfp3d.png)
 
 ---
 
-## Change Variant Inventory Quantity
+## View Inventory Item Details
 
-{/* TODO check info for correctness */}
+To view an inventory item's details:
 
-To change a product variant’s inventory quantity:
+1. Go to the Inventory page from the sidebar.
+2. Click on the inventory item you want to view.
 
-1. Go to the Inventory page.
-2. Click the product variant to edit its inventory.
-3. Under the "Location levels" section, find the location to edit the quantity in.
-4. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the right of the location.
-5. Choose "Adjust availability" from the dropdown.
-6. In the drawer that opens, edit the "In Stock" field with the new stock quantity of the variant.
-7. Once you're done, click the Save button.
+![Inventory details page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739882587/User%20Guide/Screenshot_2025-02-18_at_2.42.57_PM_dkxudi.png)
+
+---
+
+## Edit Inventory Item Details
+
+To edit an inventory item's details:
+
+1. Go to the inventory item's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the first section.
+3. Choose "Edit" from the dropdown.
+4. In the side window that opens, you can edit the inventory's title and SKU.
+5. Once you're done, click the Save button.
+
+![Edit Inventory Item Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739882721/User%20Guide/Screenshot_2025-02-18_at_2.45.12_PM_scijta.png)
+
+---
+
+## Edit Inventory Item Attributes
+
+To edit an inventory item's attributes, such as height and weight:
+
+1. Go to the inventory item's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Attributes" section.
+3. Choose "Edit" from the dropdown.
+4. In the side window that opens, you can edit the inventory item's height, width, length, weight, MID code, HS code, and country of origin.
+5. Once you're done, click the Save button.
+
+![Edit Inventory Item Attributes Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739882880/User%20Guide/Screenshot_2025-02-18_at_2.47.49_PM_uxlvkb.png)
+
+---
+
+## Edit Inventory Item Metadata
+
+Metadata is custom data that can be associated with the inventory item in key-value pairs. This is usually used by developers for custom integrations or to store additional information about the inventory item.
+
+To edit the inventory item's metadata:
+
+1. Go to the inventory item's details page.
+2. Click the <InlineIcon Icon={ArrowUpRightOnBox} alt="arrow" /> icon at the right of the "Metadata" section.
+3. In the side window that opens:
+    - Manage the key-value pairs in the table.
+    - To add a new row of key-value pairs before or after a row:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Insert row above" or "Insert row below" from the dropdown.
+    - To delete a row of key-value pairs:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Delete row" from the dropdown.
+4. Once you're done, click the Save button.
+
+---
+
+## Manage the Inventory Item's Availability
+
+You can manage which locations the inventory item is available in, the quantity available in each location, and the item's reservations.
+
+### Manage Locations Availability
+
+To manage the locations that an inventory item is available in:
+
+1. Go to the inventory item's details page.
+2. Click the "Manage locations" button at the top right of the "Locations" section.
+3. In the side window that opens, you can check or uncheck any location that the item is available in.
+4. Once you're done, click the Save button.
+
+![Manage Locations Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739883050/User%20Guide/Screenshot_2025-02-18_at_2.50.41_PM_zxtz8k.png)
+
+### Manage Quantity Availability
+
+To manage the in-stock quantity of an inventory item in a location:
+
+1. Go to the inventory item's details page.
+2. In the "Locations" section, find the location you want to edit the in-stock quantity in, and click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at its right.
+3. Choose "Edit" from the dropdown.
+4. In the side window that opens, you can edit the inventory item's in-stock quantity in that location.
+5. Once you're done, click the Save button.
+
+![Manage Quantity Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739883219/User%20Guide/Screenshot_2025-02-18_at_2.52.33_PM_jvax7o.png)
+
+### Manage Inventory Item's Reservations
+
+An inventory item may have reservations when a variant associated with it has been purchased but haven't been fulfilled yet. The reservation ensures that the required quantity is available when the order is fulfilled.
+
+You can manage all reservations from the [Reservations page](../reservations/page.mdx). You can also manage the reservations of a specific inventory item from the inventory item's details page.
+
+### Create Reservation for Item
+
+To create a reservation for an inventory item:
+
+1. Go to the inventory item's details page.
+2. In the "Reservations" section, click the "Create" button.
+3. In the form that opens:
+    - For the Location field, choose the location to reserve the item in.
+    - After you choose the location, enter the quantity to reserve in the Quantity field.
+        - The table above the field shows you how many available quantities of the item in the chosen location. When you make changes to the Quantity field, the availability will be updated in the table to reflect the change.
+    - Optionally specify a description for the reservation.
+4. Once you're done, click the Create button.
+
+![Create Reservation form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739884917/User%20Guide/Screenshot_2025-02-18_at_2.58.41_PM_d8tgpb.png)
+
+### Edit Reservation for Item
+
+To edit a reservation for an inventory item:
+
+1. Go to the inventory item's details page.
+2. In the "Reservations" section, find the reservation you want to edit and click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at its right.
+3. Choose "Edit" from the dropdown.
+4. In the side window that opens, you can edit the reservation's location, quantity, and description.
+5. Once you're done, click the Save button.
+
+![Edit Reservation form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739884918/User%20Guide/Screenshot_2025-02-18_at_3.21.36_PM_vjp0eo.png)
+
+### Delete Reservation of an Item
+
+<Note type="warning">
+
+Deleting a reservation is irreversible. If you delete a reservation created for an order, you may need to [allocate the item in the order again](../../orders/manage/page.mdx#allocate-order-items-manually).
+
+</Note>
+
+To delete a reservation for an inventory item:
+
+1. Go to the inventory item's details page.
+2. In the "Reservations" section, find the reservation you want to delete and click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at its right.
+3. Choose "Delete" from the dropdown.
+4. Confirm the action by clicking the Delete button in the pop-up.
+
+---
+
+## Delete Inventory Item
+
+<Note type="warning">
+
+Deleting an inventory item is irreversible. This may affect the associated variant(s) inventory.
+
+</Note>
+
+To delete an inventory item:
+
+1. Go to the Inventory page from the sidebar.
+2. Find the inventory item to delete, and click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at its right.
+3. Choose "Delete" from the dropdown.
+4. Confirm the action by clicking the Delete button in the pop-up.

@@ -216,7 +216,7 @@ medusaIntegrationTestRunner({
               first_name: "newf",
               last_name: "newl",
               email: "new@email.com",
-              metadata: { foo: "bar" },
+              metadata: { foo: "bar", bar: "bar", baz: "baz" },
             },
             adminHeaders
           )
@@ -230,7 +230,51 @@ medusaIntegrationTestRunner({
             first_name: "newf",
             last_name: "newl",
             email: "new@email.com",
-            metadata: { foo: "bar" },
+            metadata: { foo: "bar", bar: "bar", baz: "baz" },
+          })
+        )
+      })
+
+      it("should correctly update customer metadata", async () => {
+        let response = await api.post(
+          `/admin/customers/${customer3.id}`,
+          {
+            first_name: "newf",
+            last_name: "newl",
+            email: "new@email.com",
+            metadata: { foo: "bar", bar: "bar", baz: "baz" },
+          },
+          adminHeaders
+        )
+
+        expect(response.data.customer).toEqual(
+          expect.objectContaining({
+            first_name: "newf",
+            last_name: "newl",
+            email: "new@email.com",
+            metadata: { foo: "bar", bar: "bar", baz: "baz" },
+          })
+        )
+
+        response = await api
+          .post(
+            `/admin/customers/${customer3.id}`,
+            {
+              metadata: { foo: "", bar: "bar2", baz2: "baz2" },
+            },
+            adminHeaders
+          )
+          .catch((err) => {
+            console.log(err)
+          })
+
+        expect(response.status).toEqual(200)
+        expect(response.data.customer).toEqual(
+          expect.objectContaining({
+            first_name: "newf",
+            last_name: "newl",
+            email: "new@email.com",
+            metadata: { bar: "bar2", baz: "baz", baz2: "baz2" },
           })
         )
       })

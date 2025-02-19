@@ -1,5 +1,7 @@
 # @medusajs/event-bus-local
 
+## 2.5.0
+
 ## 2.4.0
 
 ### Patch Changes

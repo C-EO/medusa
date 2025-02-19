@@ -147,6 +147,7 @@ export const productVariantsFields = [
   "product.collection.title",
   "product.handle",
   "product.discountable",
+  "product.shipping_profile.id",
   "calculated_price.*",
   "inventory_items.inventory_item_id",
   "inventory_items.required_quantity",

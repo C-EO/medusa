@@ -9,7 +9,8 @@ export type BasePaymentCollectionStatus =
   | "authorized"
   | "partially_authorized"
   | "canceled"
-
+  | "completed"
+  | "failed"
 /**
  *
  * The status of a payment session.

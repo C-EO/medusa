@@ -18,6 +18,17 @@ export const storefrontGuidesSidebar = [
   },
   {
     type: "category",
+    title: "Examples",
+    children: [
+      {
+        type: "link",
+        path: "/storefront-development/guides/express-checkout",
+        title: "Express Checkout Storefront",
+      },
+    ],
+  },
+  {
+    type: "category",
     title: "Regions",
     children: [
       {

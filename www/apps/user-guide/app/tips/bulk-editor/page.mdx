@@ -10,17 +10,19 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you'll learn about different tips and shortcuts to using the bulk editor.
+In this guide, you'll learn about different tips and shortcuts to using the bulk editor.
 
-## Overview
+![Bulk Editor Example](https://res.cloudinary.com/dza7lstvk/image/upload/v1739535694/User%20Guide/Screenshot_2025-02-14_at_2.20.10_PM_wjsfcg.png)
+
+## Manage Large Data in Bulk
 
 The bulk editor allows you to edit prices or values using a spreadsheet-interface. It simplifies the editing process when working with a large number of data, and provides you with an intuitive user experience.
 
-The bulk editor is used in different areas of the Medusa Admin.
+The bulk editor is used in different areas of the Medusa Admin, such as product-variant pricing.
 
 {/* TODO do we still need this next section? */}
 
-{/* ---
+---
 
 ## Toggle Columns View
 
@@ -29,29 +31,38 @@ As the bulk editor may include a large number of columns, such as the different 
 To do that:
 
 1. Click on the "View" button at the top left.
-2. Check or uncheck a column by clicking on it in the dropdown. */}
+2. Check or uncheck a column by clicking on it in the dropdown.
+
+![Change viewed columns](https://res.cloudinary.com/dza7lstvk/image/upload/v1739536402/User%20Guide/Screenshot_2025-02-14_at_2.32.59_PM_a6sf4t.png)
 
 ---
 
-## Selecting Cells
+## Perform Action on Multiple Cells
 
-You can select multiple cells to apply an action on them. To do that:
+You can select multiple cells to perform an action on them. To do that:
 
 1. Click and hold the mouse on a cell
 2. Drag the mouse in the direction of the other cells you want to select.
 3. Once you're done selecting, release the hold.
+4. Perform the action on the cells:
+    - Press <Kbd>backspace</Kbd> to clear the values of the selected cells.
+    - Press <Kbd>{getOsShortcut()}</Kbd> + <Kbd>Z</Kbd> to undo a change you made on the selected cells.
+
+![Select multple cells](https://res.cloudinary.com/dza7lstvk/image/upload/v1739536835/User%20Guide/Screenshot_2025-02-14_at_2.40.17_PM_bcygtk.png)
 
 ---
 
-## Editing Cells
+## Editing Cell Values
 
-There are multiple ways you can edit cells in a bulk editor:
+There are multiple ways you can edit cells' values in a bulk editor:
 
 1. To edit the value, click the cell, then enter your new value.
 3. To apply a value of a cell to other adjacent cells:
     1. Click on a cell
-    2. Hold and Drag the blue dot at the corner of that cell to adjacent cells you want to apply the value to.
-    3. Once you're done, release the hold on the blue dot.
+    2. Hold and Drag the blue dot at the corner of that cell to the cells below it that you want to apply the value to.
+    3. Once you're done, release the hold on the blue dot. The value of the first cell will be applied to the other cells.
+
+![Draggable blue dot](https://res.cloudinary.com/dza7lstvk/image/upload/v1739537029/User%20Guide/Screenshot_2025-02-14_at_2.43.22_PM_bcefnr.png)
 
 ---
 

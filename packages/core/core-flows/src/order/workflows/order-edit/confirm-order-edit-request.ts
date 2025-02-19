@@ -44,14 +44,14 @@ export type ConfirmOrderEditRequestValidationStepInput = {
 /**
  * This step validates that a requested order edit can be confirmed.
  * If the order is canceled or the order change is not active, the step will throw an error.
- * 
+ *
  * :::note
- * 
+ *
  * You can retrieve an order and order change details using [Query](https://docs.medusajs.com/learn/fundamentals/module-links/query),
  * or [useQueryGraphStep](https://docs.medusajs.com/resources/references/medusa-workflows/steps/useQueryGraphStep).
- * 
+ *
  * :::
- * 
+ *
  * @example
  * const data = confirmOrderEditRequestValidationStep({
  *   order: {
@@ -93,10 +93,10 @@ export const confirmOrderEditRequestWorkflowId = "confirm-order-edit-request"
 /**
  * This workflow confirms an order edit request. It's used by the
  * [Confirm Order Edit Admin API Route](https://docs.medusajs.com/api/admin#order-edits_postordereditsidconfirm).
- * 
+ *
  * You can use this workflow within your customizations or your own custom workflows, allowing you to confirm an order edit
  * in your custom flow.
- * 
+ *
  * @example
  * const { result } = await confirmOrderEditRequestWorkflow(container)
  * .run({
@@ -104,9 +104,9 @@ export const confirmOrderEditRequestWorkflowId = "confirm-order-edit-request"
  *     order_id: "order_123",
  *   }
  * })
- * 
+ *
  * @summary
- * 
+ *
  * Confirm an order edit request.
  */
 export const confirmOrderEditRequestWorkflow = createWorkflow(
@@ -198,7 +198,7 @@ export const confirmOrderEditRequestWorkflow = createWorkflow(
           ({ id }) => id
         ) // items that have been removed with the change
         const newItemIds = data.orderItems.items.map(({ id }) => id)
-        return [...new Set([...previousItemIds, newItemIds])]
+        return [...new Set([...previousItemIds, ...newItemIds])]
       }
     )
 

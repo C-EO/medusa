@@ -675,6 +675,11 @@ export const slugChanges = [
     "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateLineItemPricesStep/page.mdx"
   },
   {
+    "origSlug": "/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateShippingStep",
+    "newSlug": "/references/medusa-workflows/steps/validateShippingStep",
+    "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateShippingStep/page.mdx"
+  },
+  {
     "origSlug": "/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateVariantPricesStep",
     "newSlug": "/references/medusa-workflows/steps/validateVariantPricesStep",
     "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateVariantPricesStep/page.mdx"
@@ -2380,6 +2385,11 @@ export const slugChanges = [
     "filePath": "/www/apps/resources/references/core_flows/Payment/Workflows_Payment/functions/core_flows.Payment.Workflows_Payment.validateRefundStep/page.mdx"
   },
   {
+    "origSlug": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStep",
+    "newSlug": "/references/medusa-workflows/steps/createPaymentAccountHolderStep",
+    "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStep/page.mdx"
+  },
+  {
     "origSlug": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentSessionStep",
     "newSlug": "/references/medusa-workflows/steps/createPaymentSessionStep",
     "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentSessionStep/page.mdx"
@@ -3168,6 +3178,11 @@ export const slugChanges = [
     "origSlug": "/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.deleteShippingProfileWorkflow",
     "newSlug": "/references/medusa-workflows/deleteShippingProfileWorkflow",
     "filePath": "/www/apps/resources/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.deleteShippingProfileWorkflow/page.mdx"
+  },
+  {
+    "origSlug": "/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.validateStepShippingProfileDelete",
+    "newSlug": "/references/medusa-workflows/validateStepShippingProfileDelete",
+    "filePath": "/www/apps/resources/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.validateStepShippingProfileDelete/page.mdx"
   },
   {
     "origSlug": "/references/core_flows/Stock_Location/Steps_Stock_Location/functions/core_flows.Stock_Location.Steps_Stock_Location.createStockLocations",
@@ -5560,9 +5575,19 @@ export const slugChanges = [
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.completePaymentCollections/page.mdx"
   },
   {
+    "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createAccountHolder",
+    "newSlug": "/references/payment/createAccountHolder",
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createAccountHolder/page.mdx"
+  },
+  {
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections",
     "newSlug": "/references/payment/createPaymentCollections",
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections/page.mdx"
+  },
+  {
+    "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentMethods",
+    "newSlug": "/references/payment/createPaymentMethods",
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentMethods/page.mdx"
   },
   {
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentSession",
@@ -5573,6 +5598,16 @@ export const slugChanges = [
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons",
     "newSlug": "/references/payment/createRefundReasons",
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons/page.mdx"
+  },
+  {
+    "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteAccountHolder",
+    "newSlug": "/references/payment/deleteAccountHolder",
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteAccountHolder/page.mdx"
+  },
+  {
+    "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteCaptures",
+    "newSlug": "/references/payment/deleteCaptures",
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteCaptures/page.mdx"
   },
   {
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentCollections",
@@ -5588,6 +5623,11 @@ export const slugChanges = [
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons",
     "newSlug": "/references/payment/deleteRefundReasons",
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons/page.mdx"
+  },
+  {
+    "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefunds",
+    "newSlug": "/references/payment/deleteRefunds",
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefunds/page.mdx"
   },
   {
     "origSlug": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.getWebhookActionAndData",
@@ -5715,6 +5755,11 @@ export const slugChanges = [
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.IPaymentModuleService/page.mdx"
   },
   {
+    "origSlug": "/references/payment_models/variables/payment_models.AccountHolder",
+    "newSlug": "/references/payment/models/AccountHolder",
+    "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.AccountHolder/page.mdx"
+  },
+  {
     "origSlug": "/references/payment_models/variables/payment_models.Capture",
     "newSlug": "/references/payment/models/Capture",
     "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.Capture/page.mdx"
@@ -5728,11 +5773,6 @@ export const slugChanges = [
     "origSlug": "/references/payment_models/variables/payment_models.PaymentCollection",
     "newSlug": "/references/payment/models/PaymentCollection",
     "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.PaymentCollection/page.mdx"
-  },
-  {
-    "origSlug": "/references/payment_models/variables/payment_models.PaymentMethodToken",
-    "newSlug": "/references/payment/models/PaymentMethodToken",
-    "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.PaymentMethodToken/page.mdx"
   },
   {
     "origSlug": "/references/payment_models/variables/payment_models.PaymentProvider",

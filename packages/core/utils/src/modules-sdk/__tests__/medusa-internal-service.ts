@@ -45,8 +45,11 @@ describe("Internal Module Service Factory", () => {
     let instance
 
     beforeEach(() => {
-      jest.clearAllMocks()
       instance = new IMedusaInternalService(containerMock)
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
     })
 
     it("should throw model id undefined error on retrieve if id is not defined", async () => {
@@ -201,7 +204,7 @@ describe("Internal Module Service Factory", () => {
         updateData,
       ])
 
-      const result = await instance.update(updateData)
+      const result = await instance.update({ selector: {}, data: updateData })
       expect(result).toEqual([updateData])
     })
 
@@ -221,6 +224,32 @@ describe("Internal Module Service Factory", () => {
       expect(result).toEqual([
         { entity: entitiesToUpdate[0], update: updateData },
       ])
+    })
+
+    it("should update entities metadata successfully", async () => {
+      const updateData = {
+        id: "1",
+        name: "UpdatedItem",
+        metadata: { key1: "", key2: "key2" },
+      }
+      const entitiesToUpdate = [
+        { id: "1", name: "Item", metadata: { key1: "value1" } },
+      ]
+
+      containerMock[modelRepositoryName].find.mockClear()
+      containerMock[modelRepositoryName].find.mockResolvedValueOnce(
+        entitiesToUpdate
+      )
+
+      await instance.update({ selector: {}, data: updateData })
+      expect(
+        containerMock[modelRepositoryName].update.mock.calls[0][0][0].update
+      ).toEqual({
+        ...updateData,
+        metadata: {
+          key2: "key2",
+        },
+      })
     })
 
     it("should delete entity successfully", async () => {

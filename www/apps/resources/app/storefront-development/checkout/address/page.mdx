@@ -272,7 +272,7 @@ const updateCartAddress = (customerAddress: Record<string, unknown>) => {
       city: customerAddress.city || "",
       country_code: customerAddress.country_code || cart.region?.countries?.[0].iso_2,
       province: customerAddress.province || "",
-      phone: customerAddress.phone || ""
+      phone: customerAddress.phone || "",
     }
 
     fetch(`http://localhost:9000/store/carts/${cart.id}`, {
@@ -284,8 +284,8 @@ const updateCartAddress = (customerAddress: Record<string, unknown>) => {
       },
       body: JSON.stringify({
         shipping_address: address,
-        billing_address: address
-      })
+        billing_address: address,
+      }),
     })
     .then((res) => res.json())
     .then(({ cart: updatedCart }) => {
@@ -312,11 +312,11 @@ export const react2Highlights = [
 ```tsx highlights={react2Highlights}
 "use client" // include with Next.js 13+
 
-import { useEffect, useState } from "react";
-import { useCart } from "../../../providers/cart";
-import { useCustomer } from "../../../providers/customer";
+import { useEffect, useState } from "react"
+import { useCart } from "../../../providers/cart"
+import { useCustomer } from "../../../providers/customer"
 
-export default function CheckoutAddressStep () {
+export default function CheckoutAddressStep() {
   const { cart, setCart } = useCart()
   const { customer } = useCustomer()
   const [loading, setLoading] = useState(false)
@@ -349,7 +349,7 @@ export default function CheckoutAddressStep () {
       city: customerAddress.city || "",
       country_code: customerAddress.country_code || cart.region?.countries?.[0].iso_2,
       province: customerAddress.province || "",
-      phone: customerAddress.phone || ""
+      phone: customerAddress.phone || "",
     }
 
     fetch(`http://localhost:9000/store/carts/${cart.id}`, {
@@ -361,8 +361,8 @@ export default function CheckoutAddressStep () {
       },
       body: JSON.stringify({
         shipping_address: address,
-        billing_address: address
-      })
+        billing_address: address,
+      }),
     })
     .then((res) => res.json())
     .then(({ cart: updatedCart }) => {

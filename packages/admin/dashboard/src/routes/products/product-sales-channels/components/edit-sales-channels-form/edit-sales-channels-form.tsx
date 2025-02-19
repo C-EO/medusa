@@ -1,5 +1,5 @@
-import { Button, Checkbox } from "@medusajs/ui"
-import { RowSelectionState, createColumnHelper } from "@tanstack/react-table"
+import { Button, createDataTableColumnHelper } from "@medusajs/ui"
+import { RowSelectionState } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
@@ -8,17 +8,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { HttpTypes } from "@medusajs/types"
 import { keepPreviousData } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
+import { DataTable } from "../../../../../components/data-table"
+import * as hooks from "../../../../../components/data-table/helpers/sales-channels"
 import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
-import { _DataTable } from "../../../../../components/table/data-table"
 import { useUpdateProduct } from "../../../../../hooks/api/products"
 import { useSalesChannels } from "../../../../../hooks/api/sales-channels"
-import { useSalesChannelTableColumns } from "../../../../../hooks/table/columns/use-sales-channel-table-columns"
-import { useSalesChannelTableFilters } from "../../../../../hooks/table/filters/use-sales-channel-table-filters"
-import { useSalesChannelTableQuery } from "../../../../../hooks/table/query/use-sales-channel-table-query"
-import { useDataTable } from "../../../../../hooks/use-data-table"
 
 type EditSalesChannelsFormProps = {
   product: HttpTypes.AdminProduct
@@ -29,6 +26,7 @@ const EditSalesChannelsSchema = zod.object({
 })
 
 const PAGE_SIZE = 50
+const PREFIX = "sc"
 
 export const EditSalesChannelsForm = ({
   product,
@@ -62,8 +60,9 @@ export const EditSalesChannelsForm = ({
     })
   }, [rowSelection, setValue])
 
-  const { searchParams, raw } = useSalesChannelTableQuery({
+  const searchParams = hooks.useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
   const { sales_channels, count, isLoading, isError, error } = useSalesChannels(
     {
@@ -74,22 +73,9 @@ export const EditSalesChannelsForm = ({
     }
   )
 
-  const filters = useSalesChannelTableFilters()
+  const filters = hooks.useSalesChannelTableFilters()
+  const emptyState = hooks.useSalesChannelTableEmptyState()
   const columns = useColumns()
-
-  const { table } = useDataTable({
-    data: sales_channels ?? [],
-    columns,
-    count,
-    enablePagination: true,
-    enableRowSelection: true,
-    rowSelection: {
-      state: rowSelection,
-      updater: setRowSelection,
-    },
-    getRowId: (row) => row.id,
-    pageSize: PAGE_SIZE,
-  })
 
   const { mutateAsync, isPending: isMutating } = useUpdateProduct(product.id)
 
@@ -123,22 +109,21 @@ export const EditSalesChannelsForm = ({
       <div className="flex h-full flex-col overflow-hidden">
         <RouteFocusModal.Header />
         <RouteFocusModal.Body className="flex-1 overflow-hidden">
-          <_DataTable
-            table={table}
+          <DataTable
+            data={sales_channels}
             columns={columns}
-            pageSize={PAGE_SIZE}
+            getRowId={(row) => row.id}
+            rowCount={count}
             isLoading={isLoading}
-            count={count}
             filters={filters}
-            search="autofocus"
-            pagination
-            orderBy={[
-              { key: "name", label: t("fields.name") },
-              { key: "created_at", label: t("fields.createdAt") },
-              { key: "updated_at", label: t("fields.updatedAt") },
-            ]}
-            queryObject={raw}
+            rowSelection={{
+              state: rowSelection,
+              onRowSelectionChange: setRowSelection,
+            }}
+            autoFocusSearch
             layout="fill"
+            emptyState={emptyState}
+            prefix={PREFIX}
           />
         </RouteFocusModal.Body>
         <RouteFocusModal.Footer>
@@ -159,43 +144,12 @@ export const EditSalesChannelsForm = ({
 }
 
 const columnHelper =
-  createColumnHelper<HttpTypes.AdminSalesChannelResponse["sales_channel"]>()
+  createDataTableColumnHelper<
+    HttpTypes.AdminSalesChannelResponse["sales_channel"]
+  >()
 
 const useColumns = () => {
-  const columns = useSalesChannelTableColumns()
+  const columns = hooks.useSalesChannelTableColumns()
 
-  return useMemo(
-    () => [
-      columnHelper.display({
-        id: "select",
-        header: ({ table }) => {
-          return (
-            <Checkbox
-              checked={
-                table.getIsSomePageRowsSelected()
-                  ? "indeterminate"
-                  : table.getIsAllPageRowsSelected()
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-            />
-          )
-        },
-        cell: ({ row }) => {
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          )
-        },
-      }),
-      ...columns,
-    ],
-    [columns]
-  )
+  return useMemo(() => [columnHelper.select(), ...columns], [columns])
 }

@@ -2,14 +2,10 @@ import { updateCartPromotionsWorkflow } from "@medusajs/core-flows"
 import { PromotionActions } from "@medusajs/framework/utils"
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { refetchCart } from "../../helpers"
-import {
-  StoreAddCartPromotionsType,
-  StoreRemoveCartPromotionsType,
-} from "../../validators"
 import { HttpTypes } from "@medusajs/framework/types"
 
 export const POST = async (
-  req: MedusaRequest<StoreAddCartPromotionsType>,
+  req: MedusaRequest<HttpTypes.StoreCartAddPromotion>,
   res: MedusaResponse<HttpTypes.StoreCartResponse>
 ) => {
   const workflow = updateCartPromotionsWorkflow(req.scope)
@@ -33,7 +29,7 @@ export const POST = async (
 }
 
 export const DELETE = async (
-  req: MedusaRequest<StoreRemoveCartPromotionsType>,
+  req: MedusaRequest<HttpTypes.StoreCartRemovePromotion>,
   res: MedusaResponse<{
     cart: HttpTypes.StoreCart
   }>

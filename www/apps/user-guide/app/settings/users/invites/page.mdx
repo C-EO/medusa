@@ -10,11 +10,11 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you'll learn how to manage invites in your store.
+In this guide, you'll learn how to manage invites in your store.
 
-## Overview
+## Add Admin Users through Invites
 
-To add a new user to your team, you must invite them. The user gets a notification of the invite to sign up, but you can also send them the invite link to sign up.
+To add a new user to your team, you must invite them. The user gets a notification of the invite to sign up, but you can also manually send them the invite link to sign up.
 
 <Note>
 
@@ -22,20 +22,18 @@ The form of notification sent (for example, an email) depends on what's configur
 
 </Note>
 
+---
+
 ## Invite a User
 
 To send an invite to a user:
 
 1. Go to Settings → Users.
 2. Click the Invite button.
-3. Enter the user’s email and choose their role.
+3. Enter the user’s email.
 4. Once done, click on the "Send invite" button.
 
-<Note title="Info">
-
-A user's role doesn't actually change the user's privileges. All users have the same admin privileges.
-
-</Note>
+![Invite user form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739964961/User%20Guide/Screenshot_2025-02-19_at_1.35.52_PM_rewdrm.png)
 
 ---
 
@@ -47,9 +45,13 @@ To view pending invites:
 2. Click the Invite button.
 3. Below the form, you'll find a Pending Invites table with all the invites that haven't been accepted yet.
 
+![Pending invites table](https://res.cloudinary.com/dza7lstvk/image/upload/v1739964999/User%20Guide/Screenshot_2025-02-19_at_1.36.30_PM_jvkqcw.png)
+
 ---
 
 ## Resend an Invite
+
+You can resend an invite if the user hasn't received it, they lost their link, or the invite has expired.
 
 To resend an invite to a user:
 
@@ -57,6 +59,8 @@ To resend an invite to a user:
 2. Click the Invite button.
 3. In the Pending Invites table, find the user to resend their invite and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
 4. Choose "Resend invite" from the dropdown.
+
+A notification will be sent to the user as configured by your technical team.
 
 ---
 
@@ -71,14 +75,22 @@ To copy the invite link:
 3. In the Pending Invites table, find the user to resend their invite and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
 3. Choose “Copy invite link” from the dropdown.
 
+You can then send this link to the user to sign up.
+
 ---
 
-## Revoke Invite
+## Delete Invite
 
-To revoke an invite:
+<Note type="warning">
+
+Deleting an invite will revoke the invite and the user won't be able to sign up using that invite link.
+
+</Note>
+
+To delete an invite:
 
 1. Go to Settings → Users.
 2. Click the Invite button.
 3. In the Pending Invites table, find the user to resend their invite and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
-4. Choose Revoke from the dropdown.
-5. Confirm revoking the invite by clicking the Revoke button in the pop-up.
+4. Choose Delete from the dropdown.
+5. Confirm deleting the invite by clicking the Delete button in the pop-up.

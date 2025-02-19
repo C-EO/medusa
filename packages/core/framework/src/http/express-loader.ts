@@ -1,6 +1,6 @@
 import createStore from "connect-redis"
 import cookieParser from "cookie-parser"
-import express, { Express } from "express"
+import express, { Express, RequestHandler } from "express"
 import session from "express-session"
 import Redis from "ioredis"
 import morgan from "morgan"
@@ -68,25 +68,63 @@ export async function expressLoader({ app }: { app: Express }): Promise<{
    */
   function shouldSkipHttpLog(req: MedusaRequest, res: MedusaResponse) {
     return (
-      isTest || NOISY_ENDPOINTS_CHUNKS.some((chunk) => req.url.includes(chunk))
+      isTest ||
+      NOISY_ENDPOINTS_CHUNKS.some((chunk) => req.url.includes(chunk)) ||
+      !logger.shouldLog("http")
     )
   }
+
+  let loggingMiddleware: RequestHandler
 
   /**
    * The middleware to use for logging. We write the log messages
    * using winston, but rely on morgan to hook into HTTP requests
    */
-  const loggingMiddleware = morgan(
-    IS_DEV
-      ? ":method :url ← :referrer (:status) - :response-time ms"
-      : "combined",
-    {
-      skip: shouldSkipHttpLog,
-      stream: {
-        write: (message: string) => logger.http(message.trim()),
-      },
+  if (!IS_DEV) {
+    const jsonFormat = (tokens, req, res) => {
+      const result = {
+        level: "http",
+        // client ip
+        client_ip: req.ip || "-",
+
+        // Request ID can be correlated with other logs (like error reports)
+        request_id: req.requestId || "-",
+
+        // Standard HTTP request properties
+        http_version: tokens["http-version"](req, res),
+        method: tokens.method(req, res),
+        path: tokens.url(req, res),
+
+        // Response details
+        status: Number(tokens.status(req, res)),
+        response_size: tokens.res(req, res, "content-length") || 0,
+        request_size: tokens.req(req, res, "content-length") || 0,
+        duration: Number(tokens["response-time"](req, res)),
+
+        // Useful headers that might help in debugging or tracing
+        referrer: tokens.referrer(req, res) || "-",
+        user_agent: tokens["user-agent"](req, res),
+
+        timestamp: new Date().toISOString(),
+      }
+
+      return JSON.stringify(result)
     }
-  )
+
+    loggingMiddleware = morgan(jsonFormat, {
+      skip: shouldSkipHttpLog,
+    })
+  } else {
+    loggingMiddleware = morgan(
+      ":method :url ← :referrer (:status) - :response-time ms",
+      {
+        skip: shouldSkipHttpLog,
+        stream: {
+          write: (message: string) => logger.http(message.trim()),
+        },
+      }
+    )
+  }
 
   app.use(loggingMiddleware)
   app.use(cookieParser())

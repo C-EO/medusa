@@ -6,6 +6,7 @@ import readSpecDocument from "./read-spec-document"
 import getSectionId from "./get-section-id"
 import dereference from "./dereference"
 import { unstable_cache } from "next/cache"
+import { oasFileToPath } from "docs-utils"
 
 async function getPathsOfTag_(
   tagName: string,
@@ -25,9 +26,7 @@ async function getPathsOfTag_(
 
       return {
         ...fileContent,
-        operationPath: `/${file
-          .replaceAll(/(?<!\{[^}]*)_(?![^{]*\})/g, "/")
-          .replace(/\.[A-Za-z]+$/, "")}`,
+        operationPath: oasFileToPath(file),
       }
     })
   )

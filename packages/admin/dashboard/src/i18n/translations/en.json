@@ -1281,6 +1281,7 @@
       "available": "Available",
       "inStock": "In stock",
       "markAsShipped": "Mark as shipped",
+      "markAsPickedUp": "Mark as picked up",
       "markAsDelivered": "Mark as delivered",
       "itemsToFulfillDesc": "Choose items and quantities to fulfill",
       "locationDescription": "Choose which location you want to fulfill items from.",
@@ -1310,7 +1311,8 @@
         "created": "Fulfillment created successfully",
         "canceled": "Fulfillment successfully canceled",
         "fulfillmentShipped": "Cannot cancel an already shipped fulfillment",
-        "fulfillmentDelivered": "Fulfillment marked as delivered successfully"
+        "fulfillmentDelivered": "Fulfillment marked as delivered successfully",
+        "fulfillmentPickedUp": "Fulfillment marked as picked up successfully"
       },
       "trackingLabel": "Tracking",
       "shippingFromLabel": "Shipping from",
@@ -1513,11 +1515,17 @@
     },
     "salesChannels": {
       "header": "Sales Channels",
+      "hint": "Manage the sales channels that are connected to this location.",
       "label": "Connected sales channels",
       "connectedTo": "Connected to {{count}} of {{total}} sales channels",
       "noChannels": "The location is not connected to any sales channels.",
       "action": "Connect sales channels",
       "successToast": "Sales channels were successfully updated."
+    },
+    "pickupOptions": {
+      "edit": {
+        "header": "Edit Pickup Option"
+      }
     },
     "shippingOptions": {
       "create": {
@@ -1526,6 +1534,12 @@
           "hint": "Create a new shipping option to define how products are shipped from this location.",
           "label": "Shipping options",
           "successToast": "Shipping option {{name}} was successfully created."
+        },
+        "pickup": {
+          "header": "Create Pickup Option for {{zone}}",
+          "hint": "Create a new pickup option to define how products are picked up from this location.",
+          "label": "Pickup options",
+          "successToast": "Pickup option {{name}} was successfully created."
         },
         "returns": {
           "header": "Create a Return Option for {{zone}}",
@@ -1590,6 +1604,8 @@
         "count": {
           "shipping_one": "{{count}} shipping option",
           "shipping_other": "{{count}} shipping options",
+          "pickup_one": "{{count}} pickup option",
+          "pickup_other": "{{count}} pickup options",
           "returns_one": "{{count}} return option",
           "returns_other": "{{count}} return options"
         },
@@ -2469,6 +2485,16 @@
   "salesChannels": {
     "domain": "Sales Channels",
     "subtitle": "Manage the online and offline channels you sell products on.",
+    "list": {
+      "empty": {
+        "heading": "No sales channels found",
+        "description": "Once a sales channel has been created, it will appear here."
+      },
+      "filtered": {
+        "heading": "No results",
+        "description": "No sales channels match the current filter criteria."
+      }
+    },
     "createSalesChannel": "Create Sales Channel",
     "createSalesChannelHint": "Create a new sales channel to sell your products on.",
     "enabledHint": "Specify whether the sales channel is enabled.",

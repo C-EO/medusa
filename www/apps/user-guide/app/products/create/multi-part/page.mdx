@@ -1,0 +1,33 @@
+---
+sidebar_label: "Multi-Part Product"
+---
+
+export const metadata = {
+  title: `Create Multi-Part Product`,
+}
+
+# {metadata.title}
+
+In this guide, you'll learn how to create a product whose variants are made up of multiple inventory parts.
+
+## Multi-Part Products with Inventory Kits
+
+Consider a bicycle that consists of a frame, wheels, and handlebars. Each of these parts is an inventory item that makes up the bicycle. When you create a product with multi-part variants, you're creating a product that consists of multiple inventory items.
+
+Medusa supports variants with inventory kits, which is a collection of inventory items that make up the variant's part. In addition, the variant can require a specific quantity of each inventory item to be available in stock.
+
+For example, a bicycle product variant needs two wheels, one frame, and one handlebar to be available in stock. If any of these inventory items are out of stock, the variant is not purchasable. Also, when the variant is purchased, the inventory items are automatically deducted from the stock based on the required quantity.
+
+![Multi-part Product Diagram](https://res.cloudinary.com/dza7lstvk/image/upload/v1739868032/User%20Guide/multi-part_product_lgnymo.jpg)
+
+---
+
+## How to Create a Multi-Part Product
+
+You create a product with multi-part variants as explained in the [Create Product](../page.mdx) guide. For the variants with multi-parts, you enable the "Has inventory kit" toggle in the "Variants" step.
+
+![Enable has inventory kit](https://res.cloudinary.com/dza7lstvk/image/upload/v1739865469/User%20Guide/Screenshot_2025-02-18_at_9.57.05_AM_j7cugr.png)
+
+This opens a new step in the product-creation form, where you can add inventory items that make up the variant. For each inventory item, you can specify the quantity required for the variant to be purchasable.
+
+![Create Product Fourth Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739808931/User%20Guide/Screenshot_2025-02-17_at_6.15.16_PM_hofawf.png)

@@ -6,21 +6,31 @@ export const metadata = {
 
 # {metadata.title}
 
-This user guide is intended to help users learn how they can use the Medusa Admin to perform different operational and ecommerce tasks.
+Welcome to the Medusa Admin user guide. This user guide is intended to help admin users learn how they can use the Medusa Admin to perform commerce operations and manage their store.
 
-{/* TODO change image */}
+{/* TODO update photo */}
 
-![Medusa Admin Overview](https://res.cloudinary.com/dza7lstvk/image/upload/v1710228410/User%20Guide/Screenshot_2024-03-12_at_9.24.45_AM_wllqvq.png)
+![Medusa Admin Overview](https://res.cloudinary.com/dza7lstvk/image/upload/v1739530936/User%20Guide/Screenshot_2025-02-14_at_1.01.35_PM_ecyltl.png)
+
+## Who is this guide for?
+
+This guide is for Medusa Admin users looking to master the Medusa Admin and manage their store effectively. You don't need any technical knowledge to follow these guides.
+
+You can also follow this guide if you're exploring Medusa and its operational features.
+
+<Note>
+
+For technical users, learn how to build and customize Medusa in [this documentation](!docs!/learn).
+
+</Note>
 
 ## Access the Medusa Admin
 
-To access the admin panel of your ecommerce store, open the URL of your local or deployed website.
+To access the admin panel of your ecommerce store, open the URL of your local or deployed website. You’ll be asked to log in.
 
-You’ll be asked to log in.
+![Log In Page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739526611/User%20Guide/Screenshot_2025-02-14_at_11.45.35_AM_j1gepy.png)
 
-![Log In Page](https://res.cloudinary.com/dza7lstvk/image/upload/v1710228558/User%20Guide/Screenshot_2024-03-12_at_9.29.08_AM_cqjgq3.png)
-
-You must use your user’s email and password to log in. If you’re unsure what your email and password are, please contact the technical personnel that deployed your Medusa application and admin.
+You must use your user’s email and password to log in. If you’re unsure what your email and password are, please contact the technical team that deployed your Medusa application.
 
 <Note title="Technical Tip">
 
@@ -30,35 +40,42 @@ Refer to [this documentation](!resources!/medusa-cli#user) on how to create a us
 
 ## Tour of Medusa Admin
 
-After you log into your Medusa Admin, you see a sidebar menu to the left, a search bar at the top, some icons at the top right, and in the middle the content of the page you’re currently on.
+After you log into your Medusa Admin, you see a sidebar menu to the left with a search bar at its top, a <InlineIcon Icon={BellAlert} alt="bell" /> at the top right, and in the middle the content of the page you’re currently on.
 
 ### Sidebar Menu
 
 The sidebar menu includes the main navigation of your Medusa Admin. You can use it to navigate between different pages, such as Products or Orders pages.
 
-{/* TODO update image */}
-
-![Sidebar Menu](https://res.cloudinary.com/dza7lstvk/image/upload/v1697793775/Medusa%20Docs/User%20Guide/Screenshot_2023-10-20_at_12.22.43_PM_shbr0e.png)
+![Sidebar Menu](https://res.cloudinary.com/dza7lstvk/image/upload/v1739529281/User%20Guide/Screenshot_2025-02-14_at_12.34.22_PM_oeyaol.png)
 
 You can hide the sidebar by clicking the <InlineIcon Icon={SidebarLeft} alt="sidebar" /> icon at the top next to the sidebar. Clicking it again shows the sidebar.
 
+### Sidebar Shortcuts
+
+Sidebar items have shortcuts. For example, the Products page has a <Kbd>G</Kbd> then <Kbd>P</Kbd> shortcut. To view the shortcut of an item, hover your mouse for a few seconds and a tooltip will appear with the shortcut.
+
+![Sidebar Shortcuts](https://res.cloudinary.com/dza7lstvk/image/upload/v1739530172/User%20Guide/Screenshot_2025-02-14_at_12.48.19_PM_moyjtv.png)
+
+You can also find all shortcuts by clicking on your profile item at the bottom of the sidebar and choosing "Shortcuts".
+
+### Settings and Quick Actions
+
+At the bottom of the sidebar you'll find a Settings item, which takes you to further settings of your store such as Region and Sales Channel management. You'll also find your avatar and name.
+
+![Settings and profile](https://res.cloudinary.com/dza7lstvk/image/upload/v1739530277/User%20Guide/Screenshot_2025-02-14_at_12.51.06_PM_lq0ehf.png)
+
+By clicking on your avatar and name, you'll view quick actions such as going to profile settings, view shortcuts, or changing the admin theme.
+
+![Profile Quick Actions](https://res.cloudinary.com/dza7lstvk/image/upload/v1739530277/User%20Guide/Screenshot_2025-02-14_at_12.50.50_PM_qqmw54.png)
+
 ### Search Bar
 
-You’ll find at the top of the page a search bar. Use this search bar to search orders, products, customers, and more information available in your Medusa Admin.
+At the top of the sidebar, you'll find a search item. You can also open the search window using the shortcuts:
 
-<Note title="Tip">
+- Windows and Linux: <Kbd>CTRL</Kbd> + <Kbd>K</Kbd>
+- Mac OS: <Kbd>⌘</Kbd> + <Kbd>K</Kbd>
 
-You can open the search window using the shortcuts:
-
-Windows and Linux: <Kbd>CTRL</Kbd> + <Kbd>K</Kbd>
-
-Mac OS: <Kbd>⌘</Kbd> + <Kbd>K</Kbd>
-
-</Note>
-
-{/* TODO check if image needs updating */}
-
-![Search Window](https://res.cloudinary.com/dza7lstvk/image/upload/v1710228839/User%20Guide/Screenshot_2024-03-12_at_9.33.46_AM_ywdvpb.png)
+![Search Window](https://res.cloudinary.com/dza7lstvk/image/upload/v1739529553/User%20Guide/Screenshot_2025-02-14_at_12.36.53_PM_vps6cm.png)
 
 You can select a result with your mouse, or use the up and down arrows on your keyboard to navigate between the results, then choose a result by hitting the <Kbd>Enter</Kbd> key.
 
@@ -66,9 +83,7 @@ You can select a result with your mouse, or use the up and down arrows on your k
 
 At the top right you’ll find a <InlineIcon Icon={BellAlert} alt="Bell" /> icon. Clicking this icon opens a side window to view any notifications you might have. Use this to view notifications such as completed product exports.
 
-{/* TODO change images */}
-
-![Notifications Window](https://res.cloudinary.com/dza7lstvk/image/upload/v1710243446/User%20Guide/XS_from_Figma_mkn3i2.jpg)
+![Notifications Window](https://res.cloudinary.com/dza7lstvk/image/upload/v1739529955/User%20Guide/Screenshot_2025-02-14_at_12.45.44_PM_ljdvof.png)
 
 ### Change Language
 
@@ -76,20 +91,10 @@ The Medusa Admin supports multiple-languages, with English being the default one
 
 Learn how to change the language in [this guide](./settings/profile/page.mdx#change-admin-language).
 
-### Quick Actions
+### Change Admin Theme
 
-At the top right in the sidebar, you’ll find an avatar icon with your email or name. By clicking this icon, you’ll see a dropdown. Use this dropdown to access settings or sign out.
+The Medusa Admin comes in light and dark themes. You can change the theme by clicking the profile item at the bottom of the sidebar -> Theme -> Light, Dark, or System, defaulting to your Operating System or Browser theme.
 
-{/* TODO check if image needs updating */}
+{/* TODO add dark theme */}
 
-![Quick Actions Dropdown](https://res.cloudinary.com/dza7lstvk/image/upload/v1710229778/User%20Guide/Screenshot_2024-03-12_at_9.49.26_AM_j3f1pu.png)
-
-### Change Theme
-
-The Medusa Admin supports both light and dark modes.
-
-![Dark mode](https://res.cloudinary.com/dza7lstvk/image/upload/v1710323255/User%20Guide/Screenshot_2024-03-13_at_11.46.52_AM_atvw1e.png)
-
-You can switch the theme by opening the quick actions dropdown, choosing theme, then choosing the prefered mode.
-
-![Switch modes](https://res.cloudinary.com/dza7lstvk/image/upload/v1710323157/User%20Guide/Screenshot_2024-03-13_at_11.43.01_AM_giyhto.png)
+![Dark Theme](https://res.cloudinary.com/dza7lstvk/image/upload/v1739530936/User%20Guide/Screenshot_2025-02-14_at_1.01.56_PM_fdcgmz.png)

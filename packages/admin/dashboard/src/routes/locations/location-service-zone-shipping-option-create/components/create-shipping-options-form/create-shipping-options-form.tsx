@@ -12,7 +12,10 @@ import {
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useCreateShippingOptions } from "../../../../../hooks/api/shipping-options"
 import { castNumber } from "../../../../../lib/cast-number"
-import { ShippingOptionPriceType } from "../../../common/constants"
+import {
+  FulfillmentSetType,
+  ShippingOptionPriceType,
+} from "../../../common/constants"
 import { buildShippingOptionPriceRules } from "../../../common/utils/price-rule-helpers"
 import { CreateShippingOptionDetailsForm } from "./create-shipping-option-details-form"
 import { CreateShippingOptionsPricesForm } from "./create-shipping-options-prices-form"
@@ -31,12 +34,14 @@ type CreateShippingOptionFormProps = {
   zone: HttpTypes.AdminServiceZone
   locationId: string
   isReturn?: boolean
+  type: FulfillmentSetType
 }
 
 export function CreateShippingOptionsForm({
   zone,
   isReturn,
   locationId,
+  type,
 }: CreateShippingOptionFormProps) {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DETAILS)
   const [validDetails, setValidDetails] = useState(false)
@@ -309,13 +314,14 @@ export function CreateShippingOptionsForm({
                 form={form}
                 zone={zone}
                 isReturn={isReturn}
+                type={type}
                 locationId={locationId}
                 fulfillmentProviderOptions={fulfillmentProviderOptions || []}
                 selectedProviderId={selectedProviderId}
               />
             </ProgressTabs.Content>
             <ProgressTabs.Content value={Tab.PRICING} className="size-full">
-              <CreateShippingOptionsPricesForm form={form} />
+              <CreateShippingOptionsPricesForm form={form} type={type} />
             </ProgressTabs.Content>
           </RouteFocusModal.Body>
           <RouteFocusModal.Footer>

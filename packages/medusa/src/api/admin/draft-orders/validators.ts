@@ -64,14 +64,14 @@ const CreateDraftOrder = z
     sales_channel_id: z.string().nullish(),
     email: z.string().nullish(),
     customer_id: z.string().nullish(),
-    billing_address: AddressPayload.optional(),
-    shipping_address: AddressPayload.optional(),
+    billing_address: z.union([AddressPayload, z.string()]).optional(),
+    shipping_address: z.union([AddressPayload, z.string()]).optional(),
     items: z.array(Item).optional(),
     region_id: z.string(),
     promo_codes: z.array(z.string()).optional(),
     currency_code: z.string().nullish(),
     no_notification_order: z.boolean().optional(),
-    shipping_methods: z.array(ShippingMethod),
+    shipping_methods: z.array(ShippingMethod).optional(),
     metadata: z.record(z.unknown()).nullish(),
   })
   .strict()

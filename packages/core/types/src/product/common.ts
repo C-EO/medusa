@@ -726,8 +726,13 @@ export interface FilterableProductProps
    * Filters on a product's variant properties.
    */
   variants?: {
-    options?: { value: string; option_id: string }
+    options?: {
+      value?: string
+      option_id?: string
+      option?: Record<string, any>
+    }
   }
+
   /**
    * Filter a product by the ID of the associated type
    */
@@ -899,22 +904,29 @@ export interface FilterableProductVariantProps
    * Search through the title and different code attributes on the variant
    */
   q?: string
+
   /**
    * The IDs to filter product variants by.
    */
-  id?: string | string[]
+  id?: string | string[] | OperatorMap<string | string[]>
+
   /**
    * The SKUs to filter product variants by.
    */
-  sku?: string | string[]
+  sku?: string | string[] | OperatorMap<string | string[]>
   /**
    * Filter the product variants by their associated products' IDs.
    */
-  product_id?: string | string[]
+  product_id?: string | string[] | OperatorMap<string | string[]>
+
   /**
    * Filter product variants by their associated options.
    */
-  options?: Record<string, string>
+  options?: {
+    value?: string
+    option_id?: string
+    option?: Record<string, any>
+  }
 }
 
 /**

@@ -4,6 +4,7 @@
  * description: The cart's details.
  * x-schemaName: StoreCart
  * required:
+ *   - promotions
  *   - currency_code
  *   - id
  *   - original_item_total
@@ -174,6 +175,11 @@
  *     type: number
  *     title: original_shipping_tax_total
  *     description: The total taxes applied on the cart's shipping amount.
+ *   promotions:
+ *     type: array
+ *     description: The cart's promotions.
+ *     items:
+ *       $ref: "#/components/schemas/StoreCartPromotion"
  * 
 */
 

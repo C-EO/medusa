@@ -206,10 +206,7 @@ async function start(args: {
 
       const server = GracefulShutdownServer.create(
         http_.listen(port, host).on("listening", () => {
-          logger.success(
-            serverActivity,
-            `Server is ready on http://${host || "localhost"}:${port}`
-          )
+          logger.success(serverActivity, `Server is ready on port: ${port}`)
           displayAdminUrl({ container, host, port })
           track("CLI_START_COMPLETED")
         })

@@ -1,7 +1,9 @@
 import {
   GraphResultSet,
+  IIndexService,
   RemoteJoinerOptions,
   RemoteJoinerQuery,
+  RemoteQueryFilters,
   RemoteQueryFunction,
   RemoteQueryFunctionReturnPagination,
   RemoteQueryInput,
@@ -12,6 +14,7 @@ import {
   MedusaError,
   isObject,
   remoteQueryObjectFromString,
+  unflattenObjectKeys,
 } from "@medusajs/utils"
 import { RemoteQuery } from "./remote-query"
 import { toRemoteQuery } from "./to-remote-query"
@@ -21,6 +24,7 @@ import { toRemoteQuery } from "./to-remote-query"
  */
 export class Query {
   #remoteQuery: RemoteQuery
+  #indexModule: IIndexService
 
   /**
    * Method to wrap execution of the graph query for instrumentation
@@ -54,8 +58,15 @@ export class Query {
     },
   }
 
-  constructor(remoteQuery: RemoteQuery) {
+  constructor({
+    remoteQuery,
+    indexModule,
+  }: {
+    remoteQuery: RemoteQuery
+    indexModule: IIndexService
+  }) {
     this.#remoteQuery = remoteQuery
+    this.#indexModule = indexModule
   }
 
   #unwrapQueryConfig(
@@ -172,14 +183,81 @@ export class Query {
 
     return this.#unwrapRemoteQueryResponse(response)
   }
+
+  /**
+   * Index function uses the Index module to query and hydrates the data with query.graph
+   * returns a result set
+   */
+  async index<const TEntry extends string>(
+    queryOptions: RemoteQueryInput<TEntry> & {
+      joinFilters?: RemoteQueryFilters<TEntry>
+    },
+    options?: RemoteJoinerOptions
+  ): Promise<GraphResultSet<TEntry>> {
+    if (!this.#indexModule) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        "Index module is not loaded."
+      )
+    }
+
+    const mainEntity = queryOptions.entity
+
+    const fields = queryOptions.fields.map((field) => mainEntity + "." + field)
+    const filters = queryOptions.filters
+      ? { [mainEntity]: queryOptions.filters }
+      : ({} as any)
+    const joinFilters = queryOptions.joinFilters
+      ? { [mainEntity]: queryOptions.joinFilters }
+      : ({} as any)
+    const pagination = queryOptions.pagination as any
+    if (pagination?.order) {
+      pagination.order = {
+        [mainEntity]: unflattenObjectKeys(pagination?.order),
+      }
+    }
+
+    const indexResponse = (await this.#indexModule.query({
+      fields,
+      filters,
+      joinFilters,
+      pagination,
+    })) as unknown as GraphResultSet<TEntry>
+
+    delete queryOptions.pagination
+    delete queryOptions.filters
+
+    let finalResultset: GraphResultSet<TEntry> = indexResponse
+
+    if (indexResponse.data.length) {
+      finalResultset = await this.graph(queryOptions, {
+        ...options,
+        initialData: indexResponse.data,
+      })
+    }
+
+    return {
+      data: finalResultset.data,
+      metadata: indexResponse.metadata as RemoteQueryFunctionReturnPagination,
+    }
+  }
 }
 
 /**
  * API wrapper around the remoteQuery with backward compatibility support
  * @param remoteQuery
  */
-export function createQuery(remoteQuery: RemoteQuery) {
-  const query = new Query(remoteQuery)
+export function createQuery({
+  remoteQuery,
+  indexModule,
+}: {
+  remoteQuery: RemoteQuery
+  indexModule: IIndexService
+}) {
+  const query = new Query({
+    remoteQuery,
+    indexModule,
+  })
 
   function backwardCompatibleQuery(...args: any[]) {
     return query.query.apply(query, args)
@@ -187,6 +265,7 @@ export function createQuery(remoteQuery: RemoteQuery) {
 
   backwardCompatibleQuery.graph = query.graph.bind(query)
   backwardCompatibleQuery.gql = query.gql.bind(query)
+  backwardCompatibleQuery.index = query.index.bind(query)
 
   return backwardCompatibleQuery as Omit<RemoteQueryFunction, symbol>
 }

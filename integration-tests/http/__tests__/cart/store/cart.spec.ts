@@ -1123,6 +1123,102 @@ medusaIntegrationTestRunner({
             )
           })
 
+          it("should successfully complete cart without shipping for digital products", async () => {
+            /**
+             * Product has a shipping profile so cart item should not require shipping
+             */
+            const product = (
+              await api.post(
+                `/admin/products`,
+                {
+                  title: "Product without inventory management",
+                  description: "test",
+                  options: [
+                    {
+                      title: "Size",
+                      values: ["S", "M", "L", "XL"],
+                    },
+                  ],
+                  variants: [
+                    {
+                      title: "S / Black",
+                      sku: "special-shirt",
+                      options: {
+                        Size: "S",
+                      },
+                      manage_inventory: false,
+                      prices: [
+                        {
+                          amount: 1500,
+                          currency_code: "usd",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                adminHeaders
+              )
+            ).data.product
+
+            let cart = (
+              await api.post(
+                `/store/carts`,
+                {
+                  currency_code: "usd",
+                  sales_channel_id: salesChannel.id,
+                  region_id: region.id,
+                  shipping_address: shippingAddressData,
+                },
+                storeHeadersWithCustomer
+              )
+            ).data.cart
+
+            cart = (
+              await api.post(
+                `/store/carts/${cart.id}/line-items`,
+                {
+                  variant_id: product.variants[0].id,
+                  quantity: 1,
+                },
+                storeHeaders
+              )
+            ).data.cart
+
+            const paymentCollection = (
+              await api.post(
+                `/store/payment-collections`,
+                { cart_id: cart.id },
+                storeHeaders
+              )
+            ).data.payment_collection
+
+            await api.post(
+              `/store/payment-collections/${paymentCollection.id}/payment-sessions`,
+              { provider_id: "pp_system_default" },
+              storeHeaders
+            )
+
+            expect(cart.items[0].requires_shipping).toEqual(false)
+
+            const response = await api.post(
+              `/store/carts/${cart.id}/complete`,
+              {},
+              storeHeaders
+            )
+
+            expect(response.status).toEqual(200)
+            expect(response.data.order).toEqual(
+              expect.objectContaining({
+                shipping_methods: [],
+                items: expect.arrayContaining([
+                  expect.objectContaining({
+                    requires_shipping: false,
+                  }),
+                ]),
+              })
+            )
+          })
+
           describe("with sale price lists", () => {
             let priceList
 
@@ -1171,7 +1267,7 @@ medusaIntegrationTestRunner({
             it("should add price from price list and set compare_at_unit_price for order item", async () => {
               const response = await api.post(
                 `/store/carts/${cart.id}/complete`,
-                { variant_id: product.variants[0].id, quantity: 1 },
+                {},
                 storeHeaders
               )
 
@@ -1187,6 +1283,239 @@ medusaIntegrationTestRunner({
                     }),
                   ]),
                 })
+              )
+            })
+          })
+
+          describe("with inventory kit", () => {
+            let stockLocation, inventoryItem, product, cart
+            beforeEach(async () => {
+              stockLocation = (
+                await api.post(
+                  `/admin/stock-locations`,
+                  { name: "test location" },
+                  adminHeaders
+                )
+              ).data.stock_location
+
+              inventoryItem = (
+                await api.post(
+                  `/admin/inventory-items`,
+                  { sku: "bottle" },
+                  adminHeaders
+                )
+              ).data.inventory_item
+
+              await api.post(
+                `/admin/inventory-items/${inventoryItem.id}/location-levels`,
+                {
+                  location_id: stockLocation.id,
+                  stocked_quantity: 10,
+                },
+                adminHeaders
+              )
+
+              await api.post(
+                `/admin/stock-locations/${stockLocation.id}/sales-channels`,
+                { add: [salesChannel.id] },
+                adminHeaders
+              )
+
+              product = (
+                await api.post(
+                  "/admin/products",
+                  {
+                    title: `Test fixture ${shippingProfile.id}`,
+                    shipping_profile_id: shippingProfile.id,
+                    options: [
+                      { title: "pack", values: ["1-pack", "2-pack", "3-pack"] },
+                    ],
+                    variants: [
+                      {
+                        title: "2-pack",
+                        sku: "2-pack",
+                        inventory_items: [
+                          {
+                            inventory_item_id: inventoryItem.id,
+                            required_quantity: 2,
+                          },
+                        ],
+                        prices: [
+                          {
+                            currency_code: "usd",
+                            amount: 100,
+                          },
+                        ],
+                        options: {
+                          pack: "2-pack",
+                        },
+                      },
+                      {
+                        title: "3-pack",
+                        sku: "3-pack",
+                        inventory_items: [
+                          {
+                            inventory_item_id: inventoryItem.id,
+                            required_quantity: 3,
+                          },
+                        ],
+                        prices: [
+                          {
+                            currency_code: "usd",
+                            amount: 140,
+                          },
+                        ],
+                        options: {
+                          pack: "3-pack",
+                        },
+                      },
+                    ],
+                  },
+                  adminHeaders
+                )
+              ).data.product
+
+              cart = (
+                await api.post(
+                  `/store/carts`,
+                  {
+                    currency_code: "usd",
+                    sales_channel_id: salesChannel.id,
+                    region_id: region.id,
+                    shipping_address: shippingAddressData,
+                    items: [
+                      { variant_id: product.variants[0].id, quantity: 1 },
+                      { variant_id: product.variants[1].id, quantity: 1 },
+                    ],
+                  },
+                  storeHeadersWithCustomer
+                )
+              ).data.cart
+
+              const fulfillmentSets = (
+                await api.post(
+                  `/admin/stock-locations/${stockLocation.id}/fulfillment-sets?fields=*fulfillment_sets`,
+                  {
+                    name: `Test-inventory`,
+                    type: "test-type",
+                  },
+                  adminHeaders
+                )
+              ).data.stock_location.fulfillment_sets
+
+              const fulfillmentSet = (
+                await api.post(
+                  `/admin/fulfillment-sets/${fulfillmentSets[0].id}/service-zones`,
+                  {
+                    name: `Test-inventory`,
+                    geo_zones: [{ type: "country", country_code: "US" }],
+                  },
+                  adminHeaders
+                )
+              ).data.fulfillment_set
+
+              await api.post(
+                `/admin/stock-locations/${stockLocation.id}/fulfillment-providers`,
+                { add: ["manual_test-provider"] },
+                adminHeaders
+              )
+
+              const shippingOption = (
+                await api.post(
+                  `/admin/shipping-options`,
+                  {
+                    name: `Test shipping option ${fulfillmentSet.id}`,
+                    service_zone_id: fulfillmentSet.service_zones[0].id,
+                    shipping_profile_id: shippingProfile.id,
+                    provider_id: "manual_test-provider",
+                    price_type: "flat",
+                    type: {
+                      label: "Test type",
+                      description: "Test description",
+                      code: "test-code",
+                    },
+                    prices: [{ currency_code: "usd", amount: 1000 }],
+                    rules: [],
+                  },
+                  adminHeaders
+                )
+              ).data.shipping_option
+
+              await api.post(
+                `/store/carts/${cart.id}/shipping-methods`,
+                { option_id: shippingOption.id },
+                storeHeaders
+              )
+
+              const paymentCollection = (
+                await api.post(
+                  `/store/payment-collections`,
+                  { cart_id: cart.id },
+                  storeHeaders
+                )
+              ).data.payment_collection
+
+              await api.post(
+                `/store/payment-collections/${paymentCollection.id}/payment-sessions`,
+                { provider_id: "pp_system_default" },
+                storeHeaders
+              )
+            })
+
+            it("should complete a cart with inventory item shared between variants", async () => {
+              console.log(cart)
+
+              const response = await api.post(
+                `/store/carts/${cart.id}/complete`,
+                {},
+                storeHeaders
+              )
+
+              expect(response.status).toEqual(200)
+              expect(response.data.order).toEqual(
+                expect.objectContaining({
+                  items: expect.arrayContaining([
+                    expect.objectContaining({
+                      title: "2-pack",
+                      quantity: 1,
+                    }),
+                    expect.objectContaining({
+                      title: "3-pack",
+                      quantity: 1,
+                    }),
+                  ]),
+                })
+              )
+
+              const reservations = (
+                await api.get(`/admin/reservations`, adminHeaders)
+              ).data.reservations
+
+              expect(reservations).toEqual(
+                expect.arrayContaining([
+                  expect.objectContaining({
+                    location_id: stockLocation.id,
+                    inventory_item_id: inventoryItem.id,
+                    quantity: 2, // 2-pack
+                    inventory_item: expect.objectContaining({
+                      id: inventoryItem.id,
+                      sku: "bottle",
+                      reserved_quantity: 5,
+                      stocked_quantity: 10,
+                    }),
+                  }),
+                  expect.objectContaining({
+                    location_id: stockLocation.id,
+                    inventory_item_id: inventoryItem.id,
+                    quantity: 3, // 3-pack
+                    inventory_item: expect.objectContaining({
+                      id: inventoryItem.id,
+                      sku: "bottle",
+                      reserved_quantity: 5,
+                      stocked_quantity: 10,
+                    }),
+                  }),
+                ])
               )
             })
           })

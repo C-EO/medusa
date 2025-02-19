@@ -154,7 +154,9 @@ export const ApiKeyGeneralSection = ({ apiKey }: ApiKeyGeneralSectionProps) => {
           {t("fields.key")}
         </Text>
         {apiKey.type === "secret" ? (
-          <Badge size="2xsmall">{prettifyRedactedToken(apiKey.redacted)}</Badge>
+          <Badge size="2xsmall" className="inline-block w-fit">
+            {prettifyRedactedToken(apiKey.redacted)}
+          </Badge>
         ) : (
           <Copy asChild content={apiKey.token} className="cursor-pointer">
             <Badge size="2xsmall" className="text-ui-tag-neutral-text">

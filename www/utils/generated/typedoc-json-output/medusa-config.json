@@ -1,12 +1,12 @@
 {
-	"id": 40850,
+	"id": 40948,
 	"name": "medusa-config",
 	"variant": "project",
 	"kind": 1,
 	"flags": {},
 	"children": [
 		{
-			"id": 40851,
+			"id": 40949,
 			"name": "AdminOptions",
 			"variant": "declaration",
 			"kind": 256,
@@ -21,7 +21,7 @@
 			},
 			"children": [
 				{
-					"id": 40852,
+					"id": 40950,
 					"name": "disable",
 					"variant": "declaration",
 					"kind": 1024,
@@ -66,9 +66,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 31,
+							"line": 32,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L31"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L32"
 						}
 					],
 					"type": {
@@ -77,7 +77,7 @@
 					}
 				},
 				{
-					"id": 40853,
+					"id": 40951,
 					"name": "path",
 					"variant": "declaration",
 					"kind": 1024,
@@ -178,9 +178,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 58,
+							"line": 59,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L58"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L59"
 						}
 					],
 					"type": {
@@ -198,7 +198,7 @@
 					}
 				},
 				{
-					"id": 40854,
+					"id": 40952,
 					"name": "outDir",
 					"variant": "declaration",
 					"kind": 1024,
@@ -243,9 +243,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 73,
+							"line": 74,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L73"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L74"
 						}
 					],
 					"type": {
@@ -254,7 +254,7 @@
 					}
 				},
 				{
-					"id": 40855,
+					"id": 40953,
 					"name": "backendUrl",
 					"variant": "declaration",
 					"kind": 1024,
@@ -283,9 +283,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 88,
+							"line": 89,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L88"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L89"
 						}
 					],
 					"type": {
@@ -294,7 +294,7 @@
 					}
 				},
 				{
-					"id": 40856,
+					"id": 40954,
 					"name": "vite",
 					"variant": "declaration",
 					"kind": 1024,
@@ -313,22 +313,45 @@
 							},
 							{
 								"kind": "text",
-								"text": "."
+								"text": ".\n\nLearn about configurations you can pass to Vite in [Vite's documentation](https://vite.dev/config/)."
+							}
+						],
+						"blockTags": [
+							{
+								"tag": "@example",
+								"content": [
+									{
+										"kind": "text",
+										"text": "For example, if you're using a third-party library that isn't ESM-compatible, add it to Vite's "
+									},
+									{
+										"kind": "code",
+										"text": "`optimizeDeps`"
+									},
+									{
+										"kind": "text",
+										"text": " configuration:\n\n"
+									},
+									{
+										"kind": "code",
+										"text": "```ts title=\"medusa-config.ts\"\nmodule.exports = defineConfig({\n  admin: {\n    vite: () => {\n      return {\n        optimizeDeps: {\n          include: [\"qs\"],\n        },\n      };\n    },\n  },\n  // ...\n})\n```"
+									}
+								]
 							}
 						]
 					},
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 95,
+							"line": 114,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L95"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L114"
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 40857,
+							"id": 40955,
 							"name": "__type",
 							"variant": "declaration",
 							"kind": 65536,
@@ -336,14 +359,14 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 95,
+									"line": 114,
 									"character": 9,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L95"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L114"
 								}
 							],
 							"signatures": [
 								{
-									"id": 40858,
+									"id": 40956,
 									"name": "__type",
 									"variant": "signature",
 									"kind": 4096,
@@ -351,14 +374,14 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 95,
+											"line": 114,
 											"character": 9,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L95"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L114"
 										}
 									],
 									"parameters": [
 										{
-											"id": 40859,
+											"id": 40957,
 											"name": "config",
 											"variant": "param",
 											"kind": 32768,
@@ -391,25 +414,25 @@
 				{
 					"title": "Properties",
 					"children": [
-						40852,
-						40853,
-						40854,
-						40855,
-						40856
+						40950,
+						40951,
+						40952,
+						40953,
+						40954
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "types.ts",
-					"line": 15,
+					"line": 16,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L15"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L16"
 				}
 			]
 		},
 		{
-			"id": 40860,
+			"id": 40958,
 			"name": "HttpCompressionOptions",
 			"variant": "declaration",
 			"kind": 256,
@@ -424,7 +447,7 @@
 			},
 			"children": [
 				{
-					"id": 40861,
+					"id": 40959,
 					"name": "enabled",
 					"variant": "declaration",
 					"kind": 1024,
@@ -450,9 +473,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 145,
+							"line": 164,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L145"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L164"
 						}
 					],
 					"type": {
@@ -461,7 +484,7 @@
 					}
 				},
 				{
-					"id": 40862,
+					"id": 40960,
 					"name": "level",
 					"variant": "declaration",
 					"kind": 1024,
@@ -487,9 +510,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 150,
+							"line": 169,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L150"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L169"
 						}
 					],
 					"type": {
@@ -498,7 +521,7 @@
 					}
 				},
 				{
-					"id": 40863,
+					"id": 40961,
 					"name": "memLevel",
 					"variant": "declaration",
 					"kind": 1024,
@@ -524,9 +547,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 155,
+							"line": 174,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L155"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L174"
 						}
 					],
 					"type": {
@@ -535,7 +558,7 @@
 					}
 				},
 				{
-					"id": 40864,
+					"id": 40962,
 					"name": "threshold",
 					"variant": "declaration",
 					"kind": 1024,
@@ -561,9 +584,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 160,
+							"line": 179,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L160"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L179"
 						}
 					],
 					"type": {
@@ -585,24 +608,24 @@
 				{
 					"title": "Properties",
 					"children": [
-						40861,
-						40862,
-						40863,
-						40864
+						40959,
+						40960,
+						40961,
+						40962
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "types.ts",
-					"line": 141,
+					"line": 160,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L141"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L160"
 				}
 			]
 		},
 		{
-			"id": 40865,
+			"id": 40963,
 			"name": "ProjectConfigOptions",
 			"variant": "declaration",
 			"kind": 256,
@@ -617,7 +640,7 @@
 			},
 			"children": [
 				{
-					"id": 40866,
+					"id": 40964,
 					"name": "databaseName",
 					"variant": "declaration",
 					"kind": 1024,
@@ -654,9 +677,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 187,
+							"line": 206,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L187"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L206"
 						}
 					],
 					"type": {
@@ -665,7 +688,7 @@
 					}
 				},
 				{
-					"id": 40867,
+					"id": 40965,
 					"name": "databaseUrl",
 					"variant": "declaration",
 					"kind": 1024,
@@ -802,9 +825,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 225,
+							"line": 244,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L225"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L244"
 						}
 					],
 					"type": {
@@ -813,7 +836,7 @@
 					}
 				},
 				{
-					"id": 40868,
+					"id": 40966,
 					"name": "databaseSchema",
 					"variant": "declaration",
 					"kind": 1024,
@@ -843,9 +866,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 241,
+							"line": 260,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L241"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L260"
 						}
 					],
 					"type": {
@@ -854,7 +877,7 @@
 					}
 				},
 				{
-					"id": 40869,
+					"id": 40967,
 					"name": "databaseLogging",
 					"variant": "declaration",
 					"kind": 1024,
@@ -883,9 +906,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 257,
+							"line": 276,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L257"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L276"
 						}
 					],
 					"type": {
@@ -894,7 +917,7 @@
 					}
 				},
 				{
-					"id": 40870,
+					"id": 40968,
 					"name": "databaseDriverOptions",
 					"variant": "declaration",
 					"kind": 1024,
@@ -971,9 +994,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 284,
+							"line": 303,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L284"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L303"
 						}
 					],
 					"type": {
@@ -1001,14 +1024,14 @@
 							{
 								"type": "reflection",
 								"declaration": {
-									"id": 40871,
+									"id": 40969,
 									"name": "__type",
 									"variant": "declaration",
 									"kind": 65536,
 									"flags": {},
 									"children": [
 										{
-											"id": 40872,
+											"id": 40970,
 											"name": "connection",
 											"variant": "declaration",
 											"kind": 1024,
@@ -1018,22 +1041,22 @@
 											"sources": [
 												{
 													"fileName": "types.ts",
-													"line": 285,
+													"line": 304,
 													"character": 4,
-													"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L285"
+													"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L304"
 												}
 											],
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 40873,
+													"id": 40971,
 													"name": "__type",
 													"variant": "declaration",
 													"kind": 65536,
 													"flags": {},
 													"children": [
 														{
-															"id": 40874,
+															"id": 40972,
 															"name": "ssl",
 															"variant": "declaration",
 															"kind": 1024,
@@ -1051,67 +1074,29 @@
 															"sources": [
 																{
 																	"fileName": "types.ts",
-																	"line": 289,
+																	"line": 308,
 																	"character": 6,
-																	"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L289"
+																	"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L308"
 																}
 															],
 															"type": {
-																"type": "reflection",
-																"declaration": {
-																	"id": 40875,
-																	"name": "__type",
-																	"variant": "declaration",
-																	"kind": 65536,
-																	"flags": {},
-																	"children": [
-																		{
-																			"id": 40876,
-																			"name": "rejectUnauthorized",
-																			"variant": "declaration",
-																			"kind": 1024,
-																			"flags": {
-																				"isOptional": true
-																			},
-																			"comment": {
-																				"summary": [
-																					{
-																						"kind": "text",
-																						"text": "Whether to fail connection if the server certificate is verified against the list of supplied CAs and the hostname and no match is found."
-																					}
-																				]
-																			},
-																			"sources": [
-																				{
-																					"fileName": "types.ts",
-																					"line": 293,
-																					"character": 8,
-																					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L293"
-																				}
-																			],
-																			"type": {
-																				"type": "literal",
-																				"value": false
-																			}
-																		}
-																	],
-																	"groups": [
-																		{
-																			"title": "Properties",
-																			"children": [
-																				40876
-																			]
-																		}
-																	],
-																	"sources": [
-																		{
-																			"fileName": "types.ts",
-																			"line": 289,
-																			"character": 12,
-																			"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L289"
-																		}
-																	]
-																}
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "boolean"
+																	},
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "../../node_modules/@types/node/tls.d.ts",
+																			"qualifiedName": "\"tls\".ConnectionOptions"
+																		},
+																		"name": "ConnectionOptions",
+																		"package": "@types/node",
+																		"qualifiedName": "\"tls\".ConnectionOptions"
+																	}
+																]
 															}
 														}
 													],
@@ -1119,16 +1104,16 @@
 														{
 															"title": "Properties",
 															"children": [
-																40874
+																40972
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "types.ts",
-															"line": 285,
+															"line": 304,
 															"character": 17,
-															"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L285"
+															"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L304"
 														}
 													]
 												}
@@ -1139,16 +1124,16 @@
 										{
 											"title": "Properties",
 											"children": [
-												40872
+												40970
 											]
 										}
 									],
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 284,
+											"line": 303,
 											"character": 48,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L284"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L303"
 										}
 									]
 								}
@@ -1157,7 +1142,7 @@
 					}
 				},
 				{
-					"id": 40877,
+					"id": 40973,
 					"name": "redisUrl",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1202,9 +1187,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 327,
+							"line": 341,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L327"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L341"
 						}
 					],
 					"type": {
@@ -1213,7 +1198,7 @@
 					}
 				},
 				{
-					"id": 40878,
+					"id": 40974,
 					"name": "redisPrefix",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1258,9 +1243,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 345,
+							"line": 359,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L345"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L359"
 						}
 					],
 					"type": {
@@ -1269,7 +1254,7 @@
 					}
 				},
 				{
-					"id": 40879,
+					"id": 40975,
 					"name": "redisOptions",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1298,9 +1283,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 365,
+							"line": 379,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L365"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L379"
 						}
 					],
 					"type": {
@@ -1314,7 +1299,7 @@
 					}
 				},
 				{
-					"id": 40880,
+					"id": 40976,
 					"name": "sessionOptions",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1343,9 +1328,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 383,
+							"line": 397,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L383"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L397"
 						}
 					],
 					"type": {
@@ -1359,7 +1344,7 @@
 					}
 				},
 				{
-					"id": 40882,
+					"id": 40978,
 					"name": "workerMode",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1444,9 +1429,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 437,
+							"line": 451,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L437"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L451"
 						}
 					],
 					"type": {
@@ -1468,7 +1453,7 @@
 					}
 				},
 				{
-					"id": 40883,
+					"id": 40979,
 					"name": "http",
 					"variant": "declaration",
 					"kind": 1024,
@@ -1495,22 +1480,22 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 458,
+							"line": 472,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L458"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L472"
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 40884,
+							"id": 40980,
 							"name": "__type",
 							"variant": "declaration",
 							"kind": 65536,
 							"flags": {},
 							"children": [
 								{
-									"id": 40885,
+									"id": 40981,
 									"name": "jwtSecret",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1547,9 +1532,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 478,
+											"line": 492,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L478"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L492"
 										}
 									],
 									"type": {
@@ -1558,7 +1543,7 @@
 									}
 								},
 								{
-									"id": 40886,
+									"id": 40982,
 									"name": "jwtExpiresIn",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1595,9 +1580,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 497,
+											"line": 511,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L497"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L511"
 										}
 									],
 									"type": {
@@ -1606,7 +1591,7 @@
 									}
 								},
 								{
-									"id": 40887,
+									"id": 40983,
 									"name": "cookieSecret",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1643,9 +1628,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 517,
+											"line": 531,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L517"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L531"
 										}
 									],
 									"type": {
@@ -1654,7 +1639,7 @@
 									}
 								},
 								{
-									"id": 40888,
+									"id": 40984,
 									"name": "authCors",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1765,9 +1750,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 570,
+											"line": 584,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L570"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L584"
 										}
 									],
 									"type": {
@@ -1776,7 +1761,7 @@
 									}
 								},
 								{
-									"id": 40889,
+									"id": 40985,
 									"name": "compression",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1813,20 +1798,20 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 597,
+											"line": 611,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L597"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L611"
 										}
 									],
 									"type": {
 										"type": "reference",
-										"target": 40860,
+										"target": 40958,
 										"name": "HttpCompressionOptions",
 										"package": "@medusajs/framework"
 									}
 								},
 								{
-									"id": 40890,
+									"id": 40986,
 									"name": "storeCors",
 									"variant": "declaration",
 									"kind": 1024,
@@ -1929,9 +1914,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 650,
+											"line": 664,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L650"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L664"
 										}
 									],
 									"type": {
@@ -1940,7 +1925,7 @@
 									}
 								},
 								{
-									"id": 40891,
+									"id": 40987,
 									"name": "adminCors",
 									"variant": "declaration",
 									"kind": 1024,
@@ -2043,9 +2028,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 704,
+											"line": 718,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L704"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L718"
 										}
 									],
 									"type": {
@@ -2054,7 +2039,7 @@
 									}
 								},
 								{
-									"id": 40892,
+									"id": 40988,
 									"name": "authMethodsPerActor",
 									"variant": "declaration",
 									"kind": 1024,
@@ -2135,9 +2120,9 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 732,
+											"line": 746,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L732"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L746"
 										}
 									],
 									"type": {
@@ -2164,7 +2149,7 @@
 									}
 								},
 								{
-									"id": 40893,
+									"id": 40989,
 									"name": "restrictedFields",
 									"variant": "declaration",
 									"kind": 1024,
@@ -2193,22 +2178,22 @@
 									"sources": [
 										{
 											"fileName": "types.ts",
-											"line": 750,
+											"line": 764,
 											"character": 4,
-											"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L750"
+											"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L764"
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 40894,
+											"id": 40990,
 											"name": "__type",
 											"variant": "declaration",
 											"kind": 65536,
 											"flags": {},
 											"children": [
 												{
-													"id": 40895,
+													"id": 40991,
 													"name": "store",
 													"variant": "declaration",
 													"kind": 1024,
@@ -2218,9 +2203,9 @@
 													"sources": [
 														{
 															"fileName": "types.ts",
-															"line": 751,
+															"line": 765,
 															"character": 6,
-															"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L751"
+															"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L765"
 														}
 													],
 													"type": {
@@ -2236,16 +2221,16 @@
 												{
 													"title": "Properties",
 													"children": [
-														40895
+														40991
 													]
 												}
 											],
 											"sources": [
 												{
 													"fileName": "types.ts",
-													"line": 750,
+													"line": 764,
 													"character": 23,
-													"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L750"
+													"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L764"
 												}
 											]
 										}
@@ -2256,24 +2241,24 @@
 								{
 									"title": "Properties",
 									"children": [
-										40885,
-										40886,
-										40887,
-										40888,
-										40889,
-										40890,
-										40891,
-										40892,
-										40893
+										40981,
+										40982,
+										40983,
+										40984,
+										40985,
+										40986,
+										40987,
+										40988,
+										40989
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 458,
+									"line": 472,
 									"character": 8,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L458"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L472"
 								}
 							]
 						}
@@ -2284,31 +2269,31 @@
 				{
 					"title": "Properties",
 					"children": [
-						40866,
-						40867,
-						40868,
-						40869,
-						40870,
-						40877,
-						40878,
-						40879,
-						40880,
-						40882,
-						40883
+						40964,
+						40965,
+						40966,
+						40967,
+						40968,
+						40973,
+						40974,
+						40975,
+						40976,
+						40978,
+						40979
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "types.ts",
-					"line": 168,
+					"line": 187,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L168"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L187"
 				}
 			]
 		},
 		{
-			"id": 40896,
+			"id": 40992,
 			"name": "ConfigModule",
 			"variant": "declaration",
 			"kind": 256,
@@ -2363,7 +2348,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "projectConfig",
-						"target": 40897,
+						"target": 40993,
 						"tsLinkText": "projectConfig"
 					},
 					{
@@ -2374,7 +2359,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "plugins",
-						"target": 40899,
+						"target": 40995,
 						"tsLinkText": "plugins"
 					},
 					{
@@ -2385,7 +2370,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "admin",
-						"target": 40898,
+						"target": 40994,
 						"tsLinkText": "admin"
 					},
 					{
@@ -2396,7 +2381,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "modules",
-						"target": 40903,
+						"target": 40999,
 						"tsLinkText": "modules"
 					},
 					{
@@ -2407,7 +2392,7 @@
 						"kind": "inline-tag",
 						"tag": "@link",
 						"text": "featureFlags",
-						"target": 40904,
+						"target": 41000,
 						"tsLinkText": "featureFlags"
 					},
 					{
@@ -2442,7 +2427,7 @@
 			},
 			"children": [
 				{
-					"id": 40897,
+					"id": 40993,
 					"name": "projectConfig",
 					"variant": "declaration",
 					"kind": 1024,
@@ -2458,20 +2443,20 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 806,
+							"line": 820,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L806"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L820"
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 40865,
+						"target": 40963,
 						"name": "ProjectConfigOptions",
 						"package": "@medusajs/framework"
 					}
 				},
 				{
-					"id": 40898,
+					"id": 40994,
 					"name": "admin",
 					"variant": "declaration",
 					"kind": 1024,
@@ -2500,20 +2485,20 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 822,
+							"line": 836,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L822"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L836"
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 40851,
+						"target": 40949,
 						"name": "AdminOptions",
 						"package": "@medusajs/framework"
 					}
 				},
 				{
-					"id": 40899,
+					"id": 40995,
 					"name": "plugins",
 					"variant": "declaration",
 					"kind": 1024,
@@ -2588,9 +2573,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 857,
+							"line": 871,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L857"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L871"
 						}
 					],
 					"type": {
@@ -2605,14 +2590,14 @@
 								{
 									"type": "reflection",
 									"declaration": {
-										"id": 40900,
+										"id": 40996,
 										"name": "__type",
 										"variant": "declaration",
 										"kind": 65536,
 										"flags": {},
 										"children": [
 											{
-												"id": 40901,
+												"id": 40997,
 												"name": "resolve",
 												"variant": "declaration",
 												"kind": 1024,
@@ -2636,9 +2621,9 @@
 												"sources": [
 													{
 														"fileName": "types.ts",
-														"line": 862,
+														"line": 876,
 														"character": 8,
-														"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L862"
+														"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L876"
 													}
 												],
 												"type": {
@@ -2647,7 +2632,7 @@
 												}
 											},
 											{
-												"id": 40902,
+												"id": 40998,
 												"name": "options",
 												"variant": "declaration",
 												"kind": 1024,
@@ -2663,9 +2648,9 @@
 												"sources": [
 													{
 														"fileName": "types.ts",
-														"line": 867,
+														"line": 881,
 														"character": 8,
-														"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L867"
+														"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L881"
 													}
 												],
 												"type": {
@@ -2693,17 +2678,17 @@
 											{
 												"title": "Properties",
 												"children": [
-													40901,
-													40902
+													40997,
+													40998
 												]
 											}
 										],
 										"sources": [
 											{
 												"fileName": "types.ts",
-												"line": 858,
+												"line": 872,
 												"character": 6,
-												"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L858"
+												"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L872"
 											}
 										]
 									}
@@ -2713,7 +2698,7 @@
 					}
 				},
 				{
-					"id": 40903,
+					"id": 40999,
 					"name": "modules",
 					"variant": "declaration",
 					"kind": 1024,
@@ -2782,9 +2767,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 899,
+							"line": 913,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L899"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L913"
 						}
 					],
 					"type": {
@@ -2847,7 +2832,7 @@
 					}
 				},
 				{
-					"id": 40904,
+					"id": 41000,
 					"name": "featureFlags",
 					"variant": "declaration",
 					"kind": 1024,
@@ -2894,9 +2879,9 @@
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 931,
+							"line": 945,
 							"character": 2,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L931"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L945"
 						}
 					],
 					"type": {
@@ -2952,25 +2937,25 @@
 				{
 					"title": "Properties",
 					"children": [
-						40897,
-						40898,
-						40899,
-						40903,
-						40904
+						40993,
+						40994,
+						40995,
+						40999,
+						41000
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "types.ts",
-					"line": 802,
+					"line": 816,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L802"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L816"
 				}
 			]
 		},
 		{
-			"id": 40905,
+			"id": 41001,
 			"name": "PluginDetails",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -2978,22 +2963,22 @@
 			"sources": [
 				{
 					"fileName": "types.ts",
-					"line": 934,
+					"line": 948,
 					"character": 12,
-					"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L934"
+					"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L948"
 				}
 			],
 			"type": {
 				"type": "reflection",
 				"declaration": {
-					"id": 40906,
+					"id": 41002,
 					"name": "__type",
 					"variant": "declaration",
 					"kind": 65536,
 					"flags": {},
 					"children": [
 						{
-							"id": 40907,
+							"id": 41003,
 							"name": "resolve",
 							"variant": "declaration",
 							"kind": 1024,
@@ -3001,9 +2986,9 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 935,
+									"line": 949,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L935"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L949"
 								}
 							],
 							"type": {
@@ -3012,7 +2997,7 @@
 							}
 						},
 						{
-							"id": 40908,
+							"id": 41004,
 							"name": "name",
 							"variant": "declaration",
 							"kind": 1024,
@@ -3020,9 +3005,9 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 936,
+									"line": 950,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L936"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L950"
 								}
 							],
 							"type": {
@@ -3031,7 +3016,7 @@
 							}
 						},
 						{
-							"id": 40909,
+							"id": 41005,
 							"name": "id",
 							"variant": "declaration",
 							"kind": 1024,
@@ -3039,9 +3024,9 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 937,
+									"line": 951,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L937"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L951"
 								}
 							],
 							"type": {
@@ -3050,7 +3035,7 @@
 							}
 						},
 						{
-							"id": 40910,
+							"id": 41006,
 							"name": "options",
 							"variant": "declaration",
 							"kind": 1024,
@@ -3058,9 +3043,9 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 938,
+									"line": 952,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L938"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L952"
 								}
 							],
 							"type": {
@@ -3084,7 +3069,7 @@
 							}
 						},
 						{
-							"id": 40911,
+							"id": 41007,
 							"name": "version",
 							"variant": "declaration",
 							"kind": 1024,
@@ -3092,9 +3077,9 @@
 							"sources": [
 								{
 									"fileName": "types.ts",
-									"line": 939,
+									"line": 953,
 									"character": 2,
-									"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L939"
+									"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L953"
 								}
 							],
 							"type": {
@@ -3107,20 +3092,20 @@
 						{
 							"title": "Properties",
 							"children": [
-								40907,
-								40908,
-								40909,
-								40910,
-								40911
+								41003,
+								41004,
+								41005,
+								41006,
+								41007
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "types.ts",
-							"line": 934,
+							"line": 948,
 							"character": 28,
-							"url": "https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/framework/src/config/types.ts#L934"
+							"url": "https://github.com/medusajs/medusa/blob/03344a0ee0b6540944f49fcebffd8d10e6bf67b1/packages/core/framework/src/config/types.ts#L948"
 						}
 					]
 				}
@@ -3131,262 +3116,254 @@
 		{
 			"title": "Interfaces",
 			"children": [
-				40851,
-				40860,
-				40865,
-				40896
+				40949,
+				40958,
+				40963,
+				40992
 			]
 		},
 		{
 			"title": "Type Aliases",
 			"children": [
-				40905
+				41001
 			]
 		}
 	],
 	"packageName": "@medusajs/framework",
 	"symbolIdMap": {
-		"40850": {
+		"40948": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": ""
 		},
-		"40851": {
+		"40949": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "AdminOptions"
 		},
-		"40852": {
+		"40950": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.disable"
 		},
-		"40853": {
+		"40951": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.path"
 		},
-		"40854": {
+		"40952": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.outDir"
 		},
-		"40855": {
+		"40953": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.backendUrl"
 		},
-		"40856": {
+		"40954": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.vite"
 		},
-		"40857": {
+		"40955": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40858": {
+		"40956": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40859": {
+		"40957": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "config"
 		},
-		"40860": {
+		"40958": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "HttpCompressionOptions"
 		},
-		"40861": {
+		"40959": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.enabled"
 		},
-		"40862": {
+		"40960": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.level"
 		},
-		"40863": {
+		"40961": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.memLevel"
 		},
-		"40864": {
+		"40962": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.threshold"
 		},
-		"40865": {
+		"40963": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "ProjectConfigOptions"
 		},
-		"40866": {
+		"40964": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.databaseName"
 		},
-		"40867": {
+		"40965": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.databaseUrl"
 		},
-		"40868": {
+		"40966": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.databaseSchema"
 		},
-		"40869": {
+		"40967": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.databaseLogging"
 		},
-		"40870": {
+		"40968": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.databaseDriverOptions"
 		},
-		"40871": {
+		"40969": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40872": {
+		"40970": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.connection"
 		},
-		"40873": {
+		"40971": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40874": {
+		"40972": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.ssl"
 		},
-		"40875": {
-			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
-			"qualifiedName": "__type"
-		},
-		"40876": {
-			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
-			"qualifiedName": "__type.rejectUnauthorized"
-		},
-		"40877": {
+		"40973": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.redisUrl"
 		},
-		"40878": {
+		"40974": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.redisPrefix"
 		},
-		"40879": {
+		"40975": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.redisOptions"
 		},
-		"40880": {
+		"40976": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.sessionOptions"
 		},
-		"40882": {
+		"40978": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.workerMode"
 		},
-		"40883": {
+		"40979": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.http"
 		},
-		"40884": {
+		"40980": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40885": {
+		"40981": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.jwtSecret"
 		},
-		"40886": {
+		"40982": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.jwtExpiresIn"
 		},
-		"40887": {
+		"40983": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.cookieSecret"
 		},
-		"40888": {
+		"40984": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.authCors"
 		},
-		"40889": {
+		"40985": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.compression"
 		},
-		"40890": {
+		"40986": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.storeCors"
 		},
-		"40891": {
+		"40987": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.adminCors"
 		},
-		"40892": {
+		"40988": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.authMethodsPerActor"
 		},
-		"40893": {
+		"40989": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.restrictedFields"
 		},
-		"40894": {
+		"40990": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40895": {
+		"40991": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.store"
 		},
-		"40896": {
+		"40992": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "ConfigModule"
 		},
-		"40897": {
+		"40993": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.projectConfig"
 		},
-		"40898": {
+		"40994": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.admin"
 		},
-		"40899": {
+		"40995": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.plugins"
 		},
-		"40900": {
+		"40996": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40901": {
+		"40997": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.resolve"
 		},
-		"40902": {
+		"40998": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.options"
 		},
-		"40903": {
+		"40999": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.modules"
 		},
-		"40904": {
+		"41000": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.featureFlags"
 		},
-		"40905": {
+		"41001": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "PluginDetails"
 		},
-		"40906": {
+		"41002": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type"
 		},
-		"40907": {
+		"41003": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.resolve"
 		},
-		"40908": {
+		"41004": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.name"
 		},
-		"40909": {
+		"41005": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.id"
 		},
-		"40910": {
+		"41006": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.options"
 		},
-		"40911": {
+		"41007": {
 			"sourceFileName": "../../../../packages/core/framework/src/config/types.ts",
 			"qualifiedName": "__type.version"
 		}
@@ -3396,7 +3373,7 @@
 			"1": "../../../../packages/core/framework/src/config/types.ts"
 		},
 		"reflections": {
-			"1": 40850
+			"1": 40948
 		}
 	}
 }

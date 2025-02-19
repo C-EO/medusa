@@ -12,9 +12,9 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn how to edit items in an order. This includes adding, updating, or deleting items.
+In this guide, you’ll learn how to edit items in an order. This includes adding, updating, or deleting items.
 
-## Overview
+## How Order Edits Work
 
 Using the Medusa Admin, you can edit an order to:
 
@@ -22,77 +22,93 @@ Using the Medusa Admin, you can edit an order to:
 - Edit the quantity of an existing item in the order.
 - Delete an item from the order.
 
-When you request an order edit, the changes aren’t saved on the order until the order edit is confirmed.
+![Order edit requested section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739787160/User%20Guide/Screenshot_2025-02-17_at_12.09.50_PM_bap56a.png)
 
-There are two ways to confirm an order edit request:
+When you request an order edit, the changes aren’t saved on the order until the order edit is confirmed. There are two ways to confirm an order edit request:
 
 1. The customer reviews the order edit. If they accept the order edit and an additional payment is required, then they’ll have to authorize that payment. The customer can also reject the order edit;
-2. Or you force-confirm the order edit. If there are any additional payment required, you have to handle that manually with the customer.
+2. Or you force-confirm the order edit. You can then handle any outstanding amount.
 
 ---
 
 ## Request an Order Edit
 
-<Note type="check">
-
-You can’t request an order edit for an order if another order edit is already requested.
-
-</Note>
-
-{/* TODO check info for correctness */}
+You can only request one order edit at a time. If you need to make additional changes, you’ll have to cancel the current order edit and request a new one, or force-confirm the current order edit.
 
 To request an order edit:
 
 1. Open the order details page.
 2. In the Summary section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
-3. In the new form that opens:
+3. Choose "Edit Order" from the dropdown.
+4. In the form that opens:
     1. To add an item:
-        1. Click on the “Add items” button.
-        2. In the drawer that opens, click on the checkbox next to the items you want to add.
-        3. Once done, click on the “Add products” button.
+        1. Click on the "Add items" button.
+        2. In the list that opens, click on the checkbox next to the items you want to add.
+        3. Once done, click on the "Save" button. The item will be added under the "Items" section with the "New" badge. You can also update its quantity.
     2. To update an item’s quantity:
-        1. Find the item in the table under the "Current Items" section.
-        2. Change the value under the Quantity column.
-    5. To delete an item:
-        1. Find the item in the table under the "Current Items" section.
-        2. Change the value under the Quantity column to `0`.
-    6. Optionally enter a note for the customer to see in the Note field.
-4. Once done, click on the Save button.
+        1. Find the item under the "Items" section.
+        2. Change the value for the "qty" input. This adds the "Modified" badge to the item.
+    3. To duplicate an item:
+        1. Find the item under the "Items" section.
+        2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
+        3. Choose "Duplicate" from the dropdown. A new item with the same details will be added under the "Items" section with the "New" badge.
+    4. To delete an item:
+        1. Find the item under the "Items" section.
+        2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
+        3. Choose "Remove" from the dropdown.
+            - If you remove a newly added item, the item will be removed from the list. Otherwise, the item will have a "Removed" badge and you can't edit its quantity.
+            - To undo removing an item in the order, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to it and choose "Undo" from the dropdown.
+    5. Optionally enter a note for the customer to see in the Note field.
+    6. If you want to send a notification to the customer about the order edit, check the "Send notifications" toggle.
+5. Once done, click on the "Confirm Edit" button.
+6. Confirm requesting the order edit by clicking the "Continue" button in the pop-up.
+
+![Order Edit Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739792815/User%20Guide/Screenshot_2025-02-17_at_1.46.35_PM_quugt5.png)
+
+Once requested, a new section "Order edit requested" will show at the top of the order's details page with the edit's details.
 
 ---
 
-## Force Confirm an Order
+## Force Confirm an Order Edit
+
+As mentioned in the beginning of this guide, the customer must confirm the order edit for the changes to be saved on the order. However, you can force-confirm an order edit if you need to make the changes immediately, or if the customer delegates you to do so.
 
 <Note type="warning">
 
-Force-confirming an order makes irreversible changes to the order.
+Force-confirming an order edit makes irreversible changes to the order.
 
 </Note>
 
-<Note>
+To force confirm an order edit:
 
-If the order edit requires additional payment, you’ll have to manually receive that payment from the customer.
+1. Open the order's details page.
+2. Click the "Force confirm" button at the bottom right of the "Order edit requested" section.
 
-</Note>
+This applies the changes to the order edit. If there are any additional payments required, you'll have to mark the order as paid or share a payment link manually.
 
-{/* TODO check info for correctness */}
+### Allocating New Items
 
-To force confirm an order:
+For new items, you may see an "Allocate Items" button indicating that you need to allocate them manually from a stock location. Refer to [this guide](../manage/page.mdx#allocate-order-items-manually) to learn how to do that.
 
-1. Open the order details page.
-2. Find the order edit in the Timeline section.
-3. Click on the “Force Confirm” button.
-4. Confirm your action by clicking the “Yes, Force Confirm” button in the pop-up.
+### Handle Outstanding Amounts after Order Edit
+
+After the order edit is confirmed, you can check if there are any outstanding amounts (to be captured from the customer or returned) in the Summary section.
+
+To handle outstanding amounts by refunding or capturing the payment, refer to the [Payments guide](../payments/page.mdx#handling-outstanding-amounts).
+
+### Fulfilling New Items
+
+If the order edit added new items to the order, they'll be shown in the "Unfulfilled Items" section after the order edit is confirmed. You can then fulfill them as explained in [this guide](../fulfillments/page.mdx).
 
 ---
 
 ## Cancel an Order Edit Request
 
-To cancel an order-edit request:
+If an order edit request hasn't been confirmed yet, you can cancel it.
 
-{/* TODO check info for correctness */}
+To cancel an order edit request:
 
 1. Open the order details page.
-2. Find the order edit in the Timeline section.
-3. Click on the “Cancel Order Edit” button.
-4. Click the button again to confirm canceling the order.
+2. Click the "Cancel" button at the bottom right of the "Order edit requested" section.
+
+The order edit will be canceled and the changes won't be saved on the order. The customer also can't confirm the order edit anymore.

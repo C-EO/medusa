@@ -10,9 +10,18 @@ In this document, you’ll learn how to create an auth provider module and the m
 
 ---
 
-## 1. Create Module Directory
+## 1. Create Module Provider Directory
 
-Start by creating a new directory for your module. For example, `src/modules/my-auth`.
+Start by creating a new directory for your module provider.
+
+If you're creating the module provider in a Medusa application, create it under the `src/modules` directory. For example, `src/modules/my-auth`.
+If you're creating the module provider in a plugin, create it under the `src/providers` directory. For example, `src/providers/my-auth`.
+
+<Note>
+
+The rest of this guide always uses the `src/modules/my-auth` directory as an example.
+
+</Note>
 
 ---
 
@@ -131,10 +140,6 @@ class MyAuthProviderService extends AbstractAuthModuleProvider {
 #### Parameters
 
 <TypeList types={[{"name":"options","type":"`Record<any, any>`","description":"The provider's options.","optional":false,"defaultValue":"","expandable":false,"children":[]}]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
-
-#### Returns
-
-<TypeList types={[]} expandUrl="https://docs.medusajs.com/learn/fundamentals/data-models/manage-relationships#retrieve-records-of-relation" sectionTitle="validateOptions"/>
 
 ### authenticate
 
@@ -483,6 +488,7 @@ module.exports = defineConfig({
             id: "emailpass",
           },
           {
+            // if module provider is in a plugin, use `plugin-name/providers/my-auth`
             resolve: "./src/modules/my-auth",
             id: "my-auth",
             dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],

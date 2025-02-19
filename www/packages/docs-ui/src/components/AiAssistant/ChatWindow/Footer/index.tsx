@@ -16,10 +16,10 @@ export const AiAssistantChatWindowFooter = () => {
       <div className="flex items-center gap-docs_0.5">
         <span className="text-medusa-fg-subtle">Line break</span>
         <div className="flex items-center gap-[5px]">
-          <Kbd className="bg-medusa-bg-field-component border-medusa-border-strong w-[18px] h-[18px] inline-block">
+          <Kbd className="bg-medusa-bg-field-component border-medusa-border-strong w-[18px] h-[18px] inline-block p-0">
             ⇧
           </Kbd>
-          <Kbd className="bg-medusa-bg-field-component border-medusa-border-strong w-[18px] h-[18px] inline-block">
+          <Kbd className="bg-medusa-bg-field-component border-medusa-border-strong w-[18px] h-[18px] inline-block p-0">
             ↵
           </Kbd>
         </div>

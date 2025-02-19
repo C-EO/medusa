@@ -1,6 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import { Divider } from "../../../../components/common/divider"
-import { Text } from "@medusajs/ui"
+import { Divider, Text } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 export const ImportSummary = ({
@@ -11,12 +10,12 @@ export const ImportSummary = ({
   const { t } = useTranslation()
 
   return (
-    <div className="shadow-elevation-card-rest bg-ui-bg-component transition-fg rounded-md flex flex-row px-3 py-2">
+    <div className="shadow-elevation-card-rest bg-ui-bg-component transition-fg flex flex-row rounded-md px-3 py-2">
       <Stat
         title={summary.toCreate.toLocaleString()}
         description={t("products.import.upload.productsToCreate")}
       />
-      <Divider orientation="vertical" className="px-3 h-10" />
+      <Divider orientation="vertical" className="h-10 px-3" />
       <Stat
         title={summary.toUpdate.toLocaleString()}
         description={t("products.import.upload.productsToUpdate")}
@@ -33,7 +32,7 @@ const Stat = ({
   description: string
 }) => {
   return (
-    <div className="flex-1 flex flex-col justify-center">
+    <div className="flex flex-1 flex-col justify-center">
       <Text size="xlarge" className="font-sans font-medium">
         {title}
       </Text>

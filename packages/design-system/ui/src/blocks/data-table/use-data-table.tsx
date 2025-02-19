@@ -21,6 +21,7 @@ import {
   DataTableFilteringState,
   DataTableFilterOption,
   DataTablePaginationState,
+  DataTableRow,
   DataTableRowSelectionState,
   DataTableSortingState,
 } from "./types";
@@ -56,6 +57,7 @@ interface DataTableOptions<TData>
   rowSelection?: {
     state: DataTableRowSelectionState
     onRowSelectionChange: (state: DataTableRowSelectionState) => void
+    enableRowSelection?: boolean | ((row: DataTableRow<TData>) => boolean) | undefined
   }
   /**
    * The state and callback for the sorting.
@@ -170,7 +172,7 @@ const useDataTable = <TData,>({
   const { state: sortingState, onSortingChange } = sorting ?? {}
   const { state: filteringState, onFilteringChange } = filtering ?? {}
   const { state: paginationState, onPaginationChange } = pagination ?? {}
-  const { state: rowSelectionState, onRowSelectionChange } = rowSelection ?? {}
+  const { state: rowSelectionState, onRowSelectionChange, enableRowSelection } = rowSelection ?? {}
 
   const autoResetPageIndexHandler = React.useCallback(() => {
     return autoResetPageIndex
@@ -236,6 +238,7 @@ const useDataTable = <TData,>({
       ),
       pagination: paginationState,
     },
+    enableRowSelection,
     rowCount,
     onColumnFiltersChange: filteringStateHandler(),
     onRowSelectionChange: rowSelectionStateHandler(),

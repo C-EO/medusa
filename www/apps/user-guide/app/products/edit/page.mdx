@@ -1,0 +1,288 @@
+---
+sidebar_position: 2
+---
+
+import { ArrowUpRightOnBox, EllipsisHorizontal, EllipsisVertical, ThumbnailBadge } from "@medusajs/icons"
+import { Table } from "docs-ui"
+
+export const metadata = {
+  title: `Edit Product`,
+}
+
+# {metadata.title}
+
+In this guide, you'll learn about editing a product's details in the Medusa Admin.
+
+## Open Product's Details
+
+To open a product's details:
+
+1. Go to the Products page from the sidebar.
+2. Select one of the products to open its details page.
+
+![Product Details Page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739809615/User%20Guide/Screenshot_2025-02-17_at_6.26.42_PM_cqesbi.png)
+
+---
+
+## Manage General Product Details
+
+The first section, which has the product's title as a header, includes the product's general information and options. Use this section to view and edit the product's details.
+
+![Product Details Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739809977/User%20Guide/Screenshot_2025-02-17_at_6.32.31_PM_a3lsnl.png)
+
+### Product Statuses
+
+At the top right of the first section, you can see the product's status. A product can have one of the following statuses:
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Status</Table.HeaderCell>
+      <Table.HeaderCell>Description</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>Published</Table.Cell>
+      <Table.Cell>The product is available on the storefront and can be purchased.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Draft</Table.Cell>
+      <Table.Cell>A product whose details you're still working on. It's not available on the storefront.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Proposed</Table.Cell>
+      <Table.Cell>A product that is not yet approved for publishing. It's not available on the storefront.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Rejected</Table.Cell>
+      <Table.Cell>A product that has been rejected and is not available on the storefront.</Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
+
+### Edit Product Details
+
+To edit the product's general details:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the section.
+2. Choose "Edit" from the dropdown.
+3. In the side window that opens, you can edit the product's status, title, subtitle, handle, material, description, and whether it's discountable.
+4. Once you're done, click the "Save" button.
+
+### Delete Product
+
+In this section, you can also delete the product.
+
+<Note type="warning">
+
+Deleting a product is irreversible.
+
+</Note>
+
+To delete the product:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the section.
+2. Choose "Delete" from the dropdown.
+3. Confirm deleting the product by clicking the "Delete" button in the pop-up.
+
+---
+
+## Manage Product Media
+
+The Media section includes the product's images. Use this section to view and edit the product's images.
+
+![Media Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810036/User%20Guide/Screenshot_2025-02-17_at_6.33.44_PM_rq9wud.png)
+
+### Add Images
+
+To add images to the product:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Media" section.
+2. Choose "Edit" from the dropdown.
+3. In the form that opens, upload images either by dragging and dropping them or by clicking the "Upload images" box.
+4. Once you're done, click the Save button.
+
+### Edit Images Order
+
+You can edit the order that images are shown in. To do this:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Media" section.
+2. Choose "Edit" from the dropdown.
+3. In the form that opens, drag and drop images to change their order.
+4. Once you're done, click the Save button.
+
+### Set Thumbnail Image
+
+The product's thumbnail image has the <InlineIcon Icon={ThumbnailBadge} alt="thumbnail" /> icon at its top left.
+
+To set an image as the thumbnail:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Media" section.
+2. Choose "Edit" from the dropdown.
+3. Hover over the image you want to make as a thumbnail, then click on its checkbox.
+4. Press <Kbd>T</Kbd> or click the "Make thumbnail" button at the bottom of the page.
+5. Once you're done, click the Save button.
+
+### Delete Images
+
+You can delete the images from the product's page or from the images form.
+
+To delete product images:
+
+1. Hover over the product images you want to delete and click their checkbox.
+2. Press <Kbd>D</Kbd> or click the "Delete" button at the bottom of the page.
+3. Confirm deleting the images by clicking the "Delete" button in the pop-up.
+
+---
+
+## Manage Product Options
+
+The Options section includes the product's options. Use this section to view and edit the product's options.
+
+![Options Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810071/User%20Guide/Screenshot_2025-02-17_at_6.34.21_PM_y5eiwe.png)
+
+### Create Options
+
+<Note>
+
+Unlike the product-creation form, when you create an option for an existing product you must create the variants manually.
+
+</Note>
+
+To add a new option to the product:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Options" section.
+2. Choose Create from the dropdown.
+3. In the side window that opens:
+    - In the Option title field, enter the option's title, such as "Color".
+    - In the Values field, enter the option's values, such as "Red, Blue, Green". Values are separated by a comma.
+4. Once you're done, click the Save button.
+
+### Edit Option
+
+To edit an option:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the right of the option.
+2. Choose Edit from the dropdown.
+3. In the side window that opens, you can edit the option's title and values.
+4. Once you're done, click the Save button.
+
+### Delete Option
+
+<Note type="warning">
+
+Deleting an option is irreversible.
+
+</Note>
+
+To delete an option:
+
+1. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the right of the option.
+2. Choose Delete from the dropdown.
+3. Confirm deleting the option by clicking the Delete button in the pop-up.
+
+---
+
+## Variants Section
+
+The Variants section includes the product's variants. You can view, search, and filter variants. You can also edit a variant's informtion, or click on it to edit more of its details.
+
+Refer to [this guide](../variants/page.mdx) to learn about managing product variants.
+
+![Variants Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810147/User%20Guide/Screenshot_2025-02-17_at_6.35.01_PM_jkflov.png)
+
+---
+
+## Manage Product Metadata
+
+Metadata is custom data that can be associated with the product in key-value pairs. This is usually used by developers for custom integrations or to store additional information about the product.
+
+To edit the product's metadata:
+
+1. Click the <InlineIcon Icon={ArrowUpRightOnBox} alt="arrow" /> icon at the right of the "Metadata" section.
+2. In the side window that opens:
+    - Manage the key-value pairs in the table.
+    - To add a new row of key-value pairs before or after a row:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Insert row above" or "Insert row below" from the dropdown.
+    - To delete a row of key-value pairs:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Delete row" from the dropdown.
+3. Once you're done, click the Save button.
+
+---
+
+## Manage Product's Sales Channels
+
+The Sales Channels section includes the sales channels the product is available in. Use this section to view and edit the product's sales channels.
+
+![Sales Channels Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810276/User%20Guide/Screenshot_2025-02-17_at_6.37.44_PM_hwvbrl.png)
+
+To manage the sales chanels a product is available in:
+
+<Note type="warning">
+
+Removing a product from a sales channel will make it unavailable for purchase in that sales channel.
+
+</Note>
+
+1. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Sales Channels" section.
+2. Choose Edit from the dropdown.
+3. In the list that shows, check the sales channels you want to add the product to, or unchecked the ones you want to remove the product from.
+4. Once you're done, click the Save button.
+
+---
+
+## Manage Product's Shipping Configuration
+
+The Shipping Configuration section includes the product's shipping profile. Use this section to view and edit the product's shipping profile.
+
+![Shipping Configuration Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810310/User%20Guide/Screenshot_2025-02-17_at_6.38.17_PM_ko3a9x.png)
+
+### Edit Product's Shipping Profile
+
+To edit the product's shipping profile:
+
+1. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Shipping Configuration" section.
+2. Choose Edit from the dropdown.
+3. In the side window that opens, choose the shipping profile from the dropdown.
+4. Once you're done, click the Save button.
+
+---
+
+## Manage Product Organization
+
+The Organize section includes the product's organization details. Use this section to view and edit the product's organization details, such as categories and collection.
+
+![Organize Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810358/User%20Guide/Screenshot_2025-02-17_at_6.39.07_PM_maztxs.png)
+
+To edit the product's organization details:
+
+1. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Organize" section.
+2. Choose Edit from the dropdown.
+3. In the side window that opens, you can set the product's type, collection, categories, and tags.
+4. Once you're done, click the Save button.
+
+---
+
+## Manage Product Attributes
+
+The Attributes section includes the product's attributes, such as height and weight. Use this section to view and edit the product's attributes.
+
+![Attributes Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739810408/User%20Guide/Screenshot_2025-02-17_at_6.39.56_PM_lszje2.png)
+
+To edit the product's attributes:
+
+1. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Attributes" section.
+2. Choose Edit from the dropdown.
+3. In the side window that opens, you can set the product's width, height, length, weight, MID code, HS code, and country of origin.
+4. Once you're done, click the Save button.
+
+---
+
+## JSON Section
+
+The JSON section is useful for developers to view the raw produt data in JSON structure. Developers can use this section to debug and troubleshoot issues related to the product.
+
+To view the JSON structure, click on the <InlineIcon Icon={ArrowUpRightOnBox} alt="Expand" /> icon.

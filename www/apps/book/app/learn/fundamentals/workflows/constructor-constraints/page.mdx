@@ -6,6 +6,10 @@ export const metadata = {
 
 This chapter lists constraints of defining a workflow or its steps.
 
+Medusa creates an internal representation of the workflow definition you pass to `createWorkflow` to track and store its steps. At that point, variables in the workflow don't have any values. They only do when you execute the workflow.
+
+This creates restrictions related to variable manipulations, using if-conditions, and other constraints. This chapter lists these constraints and provides their alternatives.
+
 ## Workflow Constraints
 
 ### No Async Functions

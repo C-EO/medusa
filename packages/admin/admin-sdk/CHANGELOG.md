@@ -1,5 +1,14 @@
 # @medusajs/admin-sdk
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11272](https://github.com/medusajs/medusa/pull/11272) [`f4c2cd112ed54757ed35a55297b46b36152829cb`](https://github.com/medusajs/medusa/commit/f4c2cd112ed54757ed35a55297b46b36152829cb) Thanks [@thetutlage](https://github.com/thetutlage)! - fix: issues with peer dependencies
+
+- Updated dependencies []:
+  - @medusajs/admin-shared@2.5.0
+
 ## 2.4.0
 
 ### Patch Changes

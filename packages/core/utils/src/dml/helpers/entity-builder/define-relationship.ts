@@ -27,6 +27,7 @@ import { HasOneWithForeignKey } from "../../relations/has-one-fk"
 import { ManyToMany as DmlManyToMany } from "../../relations/many-to-many"
 import { applyEntityIndexes } from "../mikro-orm/apply-indexes"
 import { parseEntityName } from "./parse-entity-name"
+import { getForeignKey } from "./relationship-helpers"
 
 type Context = {
   MANY_TO_MANY_TRACKED_RELATIONS: Record<string, boolean>
@@ -183,10 +184,7 @@ export function defineHasOneWithFKRelationship(
   { relatedModelName }: { relatedModelName: string },
   cascades: EntityCascades<string[], string[]>
 ) {
-  const foreignKeyName =
-    relationship.options.foreignKeyName ??
-    camelToSnakeCase(`${relationship.name}Id`)
-
+  const foreignKeyName = getForeignKey(relationship)
   const shouldRemoveRelated = !!cascades.delete?.includes(relationship.name)
 
   let mappedBy: string | undefined = camelToSnakeCase(MikroORMEntity.name)
@@ -428,9 +426,7 @@ export function defineBelongsToRelationship(
     HasMany.isHasMany(otherSideRelation) ||
     DmlManyToMany.isManyToMany(otherSideRelation)
   ) {
-    const foreignKeyName =
-      relationship.options.foreignKeyName ??
-      camelToSnakeCase(`${relationship.name}Id`)
+    const foreignKeyName = getForeignKey(relationship)
     const detachCascade =
       !!relationship.mappedBy &&
       relationCascades.detach?.includes(relationship.mappedBy)
@@ -491,9 +487,7 @@ export function defineBelongsToRelationship(
     HasOne.isHasOne(otherSideRelation) ||
     HasOneWithForeignKey.isHasOneWithForeignKey(otherSideRelation)
   ) {
-    const foreignKeyName =
-      relationship.options.foreignKeyName ??
-      camelToSnakeCase(`${relationship.name}Id`)
+    const foreignKeyName = getForeignKey(relationship)
     Property({
       columnType: "text",
       type: "string",

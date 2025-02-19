@@ -4,19 +4,22 @@ sidebar_position: 8
 
 import { 
   EllipsisHorizontal, 
+  PencilSquare
 } from "@medusajs/icons"
 
 export const metadata = {
-  title: `Manage Order's Claims`,
+  title: `Manage Order Claims`,
 }
 
 # {metadata.title}
 
-In this document, you’ll learn what claims are, how to create them, and more.
+In this guide, you’ll learn what claims are, how to create them, and more.
 
-## Overview
+## Order Claims Overview
 
-If a customer receives a faulty or incorrect items for an order, you can create a claim to either refund or replace the item(s).
+If a customer receives faulty or incorrect items for an order, you can create a claim. A claim allows you to either replace or return an item for a customer, then issue a refund.
+
+![Claim in Activity section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739804058/User%20Guide/Screenshot_2025-02-17_at_4.53.59_PM_fw1pmy.png)
 
 ---
 
@@ -24,179 +27,59 @@ If a customer receives a faulty or incorrect items for an order, you can create 
 
 <Note type="warning">
 
-If the claim has a refund amount, the refund is issued to the customer right after the claim is created.
+Changes made by a claim can't be canceled. Make sure to review the claim before confirming it.
 
 </Note>
 
-<Note type="check">
+You can create an order claim after the order's items have been [delivered](../fulfillments/page.mdx#mark-fulfillment-as-delivered).
 
-You must capture the order’s payment and create fulfillment in the order for the items included in the claim first.
+To create an order claim:
 
-</Note>
-
-{/* TODO check steps for correctness */}
-
-1. Open the order details page.
-2. In the Timeline section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon at the top right.
-3. Choose "Register claim" from the dropdown.
-4. In the new form that opens, there are two steps:
-    1. In the first step, choose the items to claim, then click the Continue button.2
-    2. In the second step:
-        1. For each item under the "Items to claim" section, enter the quantity, choose the return reason, and optionally enter a note that the customer can view.
-        2. Under the "Shipping for claimed items" section:
-            1. Choose the location to return the items to.
-            2. Choose the shipping method used to return the items.
-        3. Under the "Items to Replace" section:
-            1. To add items, click on the "Add items" button, choose products from the drawer, then click the "Add products" button.
-            2. To change the quantity sent of an item, change the value under its Quantity column.
-        4. If you chose items to replace in the previous section, a "Shipping for replacement items section is shown".
-            - Choose the shipping method used to send the item to the customer. Note that its price is considered `0` as the customer isn't expected to pay for it.
-        5. If there's an amount to be refunded, change that amount by toggling the "Custom refund" button and entering the new refund amount in the field shown.
-        6. To disable sending a notification to the customer about the created claim, toggle the "Send notifications" button.
-5. Once you’re done, click on the Save button.
-
----
-
-## View Claim Details
-
-{/* TODO check steps for correctness */}
-
-To view an order’s claim details:
-
-1. Open the order details page.
-2. In the Timeline section, find the claim and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon at its right.
-3. Click on More Details in the dropdown.
-
----
-
-## Manage a Claim’s Returns
-
-{/* TODO check steps for correctness */}
-
-### Receive a Claim’s Return
-
-To mark a claim’s return as received:
-
-1. Open the order details page.
-2. In the Timeline section, find the return requested.
-3. Click on the Receive Return button.
-4. Check or uncheck the items that have been received.
-5. Click the Complete button.
-
-### Cancel a Claim’s Return
-
-{/* TODO check steps for correctness */}
-
-<Note type="warning">
-
-Canceling a return is irreversible.
-
-</Note>
-
-To cancel a return of a claim:
-
-1. Open the order details page.
-2. In the Timeline section, find the return requested and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon.
-3. Click on “Cancel return” in the dropdown.
-
----
-
-## Manage a Claim’s Fulfillments
-
-<Note type="warning">
-
-This section only applies if the claim has replacement items.
-
-</Note>
-
-### Create a Fulfillment for a Claim
-
-{/* TODO check steps for correctness */}
-
-You can create fulfillment for items in the claim that you are sending to the customer as a replacement. You can create more than one fulfillment, with each having at least one item.
-
-To create a fulfillment for a claim:
-
-1. Open the order details page.
-2. In the Timeline section, find the claim and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon.
-3. Click on Fulfill Claim in the dropdown.
+1. Go to an order’s details page.
+2. In the Summary section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right.
+3. Choose "Create Claim" from the dropdown.
 4. In the form that opens:
-    - Choose the items you want to fulfill. You can change the quantity of the items you’re fulfilling using the plus and minus icons.
-    - Optionally add under Metadata any additional information that might be necessary for the fulfillment.
-    - If you don’t want the customer to receive a notification that a fulfillment for the claim items has been created, uncheck the “Send notifications” checkbox.
-5. Once you’re done, click on the Complete button.
+    - To add items to be returned:
+        - Click on the "Add items" button in the "Inbound" section.
+        - In the list that opens, click on the checkbox next to the items you want the customer to return.
+        - Once done, click on the "Save" button.
+        - You can then change the quantity to return or manage the item's details by clicking the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to it.
+    - For the inbound items:
+        - For the Location field, choose the location to return the items to.
+        - For the Return Shipping field, you can optionally choose the shipping method to return the items with.
+            - Choosing a return shipping method adds its cost to the claim total. You can modify the cost by clicking the <InlineIcon Icon={PencilSquare} alt="edit" /> icon next to the Return Shipping total, then entering the new cost.
+    - You can optionally add an outbound item to be sent to the customer in replacement:
+        - Click on the "Add items" button in the "Outbound" section.
+        - In the list that opens, click on the checkbox next to the items you want to send to the customer.
+        - Once done, click on the "Save" button.
+        - You can then change the quantity to send or remove the item by clicking the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to it and choosing "Remove" from the dropdown.
+    - For outbound items, choose the shipping method used to send the items in the Outbound Shipping field.
+        - The shipping method's cost is added to the claim total. To edit its cost:
+            - Click the <InlineIcon Icon={PencilSquare} alt="edit" /> icon next to the Outbound Shipping total.
+            - Enter the new cost in the input shown.
+    - If you want the customer to receive a notification that a claim has been created, check the “Send notifications” toggle.
+5. Once done, click on the "Confirm Claim" button, then confirm the action by clicking the "Continue" button in the pop-up.
 
-### Mark a Claim’s Fulfillment Shipped
+![Create Claim Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739803985/User%20Guide/Screenshot_2025-02-17_at_4.52.40_PM_drn24m.png)
 
-{/* TODO check steps for correctness */}
-
-To mark a claim’s fulfillment as shipped:
-
-1. Open the order details page.
-2. Scroll down to the Fulfillment section.
-3. Find the fulfillment you want to mark as shipped. A claim’s fulfillment’s title should be prefixed with “Claim fulfillment”.
-4. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon next to it.
-5. Click on Mark Shipped in the dropdown.
-6. In the new form that opens:
-    - Enter a tracking number for the shipment.
-    - If you have more than one tracking number, click on the “Add Additional Tracking Number” to add more numbers.
-    - If you don’t want the customer to receive a notification that the fulfillment has been shipped, uncheck the “Send notifications” checkbox.
-7. Once you’re done, click the Complete button.
-
-Shipment details can be seen in the Timeline section.
-
-### Cancel a Claim’s Fulfillment
-
-<Note type="warning">
-
-Canceling a fulfillment is irreversible.
-
-</Note>
-
-<Note type="check">
-
-Only a fulfillment that hasn’t been marked as shipped can be canceled.
-
-</Note>
-
-{/* TODO check steps for correctness */}
-
-To cancel a claim’s fulfillment:
-
-1. Open the order details page.
-2. Scroll down to the Fulfillment section.
-3. Find the fulfillment you want to cancel. A claim’s fulfillment’s title should be prefixed with “Claim fulfillment”.
-4. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon next to it.
-5. Click on Cancel Fulfillment in the dropdown.
-6. Confirm canceling the fulfillment by clicking the “Yes, confirm” button in the pop-up.
+The claim will be created and you can see it in the Activity section of the order’s details page. If you added outbound items, they will also be added to the "Unfulfilled Items" section.
 
 ---
 
-## Cancel a Claim
+## Handle Outstanding Payment of a Claim
 
-{/* TODO check info for correctness */}
+After creating a claim, you can check if there are any outstanding amounts (to be captured from the customer or returned) in the Summary section.
 
-### For Refund Claims
+To handle outstanding amounts by refunding or capturing the payment, refer to the [Payments guide](../payments/page.mdx#handling-outstanding-amounts).
 
-A claim of type Refund can be canceled by just [canceling the return of the claim](#cancel-a-claims-return). However, the refund can not be reverted.
+---
 
-### For Replace Claims
+## Managing Returned Items in a Claim
 
-<Note type="warning">
+The items to be returned from the customer as part of the claim can be managed similarly to a return. Once you receive the items from the customer, you can mark them as received as explained in the [Returns guide](../returns/page.mdx#mark-return-items-as-received).
 
-Canceling a claim is irreversible.
+---
 
-</Note>
+## Fulfill Outbound Items in a Claim
 
-<Note type="check">
-
-The [return of the claim must be canceled](#cancel-a-claims-return) before the claim itself is canceled.
-
-</Note>
-
-To cancel a claim of type Replace:
-
-1. Open the order details page.
-2. In the Timeline section, find the claim and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon.
-3. Click on Cancel Claim in the dropdown.
-4. Confirm canceling the fulfillment by clicking the “Yes, remove” button in the pop-up.
+As mentioned earlier, the outbound items of a claim are added into the "Unfulfilled Items" section. To fulfill and deliver these items to the customer, refer to the [Fulfillment guide](../fulfillments/page.mdx#create-fulfillment).

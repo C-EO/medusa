@@ -213,7 +213,8 @@ export class Product {
    *       },
    *       prices: []
    *     }
-   *   ]
+   *   ],
+   *   shipping_profile_id: "sp_123"
    * })
    * .then(({ product }) => {
    *   console.log(product)

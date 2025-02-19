@@ -1,15 +1,18 @@
 import {
   Button,
+  clx,
   DataTableColumnDef,
   DataTableCommand,
   DataTableEmptyStateProps,
   DataTableFilter,
   DataTableFilteringState,
   DataTablePaginationState,
+  DataTableRow,
   DataTableRowSelectionState,
   DataTableSortingState,
   Heading,
   DataTable as Primitive,
+  Text,
   useDataTable,
 } from "@medusajs/ui"
 import React, { ReactNode, useCallback, useState } from "react"
@@ -66,14 +69,17 @@ interface DataTableProps<TData> {
   autoFocusSearch?: boolean
   rowHref?: (row: TData) => string
   emptyState?: DataTableEmptyStateProps
-  heading: string
+  heading?: string
+  subHeading?: string
   prefix?: string
   pageSize?: number
   isLoading?: boolean
   rowSelection?: {
     state: DataTableRowSelectionState
     onRowSelectionChange: (value: DataTableRowSelectionState) => void
+    enableRowSelection?: boolean | ((row: DataTableRow<TData>) => boolean)
   }
+  layout?: "fill" | "auto"
 }
 
 export const DataTable = <TData,>({
@@ -90,11 +96,13 @@ export const DataTable = <TData,>({
   autoFocusSearch = false,
   rowHref,
   heading,
+  subHeading,
   prefix,
   pageSize = 10,
   emptyState,
   rowSelection,
   isLoading = false,
+  layout = "auto",
 }: DataTableProps<TData>) => {
   const { t } = useTranslation()
 
@@ -258,14 +266,30 @@ export const DataTable = <TData,>({
     isLoading,
   })
 
+  const shouldRenderHeading = heading || subHeading
+
   return (
-    <Primitive instance={instance}>
+    <Primitive
+      instance={instance}
+      className={clx({
+        "h-full [&_tr]:last-of-type:!border-b": layout === "fill",
+      })}
+    >
       <Primitive.Toolbar
         className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center"
         translations={toolbarTranslations}
       >
-        <div className="flex w-full items-center justify-between">
-          <Heading>{heading}</Heading>
+        <div className="flex w-full items-center justify-between gap-2">
+          {shouldRenderHeading && (
+            <div>
+              {heading && <Heading>{heading}</Heading>}
+              {subHeading && (
+                <Text size="small" className="text-ui-fg-subtle">
+                  {subHeading}
+                </Text>
+              )}
+            </div>
+          )}
           <div className="flex items-center justify-end gap-x-2 md:hidden">
             {enableFiltering && (
               <Primitive.FilterMenu tooltip={t("filters.filterLabel")} />

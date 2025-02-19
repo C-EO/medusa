@@ -36,18 +36,7 @@
  *   content:
  *     application/json:
  *       schema:
- *         type: object
- *         description: The promotion's details.
- *         required:
- *           - promo_codes
- *         properties:
- *           promo_codes:
- *             type: array
- *             description: Promotion codes to add to the cart.
- *             items:
- *               type: string
- *               title: promo_codes
- *               description: A promotion code.
+ *         $ref: "#/components/schemas/StoreCartAddPromotion"
  * x-codeSamples:
  *   - lang: Shell
  *     label: cURL

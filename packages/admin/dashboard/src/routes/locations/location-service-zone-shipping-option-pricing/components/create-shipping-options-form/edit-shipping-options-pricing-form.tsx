@@ -355,13 +355,19 @@ const getDefaultValues = (prices: HttpTypes.AdminShippingOptionPrice[]) => {
     }
 
     if (hasAttributes(price, [REGION_ID_ATTRIBUTE], [ITEM_TOTAL_ATTRIBUTE])) {
-      const regionId = price.price_rules[0].value
+      const regionId = price.price_rules.find(
+        (r) => r.attribute === REGION_ID_ATTRIBUTE
+      )?.value
+
       region_prices[regionId] = price.amount
       return
     }
 
     if (hasAttributes(price, [REGION_ID_ATTRIBUTE, ITEM_TOTAL_ATTRIBUTE])) {
-      const regionId = price.price_rules[0].value
+      const regionId = price.price_rules.find(
+        (r) => r.attribute === REGION_ID_ATTRIBUTE
+      )?.value
+
       if (!conditional_region_prices[regionId]) {
         conditional_region_prices[regionId] = []
       }

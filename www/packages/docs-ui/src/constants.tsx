@@ -48,6 +48,11 @@ export const navDropdownItems: NavigationItem[] = [
         link: "/resources/recipes",
       },
       {
+        type: "link",
+        title: "Plugin Guides",
+        link: "/resources/plugins",
+      },
+      {
         type: "divider",
       },
       {
@@ -146,7 +151,9 @@ export const navDropdownItems: NavigationItem[] = [
         link: "/learn/fundamentals/admin",
       },
       {
-        type: "divider",
+        type: "link",
+        title: "Plugins",
+        link: "/learn/fundamentals/plugins",
       },
       {
         type: "link",

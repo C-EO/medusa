@@ -432,6 +432,10 @@ export const filesMap = [
     "pathname": "/commerce-modules"
   },
   {
+    "filePath": "/www/apps/resources/app/commerce-modules/payment/account-holder/page.mdx",
+    "pathname": "/commerce-modules/payment/account-holder"
+  },
+  {
     "filePath": "/www/apps/resources/app/commerce-modules/payment/events/page.mdx",
     "pathname": "/commerce-modules/payment/events"
   },
@@ -784,6 +788,10 @@ export const filesMap = [
     "pathname": "/events-reference"
   },
   {
+    "filePath": "/www/apps/resources/app/examples/guides/custom-item-price/page.mdx",
+    "pathname": "/examples/guides/custom-item-price"
+  },
+  {
     "filePath": "/www/apps/resources/app/examples/page.mdx",
     "pathname": "/examples"
   },
@@ -1082,6 +1090,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/app/storefront-development/customers/third-party-login/page.mdx",
     "pathname": "/storefront-development/customers/third-party-login"
+  },
+  {
+    "filePath": "/www/apps/resources/app/storefront-development/guides/express-checkout/page.mdx",
+    "pathname": "/storefront-development/guides/express-checkout"
   },
   {
     "filePath": "/www/apps/resources/app/storefront-development/page.mdx",
@@ -2492,6 +2504,10 @@ export const filesMap = [
     "pathname": "/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateLineItemPricesStep"
   },
   {
+    "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateShippingStep/page.mdx",
+    "pathname": "/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateShippingStep"
+  },
+  {
     "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateVariantPricesStep/page.mdx",
     "pathname": "/references/core_flows/Cart/Steps_Cart/functions/core_flows.Cart.Steps_Cart.validateVariantPricesStep"
   },
@@ -2622,6 +2638,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/variables/core_flows.Cart.Steps_Cart.validateLineItemPricesStepId/page.mdx",
     "pathname": "/references/core_flows/Cart/Steps_Cart/variables/core_flows.Cart.Steps_Cart.validateLineItemPricesStepId"
+  },
+  {
+    "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/variables/core_flows.Cart.Steps_Cart.validateShippingStepId/page.mdx",
+    "pathname": "/references/core_flows/Cart/Steps_Cart/variables/core_flows.Cart.Steps_Cart.validateShippingStepId"
   },
   {
     "filePath": "/www/apps/resources/references/core_flows/Cart/Steps_Cart/variables/core_flows.Cart.Steps_Cart.validateVariantPricesStepId/page.mdx",
@@ -5132,6 +5152,10 @@ export const filesMap = [
     "pathname": "/references/core_flows/Payment/core_flows.Payment.Workflows_Payment"
   },
   {
+    "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStep/page.mdx",
+    "pathname": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStep"
+  },
+  {
     "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentSessionStep/page.mdx",
     "pathname": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentSessionStep"
   },
@@ -5158,6 +5182,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.validateDeletedPaymentSessionsStep/page.mdx",
     "pathname": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/functions/core_flows.Payment_Collection.Steps_Payment_Collection.validateDeletedPaymentSessionsStep"
+  },
+  {
+    "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/variables/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStepId/page.mdx",
+    "pathname": "/references/core_flows/Payment_Collection/Steps_Payment_Collection/variables/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentAccountHolderStepId"
   },
   {
     "filePath": "/www/apps/resources/references/core_flows/Payment_Collection/Steps_Payment_Collection/variables/core_flows.Payment_Collection.Steps_Payment_Collection.createPaymentSessionStepId/page.mdx",
@@ -6466,6 +6494,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.deleteShippingProfileWorkflow/page.mdx",
     "pathname": "/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.deleteShippingProfileWorkflow"
+  },
+  {
+    "filePath": "/www/apps/resources/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.validateStepShippingProfileDelete/page.mdx",
+    "pathname": "/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/functions/core_flows.Shipping_Profile.Workflows_Shipping_Profile.validateStepShippingProfileDelete"
   },
   {
     "filePath": "/www/apps/resources/references/core_flows/Shipping_Profile/Workflows_Shipping_Profile/variables/core_flows.Shipping_Profile.Workflows_Shipping_Profile.deleteShippingProfileWorkflowId/page.mdx",
@@ -8844,6 +8876,10 @@ export const filesMap = [
     "pathname": "/references/core_flows/types/core_flows.ValidateShipmentStepInput"
   },
   {
+    "filePath": "/www/apps/resources/references/core_flows/types/core_flows.ValidateShippingInput/page.mdx",
+    "pathname": "/references/core_flows/types/core_flows.ValidateShippingInput"
+  },
+  {
     "filePath": "/www/apps/resources/references/core_flows/types/core_flows.ValidateShippingMethodsDataInput/page.mdx",
     "pathname": "/references/core_flows/types/core_flows.ValidateShippingMethodsDataInput"
   },
@@ -8854,6 +8890,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/core_flows/types/core_flows.ValidateShippingOptionPricesStepInput/page.mdx",
     "pathname": "/references/core_flows/types/core_flows.ValidateShippingOptionPricesStepInput"
+  },
+  {
+    "filePath": "/www/apps/resources/references/core_flows/types/core_flows.ValidateStepShippingProfileDeleteInput/page.mdx",
+    "pathname": "/references/core_flows/types/core_flows.ValidateStepShippingProfileDeleteInput"
   },
   {
     "filePath": "/www/apps/resources/references/core_flows/types/core_flows.ValidateTokenStepInput/page.mdx",
@@ -12328,10 +12368,6 @@ export const filesMap = [
     "pathname": "/references/js_sdk/admin/Upload/properties/js_sdk.admin.Upload.client"
   },
   {
-    "filePath": "/www/apps/resources/references/js_sdk/admin/User/methods/js_sdk.admin.User.create/page.mdx",
-    "pathname": "/references/js_sdk/admin/User/methods/js_sdk.admin.User.create"
-  },
-  {
     "filePath": "/www/apps/resources/references/js_sdk/admin/User/methods/js_sdk.admin.User.delete/page.mdx",
     "pathname": "/references/js_sdk/admin/User/methods/js_sdk.admin.User.delete"
   },
@@ -14328,8 +14364,16 @@ export const filesMap = [
     "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.completePaymentCollections"
   },
   {
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createAccountHolder/page.mdx",
+    "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createAccountHolder"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections/page.mdx",
     "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentCollections"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentMethods/page.mdx",
+    "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentMethods"
   },
   {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createPaymentSession/page.mdx",
@@ -14338,6 +14382,14 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons/page.mdx",
     "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.createRefundReasons"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteAccountHolder/page.mdx",
+    "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteAccountHolder"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteCaptures/page.mdx",
+    "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteCaptures"
   },
   {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deletePaymentCollections/page.mdx",
@@ -14350,6 +14402,10 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons/page.mdx",
     "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefundReasons"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefunds/page.mdx",
+    "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.deleteRefunds"
   },
   {
     "filePath": "/www/apps/resources/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.getWebhookActionAndData/page.mdx",
@@ -14448,6 +14504,10 @@ export const filesMap = [
     "pathname": "/references/payment/IPaymentModuleService/methods/payment.IPaymentModuleService.upsertPaymentCollections"
   },
   {
+    "filePath": "/www/apps/resources/references/payment/interfaces/payment.AccountHolderDTO/page.mdx",
+    "pathname": "/references/payment/interfaces/payment.AccountHolderDTO"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.BaseFilterable/page.mdx",
     "pathname": "/references/payment/interfaces/payment.BaseFilterable"
   },
@@ -14460,12 +14520,20 @@ export const filesMap = [
     "pathname": "/references/payment/interfaces/payment.Context"
   },
   {
+    "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreateAccountHolderDTO/page.mdx",
+    "pathname": "/references/payment/interfaces/payment.CreateAccountHolderDTO"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreateCaptureDTO/page.mdx",
     "pathname": "/references/payment/interfaces/payment.CreateCaptureDTO"
   },
   {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreatePaymentCollectionDTO/page.mdx",
     "pathname": "/references/payment/interfaces/payment.CreatePaymentCollectionDTO"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreatePaymentMethodDTO/page.mdx",
+    "pathname": "/references/payment/interfaces/payment.CreatePaymentMethodDTO"
   },
   {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreatePaymentSessionDTO/page.mdx",
@@ -14478,14 +14546,6 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.CreateRefundReasonDTO/page.mdx",
     "pathname": "/references/payment/interfaces/payment.CreateRefundReasonDTO"
-  },
-  {
-    "filePath": "/www/apps/resources/references/payment/interfaces/payment.CustomerAddressDTO/page.mdx",
-    "pathname": "/references/payment/interfaces/payment.CustomerAddressDTO"
-  },
-  {
-    "filePath": "/www/apps/resources/references/payment/interfaces/payment.CustomerDTO/page.mdx",
-    "pathname": "/references/payment/interfaces/payment.CustomerDTO"
   },
   {
     "filePath": "/www/apps/resources/references/payment/interfaces/payment.FilterableCaptureProps/page.mdx",
@@ -14704,12 +14764,24 @@ export const filesMap = [
     "pathname": "/references/payment/types/payment.OperatorMap"
   },
   {
+    "filePath": "/www/apps/resources/references/payment/types/payment.PaymentAccountHolderDTO/page.mdx",
+    "pathname": "/references/payment/types/payment.PaymentAccountHolderDTO"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment/types/payment.PaymentActions/page.mdx",
     "pathname": "/references/payment/types/payment.PaymentActions"
   },
   {
+    "filePath": "/www/apps/resources/references/payment/types/payment.PaymentAddressDTO/page.mdx",
+    "pathname": "/references/payment/types/payment.PaymentAddressDTO"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment/types/payment.PaymentCollectionStatus/page.mdx",
     "pathname": "/references/payment/types/payment.PaymentCollectionStatus"
+  },
+  {
+    "filePath": "/www/apps/resources/references/payment/types/payment.PaymentCustomerDTO/page.mdx",
+    "pathname": "/references/payment/types/payment.PaymentCustomerDTO"
   },
   {
     "filePath": "/www/apps/resources/references/payment/types/payment.PaymentSessionStatus/page.mdx",
@@ -14740,6 +14812,10 @@ export const filesMap = [
     "pathname": "/references/payment/types/payment.Scalar"
   },
   {
+    "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.AccountHolder/page.mdx",
+    "pathname": "/references/payment_models/variables/payment_models.AccountHolder"
+  },
+  {
     "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.Capture/page.mdx",
     "pathname": "/references/payment_models/variables/payment_models.Capture"
   },
@@ -14750,10 +14826,6 @@ export const filesMap = [
   {
     "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.PaymentCollection/page.mdx",
     "pathname": "/references/payment_models/variables/payment_models.PaymentCollection"
-  },
-  {
-    "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.PaymentMethodToken/page.mdx",
-    "pathname": "/references/payment_models/variables/payment_models.PaymentMethodToken"
   },
   {
     "filePath": "/www/apps/resources/references/payment_models/variables/payment_models.PaymentProvider/page.mdx",
@@ -19848,12 +19920,24 @@ export const filesMap = [
     "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCart"
   },
   {
+    "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartAddPromotion/page.mdx",
+    "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartAddPromotion"
+  },
+  {
     "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartAddress/page.mdx",
     "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartAddress"
   },
   {
     "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartLineItem/page.mdx",
     "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartLineItem"
+  },
+  {
+    "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartPromotion/page.mdx",
+    "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartPromotion"
+  },
+  {
+    "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartRemovePromotion/page.mdx",
+    "pathname": "/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartRemovePromotion"
   },
   {
     "filePath": "/www/apps/resources/references/types/HttpTypes/interfaces/types.HttpTypes.StoreCartResponse/page.mdx",

@@ -17,7 +17,7 @@ export type UpdateCartsStepInput = UpdateCartWorkflowInputDTO[]
 export const updateCartsStepId = "update-carts"
 /**
  * This step updates a cart.
- * 
+ *
  * @example
  * const data = updateCartsStep([{
  *   id: "cart_123",
@@ -57,6 +57,7 @@ export const updateCartsStep = createStep(
         email: cart.email,
         currency_code: cart.currency_code,
         metadata: cart.metadata,
+        completed_at: cart.completed_at,
       })
     }
 

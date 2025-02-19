@@ -6,88 +6,173 @@ sidebar_label: Manage Fulfillments
 import { 
   EllipsisHorizontal, 
 } from "@medusajs/icons"
+import { Table } from "docs-ui"
 
 export const metadata = {
-  title: `Manage Order's Fulfillments`,
+  title: `Manage Order Fulfillments`,
 }
 
 # {metadata.title}
 
-In this document, you’ll learn about order fulfillments and how to manage them, including how to create fulfillments and mark them as shipped.
+In this guide, you’ll learn about order fulfillments and how to manage them, including how to create fulfillments and mark them as shipped.
 
-## Create Fulfillment
+## Overview
 
-{/* TODO check after #4 */}
+A fulfillment represents the process of picking, packing, and shipping items to a customer. You can fulfill all items in an order at once, or fulfill them separately. Then, for each fulfillment, you create a shipment that can have a tracking number, and finally mark the fulfillment as delivered.
 
-To create a fulfillment for an order:
+Fulfillment processes are handled by the fulfillment provider, such as UPS, associated with the shipping option that the customer has chosen during checkout. You can also use a different shipping option if necessary.
 
-1. Open the order details page.
-2. Scroll down to the Unfulfilled Items section.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
-4. Choose "Create Fulfillment" from the dropdown.
-5. In the form that opens:
-    - Choose the location you want to fulfill the items from.
-    - Under Items to fulfill, enter the quantity of the items you want to fulfill.
-    - Optionally enter any additional information you want to associate with the fulfillment under the Metadata section.
-    - If you don’t want the customer to receive a notification that a fulfillment has been created, uncheck the “Send notifications” checkbox.
-6. Once done, click on the "Create fulfillment" button.
+<Note>
 
-Check the fulfillment details in the Fulfillment and Timeline sections.
+Fulfillments can also be created for order changes like item edits and exchanges.
+
+</Note>
+
+### Order Fulfillment Statuses
+
+At the top of the order details page, you can see the fulfillment status of the order. The fulfillment status can be one of the following:
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Status</Table.HeaderCell>
+      <Table.HeaderCell>Description</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+    <Table.Cell>Not Fulfilled</Table.Cell>
+    <Table.Cell>The default status when an order is placed, indicating that the items in the order haven't been fulfilled yet.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+    <Table.Cell>Partially Fulfilled</Table.Cell>
+    <Table.Cell>Some items in the order have been fulfilled, but not all.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+    <Table.Cell>Fulfilled</Table.Cell>
+    <Table.Cell>All items in the order have been fulfilled.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+    <Table.Cell>Partially Shipped</Table.Cell>
+      <Table.Cell>Some items in the order have been shipped, but not all.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Shipped</Table.Cell>
+      <Table.Cell>All items in the order have been shipped.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Partially Delivered</Table.Cell>
+      <Table.Cell>Some items in the order have been marked as delivered, but not all.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Delivered</Table.Cell>
+      <Table.Cell>All items in the order have been marked as delivered.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Partially Returned</Table.Cell>
+      <Table.Cell>Some items in the order have been returned, but not all.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Returned</Table.Cell>
+      <Table.Cell>All items in the order have been returned.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Canceled</Table.Cell>
+      <Table.Cell>All order fulfillments have been canceled.</Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
 
 ---
 
-## Mark a Fulfillment Shipped
+## Create Fulfillment
+
+To create a fulfillment for an order:
+
+1. Open the order's details page.
+2. Scroll down to the Unfulfilled Items section.
+3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
+4. Choose "Fulfill items" from the dropdown.
+5. In the form that opens:
+    - For "Location", choose the location you want to fulfill the items from. By default, the location is set to that associated with the chosen shipping method.
+        - If you change the location, the available shipping methods will also change and that will impact which stock locations the items are fulfilled from. If the item doesn't have stock in the chosen location, the fulfillment will fail.
+    - For "Shipping method", choose the shipping method to fulfill the items with. By default, the shipping method is set to that chosen by the customer during checkout.
+        - The shipping methods available are based on the location you choose. If you want to choose a shipping method that isn't available, you need to change the location first.
+        - If you choose a shipping method with a different price, Medusa doesn't change the shipping total of the order.
+    - Under Items to fulfill, enter the quantity to fulfill for each item. This is also the quantity subtracted from the stock in the chosen location if Medusa manages the variant's inventory.
+        - If you don't want to fulfill an item, change its quantity to 0.
+    - If you don’t want the customer to receive a notification that a fulfillment has been created, uncheck the “Send notifications” toggle.
+6. Once done, click on the "Create Fulfillment" button.
+
+![Fulfillment Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739781351/User%20Guide/Screenshot_2025-02-17_at_10.34.47_AM_nevpfa.png)
+
+After creating the fulfillment, a new section is shown with the header "Fulfillment #1", where `#1` is the number of the fulfillment in the order. If there are no unfulfilled items, the "Unfulfilled Items" section is removed.
+
+This can also change the order's fulfillment status to "Partially Fulfilled" or "Fulfilled" depending on the items fulfilled.
+
+---
+
+## Add a Shipment to a Fulfillment
+
+After you create a fulfillment, you can add a shipment to it. A shipment can have a tracking number and marks the fulfillment as shipped.
 
 <Note type="warning">
 
-Marking a fulfillment shipped is irreversible.
+Adding a shipment to a fulfillment is irreversible. You can't cancel the fulfillment or the order afterwards.
 
 </Note>
 
-<Note type="check">
+To add a shipment for a fulfillment:
 
-You must [create a fulfillment](#create-fulfillment) first.
+1. Open the order's details page.
+2. Scroll down to the Fulfillment's section. If you have more than one fulfillment, find the fulfillment you're looking for.
+3. Click on the "Mark as shipped" button at the bottom right of the section.
+4. In the form that opens:
+    - To add a tracking number, click on the "Add tracking number" button, then enter a tracking number.
+    - If you don’t want the customer to receive a notification that the fulfillment has been shipped, uncheck the “Send notifications” toggle.
+5. Once you’re done, click the Save button.
+
+![Shipment Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739783997/User%20Guide/Screenshot_2025-02-17_at_11.19.18_AM_o9qvsg.png)
+
+This changes the order's fulfillment status to "Partially Shipped" or "Shipped" depending on the items shipped.
+
+---
+
+## Mark Fulfillment as Delivered
+
+You can mark a fulfillment as delivered, even if it hasn't been shipped. This can be useful if you deliver items to the customer using external methods.
+
+<Note type="warning">
+
+Marking a fulfillment as delivered is irreversible. You can't cancel the fulfillment or the order afterwards, and you can't add shipments to the fulfillment.
 
 </Note>
 
-{/* TODO check after #4 */}
+To mark the fulfillment as delivered:
 
-To mark a fulfillment as shipped in an order:
-
-1. Open the order details page.
+1. Open the order's details page.
 2. Scroll down to the Fulfillment section. If you have more than one fulfillment, find the fulfillment you're looking for.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the section.
-4. Click on Mark Shipped in the dropdown.
-5. In the new window that opens:
-    - Enter a tracking number for the shipment.
-    - If you have more than one tracking number, click on the “Add Additional Tracking Number” to add more numbers.
-    - If you don’t want the customer to receive a notification that the fulfillment has been shipped, uncheck the “Send notifications” checkbox.
-6. Once you’re done, click the Complete button.
+3. Click on the "Mark as delivered" button at the bottom right of the section.
+4. Confirm marking the order as delivered by clicking the "Continue" button in the pop-up
 
-Shipment details are shown in the Timeline section.
+![Mark as Delivered Pop-up](https://res.cloudinary.com/dza7lstvk/image/upload/v1739784298/User%20Guide/Screenshot_2025-02-17_at_11.24.48_AM_dpplxp.png)
+
+This changes the order's fulfillment status to "Partially Delivered" or "Delivered" depending on the items delivered.
 
 ---
 
 ## Cancel a Fulfillment
 
-<Note type="warning">
-
-Canceling a fulfillment is irreversible.
-
-</Note>
-
-<Note type="check">
-
-Only a fulfillment that hasn’t been marked as shipped can be canceled.
-
-</Note>
-
-{/* TODO check after #4 */}
+You can cancel a fulfillment if you haven't shipped or marked it as delivered yet. This can be useful if you need to change the items fulfilled or if the customer cancels the order.
 
 To cancel a fulfillment in an order:
 
-1. Open the order details page.
+1. Open the order's details page.
 2. Scroll down to the Fulfillment section. If you have more than one fulfillment, find the fulfillment you're looking for.
 3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the section.
-4. Click on Cancel Fulfillment in the dropdown.
-5. Confirm canceling the fulfillment by clicking the “Yes, confirm” button in the pop-up.
+4. Click on Cancel in the dropdown.
+5. Confirm canceling the fulfillment by clicking the “Continue" button in the pop-up.
+
+![Cancel Fulfillment Pop-up](https://res.cloudinary.com/dza7lstvk/image/upload/v1739784441/User%20Guide/Screenshot_2025-02-17_at_11.27.05_AM_cd19ae.png)
+
+This changes the order's fulfillment status to "Canceled". Also, the "Unfulfilled Items" section is shown again, and you can create a new fulfillment.

@@ -5,6 +5,7 @@ import React from "react"
 import {
   BorderedIcon,
   Button,
+  GITHUB_ISSUES_LINK,
   LinkButton,
   SearchModalOpener,
   useLayout,
@@ -20,6 +21,7 @@ import { MainNavMobileMenu } from "./MobileMenu"
 import Link from "next/link"
 import { MainNavVersion } from "./Version"
 import { AiAssistantTriggerButton } from "../AiAssistant/TriggerButton"
+import { MainNavItemDropdown } from "./Items/Dropdown"
 
 type MainNavProps = {
   className?: string
@@ -74,14 +76,40 @@ export const MainNav = ({ className, itemsClassName }: MainNavProps) => {
           <div className="lg:flex items-center gap-docs_0.5 text-medusa-fg-subtle hidden">
             <MainNavVersion />
             {editDate && <MainNavEditDate date={editDate} />}
-            <LinkButton
-              href={config.reportIssueLink || ""}
-              variant="subtle"
-              target="_blank"
-              className="text-compact-small-plus"
-            >
-              Report Issue
-            </LinkButton>
+            <MainNavItemDropdown
+              item={{
+                type: "dropdown",
+                title: "Help",
+                children: [
+                  {
+                    type: "link",
+                    title: "Troubleshooting",
+                    link: "https://docs.medusajs.com/resources/troubleshooting",
+                  },
+                  {
+                    type: "link",
+                    title: "Report Issue",
+                    link: GITHUB_ISSUES_LINK,
+                  },
+                  {
+                    type: "link",
+                    title: "Discord Community",
+                    link: "https://discord.gg/medusajs",
+                  },
+                  {
+                    type: "divider",
+                  },
+                  {
+                    type: "link",
+                    title: "Contact Sales",
+                    link: "https://medusajs.com/contact/",
+                  },
+                ],
+              }}
+              isActive={false}
+              className="text-medusa-fg-subtle"
+              wrapperClassName="z-10"
+            />
           </div>
           <div className="flex items-center gap-docs_0.25">
             <AiAssistantTriggerButton />

@@ -5,6 +5,7 @@
  * x-schemaName: AdminCreateProduct
  * required:
  *   - title
+ *   - shipping_profile_id
  *   - options
  * properties:
  *   title:
@@ -152,6 +153,10 @@
  *     type: string
  *     title: external_id
  *     description: The ID of the product in an external or third-party system.
+ *   shipping_profile_id:
+ *     type: string
+ *     title: shipping_profile_id
+ *     description: The ID of the product's shipping profile.
  * 
 */
 

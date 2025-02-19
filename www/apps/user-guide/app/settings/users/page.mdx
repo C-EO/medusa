@@ -3,7 +3,7 @@ sidebar_position: 3
 sidebar_label: Users
 ---
 
-import { EllipsisHorizontal } from "@medusajs/icons"
+import { EllipsisHorizontal, ArrowUpRightOnBox, EllipsisVertical } from "@medusajs/icons"
 
 export const metadata = {
   title: `Manage Users`,
@@ -11,23 +11,65 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn how to invite new users, edit other users’ information, and remove users from your store.
+In this guide, you’ll learn how to manage users in your store.
+
+<Note title="Tip">
+
+You can't create a user. Instead, you need to [invite them](./invites/page.mdx) to join your store.
+
+</Note>
 
 ## View Users
 
-View admin users by going to Settings → Users.
+You can view admin users by going to Settings → Users. In the list, you can see user details such as the name and email. You can also search, filter, and sort the users to find the specific item you are looking for.
+
+![Users List](https://res.cloudinary.com/dza7lstvk/image/upload/v1739964455/User%20Guide/Screenshot_2025-02-19_at_1.27.23_PM_qliac9.png)
+
+---
+
+## View User Details
+
+To view the details of a user:
+
+1. Go to Settings → Users.
+2. Click on the user in the list.
+
+This opens the user's details page where you can also manage the user.
+
+![User details page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739964575/User%20Guide/Screenshot_2025-02-19_at_1.29.20_PM_lffysp.png)
 
 ---
 
 ## Edit a User’s Details
 
-To edit a user’s details in your team:
+To edit the details of an admin user:
 
-1. Go to Settings → Users.
-2. Find the user in the list and click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at its right.
+1. Go to the user's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the first section.
 3. Choose Edit from the dropdown.
-4. In the drawer that opens, edit the user’s information.
+4. In the side window that opens, you can edit the user's first and last names.
 5. Once done, click the Save button.
+
+![Edit user details form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739964727/User%20Guide/Screenshot_2025-02-19_at_1.31.57_PM_nevurs.png)
+
+---
+
+## Manage User Metadata
+
+Metadata is custom data that can be associated with the user in key-value pairs. This is usually used by developers for custom integrations or to store additional information about the user.
+
+To edit the user's metadata:
+
+1. Click the <InlineIcon Icon={ArrowUpRightOnBox} alt="arrow" /> icon at the right of the "Metadata" section.
+2. In the side window that opens:
+    - Manage the key-value pairs in the table.
+    - To add a new row of key-value pairs before or after a row:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Insert row above" or "Insert row below" from the dropdown.
+    - To delete a row of key-value pairs:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Delete row" from the dropdown.
+3. Once you're done, click the Save button.
 
 ---
 
@@ -45,4 +87,4 @@ To delete a user from your store:
 2. Find the user in the list and click on it.
 3. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the first section.
 4. Choose Delete from the dropdown.
-4. Confirm deleting the user by clicking the Delete button in the pop-up.
+4. Confirm deleting the user by entering their name and clicking the "Delete" button in the pop-up.

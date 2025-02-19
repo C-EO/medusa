@@ -1,0 +1,119 @@
+---
+sidebar_position: 1
+---
+
+import { DotsSix, EllipsisHorizontal, XMark, TaxExclusive, TaxInclusive } from "@medusajs/icons"
+
+export const metadata = {
+  title: `Create Product`,
+}
+
+# {metadata.title}
+
+In this guide, you’ll learn how to create a new product using the Medusa Admin.
+
+## Types of Products to Create
+
+You can create different types of products in Medusa:
+
+- A simple product without variants, such as a painting.
+- A product with variants, such as a t-shirt with different colors and sizes.
+- A product that has [multi-part variants](./multi-part/page.mdx), such as a bicycle that consists of a frame, wheels, and handlebars. Each variant has an inventory kit that makes up the product's parts.
+- A product that is sold as a [bundle](./bundle/page.mdx), such as a camera bundle that consists of a camera, a lens, and a camera bag. Each variant has an inventory kit of each product variant's inventory items.
+
+This guide covers the general steps to create any of these products. You can also refer to the specific guides for creating [multi-part products](./multi-part/page.mdx) and [bundle products](./bundle/page.mdx).
+
+---
+
+## How to Create a Product
+
+To create a new product:
+
+1. Go to the Products page from the sidebar.
+2. Click on the Create button at the top right.
+
+This opens a form with three steps: Details, Organize, and Variants. There's a fourth optional step "Inventory Kits" that's only shown if you enable the "Has inventory kit" toggle for a variant, as explained in the [third step](#3-variants-step).
+
+### 1. Details Step
+
+In the first "Details" step, you can enter the product's general information and specify their variants and options:
+
+1. Enter the product's name in the Title field. This is the only required field in the form.
+2. Optionally enter a Subtitle, Handle, and Description.
+    - The value of the Handle field is used in the product's URL on the storefront. It allows you to create a human-readable URL for the product. The handle must be unique across all products, and it must contain lowercase letters, numbers, and hyphens (`-`). If not specified, Medusa will generate a handle from the title.
+3. Optionally upload images of the product under the Medusa section.
+    - To set an image as the thumbnail:
+        - Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> at the image's right.
+        - Choose "Make thumbnail" from the dropdown.
+4. If the product has variants, such as different colors or sizes, enable the "Yes, this is a product with variants" toggle. This will show new fields to enter product options.
+    - Each product option has a title (for example, `Color`) and a list of values (for example, `Black, White`). You can separate values by a comma.
+    - To add a new product option, click the "Add" button.
+    - After adding the options, product variants are created automatically from these options. You can disable creating a product variant by unchecking its checkbox.
+
+Once you're done, click the "Continue" button.
+
+![Create Product First Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739806746/User%20Guide/Screenshot_2025-02-17_at_5.38.51_PM_eto1rg.png)
+
+### 2. Organize Step
+
+In the second "Organize" step, you can organize the product by adding it to collections, categories, and other organization details:
+
+{/* TODO add links later */}
+
+1. If you don't want to allow applying discounts to the product, disable the "Discountable" toggle.
+2. You can optionally choose a type for the products. You can create product types in [Settings](#).
+3. You can optionally choose a collection for the product. You can create collections under the [Product domain](../collections/page.mdx).
+4. You can optionally choose categories for the product. You can create categories under the [Product domain](../categories/page.mdx).
+5. You can optionally add tags to the product. You can create product tags in [Settings](#).
+6. You must enter a shipping profile for the product. A shipping profile defines how a product can be shipped. You can create shipping profiles in [Settings](#).
+7. You can optionally set the sales channels a product is available in. In the storefront, only the products that are in the storefront's sales channel can be purchased. To add the product to a sales channel:
+    - Click the "Add" button next to the "Sales channels" section.
+    - In the list that opens, check the sales channels you want to add the product to.
+    - Once you're done, click the "Save" button.
+
+Once you're done with this step, click the "Continue" button.
+
+![Create Product Second Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739807251/User%20Guide/Screenshot_2025-02-17_at_5.47.03_PM_ke1xtb.png)
+
+### 3. Variants Step
+
+In the third "Variants" step, you can manage the product's variants you added in the first step. The step shows a [bulk editor](../../tips/bulk-editor/page.mdx) with a row for each variant:
+
+1. In the column "Title", you can change the variant's title.
+2. In the column "SKU", you can set the variant's SKU.
+3. In the column "Managed Inventory", you can enable inventory management for the variant. If disabled, the variant is always considered in stock. Otherwise, you can set the inventory quantity in different stock locations, and Medusa will manage that inventory, such as decrementing it when the variant is purchased.
+4. In the column "Allow backorder", you can enable backorders for the variant. If enabled, customers can purchase the variant even if it's out of stock.
+5. In the column "Has inventory kit", you can enable inventory kits for the variant, allowing you to add multi-part or bundled products. If enabled, you'll see a [fourth step "Inventory Kits"](#4-inventory-kits-step-optional) after this step.
+6. The next columns are price columns for all the currencies and regions you have set up in Medusa. You can set the price for each variant in each currency and region. You can also add the prices after creating the product.
+
+<Note title="Tips">
+
+- Price columns that have the <InlineIcon Icon={TaxExclusive} alt="tax-exclusive" /> icon are tax-exclusive prices. Medusa will calculate taxes during checkout and add them to this price.
+- Price columns that have the <InlineIcon Icon={TaxInclusive} alt="tax-inclusive" /> icon are tax-inclusive prices. Medusa will calculate taxes during checkout as part of this price.
+
+Tax-inclusive pricing is configured in the [currency's](../../settings/store/page.mdx) or [region's](../../settings/regions/page.mdx) settings.
+
+</Note>
+
+Once you're done, either click the "Publish" button if there are no more steps, or click the "Continue" button to go to the next step.
+
+![Create Product Third Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739807921/User%20Guide/Screenshot_2025-02-17_at_5.58.27_PM_i708en.png)
+
+### 4. Inventory Kits Step (Optional)
+
+If you enabled the "Has inventory kit" checkbox for a variant in the third step, you'll see a fourth optional step "Inventory Kits". Inventory kits allow you to create:
+
+- A multi-part product, where a product is made up of multiple parts. For example, if you're selling a bicycle that consists of a frame, wheels, and handlebars, you can add the frame, wheels, and handlebars as inventory items in the variant's inventory kit.
+- A bundled product, where products are sold as a bundle. For example, if you're selling a camera bundle that consists of a camera, a lens, and a camera bag, you can add the inventory items of each of these product variants in the variant's inventory kit.
+
+To manage the inventory kit of variants in the fourth step, for each variant:
+
+1. Select an inventory item from the dropdown.
+2. In the Quantity field, enter the quantity required for a single item of the variant. For example, if the variant is a bicycle and the inventory item is a wheel, you can enter `2` in the Quantity field to indicate that the variant requires two wheels.
+3. To add more inventory items, click the Add button.
+
+Once you're done, click the "Publish" button.
+
+![Create Product Fourth Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739808931/User%20Guide/Screenshot_2025-02-17_at_6.15.16_PM_hofawf.png)
+
+You can now [manage the product](../edit/page.mdx) you created.

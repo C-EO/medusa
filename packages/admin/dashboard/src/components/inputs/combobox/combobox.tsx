@@ -57,6 +57,7 @@ interface ComboboxProps<T extends Value = Value>
   isFetchingNextPage?: boolean
   onCreateOption?: (value: string) => void
   noResultsPlaceholder?: ReactNode
+  allowClear?: boolean
 }
 
 const ComboboxImpl = <T extends Value = string>(
@@ -72,6 +73,7 @@ const ComboboxImpl = <T extends Value = string>(
     isFetchingNextPage,
     onCreateOption,
     noResultsPlaceholder,
+    allowClear,
     ...inputProps
   }: ComboboxProps<T>,
   ref: ForwardedRef<HTMLInputElement>
@@ -303,6 +305,18 @@ const ComboboxImpl = <T extends Value = string>(
             {...inputProps}
           />
         </div>
+        {allowClear && controlledValue && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              handleValueChange(undefined)
+            }}
+            className="bg-ui-bg-base hover:bg-ui-bg-base-hover txt-compact-small-plus text-ui-fg-subtle focus-within:border-ui-fg-interactive transition-fg absolute right-[28px] top-0.5 z-[1] flex h-[28px] items-center rounded-[4px] border px-1.5 py-[2px] outline-none"
+          >
+            <XMarkMini className="text-ui-fg-muted" />
+          </button>
+        )}
         <PrimitiveComboboxDisclosure
           render={(props) => {
             return (

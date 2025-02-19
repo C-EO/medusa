@@ -6,7 +6,26 @@ import { InferTypeOf } from "@medusajs/types"
 const Blog = model.define("Blog", {
   id: model.text(),
   title: model.text(),
+  tags: model.manyToMany(() => Tag),
+  comments: model.hasMany(() => Comment),
   description: model.text().nullable(),
+})
+
+const Tag = model.define("Tag", {
+  id: model.text(),
+  title: model.text(),
+})
+
+const Comment = model.define("Comment", {
+  id: model.text(),
+  post: model.belongsTo(() => Blog),
+  author: model.belongsTo(() => User),
+  description: model.text().nullable(),
+})
+
+const User = model.define("User", {
+  id: model.text(),
+  username: model.text(),
 })
 
 type BlogDTO = {
@@ -55,7 +74,7 @@ const containerMock = {
 describe("Medusa Service typings", () => {
   describe("create<Service>", () => {
     test("type-hint model properties", () => {
-      class BlogService extends MedusaService({ Blog }) {}
+      class BlogService extends MedusaService({ Blog, Comment }) {}
       const blogService = new BlogService(containerMock)
 
       expectTypeOf(blogService.createBlogs).parameters.toEqualTypeOf<
@@ -63,6 +82,8 @@ describe("Medusa Service typings", () => {
             Partial<{
               id: string | undefined
               title: string | undefined
+              comments: string[] | undefined
+              tags: string[] | undefined
               description: string | null | undefined
             }>,
             ...rest: any[]
@@ -71,6 +92,36 @@ describe("Medusa Service typings", () => {
             Partial<{
               id: string | undefined
               title: string | undefined
+              comments: string[] | undefined
+              tags: string[] | undefined
+              description: string | null | undefined
+            }>[],
+            ...rest: any[]
+          ]
+      >()
+      expectTypeOf(blogService.createBlogs).returns.toEqualTypeOf<
+        Promise<InferTypeOf<typeof Blog>> | Promise<InferTypeOf<typeof Blog>[]>
+      >()
+
+      expectTypeOf(blogService.createComments).parameters.toEqualTypeOf<
+        | [
+            Partial<{
+              id: string | undefined
+              post: string | undefined
+              author: string | undefined
+              post_id: string | undefined
+              author_id: string | undefined
+              description: string | null | undefined
+            }>,
+            ...rest: any[]
+          ]
+        | [
+            Partial<{
+              id: string | undefined
+              post: string | undefined
+              author: string | undefined
+              post_id: string | undefined
+              author_id: string | undefined
               description: string | null | undefined
             }>[],
             ...rest: any[]
@@ -143,6 +194,8 @@ describe("Medusa Service typings", () => {
             Partial<{
               id: string | undefined
               title: string | undefined
+              comments: string[] | undefined
+              tags: string[] | undefined
               description: string | null | undefined
             }>,
             ...rest: any[]
@@ -152,6 +205,8 @@ describe("Medusa Service typings", () => {
               | Partial<{
                   id: string | undefined
                   title: string | undefined
+                  comments: string[] | undefined
+                  tags: string[] | undefined
                   description: string | null | undefined
                 }>[]
               | {
@@ -160,11 +215,15 @@ describe("Medusa Service typings", () => {
                     | Partial<{
                         id: string | undefined
                         title: string | undefined
+                        comments: string[] | undefined
+                        tags: string[] | undefined
                         description: string | null | undefined
                       }>
                     | Partial<{
                         id: string | undefined
                         title: string | undefined
+                        comments: string[] | undefined
+                        tags: string[] | undefined
                         description: string | null | undefined
                       }>[]
                 }
@@ -174,11 +233,15 @@ describe("Medusa Service typings", () => {
                     | Partial<{
                         id: string | undefined
                         title: string | undefined
+                        comments: string[] | undefined
+                        tags: string[] | undefined
                         description: string | null | undefined
                       }>
                     | Partial<{
                         id: string | undefined
                         title: string | undefined
+                        comments: string[] | undefined
+                        tags: string[] | undefined
                         description: string | null | undefined
                       }>[]
                 }[]

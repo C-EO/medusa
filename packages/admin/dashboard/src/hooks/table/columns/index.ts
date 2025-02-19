@@ -8,6 +8,4 @@ export * from "./use-product-tag-table-columns"
 export * from "./use-product-type-table-columns"
 export * from "./use-region-table-columns"
 export * from "./use-return-reason-table-columns"
-export * from "./use-sales-channel-table-columns"
 export * from "./use-tax-rates-table-columns"
-

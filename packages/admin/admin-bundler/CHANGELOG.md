@@ -1,5 +1,18 @@
 # @medusajs/admin-bundler
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11172](https://github.com/medusajs/medusa/pull/11172) [`65d8d6dc0eae23c7c969664d0c2d127511cc0bd9`](https://github.com/medusajs/medusa/commit/65d8d6dc0eae23c7c969664d0c2d127511cc0bd9) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(js-sdk,admin-bundler): Import resolve from qs in a way that works in both ESM and CJS projects, and add @medusajs/js-sdk to optimized deps
+
+- [#11272](https://github.com/medusajs/medusa/pull/11272) [`f4c2cd112ed54757ed35a55297b46b36152829cb`](https://github.com/medusajs/medusa/commit/f4c2cd112ed54757ed35a55297b46b36152829cb) Thanks [@thetutlage](https://github.com/thetutlage)! - fix: issues with peer dependencies
+
+- Updated dependencies [[`6db96c80d05730a9188937599baba2602f4e2a92`](https://github.com/medusajs/medusa/commit/6db96c80d05730a9188937599baba2602f4e2a92), [`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146), [`211997b137b64ad1c21bc4fc138195ce51d98ce4`](https://github.com/medusajs/medusa/commit/211997b137b64ad1c21bc4fc138195ce51d98ce4), [`fcd3e2226ee389e89cc5b03defda9852cf99f624`](https://github.com/medusajs/medusa/commit/fcd3e2226ee389e89cc5b03defda9852cf99f624), [`d00825485f14c1d13123046fdc8a18e9843b16ce`](https://github.com/medusajs/medusa/commit/d00825485f14c1d13123046fdc8a18e9843b16ce), [`7d208afb07a2ebf5f6a66b15139e31b03fda1e12`](https://github.com/medusajs/medusa/commit/7d208afb07a2ebf5f6a66b15139e31b03fda1e12), [`9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754`](https://github.com/medusajs/medusa/commit/9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754), [`f07af7b93c86673e730dc4e5eba8df2572013f9f`](https://github.com/medusajs/medusa/commit/f07af7b93c86673e730dc4e5eba8df2572013f9f), [`51d2960a5717c41e79312dd2269fb87e3a4a5b4c`](https://github.com/medusajs/medusa/commit/51d2960a5717c41e79312dd2269fb87e3a4a5b4c)]:
+  - @medusajs/dashboard@2.5.0
+  - @medusajs/admin-vite-plugin@2.5.0
+  - @medusajs/admin-shared@2.5.0
+
 ## 2.4.0
 
 ### Patch Changes

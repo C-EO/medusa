@@ -698,6 +698,12 @@ export const POST = async (
   req: AuthenticatedMedusaRequest<CreateRequestBody>,
   res: MedusaResponse
 ) => {
+  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+  const { data: [shippingProfile] } = await query.graph({
+    entity: "shipping_profile",
+    fields: ["id"],
+  })
+
   const { result } = await createDigitalProductWorkflow(
     req.scope
   ).run({
@@ -710,7 +716,10 @@ export const POST = async (
           ...media,
         })) as Omit<CreateDigitalProductMediaInput, "digital_product_id">[],
       },
-      product: req.validatedBody.product,
+      product: {
+        ...req.validatedBody.product,
+        shipping_profile_id: shippingProfile.id,
+      },
     },
   })
 
@@ -720,7 +729,9 @@ export const POST = async (
 }
 ```
 
-This adds a `POST` API route at `/admin/digital-products`. In the route handler, you execute the `createDigitalProductWorkflow` created in the previous step, passing data from the request body as input.
+This adds a `POST` API route at `/admin/digital-products`. In the route handler, you first retrieve a shipping profile to associate it with the product, which is required.
+
+Then, you execute the `createDigitalProductWorkflow` created in the previous step, passing data from the request body as input, along with the retrieved shipping profile.
 
 The route handler imports a validation schema from a `validation-schema` file. So, create the file `src/api/validation-schemas.ts` with the following content:
 
@@ -1392,6 +1403,7 @@ fetch(`/admin/digital-products`, {
         // delegate setting the prices to the
         // product's page.
         prices: [],
+        shipping_profile_id: ""
       }],
     },
   }),

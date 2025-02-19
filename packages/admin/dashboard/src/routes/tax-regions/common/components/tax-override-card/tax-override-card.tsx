@@ -5,14 +5,20 @@ import {
   TriangleRightMini,
 } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Badge, IconButton, StatusBadge, Text, Tooltip } from "@medusajs/ui"
+import {
+  Badge,
+  Divider,
+  IconButton,
+  StatusBadge,
+  Text,
+  Tooltip,
+} from "@medusajs/ui"
 import { Collapsible as RadixCollapsible } from "radix-ui"
 import { ComponentPropsWithoutRef } from "react"
 import { useTranslation } from "react-i18next"
 
 import { FetchError } from "@medusajs/js-sdk"
 import { ActionMenu } from "../../../../../components/common/action-menu"
-import { Divider } from "../../../../../components/common/divider"
 import { useProductTypes } from "../../../../../hooks/api/product-types"
 import { useProducts } from "../../../../../hooks/api/products"
 import { formatPercentage } from "../../../../../lib/percentage-helpers"
@@ -31,15 +37,18 @@ export const TaxOverrideCard = ({ taxRate }: TaxOverrideCardProps) => {
     return null
   }
 
-  const groupedRules = taxRate.rules.reduce((acc, rule) => {
-    if (!acc[rule.reference]) {
-      acc[rule.reference] = []
-    }
+  const groupedRules = taxRate.rules.reduce(
+    (acc, rule) => {
+      if (!acc[rule.reference]) {
+        acc[rule.reference] = []
+      }
 
-    acc[rule.reference].push(rule.reference_id)
+      acc[rule.reference].push(rule.reference_id)
 
-    return acc
-  }, {} as Record<string, string[]>)
+      return acc
+    },
+    {} as Record<string, string[]>
+  )
 
   const validKeys = Object.values(TaxRateRuleReferenceType)
   const numberOfTargets = Object.keys(groupedRules).map((key) =>

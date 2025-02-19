@@ -1,3 +1,5 @@
+"use client"
+
 import { clx } from "@/utils/clx"
 import {
   CheckCircleSolid,

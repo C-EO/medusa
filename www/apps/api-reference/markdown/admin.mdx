@@ -661,19 +661,34 @@ curl -g "http://localhost:9000/admin/products?created_at[$lt]=2023-02-17T07:22:3
 
 ### Array
 
+Array filters can be passed either as:
 
-Each array value must be passed as a separate query parameter in the form
-`<parameter_name>[]=<value>`. You can also specify the index of each
+- `<parameter_name>[]=<value1>,<value2>`, separating the values by a comma.
+- `<parameter_name>[]=<value1>&<parameter_name>[]=<value2>`, passing each value as a separate query parameter. You can also specify the index of each
 parameter in the brackets `<parameter_name>[0]=<value>`.
 
 </DividedMarkdownContent>
 
 <DividedMarkdownCode>
 
-```bash title="Array filter"
+<CodeTabs group="array-filter">
+  <CodeTab label="Comma-separated" value="comma-separated">
+
+```bash
+curl -g "http://localhost:9000/admin/products?sales_channel_id[]=sc_01GPGVB42PZ7N3YQEP2WDM7PC7,sc_234PGVB42PZ7N3YQEP2WDM7PC7" \
+-H 'Authorization: Bearer {jwt_token}'
+```
+
+  </CodeTab>
+  <CodeTab label="Separate parameters" value="separate-query-parameters">
+
+```bash
 curl -g "http://localhost:9000/admin/products?sales_channel_id[]=sc_01GPGVB42PZ7N3YQEP2WDM7PC7&sales_channel_id[]=sc_234PGVB42PZ7N3YQEP2WDM7PC7" \
 -H 'Authorization: Bearer {jwt_token}'
 ```
+
+  </CodeTab>
+</CodeTabs>
 
 Note that the `-g` parameter passed to `curl` disables errors being thrown
 for using the brackets. Read more

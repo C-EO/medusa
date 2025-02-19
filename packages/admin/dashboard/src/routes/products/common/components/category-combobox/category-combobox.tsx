@@ -6,7 +6,7 @@ import {
   XMarkMini,
 } from "@medusajs/icons"
 import { AdminProductCategoryResponse } from "@medusajs/types"
-import { Text, clx } from "@medusajs/ui"
+import { Divider, Text, clx } from "@medusajs/ui"
 import { Popover as RadixPopover } from "radix-ui"
 import {
   CSSProperties,
@@ -22,7 +22,6 @@ import {
   useState,
 } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { Divider } from "../../../../../components/common/divider"
 import { TextSkeleton } from "../../../../../components/common/skeleton"
 import { useProductCategories } from "../../../../../hooks/api/categories"
 import { useDebouncedSearch } from "../../../../../hooks/use-debounced-search"

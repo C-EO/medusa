@@ -68,6 +68,10 @@ function buildWhere(
     }
 
     if (["$or", "$and"].includes(prop)) {
+      if (!Array.isArray(value)) {
+        throw new Error(`Expected array for ${prop} but got ${value}`)
+      }
+
       where[prop] = value.map((val) => {
         const deepWhere = {}
         buildWhere(val, deepWhere, flags)

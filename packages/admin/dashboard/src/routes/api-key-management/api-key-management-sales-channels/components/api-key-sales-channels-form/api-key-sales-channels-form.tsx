@@ -1,29 +1,31 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AdminSalesChannelResponse } from "@medusajs/types"
-import { Button, Checkbox, Hint, Tooltip, toast } from "@medusajs/ui"
-import { keepPreviousData } from "@tanstack/react-query"
+import { HttpTypes } from "@medusajs/types"
 import {
-  OnChangeFn,
-  RowSelectionState,
-  createColumnHelper,
-} from "@tanstack/react-table"
+  Button,
+  Checkbox,
+  DataTableRowSelectionState,
+  Hint,
+  createDataTableColumnHelper,
+  toast,
+} from "@medusajs/ui"
+import { keepPreviousData } from "@tanstack/react-query"
+import { RowSelectionState } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
+
+import { ConditionalTooltip } from "../../../../../components/common/conditional-tooltip"
+import { DataTable } from "../../../../../components/data-table"
+import * as hooks from "../../../../../components/data-table/helpers/sales-channels"
 import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
-import { _DataTable } from "../../../../../components/table/data-table"
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { VisuallyHidden } from "../../../../../components/utilities/visually-hidden"
 import { useBatchAddSalesChannelsToApiKey } from "../../../../../hooks/api/api-keys"
 import { useSalesChannels } from "../../../../../hooks/api/sales-channels"
-import { useSalesChannelTableColumns } from "../../../../../hooks/table/columns/use-sales-channel-table-columns"
-import { useSalesChannelTableFilters } from "../../../../../hooks/table/filters"
-import { useSalesChannelTableQuery } from "../../../../../hooks/table/query/use-sales-channel-table-query"
-import { useDataTable } from "../../../../../hooks/use-data-table"
 
 type ApiKeySalesChannelFormProps = {
   apiKey: string
@@ -31,10 +33,11 @@ type ApiKeySalesChannelFormProps = {
 }
 
 const AddSalesChannelsToApiKeySchema = zod.object({
-  sales_channel_ids: zod.array(zod.string()),
+  sales_channel_ids: zod.array(zod.string()).min(1),
 })
 
 const PAGE_SIZE = 50
+const PREFIX = "sc_add"
 
 export const ApiKeySalesChannelsForm = ({
   apiKey,
@@ -54,50 +57,35 @@ export const ApiKeySalesChannelsForm = ({
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const { mutateAsync, isPending } = useBatchAddSalesChannelsToApiKey(apiKey)
+  const { mutateAsync, isPending: isMutating } =
+    useBatchAddSalesChannelsToApiKey(apiKey)
 
-  const { raw, searchParams } = useSalesChannelTableQuery({
+  const searchParams = hooks.useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
 
   const columns = useColumns()
-  const filters = useSalesChannelTableFilters()
+  const filters = hooks.useSalesChannelTableFilters()
+  const emptyState = hooks.useSalesChannelTableEmptyState()
 
-  const { sales_channels, count, isLoading } = useSalesChannels(
+  const { sales_channels, count, isPending } = useSalesChannels(
     { ...searchParams },
     {
       placeholderData: keepPreviousData,
     }
   )
 
-  const updater: OnChangeFn<RowSelectionState> = (fn) => {
-    const state = typeof fn === "function" ? fn(rowSelection) : fn
-
-    const ids = Object.keys(state)
+  const updater = (selection: DataTableRowSelectionState) => {
+    const ids = Object.keys(selection)
 
     setValue("sales_channel_ids", ids, {
       shouldDirty: true,
       shouldTouch: true,
     })
 
-    setRowSelection(state)
+    setRowSelection(selection)
   }
-
-  const { table } = useDataTable({
-    data: sales_channels ?? [],
-    columns,
-    count,
-    enablePagination: true,
-    enableRowSelection: (row) => {
-      return !preSelected.includes(row.original.id!)
-    },
-    getRowId: (row) => row.id,
-    pageSize: PAGE_SIZE,
-    rowSelection: {
-      state: rowSelection,
-      updater,
-    },
-  })
 
   const handleSubmit = form.handleSubmit(async (values) => {
     await mutateAsync(values.sales_channel_ids, {
@@ -139,27 +127,23 @@ export const ApiKeySalesChannelsForm = ({
           </div>
         </RouteFocusModal.Header>
         <RouteFocusModal.Body className="flex flex-1 flex-col overflow-auto">
-          <_DataTable
-            table={table}
+          <DataTable
+            data={sales_channels}
             columns={columns}
-            count={count}
-            pageSize={PAGE_SIZE}
             filters={filters}
-            pagination
-            search="autofocus"
-            isLoading={isLoading}
-            queryObject={raw}
-            orderBy={[
-              { key: "name", label: t("fields.name") },
-              { key: "created_at", label: t("fields.createdAt") },
-              { key: "updated_at", label: t("fields.updatedAt") },
-            ]}
+            getRowId={(row) => row.id}
+            rowCount={count}
             layout="fill"
-            noRecords={{
-              message: t(
-                "apiKeyManagement.addSalesChannels.list.noRecordsMessage"
-              ),
+            emptyState={emptyState}
+            isLoading={isPending}
+            rowSelection={{
+              state: rowSelection,
+              onRowSelectionChange: updater,
+              enableRowSelection: (row) => !preSelected.includes(row.id),
             }}
+            prefix={PREFIX}
+            pageSize={PAGE_SIZE}
+            autoFocusSearch
           />
         </RouteFocusModal.Body>
         <RouteFocusModal.Footer>
@@ -169,7 +153,7 @@ export const ApiKeySalesChannelsForm = ({
                 {t("actions.cancel")}
               </Button>
             </RouteFocusModal.Close>
-            <Button size="small" type="submit" isLoading={isPending}>
+            <Button size="small" type="submit" isLoading={isMutating}>
               {t("actions.save")}
             </Button>
           </div>
@@ -179,60 +163,36 @@ export const ApiKeySalesChannelsForm = ({
   )
 }
 
-const columnHelper =
-  createColumnHelper<AdminSalesChannelResponse["sales_channel"]>()
+const columnHelper = createDataTableColumnHelper<HttpTypes.AdminSalesChannel>()
 
 const useColumns = () => {
   const { t } = useTranslation()
-  const base = useSalesChannelTableColumns()
+  const base = hooks.useSalesChannelTableColumns()
 
   return useMemo(
     () => [
-      columnHelper.display({
-        id: "select",
-        header: ({ table }) => {
-          return (
-            <Checkbox
-              checked={
-                table.getIsSomePageRowsSelected()
-                  ? "indeterminate"
-                  : table.getIsAllPageRowsSelected()
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-            />
-          )
-        },
+      columnHelper.select({
         cell: ({ row }) => {
           const isPreSelected = !row.getCanSelect()
           const isSelected = row.getIsSelected() || isPreSelected
 
-          const Component = (
-            <Checkbox
-              checked={isSelected}
-              disabled={isPreSelected}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
+          return (
+            <ConditionalTooltip
+              content={t("apiKeyManagement.salesChannels.alreadyAddedTooltip")}
+              showTooltip={isPreSelected}
+            >
+              <div>
+                <Checkbox
+                  checked={isSelected}
+                  disabled={isPreSelected}
+                  onCheckedChange={(value) => row.toggleSelected(!!value)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                />
+              </div>
+            </ConditionalTooltip>
           )
-
-          if (isPreSelected) {
-            return (
-              <Tooltip
-                content={t(
-                  "apiKeyManagement.salesChannels.alreadyAddedTooltip"
-                )}
-                side="right"
-              >
-                {Component}
-              </Tooltip>
-            )
-          }
-
-          return Component
         },
       }),
       ...base,

@@ -19,8 +19,8 @@ import { getVariantPricingLinkStep } from "../steps/get-variant-pricing-link"
 /**
  * The data to update one or more product variants, along with custom data that's passed to the workflow's hooks.
  */
-export type UpdateProductVariantsWorkflowInput =
-  (| {
+export type UpdateProductVariantsWorkflowInput = (
+  | {
       /**
        * A filter to select the product variants to update.
        */
@@ -45,20 +45,22 @@ export type UpdateProductVariantsWorkflowInput =
          */
         prices?: Partial<PricingTypes.CreateMoneyAmountDTO>[]
       })[]
-    }) & AdditionalData
+    }
+) &
+  AdditionalData
 
 export const updateProductVariantsWorkflowId = "update-product-variants"
 /**
  * This workflow updates one or more product variants. It's used by the [Update Product Variant Admin API Route](https://docs.medusajs.com/api/admin#products_postproductsidvariantsvariant_id).
- * 
- * This workflow has a hook that allows you to perform custom actions on the updated product variants. For example, you can pass under `additional_data` custom data that 
+ *
+ * This workflow has a hook that allows you to perform custom actions on the updated product variants. For example, you can pass under `additional_data` custom data that
  * allows you to update custom data models linked to the product variants.
- * 
+ *
  * You can also use this workflow within your customizations or your own custom workflows, allowing you to wrap custom logic around product-variant update.
- * 
+ *
  * @example
  * To update product variants by their IDs:
- * 
+ *
  * ```ts
  * const { result } = await updateProductVariantsWorkflow(container)
  * .run({
@@ -84,9 +86,9 @@ export const updateProductVariantsWorkflowId = "update-product-variants"
  *   }
  * })
  * ```
- * 
+ *
  * You can also update product variants by a selector:
- * 
+ *
  * ```ts
  * const { result } = await updateProductVariantsWorkflow(container)
  * .run({
@@ -108,18 +110,16 @@ export const updateProductVariantsWorkflowId = "update-product-variants"
  *   }
  * })
  * ```
- * 
+ *
  * @summary
- * 
+ *
  * Update one or more product variants.
- * 
+ *
  * @property hooks.productVariantsUpdated - This hook is executed after the product variants are updated. You can consume this hook to perform custom actions on the updated product variants.
  */
 export const updateProductVariantsWorkflow = createWorkflow(
   updateProductVariantsWorkflowId,
-  (
-    input: WorkflowData<UpdateProductVariantsWorkflowInput>
-  ) => {
+  (input: WorkflowData<UpdateProductVariantsWorkflowInput>) => {
     // Passing prices to the product module will fail, we want to keep them for after the variant is updated.
     const updateWithoutPrices = transform({ input }, (data) => {
       if ("product_variants" in data.input) {
@@ -147,7 +147,13 @@ export const updateProductVariantsWorkflow = createWorkflow(
     // We don't want to do any pricing updates if the prices didn't change
     const variantIds = transform({ input, updatedVariants }, (data) => {
       if ("product_variants" in data.input) {
-        return data.updatedVariants.map((v) => v.id)
+        const variantsWithPriceUpdates = new Set(
+          data.input.product_variants.filter((v) => !!v.prices).map((v) => v.id)
+        )
+
+        return data.updatedVariants
+          .map((v) => v.id)
+          .filter((id) => variantsWithPriceUpdates.has(id))
       }
 
       if (!data.input.update.prices) {

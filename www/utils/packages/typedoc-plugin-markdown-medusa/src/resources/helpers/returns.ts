@@ -10,13 +10,22 @@ export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper(
     "returns",
     function (reflection: SignatureReflection) {
+      let returnContent = ""
       if (reflection.variant === "signature" && "type" in reflection) {
-        return getReturnFromType(theme, reflection)
+        returnContent = getReturnFromType(theme, reflection)
       } else if (reflection.comment) {
-        return getReturnFromComment(theme, reflection.comment, reflection.name)
-      } else {
+        returnContent = getReturnFromComment(
+          theme,
+          reflection.comment,
+          reflection.name
+        )
+      }
+
+      if (!returnContent.length) {
         return ""
       }
+
+      return `${Handlebars.helpers.titleLevel()} Returns\n\n${returnContent}`
     }
   )
 }
@@ -43,6 +52,10 @@ function getReturnFromType(
     level: 1,
     maxLevel,
   })
+
+  if (!componentItems.length) {
+    return ""
+  }
 
   if (parameterStyle === "component") {
     return formatParameterComponent({

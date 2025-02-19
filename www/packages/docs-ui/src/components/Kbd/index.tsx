@@ -16,7 +16,7 @@ export const Kbd = ({
       className={clsx(
         "rounded-docs_xs border-solid border border-medusa-border-base",
         "inline-flex items-center justify-center",
-        "p-0",
+        "px-docs_0.25",
         "bg-medusa-bg-field",
         "text-medusa-fg-base",
         "font-base shadow-none",

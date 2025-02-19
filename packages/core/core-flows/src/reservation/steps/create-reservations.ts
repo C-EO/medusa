@@ -6,12 +6,13 @@ import { Modules } from "@medusajs/framework/utils"
 /**
  * The data to create reservation items.
  */
-export type CreateReservationsStepInput = InventoryTypes.CreateReservationItemInput[]
+export type CreateReservationsStepInput =
+  InventoryTypes.CreateReservationItemInput[]
 
 export const createReservationsStepId = "create-reservations-step"
 /**
  * This step creates one or more reservations.
- * 
+ *
  * @example
  * const data = createReservationsStep([
  *   {
@@ -29,7 +30,9 @@ export const createReservationsStep = createStep(
 
     const inventoryItemIds = data.map((item) => item.inventory_item_id)
 
-    const created = await locking.execute(inventoryItemIds, async () => {
+    const lockingKeys = Array.from(new Set(inventoryItemIds))
+
+    const created = await locking.execute(lockingKeys, async () => {
       return await service.createReservationItems(data)
     })
 
@@ -47,7 +50,9 @@ export const createReservationsStep = createStep(
     const locking = container.resolve(Modules.LOCKING)
 
     const inventoryItemIds = data.inventoryItemIds
-    await locking.execute(inventoryItemIds, async () => {
+    const lockingKeys = Array.from(new Set(inventoryItemIds))
+
+    await locking.execute(lockingKeys, async () => {
       await service.deleteReservationItems(data.reservations)
     })
   }

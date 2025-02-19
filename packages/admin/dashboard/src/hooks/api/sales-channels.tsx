@@ -41,7 +41,7 @@ export const useSalesChannel = (
 }
 
 export const useSalesChannels = (
-  query?: Record<string, any>,
+  query?: HttpTypes.AdminSalesChannelListParams,
   options?: Omit<
     UseQueryOptions<
       AdminSalesChannelListResponse,
@@ -120,6 +120,34 @@ export const useDeleteSalesChannel = (
       })
       queryClient.invalidateQueries({
         queryKey: salesChannelsQueryKeys.detail(id),
+      })
+
+      // Invalidate all products to ensure they are updated if they were linked to the sales channel
+      queryClient.invalidateQueries({
+        queryKey: productsQueryKeys.all,
+      })
+
+      options?.onSuccess?.(data, variables, context)
+    },
+    ...options,
+  })
+}
+
+export const useDeleteSalesChannelLazy = (
+  options?: UseMutationOptions<
+    HttpTypes.AdminSalesChannelDeleteResponse,
+    FetchError,
+    string
+  >
+) => {
+  return useMutation({
+    mutationFn: (id: string) => sdk.admin.salesChannel.delete(id),
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: salesChannelsQueryKeys.lists(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: salesChannelsQueryKeys.detail(variables),
       })
 
       // Invalidate all products to ensure they are updated if they were linked to the sales channel

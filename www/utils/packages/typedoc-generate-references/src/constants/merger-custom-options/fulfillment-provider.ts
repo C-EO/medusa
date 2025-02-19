@@ -22,9 +22,24 @@ const fulfillmentProviderOptions: FormattingOptionsType = {
       reflection_typeParameters: false,
     },
     startSections: [
-      `## 1. Create Module Directory
+      `## Understanding Fulfillment Provider Implementation
 
-Start by creating a new directory for your module. For example, \`src/modules/my-fulfillment\`.`,
+The Fulfillment Module Provider handles processing fulfillments and shipments with a third-party provirder. However, it's not responsible for managing fulfillment concepts within Medusa, such as creating a fulfillment or its shipments. The Fulfillment Module uses your fulfillment provider within core operations.
+
+For example, when the merchant creates a fulfillment for an order, the Fulfillment Module uses your fulfillment provider to create the fulfillment in the third-party system, then creates the fulfillment in Medusa. So, you only have to implement the third-party fulfillment processing logic in your fulfillment provider.
+`,
+      `## 1. Create Module Provider Directory
+
+Start by creating a new directory for your module provider.
+
+If you're creating the module provider in a Medusa application, create it under the \`src/modules\` directory. For example, \`src/modules/my-fulfillment\`.
+If you're creating the module provider in a plugin, create it under the \`src/providers\` directory. For example, \`src/providers/my-fulfillment\`.
+
+<Note>
+
+The rest of this guide always uses the \`src/modules/my-fulfillment\` directory as an example.
+
+</Note>`,
       `## 2. Create the Fulfillment Provider Service
 
 Create the file \`src/modules/my-fulfillment/service.ts\` that holds the module's main service. It must extend the \`AbstractFulfillmentProviderService\` class imported from \`@medusajs/framework/utils\`:
@@ -75,6 +90,7 @@ module.exports = defineConfig({
             id: "manual",
           },
           {
+            // if module provider is in a plugin, use \`plugin-name/providers/my-fulfillment\`
             resolve: "./src/modules/my-fulfillment",
             id: "my-fulfillment",
             options: {

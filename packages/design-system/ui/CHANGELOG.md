@@ -1,5 +1,24 @@
 # @medusajs/ui
 
+## 4.0.5
+
+### Patch Changes
+
+- [#11361](https://github.com/medusajs/medusa/pull/11361) [`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(admin-vite-plugin,icons,ui,dashboard): Upgrade vitest in all packages and align Vite version
+
+- [#11106](https://github.com/medusajs/medusa/pull/11106) [`fcd3e2226ee389e89cc5b03defda9852cf99f624`](https://github.com/medusajs/medusa/commit/fcd3e2226ee389e89cc5b03defda9852cf99f624) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(ui,dashboard): Migrate SC tables to DataTable
+
+- [#11357](https://github.com/medusajs/medusa/pull/11357) [`d00825485f14c1d13123046fdc8a18e9843b16ce`](https://github.com/medusajs/medusa/commit/d00825485f14c1d13123046fdc8a18e9843b16ce) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(ui,dashboard): Move Divider component to UI package
+
+- [#11254](https://github.com/medusajs/medusa/pull/11254) [`3cf430729698c5f62fb6e6d0ebf06ea930981653`](https://github.com/medusajs/medusa/commit/3cf430729698c5f62fb6e6d0ebf06ea930981653) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(ui): Prevent Command from triggering while a editable field has focus"
+
+- [#11368](https://github.com/medusajs/medusa/pull/11368) [`3f6425badae771a62c98508f9e6ceab20cee9354`](https://github.com/medusajs/medusa/commit/3f6425badae771a62c98508f9e6ceab20cee9354) Thanks [@pnodet](https://github.com/pnodet)! - fix(ui): add missing use client directives
+
+- [#11195](https://github.com/medusajs/medusa/pull/11195) [`9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754`](https://github.com/medusajs/medusa/commit/9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - chore(ui,dashboard): Use radix-ui package
+
+- Updated dependencies [[`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146)]:
+  - @medusajs/icons@2.5.0
+
 ## 4.0.4
 
 ### Patch Changes

@@ -33,7 +33,7 @@ const { data } = await query.graph({
   fields: ["*"],
   context: QueryContext({
     lang: "es",
-  })
+  }),
 })
 ```
 
@@ -58,7 +58,7 @@ import Author from "./models/author"
 
 class BlogModuleService extends MedusaService({
   Post,
-  Author
+  Author,
 }){
   // @ts-ignore
   async listPosts(
@@ -99,6 +99,55 @@ Learn more about the generated `list` method in [this reference](!resources!/ser
 
 </Note>
 
+### Using Pagination with Query
+
+If you pass pagination fields to `query.graph`, you must also override the `listAndCount` method in the service.
+
+For example, following along with the previous example, you must override the `listAndCountPosts` method of the Blog Module's service:
+
+```ts
+import { MedusaContext, MedusaService } from "@medusajs/framework/utils"
+import { Context, FindConfig } from "@medusajs/framework/types"
+import Post from "./models/post"
+import Author from "./models/author"
+
+class BlogModuleService extends MedusaService({
+  Post,
+  Author,
+}){
+  // @ts-ignore
+  async listAndCountPosts(
+    filters?: any, 
+    config?: FindConfig<any> | undefined, 
+    @MedusaContext() sharedContext?: Context | undefined
+  ) {
+    const context = filters.context ?? {}
+    delete filters.context
+
+    const result = await super.listAndCountPosts(
+      filters, 
+      config, 
+      sharedContext
+    )
+
+    if (context.lang === "es") {
+      result.posts = posts.map((post) => {
+        return {
+          ...post,
+          title: post.title + " en español",
+        }
+      })
+    }
+
+    return result
+  }
+}
+
+export default BlogModuleService
+```
+
+Now, the `listAndCountPosts` method will handle the context passed to `query.graph` when you pass pagination fields. You can also move the logic to transform the posts' titles to a separate method and call it from both `listPosts` and `listAndCountPosts`.
+
 ---
 
 ## Passing Query Context to Related Data Models
@@ -125,8 +174,8 @@ const { data } = await query.graph({
     lang: "es",
     author: QueryContext({
       lang: "es",
-    })
-  })
+    }),
+  }),
 })
 ```
 
@@ -144,7 +193,7 @@ import Author from "./models/author"
 
 class BlogModuleService extends MedusaService({
   Post,
-  Author
+  Author,
 }){
   // @ts-ignore
   async listPosts(
@@ -168,7 +217,7 @@ class BlogModuleService extends MedusaService({
           author: {
             ...post.author,
             name: isAuthorLangEs ? post.author.name + " en español" : post.author.name,
-          }
+          },
         }
       })
     }
@@ -201,8 +250,8 @@ const { data } = await query.graph({
   context: {
     post: QueryContext({
       lang: "es",
-    })
-  }
+    }),
+  },
 })
 ```
 

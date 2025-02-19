@@ -13,11 +13,20 @@ export type Config = {
   auth?: {
     type?: "jwt" | "session"
     jwtTokenStorageKey?: string
-    jwtTokenStorageMethod?: "local" | "session" | "memory" | "nostore"
+    jwtTokenStorageMethod?: "local" | "session" | "memory" | "custom" | "nostore"
     fetchCredentials?: "include" | "omit" | "same-origin"
+    storage?: CustomStorage
   }
   logger?: Logger
   debug?: boolean
+}
+
+export type Awaitable<T> = T | Promise<T>
+
+export interface CustomStorage {
+  getItem(key: string): Awaitable<string | null>
+  setItem(key: string, value: string): Awaitable<void>
+  removeItem(key: string): Awaitable<void>
 }
 
 export type FetchParams = Parameters<typeof fetch>

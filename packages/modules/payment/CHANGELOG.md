@@ -1,5 +1,15 @@
 # @medusajs/payment
 
+## 2.5.0
+
+### Minor Changes
+
+- [`d3bf59bb7a208a9a280743212601522da5448c1b`](https://github.com/medusajs/medusa/commit/d3bf59bb7a208a9a280743212601522da5448c1b) Thanks [@olivermrbl](https://github.com/olivermrbl)! - chore: Revamp payment provider interface
+
+### Patch Changes
+
+- [#11216](https://github.com/medusajs/medusa/pull/11216) [`016e332e9b98f316cded6eb999927fc942ce56c5`](https://github.com/medusajs/medusa/commit/016e332e9b98f316cded6eb999927fc942ce56c5) Thanks [@thetutlage](https://github.com/thetutlage)! - feat: make AbstractModuleService create method type-safe
+
 ## 2.4.0
 
 ### Minor Changes

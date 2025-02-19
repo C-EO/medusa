@@ -16,7 +16,7 @@ import {
 } from "react-aria"
 import { useDatePickerState } from "react-stately"
 
-import { InternalCalendar } from "@/components/calender"
+import { InternalCalendar } from "@/components/calendar"
 import { Popover } from "@/components/popover"
 import { TimeInput } from "@/components/time-input"
 import { Granularity } from "@/types"

@@ -14,6 +14,7 @@ import type {
   IdentifiedColumnDef,
   IdIdentifier,
   PaginationState,
+  Row,
   RowData,
   RowSelectionState,
   SortDirection,
@@ -22,6 +23,8 @@ import type {
 } from "@tanstack/react-table"
 
 export type DataTableRowData = RowData
+
+export type DataTableRow<TData extends DataTableRowData> = Row<TData>
 
 export type DataTableAction<TData> = {
   label: string

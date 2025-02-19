@@ -168,6 +168,8 @@
  *     format: date-time
  *     title: deleted_at
  *     description: The date the product was deleted.
+ *   shipping_profile:
+ *     $ref: "#/components/schemas/AdminShippingProfile"
  * 
 */
 

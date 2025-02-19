@@ -117,6 +117,7 @@ curl -X POST 'http://localhost:9000/admin/products' \
         "values": ["Default option value"]
       }
     ],
+    "shipping_profile_id": "{shipping_profile_id}",
     "additional_data": {
         "brand": "Acme"
     }
@@ -125,7 +126,7 @@ curl -X POST 'http://localhost:9000/admin/products' \
 
 <Note title="Tip">
 
-Make sure to replace the `{token}` in the authorization header with an admin user's authentication token.
+Make sure to replace the `{token}` in the authorization header with an admin user's authentication token, and `{shipping_profile_id}` with an existing shipping profile's ID.
 
 </Note>
 

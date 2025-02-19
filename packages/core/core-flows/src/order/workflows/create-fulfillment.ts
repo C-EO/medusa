@@ -467,6 +467,7 @@ export const createOrderFulfillmentWorkflow = createWorkflow(
         data: {
           order_id: input.order_id,
           fulfillment_id: fulfillment.id,
+          no_notification: input.no_notification,
         },
       })
     )

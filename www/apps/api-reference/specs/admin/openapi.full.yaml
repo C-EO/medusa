@@ -44212,6 +44212,10 @@ components:
           type: string
           title: id
           description: The product's ID.
+        shipping_profile_id:
+          type: string
+          title: shipping_profile_id
+          description: The ID of the product's shipping profile.
       required:
         - id
     AdminBatchUpdateProductVariant:
@@ -45103,6 +45107,7 @@ components:
       x-schemaName: AdminCreateProduct
       required:
         - title
+        - shipping_profile_id
         - options
       properties:
         title:
@@ -45250,6 +45255,10 @@ components:
           type: string
           title: external_id
           description: The ID of the product in an external or third-party system.
+        shipping_profile_id:
+          type: string
+          title: shipping_profile_id
+          description: The ID of the product's shipping profile.
     AdminCreateProductCategory:
       type: object
       description: The product category's details.
@@ -51343,6 +51352,8 @@ components:
           format: date-time
           title: deleted_at
           description: The date the product was deleted.
+        shipping_profile:
+          $ref: '#/components/schemas/AdminShippingProfile'
     AdminProductCategory:
       type: object
       description: The product category's details.
@@ -54160,6 +54171,9 @@ components:
             metadata:
               type: object
               description: The address's metadata, can hold custom key-value pairs.
+        metadata:
+          type: object
+          description: The order's metadata, can hold custom key-value pairs.
     AdminUpdatePriceList:
       type: object
       description: the details to update in a price list.
@@ -60815,6 +60829,7 @@ components:
       description: The cart's details.
       x-schemaName: StoreCart
       required:
+        - promotions
         - currency_code
         - id
         - original_item_total
@@ -60985,6 +61000,25 @@ components:
           type: number
           title: original_shipping_tax_total
           description: The total taxes applied on the cart's shipping amount.
+        promotions:
+          type: array
+          description: The cart's promotions.
+          items:
+            $ref: '#/components/schemas/StoreCartPromotion'
+    StoreCartAddPromotion:
+      type: object
+      description: The promotion's details.
+      required:
+        - promo_codes
+      properties:
+        promo_codes:
+          type: array
+          description: Promotion codes to add to the cart.
+          items:
+            type: string
+            title: promo_codes
+            description: A promotion code.
+      x-schemaName: StoreCartAddPromotion
     StoreCartAddress:
       type: object
       description: The address's details.
@@ -61395,6 +61429,47 @@ components:
           type: number
           title: discount_tax_total
           description: The total taxes applied on the discounted amount.
+    StoreCartPromotion:
+      type: object
+      description: The promotion's promotions.
+      x-schemaName: StoreCartPromotion
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          title: id
+          description: The promotion's ID.
+        code:
+          type: string
+          title: code
+          description: The promotion's code.
+        is_automatic:
+          type: boolean
+          title: is_automatic
+          description: The promotion's is automatic.
+        application_method:
+          type: object
+          description: The promotion's application method.
+          required:
+            - value
+            - type
+            - currency_code
+          properties:
+            value:
+              type: string
+              title: value
+              description: The application method's value.
+            type:
+              type: string
+              description: The application method's type.
+              enum:
+                - fixed
+                - percentage
+            currency_code:
+              type: string
+              title: currency_code
+              description: The application method's currency code.
     StoreCartResponse:
       type: object
       description: The cart's details.
@@ -62282,9 +62357,6 @@ components:
           title: provider_id
           description: The ID of the payment provider the customer chose.
           example: pp_stripe_stripe
-        context:
-          type: object
-          description: The payment's context, such as the customer or address details. If the customer is logged-in, the customer `id` is set in the context under a `customer.id` property.
         data:
           type: object
           description: Any data necessary for the payment provider to process the payment.

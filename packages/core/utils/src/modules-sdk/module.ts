@@ -1,12 +1,12 @@
 import { Constructor, IDmlEntity, ModuleExports } from "@medusajs/types"
-import { MedusaServiceModelObjectsSymbol } from "./medusa-service"
+import { DmlEntity } from "../dml"
 import {
   buildLinkConfigFromLinkableKeys,
   buildLinkConfigFromModelObjects,
   defineJoinerConfig,
 } from "./joiner-config-builder"
+import { MedusaServiceModelObjectsSymbol } from "./medusa-service"
 import { InfersLinksConfig } from "./types/links-config"
-import { DmlEntity } from "../dml"
 
 /**
  * Wrapper to build the module export and auto generate the joiner config if not already provided in the module service, as well as
@@ -44,29 +44,27 @@ export function Module<
 
   let linkable = {} as Linkable
 
-  if (Object.keys(modelObjects)?.length) {
-    const dmlObjects = Object.entries(modelObjects).filter(([, model]) =>
-      DmlEntity.isDmlEntity(model)
-    )
+  const dmlObjects = Object.entries(modelObjects).filter(([, model]) =>
+    DmlEntity.isDmlEntity(model)
+  )
 
-    // TODO: Custom joiner config should take precedence over the DML auto generated linkable
-    // Thats in the case of manually providing models in custom joiner config.
-    // TODO: Add support for non linkable modifier DML object to be skipped from the linkable generation
+  // TODO: Custom joiner config should take precedence over the DML auto generated linkable
+  // Thats in the case of manually providing models in custom joiner config.
+  // TODO: Add support for non linkable modifier DML object to be skipped from the linkable generation
 
-    const linkableKeys = service.prototype.__joinerConfig().linkableKeys
+  const linkableKeys = service.prototype.__joinerConfig().linkableKeys
 
-    if (dmlObjects.length) {
-      linkable = buildLinkConfigFromModelObjects<ServiceName, ModelObjects>(
-        serviceName,
-        modelObjects,
-        linkableKeys
-      ) as Linkable
-    } else {
-      linkable = buildLinkConfigFromLinkableKeys(
-        serviceName,
-        linkableKeys
-      ) as Linkable
-    }
+  if (dmlObjects.length) {
+    linkable = buildLinkConfigFromModelObjects<ServiceName, ModelObjects>(
+      serviceName,
+      modelObjects,
+      linkableKeys
+    ) as Linkable
+  } else {
+    linkable = buildLinkConfigFromLinkableKeys(
+      serviceName,
+      linkableKeys
+    ) as Linkable
   }
 
   return {

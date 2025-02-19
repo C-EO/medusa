@@ -2,6 +2,8 @@ export const schema = `
   type Product @Listeners(values: ["product.created", "product.updated", "product.deleted"]) {
     id: String
     title: String
+    created_at: DateTime
+
     deep: InternalNested
     variants: [ProductVariant]
   }

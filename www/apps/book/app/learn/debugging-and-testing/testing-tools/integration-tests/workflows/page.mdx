@@ -126,7 +126,7 @@ medusaIntegrationTestRunner({
       it("returns message", async () => {
         const { errors } = await helloWorldWorkflow(getContainer())
           .run({
-            throwOnError: false
+            throwOnError: false,
           })
 
         expect(errors.length).toBeGreaterThan(0)

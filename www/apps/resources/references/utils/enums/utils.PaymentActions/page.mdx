@@ -2,7 +2,7 @@ import { TypeList } from "docs-ui"
 
 # PaymentActions
 
-Normalized events from payment provider to internal payment module events.
+Normalized events from payment provider to internal payment module events. In principle, these should match the payment status.
 
 ## Enumeration Members
 
@@ -23,6 +23,24 @@ Payment was successful and the mount is captured.
  **FAILED** = `"failed"`
 
 Payment failed.
+
+### PENDING
+
+ **PENDING** = `"pending"`
+
+Payment is pending.
+
+### REQUIRES\_MORE
+
+ **REQUIRES\_MORE** = `"requires_more"`
+
+Payment requires more information.
+
+### CANCELED
+
+ **CANCELED** = `"canceled"`
+
+Payment was canceled.
 
 ### NOT\_SUPPORTED
 

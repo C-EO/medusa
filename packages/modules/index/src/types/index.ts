@@ -1,6 +1,10 @@
 export const schemaObjectRepresentationPropertiesToOmit = [
   "_schemaPropertiesMap",
   "_serviceNameModuleConfigMap",
+  "JSON",
+  "DateTime",
+  "Date",
+  "Time",
 ]
 
 export type Select = {

@@ -5,26 +5,30 @@ sidebar_label: Manage Returns
 
 import { 
   EllipsisHorizontal, 
+  HeartBroken,
+  PencilSquare
 } from "@medusajs/icons"
 
 export const metadata = {
-  title: `Manage Order’s Returns`,
+  title: `Manage Order Returns`,
 }
 
 # {metadata.title}
 
-In this document, you’ll learn more about order returns, how to request a return, and more.
+In this guide, you’ll learn about order returns and how to manage them.
 
-## Overview
+## Order Returns Overview
 
-Part of the order management system that Medusa provides is automating and managing order returns.
+After items have been delivered to the customer, they can return the items for a refund. These items are added back to stock or marked as damaged.
 
-There are two ways order returns can be requested:
+![Return requested in Activity section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739794292/User%20Guide/Screenshot_2025-02-17_at_2.11.19_PM_c0fuyr.png)
 
-1. The customer requests a return for an order through the storefront, which the admin user can view on the admin.
-2. The admin user requests to receive a return from the customer. The customer is informed about this through an email.
+Medusa allows you to automate the Return Merchandise Authorization (RMA) process by supporting two ways of creating returns:
 
-After a return is requested, the admin user chooses to either cancel the return or mark it as received. When a return is marked as received, a refund is issued to the customer.
+1. The customer requests a return for an order through the storefront, which you can [view](#find-return-requests-of-an-order) in the Medusa Admin dashboard;
+2. Or you can [create a return](#create-an-order-return) and inform the customer about it.
+
+As an admin user, you can then manage the return to either [cancel it](#cancel-requested-return) or [mark the items as received](#mark-return-items-as-received) and refund the customer.
 
 ---
 
@@ -32,81 +36,96 @@ After a return is requested, the admin user chooses to either cancel the return 
 
 To find return requests of an order:
 
-1. Open the order details page.
-2. On the Timeline section, find any returns requested, whether by admin users or by customers.
+1. Open the order's details page.
+2. In the Activity section, you'll find that a return was requested, which you can manage.
+
+You'll also find the items requested to be returned in the Summary section, with a note below the items to be returned.
+
+![Items to be returned in Summary section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739794541/User%20Guide/Screenshot_2025-02-17_at_2.15.01_PM_mskn1o.png)
 
 ---
 
-## Request a Return for an Order
+## Create an Order Return
 
-{/* TODO check info for correctness */}
+You can create a return from the Medusa Admin for [delivered items](../fulfillments/page.mdx#mark-fulfillment-as-delivered) in an order.
 
-To request a return for an order:
+To create a return for an order:
 
 1. Open the order details page.
-2. In the Timeline section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right.
-3. Choose "Request Return" from the dropdown.
-4. In the new window that opens, there are two steps to follow:
-    1. In the first step:
-        1. Choose the items in the order that you want to request the return.
-        2. Once you're done, click on the "Continue" button.
-    2. In the second step:
-        1. For each item under the "Items to return" section, enter the quantity, choose the [Reason](../../settings/return-reasons/page.mdx), and optionally add a note.
-        2. Under the Shipping section:
-            1. Choose the location to return items to.
-            2. Choose the shipping method used to return the items.
-        3. To change the refunded value:
-            1. Toggle the "Custom refund" button.
-            2. Enter the custom amount in the field shown.
-        4. To disable sending a notification to the customer that the order return is requested, toggle the "Send notifications" button
-5. Once done, click on the Save button.
+2. In the Summary section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right.
+3. Choose "Create Return" from the dropdown.
+4. In the form that opens:
+    - To add items to return:
+        - Click on "Add items" in the "Inbound section".
+        - In the list that opens, click on the checkbox next to the items you want the customer to return.
+        - Once done, click on the "Save" button.
+    - You can edit the quantity of the items to return by editing the input next to the inbound item.
+    - To add a reason for the returned item:
+        - Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to the item.
+        - Choose "Add Reason" from the dropdown.
+        - In the Reason select input shown, choose the reason for the return. You can add return reasons in the [Settings](../../settings/return-reasons/page.mdx) to choose from.
+    - To add a note for the returned item:
+        - Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to the item.
+        - Choose "Add Note" from the dropdown.
+    - To remove an inbound item from the return:
+        - Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to the item.
+        - Choose "Remove" from the dropdown.
+    - For the Location input, specify the location to return the items to.
+        - While you can choose a location that the item doesn't have inventory in, later, you can't receive the item unless you [add inventory](../../inventory/inventory/page.mdx) for the item's variant in the chosen location.
+    - For the "Return shipping" field, you can optionally choose a shipping option to use to return the item, subtracting the shipping cost from the return total, which is refunded to the customer.
+        - To modify the return shipping's cost:
+            - Click the <InlineIcon Icon={PencilSquare} alt="edit" /> icon next to the Return Shipping total.
+            - Enter the new cost in the input shown.
+    - If you don’t want the customer to receive a notification that a return has been created, uncheck the “Send notifications” toggle.
+5. Once you're done, click the "Confirm Return" button to create the return, then confirm the action by clicking the "Continue" button in the pop-up.
+
+This creates the return, which you can see in the Summary and Activity sections of the order's details page.
+
+![Create Return Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739798514/User%20Guide/Screenshot_2025-02-17_at_3.21.34_PM_hxliws.png)
 
 ---
 
-## Receive Return
+## Mark Return Items as Received
+
+Once the customer returns the item, you can mark it as received. This triggers a refund to the customer and the non-damaged item quantity is added to the stock quantity in the inventory.
+
+To mark return items as received:
+
+1. Open the order's details page.
+2. In the Summary section, click on the "Receive items" button.
+3. In the side window that opens:
+    - For each item part of the return:
+        - Enter the quantity that isn't damaged and can be added back into the stock in the input shown next to the item.
+        - To add damaged quantity:
+            - Decrement the quantity that isn't damaged by the damaged amount.
+            - Click on the <InlineIcon Icon={HeartBroken} alt="heart-broken" /> button next to the item.
+            - Enter the damaged quantity.
+      - To notify the customer that the return is received, check the "Send notifications" toggle.
+4. Once done, click on the "Save" button.
+
+![Mark Received Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739795669/User%20Guide/Screenshot_2025-02-17_at_2.34.13_PM_fkzrdn.png)
+
+---
+
+## Cancel Requested Return
+
+You can cancel a return, whether requested by the customer or that you created.
 
 <Note type="warning">
 
-Once the return is marked as received, a refund is issued to the customer.
+Canceling a return is irreversible. The customer would have to request a new return or you can create a return request.
 
 </Note>
 
-<Note type="check">
+To cancel a requested return:
 
-The order's payment must be captured first.
-
-</Note>
-
-{/* TODO check info for correctness */}
-
-To mark a return as received:
-
-1. Open the order details page.
-2. In the Timeline section, find the return requested.
-3. Click on the Receive Return button.
-4. Check or uncheck the items that have been received.
-5. Click the Complete button.
+1. In the Activity section, click on Cancel next to the Return Request item.
+2. Confirm the cancellation by clicking on the "Confirm" button in the pop-up.
 
 ---
 
-## Cancel a Return
+## Refund Customer for a Return
 
-<Note type="warning">
+If a return causes an outstanding amount, you can see it in the Summary section of an order. To learn how to refund the payment, refer to [this guide](../payments/page.mdx#refund-payment).
 
-Canceling a return is irreversible.
-
-</Note>
-
-<Note type="check">
-
-The return must be [marked as received](#receive-return) first.
-
-</Note>
-
-{/* TODO check info for correctness */}
-
-To cancel a return:
-
-1. Open the order details page.
-2. In the Timeline section, find the return requested and click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon.
-3. Click on “Cancel return” in the dropdown.
+![Outstanding amount in summary](https://res.cloudinary.com/dza7lstvk/image/upload/v1739799808/User%20Guide/Screenshot_2025-02-17_at_3.42.49_PM_cjxgpg.png)

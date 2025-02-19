@@ -833,7 +833,7 @@ medusaIntegrationTestRunner({
             expect.objectContaining({
               currency_code: "usd",
               amount: paymentDelta,
-              status: "authorized",
+              status: "completed",
               authorized_amount: paymentDelta,
               captured_amount: paymentDelta,
               refunded_amount: 0,

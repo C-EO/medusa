@@ -105,7 +105,13 @@ Learn more in [this documentation](../validation/page.mdx#how-to-validate-reques
 
 ## Request Body Parameters
 
-The Medusa application parses the body of any request having its `Content-Type` header set to `application/json`. The request body parameters are set in the `MedusaRequest`'s `body` property.
+The Medusa application parses the body of any request having a JSON, URL-encoded, or text request content types. The request body parameters are set in the `MedusaRequest`'s `body` property.
+
+<Note title="Tip">
+
+Learn more about configuring body parsing in [this guide](../parse-body/page.mdx).
+
+</Note>
 
 For example:
 

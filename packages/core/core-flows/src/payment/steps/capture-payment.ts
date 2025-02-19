@@ -38,4 +38,6 @@ export const capturePaymentStep = createStep(
 
     return new StepResponse(payment)
   }
+  // We don't want to compensate a capture automatically as the actual funds have already been taken.
+  // The only want to compensate here is to issue a refund, but it's better to leave that as a manual operation for now.
 )

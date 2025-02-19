@@ -4806,6 +4806,9 @@
             "markAsShipped": {
               "type": "string"
             },
+            "markAsPickedUp": {
+              "type": "string"
+            },
             "markAsDelivered": {
               "type": "string"
             },
@@ -4915,13 +4918,17 @@
                 },
                 "fulfillmentDelivered": {
                   "type": "string"
+                },
+                "fulfillmentPickedUp": {
+                  "type": "string"
                 }
               },
               "required": [
                 "created",
                 "canceled",
                 "fulfillmentShipped",
-                "fulfillmentDelivered"
+                "fulfillmentDelivered",
+                "fulfillmentPickedUp"
               ],
               "additionalProperties": false
             },
@@ -4952,6 +4959,7 @@
             "available",
             "inStock",
             "markAsShipped",
+            "markAsPickedUp",
             "markAsDelivered",
             "itemsToFulfillDesc",
             "locationDescription",
@@ -5724,6 +5732,9 @@
             "header": {
               "type": "string"
             },
+            "hint": {
+              "type": "string"
+            },
             "label": {
               "type": "string"
             },
@@ -5742,12 +5753,30 @@
           },
           "required": [
             "header",
+            "hint",
             "label",
             "connectedTo",
             "noChannels",
             "action",
             "successToast"
           ],
+          "additionalProperties": false
+        },
+        "pickupOptions": {
+          "type": "object",
+          "properties": {
+            "edit": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "type": "string"
+                }
+              },
+              "required": ["header"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["edit"],
           "additionalProperties": false
         },
         "shippingOptions": {
@@ -5757,6 +5786,25 @@
               "type": "object",
               "properties": {
                 "shipping": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "string"
+                    },
+                    "hint": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "successToast": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["header", "hint", "label", "successToast"],
+                  "additionalProperties": false
+                },
+                "pickup": {
                   "type": "object",
                   "properties": {
                     "header": {
@@ -5811,7 +5859,7 @@
                   "type": "string"
                 }
               },
-              "required": ["shipping", "returns", "tabs", "action"],
+              "required": ["shipping", "pickup", "returns", "tabs", "action"],
               "additionalProperties": false
             },
             "delete": {
@@ -5992,6 +6040,12 @@
                     "shipping_other": {
                       "type": "string"
                     },
+                    "pickup_one": {
+                      "type": "string"
+                    },
+                    "pickup_other": {
+                      "type": "string"
+                    },
                     "returns_one": {
                       "type": "string"
                     },
@@ -6002,6 +6056,8 @@
                   "required": [
                     "shipping_one",
                     "shipping_other",
+                    "pickup_one",
+                    "pickup_other",
                     "returns_one",
                     "returns_other"
                   ],
@@ -6197,6 +6253,7 @@
         "fulfillmentSets",
         "sidebar",
         "salesChannels",
+        "pickupOptions",
         "shippingOptions",
         "serviceZones"
       ],
@@ -9202,6 +9259,39 @@
         "subtitle": {
           "type": "string"
         },
+        "list": {
+          "type": "object",
+          "properties": {
+            "empty": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["heading", "description"],
+              "additionalProperties": false
+            },
+            "filtered": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["heading", "description"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["empty", "filtered"],
+          "additionalProperties": false
+        },
         "createSalesChannel": {
           "type": "string"
         },
@@ -9293,6 +9383,7 @@
       "required": [
         "domain",
         "subtitle",
+        "list",
         "createSalesChannel",
         "createSalesChannelHint",
         "enabledHint",

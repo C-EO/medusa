@@ -1,6 +1,6 @@
+import { ModuleJoinerConfig } from "@medusajs/types"
 import { defineJoinerConfig } from "@medusajs/utils"
 import { MedusaModule } from "../../medusa-module"
-import { ModuleJoinerConfig } from "@medusajs/types"
 
 const customModuleJoinerConfig = defineJoinerConfig("custom_user", {
   schema: `
@@ -62,12 +62,12 @@ const pricingJoinerConfig = defineJoinerConfig("pricing", {
     }
 
     type Price {
-      amount: Int
+      amount: Float
       deep_nested_price: DeepNestedPrice
     }
     
     type DeepNestedPrice {
-      amount: Int
+      amount: Float
     }
   `,
   alias: [

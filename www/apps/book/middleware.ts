@@ -2,12 +2,17 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  return NextResponse.rewrite(
-    new URL(
-      `/md-content${request.nextUrl.pathname.replace("/index.html.md", "")}`,
-      request.url
+  const path = request.nextUrl.pathname.replace("/index.html.md", "")
+  if (
+    !path.startsWith("/resources") &&
+    !path.startsWith("/ui") &&
+    !path.startsWith("/api") &&
+    !path.startsWith("/user-guide")
+  ) {
+    return NextResponse.rewrite(
+      new URL(`/md-content${path.replace("/index.html.md", "")}`, request.url)
     )
-  )
+  }
 }
 
 export const config = {

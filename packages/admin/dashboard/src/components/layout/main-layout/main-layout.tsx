@@ -14,12 +14,11 @@ import {
   Tag,
   Users,
 } from "@medusajs/icons"
-import { Avatar, DropdownMenu, Text, clx } from "@medusajs/ui"
+import { Avatar, Divider, DropdownMenu, Text, clx } from "@medusajs/ui"
 import { Collapsible as RadixCollapsible } from "radix-ui"
 import { useTranslation } from "react-i18next"
 
 import { useStore } from "../../../hooks/api/store"
-import { Divider } from "../../common/divider"
 import { Skeleton } from "../../common/skeleton"
 import { INavItem, NavItem } from "../../layout/nav-item"
 import { Shell } from "../../layout/shell"

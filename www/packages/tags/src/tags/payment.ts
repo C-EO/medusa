@@ -16,6 +16,10 @@ export const payment = [
     "path": "/storefront-development/checkout/payment/stripe"
   },
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "createPaymentCollectionsStep",
     "path": "/references/medusa-workflows/steps/createPaymentCollectionsStep"
   },
@@ -134,6 +138,10 @@ export const payment = [
   {
     "title": "refundPaymentsWorkflow",
     "path": "/references/medusa-workflows/refundPaymentsWorkflow"
+  },
+  {
+    "title": "createPaymentAccountHolderStep",
+    "path": "/references/medusa-workflows/steps/createPaymentAccountHolderStep"
   },
   {
     "title": "createPaymentSessionStep",

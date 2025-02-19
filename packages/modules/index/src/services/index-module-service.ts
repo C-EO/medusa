@@ -3,6 +3,7 @@ import {
   IEventBusModuleService,
   IndexTypes,
   InternalModuleDeclaration,
+  Logger,
   ModulesSdkTypes,
   RemoteQueryFunction,
 } from "@medusajs/framework/types"
@@ -11,28 +12,30 @@ import {
   ContainerRegistrationKeys,
   Modules,
   ModulesSdkUtils,
-  simpleHash,
 } from "@medusajs/framework/utils"
-import { IndexMetadata } from "@models"
 import { schemaObjectRepresentationPropertiesToOmit } from "@types"
-import { buildSchemaObjectRepresentation } from "../utils/build-config"
-import { defaultSchema } from "../utils/default-schema"
-import { gqlSchemaToTypes } from "../utils/gql-to-types"
-import { IndexMetadataStatus } from "../utils/index-metadata-status"
+import {
+  buildSchemaObjectRepresentation,
+  Configuration,
+  defaultSchema,
+  gqlSchemaToTypes,
+} from "@utils"
+import { DataSynchronizer } from "./data-synchronizer"
 
 type InjectedDependencies = {
+  logger: Logger
   [Modules.EVENT_BUS]: IEventBusModuleService
   storageProviderCtr: Constructor<IndexTypes.StorageProvider>
   [ContainerRegistrationKeys.QUERY]: RemoteQueryFunction
   storageProviderCtrOptions: unknown
   baseRepository: BaseRepository
   indexMetadataService: ModulesSdkTypes.IMedusaInternalService<any>
+  indexSyncService: ModulesSdkTypes.IMedusaInternalService<any>
+  dataSynchronizer: DataSynchronizer
 }
 
 export default class IndexModuleService
-  extends ModulesSdkUtils.MedusaService({
-    IndexMetadata,
-  })
+  extends ModulesSdkUtils.MedusaService({})
   implements IndexTypes.IIndexService
 {
   private readonly container_: InjectedDependencies
@@ -48,7 +51,25 @@ export default class IndexModuleService
 
   protected storageProvider_: IndexTypes.StorageProvider
 
-  private indexMetadataService_: ModulesSdkTypes.IMedusaInternalService<any>
+  private get indexMetadataService_(): ModulesSdkTypes.IMedusaInternalService<any> {
+    return this.container_.indexMetadataService
+  }
+
+  private get indexSyncService_(): ModulesSdkTypes.IMedusaInternalService<any> {
+    return this.container_.indexSyncService
+  }
+
+  private get dataSynchronizer_(): DataSynchronizer {
+    return this.container_.dataSynchronizer
+  }
+
+  private get logger_(): Logger {
+    try {
+      return this.container_.logger
+    } catch (e) {
+      return console as unknown as Logger
+    }
+  }
 
   constructor(
     container: InjectedDependencies,
@@ -62,7 +83,6 @@ export default class IndexModuleService
 
     const {
       [Modules.EVENT_BUS]: eventBusModuleService,
-      indexMetadataService,
       storageProviderCtr,
       storageProviderCtrOptions,
     } = container
@@ -70,8 +90,6 @@ export default class IndexModuleService
     this.eventBusModuleService_ = eventBusModuleService
     this.storageProviderCtr_ = storageProviderCtr
     this.storageProviderCtrOptions_ = storageProviderCtrOptions
-    this.indexMetadataService_ = indexMetadataService
-
     if (!this.eventBusModuleService_) {
       throw new Error(
         "EventBusModuleService is required for the IndexModule to work"
@@ -106,124 +124,25 @@ export default class IndexModuleService
 
       await gqlSchemaToTypes(this.moduleOptions_.schema ?? defaultSchema)
 
-      const fullSyncRequired = await this.syncIndexConfig()
-      if (fullSyncRequired.length > 0) {
-        await this.syncEntities(fullSyncRequired)
+      this.dataSynchronizer_.onApplicationStart({
+        schemaObjectRepresentation: this.schemaObjectRepresentation_,
+        storageProvider: this.storageProvider_,
+      })
+
+      const configurationChecker = new Configuration({
+        logger: this.logger_,
+        schemaObjectRepresentation: this.schemaObjectRepresentation_,
+        indexMetadataService: this.indexMetadataService_,
+        indexSyncService: this.indexSyncService_,
+        dataSynchronizer: this.dataSynchronizer_,
+      })
+      const entitiesMetadataChanged = await configurationChecker.checkChanges()
+
+      if (entitiesMetadataChanged.length) {
+        await this.dataSynchronizer_.syncEntities(entitiesMetadataChanged)
       }
     } catch (e) {
-      console.log(e)
-    }
-  }
-
-  private async syncIndexConfig() {
-    const schemaObjectRepresentation = (this.schemaObjectRepresentation_ ??
-      {}) as IndexTypes.SchemaObjectRepresentation
-
-    const currentConfig = await this.indexMetadataService_.list()
-    const currentConfigMap = new Map(
-      currentConfig.map((c) => [c.entity, c] as const)
-    )
-
-    type modifiedConfig = {
-      id?: string
-      entity: string
-      fields: string[]
-      fields_hash: string
-      status?: IndexMetadataStatus
-    }[]
-    const entityPresent = new Set<string>()
-    const newConfig: modifiedConfig = []
-    const updatedConfig: modifiedConfig = []
-    const deletedConfig: { entity: string }[] = []
-
-    for (const [entityName, schemaEntityObjectRepresentation] of Object.entries(
-      schemaObjectRepresentation
-    )) {
-      if (schemaObjectRepresentationPropertiesToOmit.includes(entityName)) {
-        continue
-      }
-
-      const entity = schemaEntityObjectRepresentation.entity
-      const fields = schemaEntityObjectRepresentation.fields.sort().join(",")
-      const fields_hash = simpleHash(fields)
-
-      const existingEntityConfig = currentConfigMap.get(entity)
-
-      entityPresent.add(entity)
-      if (
-        !existingEntityConfig ||
-        existingEntityConfig.fields_hash !== fields_hash
-      ) {
-        const meta = {
-          id: existingEntityConfig?.id,
-          entity,
-          fields,
-          fields_hash,
-        }
-
-        if (!existingEntityConfig) {
-          newConfig.push(meta)
-        } else {
-          updatedConfig.push({
-            ...meta,
-            status: IndexMetadataStatus.PENDING,
-          })
-        }
-      }
-    }
-
-    for (const [entity] of currentConfigMap) {
-      if (!entityPresent.has(entity)) {
-        deletedConfig.push({ entity })
-      }
-    }
-
-    if (newConfig.length > 0) {
-      await this.indexMetadataService_.create(newConfig)
-    }
-    if (updatedConfig.length > 0) {
-      await this.indexMetadataService_.update(updatedConfig)
-    }
-    if (deletedConfig.length > 0) {
-      await this.indexMetadataService_.delete(deletedConfig)
-    }
-
-    return await this.indexMetadataService_.list({
-      status: [IndexMetadataStatus.PENDING, IndexMetadataStatus.PROCESSING],
-    })
-  }
-
-  private async syncEntities(
-    entities: {
-      entity: string
-      fields: string[]
-      fields_hash: string
-    }[]
-  ) {
-    const updatedStatus = async (
-      entity: string,
-      status: IndexMetadataStatus
-    ) => {
-      await this.indexMetadataService_.update({
-        data: {
-          status,
-        },
-        selector: {
-          entity,
-        },
-      })
-    }
-
-    for (const entity of entities) {
-      await updatedStatus(entity.entity, IndexMetadataStatus.PROCESSING)
-
-      try {
-        // await this.syncEntity(entity)
-
-        await updatedStatus(entity.entity, IndexMetadataStatus.DONE)
-      } catch (e) {
-        await updatedStatus(entity.entity, IndexMetadataStatus.ERROR)
-      }
+      this.logger_.error(e)
     }
   }
 
@@ -260,8 +179,14 @@ export default class IndexModuleService
       return this.schemaObjectRepresentation_
     }
 
+    const baseSchema = `
+      scalar DateTime
+      scalar Date
+      scalar Time
+      scalar JSON
+    `
     const [objectRepresentation, entityMap] = buildSchemaObjectRepresentation(
-      this.moduleOptions_.schema ?? defaultSchema
+      baseSchema + (this.moduleOptions_.schema ?? defaultSchema)
     )
 
     this.schemaObjectRepresentation_ = objectRepresentation

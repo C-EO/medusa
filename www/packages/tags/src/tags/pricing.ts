@@ -8,6 +8,10 @@ export const pricing = [
     "path": "/commerce-modules/product/guides/price-with-taxes"
   },
   {
+    "title": "Implement Custom Line Item Pricing in Medusa",
+    "path": "/examples/guides/custom-item-price"
+  },
+  {
     "title": "Example: Show Sale Price",
     "path": "/storefront-development/products/price/examples/sale-price"
   },

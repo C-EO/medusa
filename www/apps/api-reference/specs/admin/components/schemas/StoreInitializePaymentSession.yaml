@@ -8,12 +8,6 @@ properties:
     title: provider_id
     description: The ID of the payment provider the customer chose.
     example: pp_stripe_stripe
-  context:
-    type: object
-    description: >-
-      The payment's context, such as the customer or address details. If the
-      customer is logged-in, the customer `id` is set in the context under a
-      `customer.id` property.
   data:
     type: object
     description: Any data necessary for the payment provider to process the payment.

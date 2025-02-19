@@ -3,6 +3,7 @@ import { DmlEntity } from "../entity"
 import { parseEntityName } from "./entity-builder/parse-entity-name"
 import { setGraphQLRelationship } from "./graphql-builder/set-relationship"
 import { getGraphQLAttributeFromDMLPropety } from "./graphql-builder/get-attribute"
+import { getForeignKey } from "./entity-builder"
 
 export function generateGraphQLFromEntity<T extends DmlEntity<any, any>>(
   entity: T
@@ -29,6 +30,28 @@ export function generateGraphQLFromEntity<T extends DmlEntity<any, any>>(
 
       gqlSchema.push(`${prop.attribute}`)
     } else {
+      if (["belongsTo", "hasOneWithFK"].includes(field.type)) {
+        const foreignKeyName = getForeignKey(field)
+        const fkProp = getGraphQLAttributeFromDMLPropety(
+          modelName,
+          field.name,
+          {
+            $dataType: "",
+            parse() {
+              return {
+                fieldName: foreignKeyName,
+                computed: false,
+                dataType: { name: "text" as const },
+                nullable: field.nullable || false,
+                indexes: [],
+                relationships: [],
+              }
+            },
+          }
+        )
+        gqlSchema.push(`${fkProp.attribute}`)
+      }
+
       const prop = setGraphQLRelationship(modelName, field)
       if (prop.extra) {
         extra.push(prop.extra)

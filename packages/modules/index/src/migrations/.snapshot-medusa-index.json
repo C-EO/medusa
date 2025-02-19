@@ -1,5 +1,7 @@
 {
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "name": "public",
   "tables": [
     {
@@ -31,6 +33,16 @@
           "nullable": false,
           "default": "'{}'",
           "mappedType": "json"
+        },
+        "staled_at": {
+          "name": "staled_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         },
         "created_at": {
           "name": "created_at",
@@ -78,35 +90,11 @@
           "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_data_deleted_at\" ON \"index_data\" (deleted_at) WHERE deleted_at IS NULL"
         },
         {
-          "keyName": "IDX_index_data_gin",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_data_gin\" ON \"index_data\" USING GIN (data) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_index_data_id",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_data_id\" ON \"index_data\" (id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_index_data_name",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_data_name\" ON \"index_data\" (name) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "index_data_pkey",
-          "columnNames": ["id", "name"],
+          "columnNames": [
+            "id",
+            "name"
+          ],
           "composite": true,
           "constraint": true,
           "primary": true,
@@ -163,7 +151,12 @@
           "primary": false,
           "nullable": false,
           "default": "'pending'",
-          "enumItems": ["pending", "processing", "done", "error"],
+          "enumItems": [
+            "pending",
+            "processing",
+            "done",
+            "error"
+          ],
           "mappedType": "enum"
         },
         "created_at": {
@@ -222,7 +215,9 @@
         },
         {
           "keyName": "index_metadata_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -289,6 +284,16 @@
           "nullable": false,
           "mappedType": "text"
         },
+        "staled_at": {
+          "name": "staled_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -326,24 +331,6 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "IDX_index_relation_parent_id",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_relation_parent_id\" ON \"index_relation\" (parent_id) WHERE deleted_at IS NULL"
-        },
-        {
-          "keyName": "IDX_index_relation_child_id",
-          "columnNames": [],
-          "composite": false,
-          "constraint": false,
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_relation_child_id\" ON \"index_relation\" (child_id) WHERE deleted_at IS NULL"
-        },
-        {
           "keyName": "IDX_index_relation_deleted_at",
           "columnNames": [],
           "composite": false,
@@ -354,7 +341,107 @@
         },
         {
           "keyName": "index_relation_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "entity": {
+          "name": "entity",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "last_key": {
+          "name": "last_key",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "now()",
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "index_sync",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "IDX_index_sync_deleted_at",
+          "columnNames": [],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_index_sync_deleted_at\" ON \"index_sync\" (deleted_at) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "IDX_index_sync_entity",
+          "columnNames": [],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE UNIQUE INDEX IF NOT EXISTS \"IDX_index_sync_entity\" ON \"index_sync\" (entity) WHERE deleted_at IS NULL"
+        },
+        {
+          "keyName": "index_sync_pkey",
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,

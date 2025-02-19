@@ -4,6 +4,10 @@ export const fulfillment = [
     "path": "/storefront-development/checkout/shipping"
   },
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "validateAndReturnShippingMethodsDataStep",
     "path": "/references/medusa-workflows/steps/validateAndReturnShippingMethodsDataStep"
   },
@@ -222,6 +226,14 @@ export const fulfillment = [
   {
     "title": "markOrderFulfillmentAsDeliveredWorkflow",
     "path": "/references/medusa-workflows/markOrderFulfillmentAsDeliveredWorkflow"
+  },
+  {
+    "title": "parseProductCsvStep",
+    "path": "/references/medusa-workflows/steps/parseProductCsvStep"
+  },
+  {
+    "title": "importProductsWorkflow",
+    "path": "/references/medusa-workflows/importProductsWorkflow"
   },
   {
     "title": "deleteShippingProfilesStep",

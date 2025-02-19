@@ -280,12 +280,27 @@ export function loadComment(
   return ""
 }
 
+const emptyValues = ["void", "never", "undefined"]
+
 export function isEmpty(reflectionTypes: SomeType[]) {
-  return reflectionTypes.every(
-    (type) =>
-      type.type === "intrinsic" &&
-      (type.name === "void" ||
-        type.name === "never" ||
-        type.name === "undefined")
-  )
+  return reflectionTypes.every((type) => {
+    if (type.type === "intrinsic" && emptyValues.includes(type.name)) {
+      return true
+    }
+
+    if (type.type !== "union") {
+      return false
+    }
+
+    return type.types.every((unionType) => {
+      if (
+        unionType.type === "intrinsic" &&
+        emptyValues.includes(unionType.name)
+      ) {
+        return true
+      }
+
+      return false
+    })
+  })
 }

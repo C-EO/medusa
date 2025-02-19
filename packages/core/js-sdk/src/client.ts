@@ -175,15 +175,15 @@ export class Client {
     return { stream: null, abort: abortFunc }
   }
 
-  setToken(token: string) {
-    this.setToken_(token)
+  async setToken(token: string) {
+    await this.setToken_(token)
   }
 
-  clearToken() {
-    this.clearToken_()
+  async clearToken() {
+    await this.clearToken_()
   }
 
-  protected clearToken_() {
+  protected async clearToken_() {
     const { storageMethod, storageKey } = this.getTokenStorageInfo_()
     switch (storageMethod) {
       case "local": {
@@ -192,6 +192,10 @@ export class Client {
       }
       case "session": {
         window.sessionStorage.removeItem(storageKey)
+        break
+      }
+      case "custom": {
+        await this.config.auth?.storage?.removeItem(storageKey)
         break
       }
       case "memory": {
@@ -219,7 +223,7 @@ export class Client {
       const headers = new Headers(defaultHeaders)
       const customHeaders = {
         ...this.config.globalHeaders,
-        ...this.getJwtHeader_(),
+        ...(await this.getJwtHeader_()),
         ...init?.headers,
       }
       // We use `headers.set` in order to ensure headers are overwritten in a case-insensitive manner.
@@ -278,17 +282,17 @@ export class Client {
       : {}
   }
 
-  protected getJwtHeader_ = (): { Authorization: string } | {} => {
+  protected async getJwtHeader_(): Promise<{ Authorization: string } | {}> {
     // If the user has requested for session storage, we don't want to send the JWT token in the header.
     if (this.config.auth?.type === "session") {
       return {}
     }
 
-    const token = this.getToken_()
+    const token = await this.getToken_()
     return token ? { Authorization: `Bearer ${token}` } : {}
   }
 
-  protected setToken_ = (token: string) => {
+  protected async setToken_(token: string) {
     const { storageMethod, storageKey } = this.getTokenStorageInfo_()
     switch (storageMethod) {
       case "local": {
@@ -299,6 +303,10 @@ export class Client {
         window.sessionStorage.setItem(storageKey, token)
         break
       }
+      case "custom": {
+        await this.config.auth?.storage?.setItem(storageKey, token)
+        break
+      }
       case "memory": {
         this.token = token
         break
@@ -306,7 +314,7 @@ export class Client {
     }
   }
 
-  protected getToken_ = () => {
+  protected async getToken_() {
     const { storageMethod, storageKey } = this.getTokenStorageInfo_()
     switch (storageMethod) {
       case "local": {
@@ -315,17 +323,21 @@ export class Client {
       case "session": {
         return window.sessionStorage.getItem(storageKey)
       }
+      case "custom": {
+        return await this.config.auth?.storage?.getItem(storageKey)
+      }
       case "memory": {
         return this.token
       }
     }
 
-    return
+    return null
   }
 
   protected getTokenStorageInfo_ = () => {
     const hasLocal = hasStorage("localStorage")
     const hasSession = hasStorage("sessionStorage")
+    const hasCustom = Boolean(this.config.auth?.storage)
 
     const storageMethod =
       this.config.auth?.jwtTokenStorageMethod ||
@@ -334,15 +346,23 @@ export class Client {
       this.config.auth?.jwtTokenStorageKey || this.DEFAULT_JWT_STORAGE_KEY
 
     if (!hasLocal && storageMethod === "local") {
-      throw new Error("Local JWT storage is only available in the browser")
+      this.throwError_("Local JWT storage is only available in the browser")
     }
     if (!hasSession && storageMethod === "session") {
-      throw new Error("Session JWT storage is only available in the browser")
+      this.throwError_("Session JWT storage is only available in the browser")
+    }
+    if (!hasCustom && storageMethod === "custom") {
+      this.throwError_("Custom storage was not provided in the config")
     }
 
     return {
       storageMethod,
       storageKey,
     }
+  }
+
+  protected throwError_(message: string) {
+    this.logger.error(message)
+    throw new Error(message)
   }
 }

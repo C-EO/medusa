@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11325](https://github.com/medusajs/medusa/pull/11325) [`f13c1215cb94da45861fe33967d1377e07dffb85`](https://github.com/medusajs/medusa/commit/f13c1215cb94da45861fe33967d1377e07dffb85) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(cli): If NODE_ENV is not defined then default to "production" for medusa start
+
+- Updated dependencies [[`cb0f065c9dd59fe54a52c337f9b5392723f9db58`](https://github.com/medusajs/medusa/commit/cb0f065c9dd59fe54a52c337f9b5392723f9db58), [`016e332e9b98f316cded6eb999927fc942ce56c5`](https://github.com/medusajs/medusa/commit/016e332e9b98f316cded6eb999927fc942ce56c5), [`a33aebd8957f4bab10afd5e50a810cf738879b0d`](https://github.com/medusajs/medusa/commit/a33aebd8957f4bab10afd5e50a810cf738879b0d), [`c9821171866a5a66ce5b7f0b8a414de48dbcdc7e`](https://github.com/medusajs/medusa/commit/c9821171866a5a66ce5b7f0b8a414de48dbcdc7e), [`244cd714b2e8dc742afbefd0d175649f8fc45eed`](https://github.com/medusajs/medusa/commit/244cd714b2e8dc742afbefd0d175649f8fc45eed), [`3c51709daf07dcdd5563fa08fec2446a42cc8058`](https://github.com/medusajs/medusa/commit/3c51709daf07dcdd5563fa08fec2446a42cc8058)]:
+  - @medusajs/utils@2.5.0
+  - @medusajs/telemetry@2.5.0
+
 ## 2.4.0
 
 ### Minor Changes

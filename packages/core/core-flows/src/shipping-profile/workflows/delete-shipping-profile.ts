@@ -9,11 +9,41 @@ import { deleteShippingProfilesStep } from "../steps"
 import { removeRemoteLinkStep, useQueryGraphStep } from "../../common"
 
 /**
- * This step validates that the shipping profiles to delete are not linked to any products.
+ * The data to validate the deletion of shipping profiles.
  */
-const validateStepShippingProfileDelete = createStep(
+export type ValidateStepShippingProfileDeleteInput = {
+  /**
+   * The links between products and shipping profiles.
+   */
+  links: { 
+    /**
+     * The ID of the product linked to the shipping profile.
+     */
+    product_id: string
+    /**
+     * The ID of the shipping profile to be deleted.
+     */
+    shipping_profile_id: string
+  }[]
+}
+
+/**
+ * This step validates that the shipping profiles to delete are not linked to any products.
+ * Otherwise, an error is thrown.
+ * 
+ * @example
+ * validateStepShippingProfileDelete({
+ *   links: [
+ *     {
+ *       product_id: "product_123",
+ *       shipping_profile_id: "sp_123"
+ *     }
+ *   ]
+ * })
+ */
+export const validateStepShippingProfileDelete = createStep(
   "validate-step-shipping-profile-delete",
-  (data: { links: { product_id: string; shipping_profile_id: string }[] }) => {
+  (data: ValidateStepShippingProfileDeleteInput ) => {
     const { links } = data
 
     if (links.length > 0) {

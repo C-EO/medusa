@@ -1,5 +1,11 @@
 # @medusajs/index
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11178](https://github.com/medusajs/medusa/pull/11178) [`a33aebd8957f4bab10afd5e50a810cf738879b0d`](https://github.com/medusajs/medusa/commit/a33aebd8957f4bab10afd5e50a810cf738879b0d) Thanks [@adrien2p](https://github.com/adrien2p)! - feat(indes): full sync
+
 ## 2.4.0
 
 ### Minor Changes

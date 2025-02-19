@@ -24,7 +24,9 @@ export async function GET(req: NextRequest, { params }: Params) {
   path.join(process.cwd(), "app")
   path.join(process.cwd(), "references")
 
-  const filePathFromMap = await getFileFromMaps(`/${slug.join("/")}`)
+  const filePathFromMap = await getFileFromMaps(
+    `/${slug.join("/")}`.replace("//", "/")
+  )
   if (!filePathFromMap) {
     return notFound()
   }
@@ -77,7 +79,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 const getCleanMd_ = unstable_cache(
   async (filePath: string, plugins?: { before?: Plugin[]; after?: Plugin[] }) =>
-    getCleanMd({ filePath, plugins }),
+    getCleanMd({ file: filePath, plugins }),
   ["clean-md"],
   {
     revalidate: 3600,

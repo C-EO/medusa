@@ -36,7 +36,7 @@ To learn more about the `additional_data` property and the API routes that accep
 
 ---
 
-## 1. Consume the productCreated Hook
+## 1. Consume the productsCreated Hook
 
 A workflow hook is a point in a workflow where you can inject a step to perform a custom functionality. Consuming a workflow hook allows you to extend the features of a workflow and, consequently, the API route that uses it.
 
@@ -84,7 +84,7 @@ createProductsWorkflow.hooks.productsCreated(
 )
 ```
 
-Workflows have a special `hooks` property to access its hooks and consume them. Each hook, such as `productCreated`, accepts a step function as a parameter. The step function accepts the following parameters:
+Workflows have a special `hooks` property to access its hooks and consume them. Each hook, such as `productsCreated`, accepts a step function as a parameter. The step function accepts the following parameters:
 
 1. An object having an `additional_data` property, which is the custom data passed in the request body under `additional_data`. The object will also have properties passed from the workflow to the hook, which in this case is the `products` property that holds an array of the created products.
 2. An object of properties related to the step's context. It has a `container` property whose value is the [Medusa container](../../../fundamentals/medusa-container/page.mdx) to resolve framework and commerce tools.
@@ -101,7 +101,7 @@ Learn more about Link in [this chapter](../../../fundamentals/module-links/link/
 
 </Note>
 
-To use Link in the `productCreated` hook, replace the `TODO` with the following:
+To use Link in the `productsCreated` hook, replace the `TODO` with the following:
 
 export const hook2Highlights = [
   ["1", `"link"`, "Resolve Link from the container."]
@@ -169,7 +169,7 @@ In the compensation function, if the `links` parameter isn't empty, you resolve 
 
 ## 2. Configure Additional Data Validation
 
-Now that you've consumed the `productCreated` hook, you want to configure the `/admin/products` API route that creates a new product to accept a brand ID in its `additional_data` parameter.
+Now that you've consumed the `productsCreated` hook, you want to configure the `/admin/products` API route that creates a new product to accept a brand ID in its `additional_data` parameter.
 
 You configure the properties accepted in `additional_data` in the `src/api/middlewares.ts` that exports middleware configurations. So, create the file (or, if already existing, add to the file) `src/api/middlewares.ts` the following content:
 
@@ -230,13 +230,14 @@ curl -X POST 'http://localhost:9000/admin/products' \
         "values": ["Default option value"]
       }
     ],
+    "shipping_profile_id": "{shipping_profile_id}",
     "additional_data": {
         "brand_id": "{brand_id}"
     }
 }'
 ```
 
-Make sure to replace `{token}` with the token you received from the previous request, and  `{brand_id}` with the ID of a brand in your application.
+Make sure to replace `{token}` with the token you received from the previous request, `shipping_profile_id` with the ID of a shipping profile in your application, and `{brand_id}` with the ID of a brand in your application. You can retrieve the ID of a shipping profile either from the Medusa Admin, or the [List Shipping Profiles API route](!api!/admin#shipping-profiles_getshippingprofiles).
 
 The request creates a product and returns it.
 

@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom"
 
 import { PencilSquare } from "@medusajs/icons"
 import { DataTable } from "../../../../../components/data-table"
-import { useDataTableDateFilters } from "../../../../../components/data-table/hooks/general/use-data-table-date-filters"
+import { useDataTableDateColumns } from "../../../../../components/data-table/helpers/general/use-data-table-date-columns"
+import { useDataTableDateFilters } from "../../../../../components/data-table/helpers/general/use-data-table-date-filters"
 import { useUsers } from "../../../../../hooks/api/users"
-import { useDate } from "../../../../../hooks/use-date"
 import { useQueryParams } from "../../../../../hooks/use-query-params"
 
 const PAGE_SIZE = 20
@@ -73,7 +73,8 @@ const columnHelper = createDataTableColumnHelper<HttpTypes.AdminUser>()
 const useColumns = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { getFullDate } = useDate()
+
+  const dateColumns = useDataTableDateColumns<HttpTypes.AdminUser>()
 
   return useMemo(
     () => [
@@ -104,24 +105,7 @@ const useColumns = () => {
         sortAscLabel: t("filters.sorting.alphabeticallyAsc"),
         sortDescLabel: t("filters.sorting.alphabeticallyDesc"),
       }),
-      columnHelper.accessor("created_at", {
-        header: t("fields.createdAt"),
-        cell: ({ row }) => {
-          return getFullDate({ date: row.original.created_at })
-        },
-        enableSorting: true,
-        sortAscLabel: t("filters.sorting.dateAsc"),
-        sortDescLabel: t("filters.sorting.dateDesc"),
-      }),
-      columnHelper.accessor("updated_at", {
-        header: t("fields.updatedAt"),
-        cell: ({ row }) => {
-          return getFullDate({ date: row.original.updated_at })
-        },
-        enableSorting: true,
-        sortAscLabel: t("filters.sorting.dateAsc"),
-        sortDescLabel: t("filters.sorting.dateDesc"),
-      }),
+      ...dateColumns,
       columnHelper.action({
         actions: [
           {
@@ -134,7 +118,7 @@ const useColumns = () => {
         ],
       }),
     ],
-    [t, getFullDate, navigate]
+    [t, navigate, dateColumns]
   )
 }
 

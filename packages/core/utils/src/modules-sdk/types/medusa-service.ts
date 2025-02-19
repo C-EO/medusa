@@ -3,11 +3,12 @@ import {
   Context,
   FindConfig,
   IDmlEntity,
-  InferEntityType,
   Pluralize,
   Prettify,
   RestoreReturn,
   SoftDeleteReturn,
+  InferEntityType,
+  InferEntityForModuleService,
 } from "@medusajs/types"
 import { DmlEntity } from "../../dml"
 
@@ -45,7 +46,7 @@ export type ModelConfigurationsToConfigTemplate<T extends ModelEntries> = {
       ? InstanceType<T[Key]>
       : any
     inputDto: T[Key] extends DmlEntity<any, any>
-      ? Omit<InferEntityType<T[Key]>, DMLDTOExcludeProperties>
+      ? Omit<InferEntityForModuleService<T[Key]>, DMLDTOExcludeProperties>
       : T[Key] extends Constructor<any>
       ? InstanceType<T[Key]>
       : any

@@ -1,0 +1,931 @@
+---
+sidebar_title: "Custom Item Price"
+tags:
+    - cart
+    - pricing
+    - server
+---
+
+import { Github, PlaySolid } from "@medusajs/icons"
+import { Prerequisites, WorkflowDiagram } from "docs-ui"
+
+export const ogImage = "https://res.cloudinary.com/dza7lstvk/image/upload/v1738682676/Medusa%20Resources/guide-custom-item-pricing_lrilmb.jpg"
+
+export const metadata = {
+  title: `Implement Custom Line Item Pricing in Medusa`,
+  openGraph: {
+    images: [
+      {
+        url: ogImage,
+        width: 1600,
+        height: 836,
+        type: "image/jpeg"
+      }
+    ],
+  },
+  twitter: {
+    images: [
+      {
+        url: ogImage,
+        width: 1600,
+        height: 836,
+        type: "image/jpeg"
+      }
+    ]
+  }
+}
+
+# {metadata.title}
+
+In this guide, you'll learn how to add line items with custom prices to a cart in Medusa.
+
+When you install a Medusa application, you get a fully-fledged commerce platform with a framework for customization. The Medusa application's commerce features are built around [commerce modules](../../../commerce-modules/page.mdx) which are available out-of-the-box. These features include managing carts and adding line items to them.
+
+By default, you can add product variants to the cart, where the price of its associated line item is based on the product variant's price. However, you can build customizations to add line items with custom prices to the cart. This is useful when integrating an Enterprise Resource Planning (ERP), Product Information Management (PIM), or other third-party services that provide real-time prices for your products.
+
+To showcase how to add line items with custom prices to the cart, this guide uses [GoldAPI.io](https://www.goldapi.io) as an example of a third-party system that you can integrate for real-time prices. You can follow the same approach for other third-party integrations that provide custom pricing.
+
+You can follow this guide whether you're new to Medusa or an advanced Medusa developer.
+
+### Summary
+
+This guide will teach you how to:
+
+- Install and set up Medusa.
+- Integrate the third-party service [GoldAPI.io](https://www.goldapi.io) that retrieves real-time prices for metals like Gold and Silver.
+- Add an API route to add a product variant that has metals, such as a gold ring, to the cart with the real-time price retrieved from the third-party service.
+
+![Diagram showcasing overview of implementation for adding an item to cart from storefront.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738920014/Medusa%20Resources/custom-line-item-3_zu3qh2.jpg)
+
+<CardList items={[
+  {
+    href: "https://github.com/medusajs/examples/tree/main/custom-item-price",
+    title: "Custom Item Price Example Repository",
+    text: "Find the full code for this recipe example in this repository.",
+    icon: Github,
+  },
+  {
+    href: "https://res.cloudinary.com/dza7lstvk/raw/upload/v1738246728/OpenApi/Custom_Item_Price_gdfnl3.yaml",
+    title: "OpenApi Specs for Postman",
+    text: "Import this OpenApi Specs file into tools like Postman.",
+    icon: PlaySolid,
+  },
+]} />
+
+---
+
+## Step 1: Install a Medusa Application
+
+<Prerequisites items={[
+  {
+    text: "Node.js v20+",
+    link: "https://nodejs.org/en/download"
+  },
+  {
+    text: "Git CLI tool",
+    link: "https://git-scm.com/downloads"
+  },
+  {
+    text: "PostgreSQL",
+    link: "https://www.postgresql.org/download/"
+  }
+]} />
+
+Start by installing the Medusa application on your machine with the following command:
+
+```bash
+npx create-medusa-app@latest
+```
+
+You'll first be asked for the project's name. You can also optionally choose to install the [Next.js starter storefront](../../../nextjs-starter/page.mdx).
+
+Afterwards, the installation process will start, which will install the Medusa application in a directory with your project's name. If you chose to install the Next.js starter, it'll be installed in a separate directory with the `{project-name}-storefront` name.
+
+<Note title="Why is the storefront installed separately">
+
+The Medusa application is composed of a headless Node.js server and an admin dashboard. The storefront is installed or custom-built separately and connects to the Medusa application through its REST endpoints, called [API routes](!docs!/learn/fundamentals/api-routes). Learn more about Medusa's architecture in [this documentation](!docs!/learn/introduction/architecture).
+
+</Note>
+
+Once the installation finishes successfully, the Medusa Admin dashboard will open with a form to create a new user. Enter the user's credentials and submit the form. Afterwards, you can log in with the new user and explore the dashboard.
+
+<Note title="Ran into Errors">
+
+Check out the [troubleshooting guides](../../../troubleshooting/create-medusa-app-errors/page.mdx) for help.
+
+</Note>
+
+---
+
+## Step 2: Integrate GoldAPI.io
+
+<Prerequisites
+  items={[
+    {
+      text: "GoldAPI.io Account. You can create a free account.",
+      link: "https://www.goldapi.io"
+    }
+  ]}
+/>
+
+To integrate third-party services into Medusa, you create a custom module. A module is a reusable package with functionalities related to a single feature or domain. Medusa integrates the module into your application without implications or side effects on your setup.
+
+In this step, you'll create a Metal Price Module that uses the GoldAPI.io service to retrieve real-time prices for metals like Gold and Silver. You'll use this module later to retrieve the real-time price of a product variant based on the metals in it, and add it to the cart with that custom price.
+
+<Note>
+
+Learn more about modules in [this documentation](!docs!/learn/fundamentals/modules).
+
+</Note>
+
+### Create Module Directory
+
+A module is created under the `src/modules` directory of your Medusa application. So, create the directory `src/modules/metal-prices`.
+
+![Diagram showcasing the module directory to create](https://res.cloudinary.com/dza7lstvk/image/upload/v1738247192/Medusa%20Resources/custom-item-price-1_q16evr.jpg)
+
+### Create Module's Service
+
+You define a module's functionalities in a service. A service is a TypeScript or JavaScript class that the module exports. In the service's methods, you can connect to the database, which is useful if your module defines tables in the database, or connect to a third-party service.
+
+In this section, you'll create the Metal Prices Module's service that connects to the GoldAPI.io service to retrieve real-time prices for metals.
+
+Start by creating the file `src/modules/metal-prices/service.ts` with the following content:
+
+![Diagram showcasing the service file to create](https://res.cloudinary.com/dza7lstvk/image/upload/v1738247303/Medusa%20Resources/custom-item-price-2_eaefis.jpg)
+
+```ts title="src/modules/metal-prices/service.ts"
+type Options = {
+  accessToken: string
+  sandbox?: boolean
+}
+
+export default class MetalPricesModuleService {
+  protected options_: Options
+
+  constructor({}, options: Options) {
+    this.options_ = options
+  }
+}
+```
+
+A module can accept options that are passed to its service. You define an `Options` type that indicates the options the module accepts. It accepts two options:
+
+- `accessToken`: The access token for the GoldAPI.io service.
+- `sandbox`: A boolean that indicates whether to simulate sending requests to the GoldAPI.io service. This is useful when running in a test environment.
+
+The service's constructor receives the module's options as a second parameter. You store the options in the service's `options_` property.
+
+<Note title="What is the first parameter in the constructor?">
+
+A module has a container of Medusa framework tools and local resources in the module that you can access in the service constructor's first parameter. Learn more in [this documentation](!docs!/learn/fundamentals/modules/container).
+
+</Note>
+
+#### Add Method to Retrieve Metal Prices
+
+Next, you'll add the method to retrieve the metal prices from the third-party service.
+
+First, add the following types at the beginning of `src/modules/metal-prices/service.ts`:
+
+```ts title="src/modules/metal-prices/service.ts"
+export enum MetalSymbols {
+  Gold = "XAU",
+  Silver = "XAG",
+  Platinum = "XPT",
+  Palladium = "XPD"
+}
+
+export type PriceResponse = {
+  metal: MetalSymbols
+  currency: string
+  exchange: string
+  symbol: string
+  price: number
+  [key: string]: unknown
+}
+
+```
+
+The `MetalSymbols` enum defines the symbols for metals like Gold, Silver, Platinum, and Palladium. The `PriceResponse` type defines the structure of the response from the GoldAPI.io's endpoint.
+
+Next, add the method `getMetalPrices` to the `MetalPricesModuleService` class:
+
+```ts title="src/modules/metal-prices/service.ts"
+import { MedusaError } from "@medusajs/framework/utils"
+
+// ...
+
+export default class MetalPricesModuleService {
+  // ...
+  async getMetalPrice(
+    symbol: MetalSymbols, 
+    currency: string
+  ): Promise<PriceResponse> {
+    const upperCaseSymbol = symbol.toUpperCase()
+    const upperCaseCurrency = currency.toUpperCase()
+
+    return fetch(`https://www.goldapi.io/api/${upperCaseSymbol}/${upperCaseCurrency}`, {
+      headers: {
+        "x-access-token": this.options_.accessToken,
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    }).then((response) => response.json())
+    .then((response) => {
+      if (response.error) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          response.error
+        )
+      }
+
+      return response
+    })
+  }
+}
+```
+
+The `getMetalPrice` method accepts the metal symbol and currency as parameters. You send a request to GoldAPI.io's `/api/{symbol}/{currency}` endpoint to retrieve the metal's price, also passing the access token in the request's headers.
+
+If the response contains an error, you throw a `MedusaError` with the error message. Otherwise, you return the response, which is of type `PriceResponse`.
+
+#### Add Helper Methods
+
+You'll also add two helper methods to the `MetalPricesModuleService`. The first one is `getMetalSymbols` that returns the metal symbols as an array of strings:
+
+```ts title="src/modules/metal-prices/service.ts"
+export default class MetalPricesModuleService {
+  // ...
+  async getMetalSymbols(): Promise<string[]> {
+    return Object.values(MetalSymbols)
+  }
+}
+```
+
+The second is `getMetalSymbol` that receives a name like `gold` and returns the corresponding metal symbol:
+
+```ts title="src/modules/metal-prices/service.ts"
+export default class MetalPricesModuleService {
+  // ...
+  async getMetalSymbol(name: string): Promise<MetalSymbols | undefined> {
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+    return MetalSymbols[formattedName as keyof typeof MetalSymbols]
+  }
+}
+```
+
+You'll use these methods in later steps.
+
+### Export Module Definition
+
+The final piece to a module is its definition, which you export in an `index.ts` file at its root directory. This definition tells Medusa the name of the module and its service.
+
+So, create the file `src/modules/metal-prices/index.ts` with the following content:
+
+![The directory structure of the Metal Prices Module after adding the definition file.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738248049/Medusa%20Resources/custom-item-price-3_imtbuw.jpg)
+
+```ts title="src/modules/metal-prices/index.ts"
+import { Module } from "@medusajs/framework/utils"
+import MetalPricesModuleService from "./service"
+
+export const METAL_PRICES_MODULE = "metal-prices"
+
+export default Module(METAL_PRICES_MODULE, {
+  service: MetalPricesModuleService,
+})
+```
+
+You use the `Module` function from the Modules SDK to create the module's definition. It accepts two parameters:
+
+1. The module's name, which is `metal-prices`.
+2. An object with a required property `service` indicating the module's service.
+
+### Add Module to Medusa's Configurations
+
+Once you finish building the module, add it to Medusa's configurations to start using it.
+
+In `medusa-config.ts`, add a `modules` property and pass an array with your custom module:
+
+```ts title="medusa-config.ts"
+module.exports = defineConfig({
+  // ...
+  modules: [
+    {
+      resolve: "./src/modules/metal-prices",
+      options: {
+        accessToken: process.env.GOLD_API_TOKEN,
+        sandbox: process.env.GOLD_API_SANDBOX === "true",
+      },
+    },
+  ],
+})
+```
+
+Each object in the `modules` array has a `resolve` property, whose value is either a path to the module's directory, or an `npm` package’s name.
+
+The object also has an `options` property that accepts the module's options. You set the `accessToken` and `sandbox` options based on environment variables.
+
+You'll find the access token at the top of your GoldAPI.io dashboard.
+
+![The access token is below the "API Token" header of your GoldAPI.io dashboard.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738248335/Medusa%20Resources/Screenshot_2025-01-30_at_4.44.07_PM_xht3j4.png)
+
+Set the access token as an environment variable in `.env`:
+
+```bash
+GOLD_API_TOKEN=
+```
+
+You'll start using the module in the next steps.
+
+---
+
+## Step 3: Add Custom Item to Cart Workflow
+
+In this section, you'll implement the logic to retrieve the real-time price of a variant based on the metals in it, then add the variant to the cart with the custom price. You'll implement this logic in a workflow.
+
+A workflow is a series of queries and actions, called steps, that complete a task. You construct a workflow like you construct a function, but it's a special function that allows you to track its executions' progress, define roll-back logic, and configure other advanced features. Then, you execute the workflow from other customizations, such as in an endpoint.
+
+<Note>
+
+Learn more about workflows in [this documentation](!docs!/learn/fundamentals/workflows)
+
+</Note>
+
+The workflow you'll implement in this section has the following steps:
+
+<WorkflowDiagram
+  workflow={{
+    name: "addCustomToCartWorkflow",
+    steps: [
+      {
+        type: "step",
+        name: "useQueryGraphStep (Retrieve Cart)",
+        description: "Retrieve the cart's ID and currency using Query.",
+        depth: 1,
+        link: "/references/helper-steps/useQueryGraphStep"
+      },
+      {
+        type: "step",
+        name: "useQueryGraphStep (Retrieve Variant)",
+        description: "Retrieve the variant's details using Query",
+        depth: 1,
+        link: "/references/helper-steps/useQueryGraphStep"
+      },
+      {
+        type: "step",
+        name: "getVariantMetalPricesStep",
+        description: "Retrieve the variant's price using the third-party service.",
+        depth: 1,
+        link: "#getvariantmetalpricesstep"
+      },
+      {
+        type: "step",
+        name: "addToCartWorkflow",
+        description: "Add the item with the custom price to the cart.",
+        depth: 1,
+        link: "/references/medusa-workflows/addToCartWorkflow"
+      },
+      {
+        type: "step",
+        name: "useQueryGraphStep (Retrieve Cart)",
+        description: "Retrieve the updated cart's details using Query.",
+        depth: 1,
+        link: "/references/helper-steps/useQueryGraphStep"
+      },
+    ]
+  }}
+  hideLegend
+/>
+
+`useQueryGraphStep` and `addToCartWorkflow` are available through Medusa's core workflows package. You'll only implement the `getVariantMetalPricesStep`.
+
+### getVariantMetalPricesStep
+
+The `getVariantMetalPricesStep` will retrieve the real-time metal price of a variant received as an input.
+
+To create the step, create the file `src/workflows/steps/get-variant-metal-prices.ts` with the following content:
+
+![The directory structure after adding the step file.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738249036/Medusa%20Resources/custom-item-price-4_kumzdc.jpg)
+
+```ts title="src/workflows/steps/get-variant-metal-prices.ts"
+import { createStep } from "@medusajs/framework/workflows-sdk"
+import { ProductVariantDTO } from "@medusajs/framework/types"
+import { METAL_PRICES_MODULE } from "../../modules/metal-prices"
+import MetalPricesModuleService from "../../modules/metal-prices/service"
+
+export type GetVariantMetalPricesStepInput = {
+  variant: ProductVariantDTO & {
+    calculated_price?: {
+      calculated_amount: number
+    }
+  }
+  currencyCode: string
+  quantity?: number
+}
+
+export const getVariantMetalPricesStep = createStep(
+  "get-variant-metal-prices",
+  async ({
+    variant,
+    currencyCode,
+    quantity = 1,
+  }: GetVariantMetalPricesStepInput, { container }) => {
+    const metalPricesModuleService: MetalPricesModuleService = 
+      container.resolve(METAL_PRICES_MODULE)
+
+    // TODO 
+  }
+)
+```
+
+You create a step with `createStep` from the Workflows SDK. It accepts two parameters:
+
+1. The step's unique name, which is `get-variant-metal-prices`.
+2. An async function that receives two parameters:
+    - An input object with the variant, currency code, and quantity. The variant has a `calculated_price` property that holds the variant's fixed price in the Medusa application. This is useful when you want to add a fixed price to the real-time custom price, such as handling fees.
+    - The [Medusa container](!docs!/learn/fundamentals/medusa-container), which is a registry of framework and commerce tools that you can access in the step.
+
+In the step function, so far you only resolve the Metal Prices Module's service from the Medusa container.
+
+Next, you'll validate that the specified variant can have its price calculated. Add the following import at the top of the file:
+
+```ts title="src/workflows/steps/get-variant-metal-prices.ts"
+import { MedusaError } from "@medusajs/framework/utils"
+```
+
+And replace the `TODO` in the step function with the following:
+
+```ts title="src/workflows/steps/get-variant-metal-prices.ts"
+const variantMetal = variant.options.find(
+  (option) => option.option?.title === "Metal"
+)?.value
+const metalSymbol = await metalPricesModuleService
+  .getMetalSymbol(variantMetal || "")
+
+if (!metalSymbol) {
+  throw new MedusaError(
+    MedusaError.Types.INVALID_DATA,
+    "Variant doesn't have metal. Make sure the variant's SKU matches a metal symbol."
+  )
+}
+
+if (!variant.weight) {
+  throw new MedusaError(
+    MedusaError.Types.INVALID_DATA,
+    "Variant doesn't have weight. Make sure the variant has weight to calculate its price."
+  )
+}
+
+// TODO retrieve custom price
+```
+
+In the code above, you first retrieve the metal option's value from the variant's options, assuming that a variant has metals if it has a `Metal` option. Then, you retrieve the metal symbol of the option's value using the `getMetalSymbol` method of the Metal Prices Module's service.
+
+If the variant doesn't have a metal in its options, the option's value is not valid, or the variant doesn't have a weight, you throw an error. The weight is necessary to calculate the price based on the metal's price per weight.
+
+Next, you'll retrieve the real-time price of the metal using the third-party service. Replace the `TODO` with the following:
+
+```ts title="src/workflows/steps/get-variant-metal-prices.ts"
+let price = variant.calculated_price?.calculated_amount || 0
+const weight = variant.weight
+const { price: metalPrice } = await metalPricesModuleService.getMetalPrice(
+  metalSymbol as MetalSymbols, currencyCode
+)
+price += (metalPrice * weight * quantity)
+
+return new StepResponse(price)
+```
+
+In the code above, you first set the price to the variant's fixed price, if it has one. Then, you retrieve the metal's price using the `getMetalPrice` method of the Metal Prices Module's service. 
+
+Finally, you calculate the price by multiplying the metal's price by the variant's weight and the quantity to add to the cart, then add the fixed price to it.
+
+Every step must return a `StepResponse` instance. The `StepResponse` constructor accepts the step's output as a parameter, which in this case is the variant's price.
+
+### Create addCustomToCartWorkflow
+
+Now that you have the `getVariantMetalPricesStep`, you can create the workflow that adds the item with custom pricing to the cart.
+
+Create the file `src/workflows/add-custom-to-cart.ts` with the following content:
+
+![The directory structure after adding the workflow file.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738251380/Medusa%20Resources/custom-item-price-5_zorahv.jpg)
+
+export const workflowHighlights = [
+  ["18", "useQueryGraphStep", "Retrieve the cart's details."],
+  ["24", "useQueryGraphStep", "Retrieve the variant's details."],
+]
+
+```ts title="src/workflows/add-custom-to-cart.ts" highlights={workflowHighlights}
+import { createWorkflow } from "@medusajs/framework/workflows-sdk"
+import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
+import { QueryContext } from "@medusajs/framework/utils"
+
+type AddCustomToCartWorkflowInput = {
+  cart_id: string
+  item: {
+    variant_id: string
+    quantity: number
+    metadata?: Record<string, unknown>
+  }
+}
+
+export const addCustomToCartWorkflow = createWorkflow(
+  "add-custom-to-cart",
+  ({ cart_id, item }: AddCustomToCartWorkflowInput) => {
+    // @ts-ignore
+    const { data: carts } = useQueryGraphStep({
+      entity: "cart",
+      filters: { id: cart_id },
+      fields: ["id", "currency_code"],
+    })
+
+    const { data: variants } = useQueryGraphStep({
+      entity: "variant",
+      fields: [
+        "*",
+        "options.*",
+        "options.option.*",
+        "calculated_price.*",
+      ],
+      filters: {
+        id: item.variant_id,
+      },
+      options: {
+        throwIfKeyNotFound: true,
+      },
+      context: {
+        calculated_price: QueryContext({
+          currency_code: carts[0].currency_code,
+        }),
+      },
+    }).config({ name: "retrieve-variant" })
+
+    // TODO add more steps
+  }
+)
+```
+
+You create a workflow with `createWorkflow` from the Workflows SDK. It accepts two parameters:
+
+1. The workflow's unique name, which is `add-custom-to-cart`.
+2. A function that receives an input object with the cart's ID and the item to add to the cart. The item has the variant's ID, quantity, and optional metadata.
+
+In the function, you first retrieve the cart's details using the `useQueryGraphStep` helper step. This step uses [Query](!docs!/learn/fundamentals/module-links/query) which is a Modules SDK tool that retrieves data across modules. You use it to retrieve the cart's ID and currency code.
+
+You also retrieve the variant's details using the `useQueryGraphStep` helper step. You pass the variant's ID to the step's filters and specify the fields to retrieve. To retrieve the variant's price based on the cart's context, you pass the cart's currency code to the `calculated_price` context.
+
+Next, you'll retrieve the variant's real-time price using the `getVariantMetalPricesStep` you created earlier. First, add the following import:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+import { 
+  getVariantMetalPricesStep, 
+  GetVariantMetalPricesStepInput,
+} from "./steps/get-variant-metal-prices"
+```
+
+Then, replace the `TODO` in the workflow with the following:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+const price = getVariantMetalPricesStep({
+  variant: variants[0],
+  currencyCode: carts[0].currency_code,
+  quantity: item.quantity,
+} as unknown as GetVariantMetalPricesStepInput)
+
+// TODO add item with custom price to cart
+```
+
+You execute the `getVariantMetalPricesStep` passing it the variant's details, the cart's currency code, and the quantity of the item to add to the cart. The step returns the variant's custom price.
+
+Next, you'll add the item with the custom price to the cart. First, add the following imports at the top of the file:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+import { transform } from "@medusajs/framework/workflows-sdk"
+import { addToCartWorkflow } from "@medusajs/medusa/core-flows"
+```
+
+Then, replace the `TODO` in the workflow with the following:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+const itemToAdd = transform({
+  item,
+  price,
+}, (data) => {
+  return [{
+    ...data.item,
+    unit_price: data.price,
+  }]
+})
+
+addToCartWorkflow.runAsStep({
+  input: {
+    items: itemToAdd,
+    cart_id,
+  },
+})
+
+// TODO retrieve and return cart
+```
+
+You prepare the item to add to the cart using `transform` from the Workflows SDK. It allows you to manipulate and create variables in a workflow. After that, you use Medusa's `addToCartWorkflow` to add the item with the custom price to the cart.
+
+<Note title="Tip">
+
+A workflow's constructor function has some constraints in implementation, which is why you need to use `transform` for variable manipulation. Learn more about these constraints in [this documentation](!docs!/learn/fundamentals/workflows/constructor-constraints).
+
+</Note>
+
+Lastly, you'll retrieve the cart's details again and return them. Add the following import at the beginning of the file:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+import { WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+```
+
+And replace the last `TODO` in the workflow with the following:
+
+```ts title="src/workflows/add-custom-to-cart.ts"
+// @ts-ignore
+const { data: updatedCarts } = useQueryGraphStep({
+  entity: "cart",
+  filters: { id: cart_id },
+  fields: ["id", "items.*"],
+}).config({ name: "refetch-cart" })
+
+return new WorkflowResponse({
+  cart: updatedCarts[0],
+})
+```
+
+In the code above, you retrieve the updated cart's details using the `useQueryGraphStep` helper step. To return data from the workflow, you create and return a `WorkflowResponse` instance. It accepts as a parameter the data to return, which is the updated cart.
+
+In the next step, you'll use the workflow in a custom route to add an item with a custom price to the cart.
+
+---
+
+## Step 4: Create Add Custom Item to Cart API Route
+
+Now that you've implemented the logic to add an item with a custom price to the cart, you'll expose this functionality in an API route.
+
+An API Route is an endpoint that exposes commerce features to external applications and clients, such as storefronts. You'll create an API route at the path `/store/carts/:id/line-items-metals` that executes the workflow from the previous step to add a product variant with custom price to the cart.
+
+<Note>
+
+Learn more about API routes in [this documentation](!docs!/learn/fundamentals/api-routes).
+
+</Note>
+
+### Create API Route
+
+An API route is created in a `route.ts` file under a sub-directory of the `src/api` directory.
+
+The path of the API route is the file's path relative to `src/api`. So, to create the `/store/carts/:id/line-items-metals` API route, create the file `src/api/store/carts/[id]/line-items-metals/route.ts` with the following content:
+
+![The directory structure after adding the API route file.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738252712/Medusa%20Resources/custom-item-price-6_deecbu.jpg)
+
+```ts title="src/api/store/carts/[id]/line-items-metals/route.ts"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework"
+import { HttpTypes } from "@medusajs/framework/types"
+import { addCustomToCartWorkflow } from "../../../../../workflows/add-custom-to-cart"
+
+export const POST = async (
+  req: MedusaRequest<HttpTypes.StoreAddCartLineItem>, 
+  res: MedusaResponse
+) => {
+  const { id } = req.params
+  const item = req.validatedBody
+
+  const { result } = await addCustomToCartWorkflow(req.scope)
+    .run({
+      input: {
+        cart_id: id,
+        item,
+      },
+    })
+
+  res.status(200).json({ cart: result.cart })
+}
+```
+
+Since you export a `POST` function in this file, you're exposing a `POST` API route at `/store/carts/:id/line-items-metals`. The route handler function accepts two parameters:
+
+1. A request object with details and context on the request, such as path and body parameters.
+2. A response object to manipulate and send the response.
+
+In the function, you retrieve the cart's ID from the path parameter, and the item's details from the request body. This API route will accept the same request body parameters as Medusa's [Add Item to Cart API Route](!api!/store#carts_postcartsidlineitems).
+
+Then, you execute the `addCustomToCartWorkflow` by invoking it, passing it the Medusa container, which is available in the request's `scope` property, then executing its `run` method. You pass the workflow's input object with the cart's ID and the item to add to the cart.
+
+Finally, you return a response with the updated cart's details.
+
+### Add Request Body Validation Middleware
+
+To ensure that the request body contains the required parameters, you'll add a middleware that validates the incoming request's body based on a defined schema.
+
+A middleware is a function executed before the API route when a request is sent to it. You define middlewares in Medusa in the `src/api/middlewares.ts` directory.
+
+<Note>
+
+Learn more about middlewares in [this documentation](!docs!/learn/fundamentals/api-routes/middlewares).
+
+</Note>
+
+To add a validation middleware to the custom API route, create the file `src/api/middlewares.ts` with the following content:
+
+![The directory structure after adding the middleware file.](https://res.cloudinary.com/dza7lstvk/image/upload/v1738253099/Medusa%20Resources/custom-item-price-7_l7iw2a.jpg)
+
+```ts title="src/api/middlewares.ts"
+import { 
+  defineMiddlewares,
+  validateAndTransformBody,
+} from "@medusajs/framework/http"
+import { 
+  StoreAddCartLineItem,
+} from "@medusajs/medusa/api/store/carts/validators"
+
+export default defineMiddlewares({
+  routes: [
+    {
+      matcher: "/store/carts/:id/line-items-metals",
+      method: "POST",
+      middlewares: [
+        validateAndTransformBody(
+          StoreAddCartLineItem
+        ),
+      ],
+    },
+  ],
+})
+```
+
+In this file, you export the middlewares definition using `defineMiddlewares` from the Medusa Framework. This function accepts an object having a `routes` property, which is an array of middleware configurations to apply on routes.
+
+You pass in the `routes` array an object having the following properties:
+
+- `matcher`: The route to apply the middleware on.
+- `method`: The HTTP method to apply the middleware on for the specified API route.
+- `middlewares`: An array of the middlewares to apply. You apply the `validateAndTransformBody` middleware, which validates the request body based on the `StoreAddCartLineItem` schema. This validation schema is the same schema used for Medusa's [Add Item to Cart API Route](!api!/store#carts_postcartsidlineitems).
+
+Any request sent to the `/store/carts/:id/line-items-metals` API route will now fail if it doesn't have the required parameters.
+
+<Note>
+
+Learn more about API route validation in [this documentation](!docs!/learn/fundamentals/api-routes/validation).
+
+</Note>
+
+### Prepare to Test API Route
+
+Before you test the API route, you'll prepare and retrieve the necessary data to add a product variant with a custom price to the cart.
+
+#### Create Product with Metal Variant
+
+You'll first create a product that has a `Metal` option, and variant(s) with values for this option.
+
+Start the Medusa application with the following command:
+
+```bash npm2yarn
+npm run dev
+```
+
+Then, open the Medusa Admin dashboard at `localhost:9000/app` and log in with the email and password you created when you installed the Medusa application in the first step.
+
+Once you log in, click on Products in the sidebar, then click the Create button at the top right.
+
+![Click on Products in the sidebar at the left, then click on the Create button at the top right of the content](https://res.cloudinary.com/dza7lstvk/image/upload/v1738253415/Medusa%20Resources/Screenshot_2025-01-30_at_6.09.36_PM_ee0jr2.png)
+
+Then, in the Create Product form:
+
+1. Enter a name for the product, and optionally enter other details like description.
+2. Enable the "Yes, this is a product with variants" toggle.
+3. Under Product Options, enter "Metal" for the title, and enter "Gold" for the values.
+
+Once you're done, click the Continue button.
+
+![Fill in the product details, enable the "Yes, this is a product with variants" toggle, and add the "Metal" option with "Gold" value](https://res.cloudinary.com/dza7lstvk/image/upload/v1738253520/Medusa%20Resources/Screenshot_2025-01-30_at_6.11.29_PM_lqxth9.png)
+
+You can skip the next two steps by clicking the Continue button again, then the Publish button.
+
+Once you're done, the product's page will open. You'll now add weight to the product's Gold variant. To do that:
+
+- Scroll to the Variants section and find the Gold variant.
+- Click on the three-dots icon at its right.
+- Choose "Edit" from the dropdown.
+
+![Find the Gold variant in the Variants section, click on the three-dots icon, and choose "Edit"](https://res.cloudinary.com/dza7lstvk/image/upload/v1738254038/Medusa%20Resources/Screenshot_2025-01-30_at_6.19.52_PM_j3hjcx.png)
+
+In the side window that opens, find the Weight field, enter the weight, and click the Save button.
+
+![Enter the weight in the Weight field, then click the Save button](https://res.cloudinary.com/dza7lstvk/image/upload/v1738254165/Medusa%20Resources/Screenshot_2025-01-30_at_6.22.15_PM_yplzdp.png)
+
+Finally, you need to set fixed prices for the variant, even if they're just `0`. To do that:
+
+1. Click on the three-dots icon at the top right of the Variants section.
+2. Choose "Edit Prices" from the dropdown.
+
+![Click on the three-dots icon at the top right of the Variants section, then choose "Edit Prices"](https://res.cloudinary.com/dza7lstvk/image/upload/v1738255203/Medusa%20Resources/Screenshot_2025-01-30_at_6.39.35_PM_s3jpxh.png)
+
+For each cell in the table, either enter a fixed price for the specified currency or leave it as `0`. Once you're done, click the Save button.
+
+![Enter fixed prices for the variant in the table, then click the Save button](https://res.cloudinary.com/dza7lstvk/image/upload/v1738255272/Medusa%20Resources/Screenshot_2025-01-30_at_6.40.45_PM_zw1l59.png)
+
+You'll use this variant to add it to the cart later. You can find its ID by clicking on the variant, opening its details page. Then, on the details page, click on the icon at the right of the JSON section, and copy the ID from the JSON data.
+
+![Click on the icon at the right of the JSON section to copy the variant's ID](https://res.cloudinary.com/dza7lstvk/image/upload/v1738254314/Medusa%20Resources/Screenshot_2025-01-30_at_6.24.49_PM_ka7xew.png)
+
+#### Retrieve Publishable API Key
+
+All requests sent to API routes starting with `/store` must have a publishable API key in the header. This ensures the request's operations are scoped to the publishable API key's associated sales channels. For example, products that aren't available in a cart's sales channel can't be added to it.
+
+To retrieve the publishable API key, on the Medusa Admin:
+
+1. Click on Settings in the sidebar at the bottom left.
+2. Click on Publishable API Keys from the sidebar, then click on a publishable API key in the list.
+
+![Click on publishable API keys in the Settings sidebar, then click on a publishable API key in the list](https://res.cloudinary.com/dza7lstvk/image/upload/v1738254523/Medusa%20Resources/Screenshot_2025-01-30_at_6.28.17_PM_mldscc.png)
+
+3. Click on the publishable API key to copy it.
+
+![Click on the publishable API key to copy it](https://res.cloudinary.com/dza7lstvk/image/upload/v1738254601/Medusa%20Resources/Screenshot_2025-01-30_at_6.29.26_PM_vvatki.png)
+
+You'll use this key when you test the API route.
+
+### Test API Route
+
+To test out the API route, you need to create a cart. A cart must be associated with a region. So, to retrieve the ID of a region in your store, send a `GET` request to the `/store/regions` API route:
+
+```bash
+curl 'localhost:9000/store/regions' \
+-H 'x-publishable-api-key: {api_key}'
+```
+
+Make sure to replace `{api_key}` with the publishable API key you copied earlier.
+
+This will return a list of regions. Copy the ID of one of the regions.
+
+Then, send a `POST` request to the `/store/carts` API route to create a cart:
+
+```bash
+curl -X POST 'localhost:9000/store/carts' \
+-H 'x-publishable-api-key: {api_key}' \
+-H 'Content-Type: application/json' \
+--data '{
+    "region_id": "{region_id}"
+}'
+```
+
+Make sure to replace `{api_key}` with the publishable API key you copied earlier, and `{region_id}` with the ID of a region from the previous request.
+
+This will return the created cart. Copy the ID of the cart to use it next.
+
+Finally, to add the Gold variant to the cart with a custom price, send a `POST` request to the `/store/carts/:id/line-items-metals` API route:
+
+```bash
+curl -X POST 'localhost:9000/store/carts/{cart_id}/line-items-metals' \
+-H 'x-publishable-api-key: {api_key}' \
+-H 'Content-Type: application/json' \
+--data '{
+    "variant_id": "{variant_id}",
+    "quantity": 1
+}'
+```
+
+Make sure to replace:
+
+- `{api_key}` with the publishable API key you copied earlier.
+- `{cart_id}` with the ID of the cart you created.
+- `{variant_id}` with the ID of the Gold variant you created.
+
+This will return the cart's details, where you can see in its `items` array the item with the custom price:
+
+```json title="Example Response"
+{
+  "cart": {
+    "items": [
+      {
+        "variant_id": "{variant_id}",
+        "quantity": 1,
+        "is_custom_price": true,
+        // example custom price
+        "unit_price": 2000
+      }
+    ]
+  }
+}
+```
+
+The price will be the result of the calculation you've implemented earlier, which is the fixed price of the variant plus the real-time price of the metal, multiplied by the weight of the variant and the quantity added to the cart.
+
+This price will be reflected in the cart's total price, and you can proceed to checkout with the custom-priced item.
+
+---
+
+## Next Steps
+
+You've now implemented custom item pricing in Medusa. You can also customize the [storefront](../../../nextjs-starter/page.mdx) to use the new API route to add custom-priced items to the cart.
+
+If you're new to Medusa, check out the [main documentation](!docs!/learn), where you'll get a more in-depth learning of all the concepts you've used in this guide and more.
+
+To learn more about the commerce features that Medusa provides, check out Medusa's [Commerce Modules](../../../commerce-modules/page.mdx).
+
+For other general guides related to [deployment](../../../deployment/page.mdx), [storefront development](../../../storefront-development/page.mdx), [integrations](../../../integrations/page.mdx), and more, check out the [Development Resources](../../../page.mdx).

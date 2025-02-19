@@ -1,8 +1,9 @@
-import { generateSidebar } from "build-scripts"
+import { generateEditedDates, generateSidebar } from "build-scripts"
 import { sidebar } from "../sidebar.mjs"
 
 async function main() {
-  generateSidebar(sidebar)
+  await generateSidebar(sidebar)
+  await generateEditedDates()
 }
 
 void main()

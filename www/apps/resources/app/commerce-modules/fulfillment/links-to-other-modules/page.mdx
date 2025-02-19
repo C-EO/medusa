@@ -15,6 +15,7 @@ The Fulfillment Module has the following links to other modules:
 - [`Order` data model of the Order Module \<\> `Fulfillment` data model](#order-module).
 - [`Return` data model of the Order Module \<\> `Fulfillment` data model](#order-module).
 - [`PriceSet` data model of the Pricing Module \<\> `ShippingOption` data model](#pricing-module).
+- [`Product` data model of the Product Module \<\> `ShippingProfile` data model](#product-module).
 - [`StockLocation` data model of the Stock Location Module \<\> `FulfillmentProvider` data model](#stock-location-module).
 - [`StockLocation` data model of the Stock Location Module \<\> `FulfillmentSet` data model](#stock-location-module).
 
@@ -207,6 +208,101 @@ createRemoteLinkStep({
   },
   [Modules.PRICING]: {
     price_set_id: "pset_123",
+  },
+})
+```
+
+  </CodeTab>
+</CodeTabs>
+
+---
+
+## Product Module
+
+Medusa defines a link between the `ShippingProfile` data model and the `Product` data model of the Product Module. Each product must belong to a shipping profile.
+
+<Note>
+
+This link is introduced in [Medusa v2.5.0](https://github.com/medusajs/medusa/releases/tag/v2.5.0).
+
+</Note>
+
+### Retrieve with Query
+
+To retrieve the products of a shipping profile with [Query](!docs!/learn/fundamentals/module-links/query), pass `products.*` in `fields`:
+
+<CodeTabs group="relation-query">
+  <CodeTab label="query.graph" value="method">
+
+```ts
+const { data: shippingProfiles } = await query.graph({
+  entity: "shipping_profile",
+  fields: [
+    "products.*",
+  ],
+})
+
+// shippingProfiles.products
+```
+
+  </CodeTab>
+  <CodeTab label="useQueryGraphStep" value="step">
+
+```ts
+import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+const { data: shippingProfiles } = useQueryGraphStep({
+  entity: "shipping_profile",
+  fields: [
+    "products.*",
+  ],
+})
+
+// shippingProfiles.products
+```
+
+  </CodeTab>
+</CodeTabs>
+
+### Manage with Link
+
+To manage the shipping profile of a product, use [Link](!docs!/learn/fundamentals/module-links/link):
+
+<CodeTabs group="relation-link">
+  <CodeTab label="link.create" value="method">
+
+```ts
+import { Modules } from "@medusajs/framework/utils"
+
+// ...
+
+await link.create({
+  [Modules.PRODUCT]: {
+    product_id: "prod_123",
+  },
+  [Modules.FULFILLMENT]: {
+    shipping_profile_id: "sp_123",
+  },
+})
+```
+
+  </CodeTab>
+  <CodeTab label="createRemoteLinkStep" value="step">
+
+```ts
+import { Modules } from "@medusajs/framework/utils"
+import { createRemoteLinkStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+createRemoteLinkStep({
+  [Modules.PRODUCT]: {
+    product_id: "prod_123",
+  },
+  [Modules.FULFILLMENT]: {
+    shipping_profile_id: "sp_123",
   },
 })
 ```

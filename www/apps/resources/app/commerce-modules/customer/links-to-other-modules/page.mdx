@@ -18,8 +18,103 @@ Read-only links are used to query data across modules, but the relations aren't 
 
 </Note>
 
+- [`Customer` data model \<\> `AccountHolder` data model of Payment Module](#payment-module).
 - [`Cart` data model of Cart Module \<\> `Customer` data model](#cart-module). (Read-only).
 - [`Order` data model of Order Module \<\> `Customer` data model](#order-module). (Read-only).
+
+---
+
+## Payment Module
+
+Medusa defines a link between the `Customer` and `AccountHolder` data models, allowing payment providers to save payment methods for a customer, if the payment provider supports it.
+
+<Note>
+
+This link is available starting from Medusa `v2.5.0`.
+
+</Note>
+
+### Retrieve with Query
+
+To retrieve the account holder associated with a customer with [Query](!docs!/learn/fundamentals/module-links/query), pass `customer.*` in `fields`:
+
+<CodeTabs group="relation-query">
+  <CodeTab label="query.graph" value="method">
+
+```ts
+const { data: customers } = await query.graph({
+  entity: "customer",
+  fields: [
+    "account_holder.*",
+  ],
+})
+
+// customers.account_holder
+```
+
+  </CodeTab>
+  <CodeTab label="useQueryGraphStep" value="step">
+
+```ts
+import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+const { data: customers } = useQueryGraphStep({
+  entity: "customer",
+  fields: [
+    "account_holder.*",
+  ],
+})
+
+// customers.account_holder
+```
+
+  </CodeTab>
+</CodeTabs>
+
+### Manage with Link
+
+To manage the account holders of a customer, use [Link](!docs!/learn/fundamentals/module-links/link):
+
+<CodeTabs group="relation-link">
+  <CodeTab label="link.create" value="method">
+
+```ts
+import { Modules } from "@medusajs/framework/utils"
+
+// ...
+
+await link.create({
+  [Modules.CUSTOMER]: {
+    customer_id: "cus_123",
+  },
+  [Modules.PAYMENT]: {
+    account_holder_id: "acchld_123",
+  },
+})
+```
+
+  </CodeTab>
+  <CodeTab label="createRemoteLinkStep" value="step">
+
+```ts
+import { createRemoteLinkStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+createRemoteLinkStep({
+  [Modules.CUSTOMER]: {
+    customer_id: "cus_123",
+  },
+  [Modules.PAYMENT]: {
+    account_holder_id: "acchld_123",
+  },
+})
+```
+
+  </CodeTab>
+</CodeTabs>
 
 ---
 

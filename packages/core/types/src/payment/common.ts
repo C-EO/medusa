@@ -10,6 +10,8 @@ export type PaymentCollectionStatus =
   | "authorized"
   | "partially_authorized"
   | "canceled"
+  | "failed"
+  | "completed"
 
 export type PaymentSessionStatus =
   | "authorized"

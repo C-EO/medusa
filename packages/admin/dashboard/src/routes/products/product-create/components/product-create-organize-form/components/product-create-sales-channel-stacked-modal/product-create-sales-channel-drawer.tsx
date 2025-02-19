@@ -1,24 +1,21 @@
-import { AdminSalesChannelResponse } from "@medusajs/types"
-import { Button, Checkbox } from "@medusajs/ui"
+import { HttpTypes } from "@medusajs/types"
 import {
-  OnChangeFn,
-  RowSelectionState,
-  createColumnHelper,
-} from "@tanstack/react-table"
+  Button,
+  createDataTableColumnHelper,
+  DataTableRowSelectionState,
+} from "@medusajs/ui"
 import { useEffect, useMemo, useState } from "react"
 import { UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
+import { keepPreviousData } from "@tanstack/react-query"
+import { DataTable } from "../../../../../../../components/data-table"
+import * as hooks from "../../../../../../../components/data-table/helpers/sales-channels"
 import {
   StackedFocusModal,
   useStackedModal,
 } from "../../../../../../../components/modals"
-import { _DataTable } from "../../../../../../../components/table/data-table"
 import { useSalesChannels } from "../../../../../../../hooks/api/sales-channels"
-import { useSalesChannelTableColumns } from "../../../../../../../hooks/table/columns/use-sales-channel-table-columns"
-import { useSalesChannelTableFilters } from "../../../../../../../hooks/table/filters/use-sales-channel-table-filters"
-import { useSalesChannelTableQuery } from "../../../../../../../hooks/table/query/use-sales-channel-table-query"
-import { useDataTable } from "../../../../../../../hooks/use-data-table"
 import { ProductCreateSchemaType } from "../../../../types"
 import { SC_STACKED_MODAL_ID } from "../../constants"
 
@@ -35,16 +32,19 @@ export const ProductCreateSalesChannelStackedModal = ({
   const { getValues, setValue } = form
   const { setIsOpen, getIsOpen } = useStackedModal()
 
-  const [selection, setSelection] = useState<RowSelectionState>({})
+  const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>(
+    {}
+  )
   const [state, setState] = useState<{ id: string; name: string }[]>([])
 
-  const { searchParams, raw } = useSalesChannelTableQuery({
+  const searchParams = hooks.useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
     prefix: SC_STACKED_MODAL_ID,
   })
   const { sales_channels, count, isLoading, isError, error } = useSalesChannels(
+    searchParams,
     {
-      ...searchParams,
+      placeholderData: keepPreviousData,
     }
   )
 
@@ -65,7 +65,7 @@ export const ProductCreateSalesChannelStackedModal = ({
         }))
       )
 
-      setSelection(
+      setRowSelection(
         salesChannels.reduce(
           (acc, channel) => ({
             ...acc,
@@ -77,11 +77,12 @@ export const ProductCreateSalesChannelStackedModal = ({
     }
   }, [open, getValues])
 
-  const updater: OnChangeFn<RowSelectionState> = (fn) => {
-    const value = typeof fn === "function" ? fn(selection) : fn
-    const ids = Object.keys(value)
+  const onRowSelectionChange = (state: DataTableRowSelectionState) => {
+    const ids = Object.keys(state)
 
-    const addedIdsSet = new Set(ids.filter((id) => value[id] && !selection[id]))
+    const addedIdsSet = new Set(
+      ids.filter((id) => state[id] && !rowSelection[id])
+    )
 
     let addedSalesChannels: { id: string; name: string }[] = []
 
@@ -91,10 +92,10 @@ export const ProductCreateSalesChannelStackedModal = ({
     }
 
     setState((prev) => {
-      const filteredPrev = prev.filter((channel) => value[channel.id])
+      const filteredPrev = prev.filter((channel) => state[channel.id])
       return Array.from(new Set([...filteredPrev, ...addedSalesChannels]))
     })
-    setSelection(value)
+    setRowSelection(state)
   }
 
   const handleAdd = () => {
@@ -105,23 +106,9 @@ export const ProductCreateSalesChannelStackedModal = ({
     setIsOpen(SC_STACKED_MODAL_ID, false)
   }
 
-  const filters = useSalesChannelTableFilters()
+  const filters = hooks.useSalesChannelTableFilters()
   const columns = useColumns()
-
-  const { table } = useDataTable({
-    data: sales_channels ?? [],
-    columns,
-    count: sales_channels?.length ?? 0,
-    enablePagination: true,
-    enableRowSelection: true,
-    getRowId: (row) => row.id,
-    pageSize: PAGE_SIZE,
-    rowSelection: {
-      state: selection,
-      updater,
-    },
-    prefix: SC_STACKED_MODAL_ID,
-  })
+  const emptyState = hooks.useSalesChannelTableEmptyState()
 
   if (isError) {
     throw error
@@ -131,22 +118,20 @@ export const ProductCreateSalesChannelStackedModal = ({
     <StackedFocusModal.Content className="flex flex-col overflow-hidden">
       <StackedFocusModal.Header />
       <StackedFocusModal.Body className="flex-1 overflow-hidden">
-        <_DataTable
-          table={table}
+        <DataTable
+          data={sales_channels}
           columns={columns}
-          pageSize={PAGE_SIZE}
           filters={filters}
+          emptyState={emptyState}
+          rowCount={count}
+          pageSize={PAGE_SIZE}
+          getRowId={(row) => row.id}
+          rowSelection={{
+            state: rowSelection,
+            onRowSelectionChange,
+          }}
           isLoading={isLoading}
           layout="fill"
-          orderBy={[
-            { key: "name", label: t("fields.name") },
-            { key: "created_at", label: t("fields.createdAt") },
-            { key: "updated_at", label: t("fields.updatedAt") },
-          ]}
-          queryObject={raw}
-          search
-          pagination
-          count={count}
           prefix={SC_STACKED_MODAL_ID}
         />
       </StackedFocusModal.Body>
@@ -166,44 +151,10 @@ export const ProductCreateSalesChannelStackedModal = ({
   )
 }
 
-const columnHelper =
-  createColumnHelper<AdminSalesChannelResponse["sales_channel"]>()
+const columnHelper = createDataTableColumnHelper<HttpTypes.AdminSalesChannel>()
 
 const useColumns = () => {
-  const base = useSalesChannelTableColumns()
+  const base = hooks.useSalesChannelTableColumns()
 
-  return useMemo(
-    () => [
-      columnHelper.display({
-        id: "select",
-        header: ({ table }) => {
-          return (
-            <Checkbox
-              checked={
-                table.getIsSomePageRowsSelected()
-                  ? "indeterminate"
-                  : table.getIsAllPageRowsSelected()
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-            />
-          )
-        },
-        cell: ({ row }) => {
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          )
-        },
-      }),
-      ...base,
-    ],
-    [base]
-  )
+  return useMemo(() => [columnHelper.select(), ...base], [base])
 }

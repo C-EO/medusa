@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { UseFormReturn, useWatch } from "react-hook-form"
 
 import { DataGrid } from "../../../../../components/data-grid"
@@ -12,18 +12,24 @@ import { useRegions } from "../../../../../hooks/api/regions"
 import { useStore } from "../../../../../hooks/api/store"
 import { ConditionalPriceForm } from "../../../common/components/conditional-price-form"
 import { ShippingOptionPriceProvider } from "../../../common/components/shipping-option-price-provider"
-import { CONDITIONAL_PRICES_STACKED_MODAL_ID } from "../../../common/constants"
+import {
+  FulfillmentSetType,
+  CONDITIONAL_PRICES_STACKED_MODAL_ID,
+} from "../../../common/constants"
 import { useShippingOptionPriceColumns } from "../../../common/hooks/use-shipping-option-price-columns"
 import { ConditionalPriceInfo } from "../../../common/types"
 import { CreateShippingOptionSchema } from "./schema"
 
 type PricingPricesFormProps = {
   form: UseFormReturn<CreateShippingOptionSchema>
+  type: FulfillmentSetType
 }
 
 export const CreateShippingOptionsPricesForm = ({
   form,
+  type,
 }: PricingPricesFormProps) => {
+  const isPickup = type === FulfillmentSetType.Pickup
   const { getIsOpen, setIsOpen } = useStackedModal()
   const [selectedPrice, setSelectedPrice] =
     useState<ConditionalPriceInfo | null>(null)
@@ -79,6 +85,25 @@ export const CreateShippingOptionsPricesForm = ({
     () => [[...(currencies || []), ...(regions || [])]],
     [currencies, regions]
   )
+
+  /**
+   * Prefill prices with 0 if createing a pickup (shipping) option
+   */
+  useEffect(() => {
+    if (!isLoading && isPickup) {
+      if (currencies.length > 0) {
+        currencies.forEach((currency) => {
+          form.setValue(`currency_prices.${currency}`, "0")
+        })
+      }
+
+      if (regions.length > 0) {
+        regions.forEach((region) => {
+          form.setValue(`region_prices.${region.id}`, "0")
+        })
+      }
+    }
+  }, [isLoading, isPickup])
 
   if (isStoreError) {
     throw storeError

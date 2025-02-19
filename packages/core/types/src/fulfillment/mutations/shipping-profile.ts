@@ -10,7 +10,7 @@ export interface CreateShippingProfileDTO {
   /**
    * The type of the shipping profile.
    */
-  type?: string
+  type: string
 
   /**
    * Holds custom data in key-value pairs.

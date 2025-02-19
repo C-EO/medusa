@@ -10,6 +10,7 @@ import {
   Modules,
   ProductWorkflowEvents,
   arrayDifference,
+  isDefined,
 } from "@medusajs/framework/utils"
 import {
   WorkflowData,
@@ -50,7 +51,7 @@ export type UpdateProductsWorkflowInputSelector = {
     /**
      * The shipping profile to set.
      */
-    shipping_profile_id?: string
+    shipping_profile_id?: string | null
   }
 } & AdditionalData
 
@@ -73,7 +74,7 @@ export type UpdateProductsWorkflowInputProducts = {
     /**
      * The shipping profile to set.
      */
-    shipping_profile_id?: string
+    shipping_profile_id?: string | null
   })[]
 } & AdditionalData
 
@@ -141,6 +142,25 @@ function findProductsWithSalesChannels({
   return !input.update?.sales_channels ? [] : productIds
 }
 
+function findProductsWithShippingProfiles({
+  updatedProducts,
+  input,
+}: {
+  updatedProducts: ProductTypes.ProductDTO[]
+  input: UpdateProductWorkflowInput
+}) {
+  let productIds = updatedProducts.map((p) => p.id)
+
+  if ("products" in input) {
+    const discardedProductIds: string[] = input.products
+      .filter((p) => !isDefined(p.shipping_profile_id))
+      .map((p) => p.id as string)
+    return arrayDifference(productIds, discardedProductIds)
+  }
+
+  return !isDefined(input.update?.shipping_profile_id) ? [] : productIds
+}
+
 function prepareSalesChannelLinks({
   input,
   updatedProducts,
@@ -196,7 +216,7 @@ function prepareShippingProfileLinks({
     }
 
     return input.products
-      .filter((p) => p.shipping_profile_id)
+      .filter((p) => typeof p.shipping_profile_id === "string")
       .map((p) => ({
         [Modules.PRODUCT]: {
           product_id: p.id,
@@ -207,7 +227,7 @@ function prepareShippingProfileLinks({
       }))
   }
 
-  if (input.selector && input.update?.shipping_profile_id) {
+  if (input.selector && typeof input.update?.shipping_profile_id === "string") {
     return updatedProducts.map((p) => ({
       [Modules.PRODUCT]: {
         product_id: p.id,
@@ -417,10 +437,6 @@ export const updateProductsWorkflow = createWorkflow(
     const toUpdateInput = transform({ input }, prepareUpdateProductInput)
     const updatedProducts = updateProductsStep(toUpdateInput)
 
-    const updatedPorductIds = transform({ updatedProducts }, (data) => {
-      return data.updatedProducts.map((p) => p.id)
-    })
-
     const salesChannelLinks = transform(
       { input, updatedProducts },
       prepareSalesChannelLinks
@@ -441,6 +457,11 @@ export const updateProductsWorkflow = createWorkflow(
       findProductsWithSalesChannels
     )
 
+    const productsWithShippingProfiles = transform(
+      { updatedProducts, input },
+      findProductsWithShippingProfiles
+    )
+
     const currentSalesChannelLinks = useRemoteQueryStep({
       entry_point: "product_sales_channel",
       fields: ["product_id", "sales_channel_id"],
@@ -450,7 +471,7 @@ export const updateProductsWorkflow = createWorkflow(
     const currentShippingProfileLinks = useRemoteQueryStep({
       entry_point: "product_shipping_profile",
       fields: ["product_id", "shipping_profile_id"],
-      variables: { filters: { product_id: updatedPorductIds } },
+      variables: { filters: { product_id: productsWithShippingProfiles } },
     }).config({ name: "get-current-shipping-profile-links-step" })
 
     const toDeleteSalesChannelLinks = transform(

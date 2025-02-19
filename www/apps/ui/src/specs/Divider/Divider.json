@@ -1,0 +1,54 @@
+{
+  "description": "",
+  "methods": [],
+  "displayName": "Divider",
+  "props": {
+    "orientation": {
+      "required": false,
+      "tsType": {
+        "name": "union",
+        "raw": "\"horizontal\" | \"vertical\"",
+        "elements": [
+          {
+            "name": "literal",
+            "value": "\"horizontal\""
+          },
+          {
+            "name": "literal",
+            "value": "\"vertical\""
+          }
+        ]
+      },
+      "description": "",
+      "defaultValue": {
+        "value": "\"horizontal\"",
+        "computed": false
+      }
+    },
+    "variant": {
+      "required": false,
+      "tsType": {
+        "name": "union",
+        "raw": "\"dashed\" | \"solid\"",
+        "elements": [
+          {
+            "name": "literal",
+            "value": "\"dashed\""
+          },
+          {
+            "name": "literal",
+            "value": "\"solid\""
+          }
+        ]
+      },
+      "description": "",
+      "defaultValue": {
+        "value": "\"solid\"",
+        "computed": false
+      }
+    }
+  },
+  "composes": [
+    "Omit"
+  ]
+}

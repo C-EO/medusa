@@ -139,7 +139,7 @@ moduleIntegrationTestRunner<IPaymentModuleService>({
               amount: 200,
               authorized_amount: 200,
               captured_amount: 200,
-              status: "authorized",
+              status: "completed",
               deleted_at: null,
               completed_at: expect.any(Date),
               payment_sessions: [

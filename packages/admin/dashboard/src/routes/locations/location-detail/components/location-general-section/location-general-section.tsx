@@ -11,6 +11,7 @@ import { HttpTypes } from "@medusajs/types"
 import {
   Badge,
   Container,
+  Divider,
   Heading,
   IconButton,
   StatusBadge,
@@ -23,7 +24,6 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
-import { Divider } from "../../../../../components/common/divider"
 import { NoRecords } from "../../../../../components/common/empty-table-content"
 import { IconAvatar } from "../../../../../components/common/icon-avatar"
 import { LinkButton } from "../../../../../components/common/link-button"
@@ -195,12 +195,14 @@ type ServiceZoneOptionsProps = {
   zone: HttpTypes.AdminServiceZone
   locationId: string
   fulfillmentSetId: string
+  type: FulfillmentSetType
 }
 
 function ServiceZoneOptions({
   zone,
   locationId,
   fulfillmentSetId,
+  type,
 }: ServiceZoneOptionsProps) {
   const { t } = useTranslation()
 
@@ -216,7 +218,7 @@ function ServiceZoneOptions({
       <div className="flex flex-col gap-y-4 px-6 py-4">
         <div className="item-center flex justify-between">
           <span className="text-ui-fg-subtle txt-small self-center font-medium">
-            {t("stockLocations.shippingOptions.create.shipping.label")}
+            {t(`stockLocations.shippingOptions.create.${type}.label`)}
           </span>
           <LinkButton
             to={`/settings/locations/${locationId}/fulfillment-set/${fulfillmentSetId}/service-zone/${zone.id}/shipping-option/create`}
@@ -274,9 +276,15 @@ type ServiceZoneProps = {
   zone: HttpTypes.AdminServiceZone
   locationId: string
   fulfillmentSetId: string
+  type: FulfillmentSetType
 }
 
-function ServiceZone({ zone, locationId, fulfillmentSetId }: ServiceZoneProps) {
+function ServiceZone({
+  zone,
+  locationId,
+  fulfillmentSetId,
+  type,
+}: ServiceZoneProps) {
   const { t } = useTranslation()
   const prompt = usePrompt()
   const [open, setOpen] = useState(true)
@@ -368,7 +376,7 @@ function ServiceZone({ zone, locationId, fulfillmentSetId }: ServiceZoneProps) {
             />
             <span>·</span>
             <Text className="text-ui-fg-subtle txt-small">
-              {t("stockLocations.shippingOptions.fields.count.shipping", {
+              {t(`stockLocations.shippingOptions.fields.count.${type}`, {
                 count: shippingOptionsCount,
               })}
             </Text>
@@ -427,6 +435,7 @@ function ServiceZone({ zone, locationId, fulfillmentSetId }: ServiceZoneProps) {
         <ServiceZoneOptions
           fulfillmentSetId={fulfillmentSetId}
           locationId={locationId}
+          type={type}
           zone={zone}
         />
       )}
@@ -570,6 +579,7 @@ function FulfillmentSet(props: FulfillmentSetProps) {
             {fulfillmentSet?.service_zones.map((zone) => (
               <ServiceZone
                 zone={zone}
+                type={type}
                 key={zone.id}
                 locationId={locationId}
                 fulfillmentSetId={fulfillmentSet.id}

@@ -1,5 +1,6 @@
 export * from "./add-url-to-relative-link.js"
 export * from "./broken-link-checker.js"
+export * from "./change-links-md.js"
 export * from "./cloudinary-img.js"
 export * from "./cross-project-links.js"
 export * from "./local-links.js"

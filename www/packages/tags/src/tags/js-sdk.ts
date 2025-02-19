@@ -1,5 +1,9 @@
 export const jsSdk = [
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "apiKey",
     "path": "/references/js-sdk/admin/apiKey"
   },

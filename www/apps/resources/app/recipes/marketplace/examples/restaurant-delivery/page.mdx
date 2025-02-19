@@ -745,20 +745,16 @@ To implement and expose a feature that manipulates data, you create a workflow t
 
 So, you'll start by implementing the functionality to create a user in a workflow. The workflow has two steps:
 
-1. Create the user in the database.
+1. Create the user in the database. This user is either a restaurant admin or a driver. So, you'll create two separate steps for each user type.
 2. Set the actor type of the user’s authentication identity (created by the `/auth/{actor_type}/{provider}/register` API route). For this step, you’ll use `setAuthAppMetadataStep` from Medusa's core workflows.
 
-To implement the first step, create the file `src/workflows/user/steps/create-user.ts` with the following content:
+You'll start by implementing the steps to create a restaurant admin. Create the file `
 
-```ts title="src/workflows/user/steps/create-user.ts" collapsibleLines="1-9" expandButtonLabel="Show Imports"
-import { MedusaError } from "@medusajs/framework/utils"
+To implement the first step, create the file `src/workflows/user/steps/create-restaurant-admin.ts` with the following content:
+
+```ts title="src/workflows/user/steps/create-restaurant-admin.ts"
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
-import {
-  CreateDriverInput,
-  CreateRestaurantAdminInput,
-} from "../workflows/create-user"
 import { RESTAURANT_MODULE } from "../../../modules/restaurant"
-import { DELIVERY_MODULE } from "../../../modules/delivery"
 
 export type CreateRestaurantAdminInput = {
   restaurant_id: string;
@@ -766,6 +762,43 @@ export type CreateRestaurantAdminInput = {
   first_name: string;
   last_name: string;
 };
+
+export const createRestaurantAdminStep = createStep(
+  "create-restaurant-admin-step",
+  async (
+    data: CreateRestaurantAdminInput,
+    { container }
+  ) => {
+    const restaurantModuleService = container.resolve(RESTAURANT_MODULE)
+    const restaurantAdmin = await restaurantModuleService.createRestaurantAdmins(
+      data
+    )
+
+    return new StepResponse(restaurantAdmin, restaurantAdmin.id)
+  },
+  async (id, { container }) => {
+    if (!id) {
+      return
+    }
+
+    const service = container.resolve(RESTAURANT_MODULE)
+
+      await service.deleteRestaurantAdmins(id)
+  }
+)
+
+```
+
+This creates a step that accepts as input the data of the restaurant to create and its type. The step creates a restaurant admin and returns it.
+
+In the compensation function, you delete the created restaurant admin if an error occurs.
+
+Then, to implement the step that creates a driver, create the file `src/workflows/user/steps/create-driver.ts` with the following content:
+
+```ts title="src/workflows/user/steps/create-driver.ts"
+import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
+import { RESTAURANT_MODULE } from "../../../modules/restaurant"
+import { DELIVERY_MODULE } from "../../../modules/delivery"
 
 export type CreateDriverInput = {
   email: string;
@@ -775,101 +808,49 @@ export type CreateDriverInput = {
   avatar_url?: string;
 };
 
-type CreateUserStepInput = (CreateRestaurantAdminInput | CreateDriverInput) & {
-  actor_type: "restaurant" | "driver";
-};
-
-export const createUserStep = createStep(
-  "create-user-step",
+export const createDriverStep = createStep(
+  "create-driver-step",
   async (
-    { actor_type, ...data }: CreateUserStepInput,
+    data: CreateDriverInput,
     { container }
   ) => {
-    if (actor_type === "restaurant") {
-      // TODO create restaurant admin
-    } else if (actor_type === "driver") {
-      // TODO create driver
+    const deliveryModuleService = container.resolve(DELIVERY_MODULE)
+    
+    const driver = await deliveryModuleService.createDrivers(data)
+
+    return new StepResponse(driver, driver.id)
+  },
+  async (id, { container }) => {
+    if (!id) {
+      return
     }
 
-    throw MedusaError.Types.INVALID_DATA
-  },
-  function ({ id, actor_type }, { container }) {
-    // TODO add compensation actions
+    const service = container.resolve(RESTAURANT_MODULE)
+
+    await service.deleteRestaurantAdmins(id)
   }
 )
 ```
 
-This creates a step that accepts as input the data of the user to create and its type. If the type is `restaurant`, then a restaurant admin is created. If the type is a `driver`, then a driver is created. Otherwise, an error is thrown.
+This creates a step that accepts as input the data of the driver to create. The step creates a driver and returns it.
 
-Replace the first `TODO` with the following to create a restaurant admin:
-
-```ts title="src/workflows/user/steps/create-user.ts"
-const service = container.resolve(RESTAURANT_MODULE)
-
-const restaurantAdmin = await service.createRestaurantAdmins(
-  data
-)
-
-return new StepResponse(restaurantAdmin, {
-  id: restaurantAdmin.id,
-  actor_type: actor_type as string,
-})
-```
-
-This resolves the Restaurant Module’s main service, creates the restaurant admin, and returns it.
-
-Then, replace the second `TODO` with the following to create a driver:
-
-```ts title="src/workflows/user/steps/create-user.ts"
-const service = container.resolve(DELIVERY_MODULE)
-
-const driver = await service.createDrivers(data)
-
-return new StepResponse(driver, {
-  id: driver.id,
-  actor_type: actor_type as string,
-})
-```
-
-This resolves the Driver Module’s main service, creates the driver, and returns it.
-
-Finally, replace the remaining `TODO` with the following compensation action:
-
-```ts title="src/workflows/user/steps/create-user.ts"
-if (actor_type === "restaurant") {
-  const service = container.resolve(RESTAURANT_MODULE)
-
-  return service.deleteRestaurantAdmins(id)
-} else {
-  const service = container.resolve(DELIVERY_MODULE)
-
-  return service.deleteDrivers(id)
-}
-```
-
-In the compensation function, if the `actor_type` is a restaurant, you delete the created restaurant admin. Otherwise, you delete the created driver.
+In the compensation function, you delete the created driver if an error occurs.
 
 Next, create the workflow in the file `src/workflows/user/workflows/create-user.ts`:
 
-```ts title="src/workflows/user/workflows/create-user.ts" collapsibleLines="1-12" expandButtonLabel="Show Imports"
+```ts title="src/workflows/user/workflows/create-user.ts" collapsibleLines="1-13" expandButtonLabel="Show Imports"
 import { setAuthAppMetadataStep } from "@medusajs/medusa/core-flows"
 import {
   createWorkflow,
   transform,
+  when,
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk"
+import { CreateDriverInput, createDriverStep } from "../steps/create-driver"
 import { 
-  CreateDriverInput, 
   CreateRestaurantAdminInput, 
-  createUserStep,
-} from "../steps/create-user"
-
-type WorkflowInput = {
-  user: (CreateRestaurantAdminInput | CreateDriverInput) & {
-    actor_type: "restaurant" | "driver";
-  };
-  auth_identity_id: string;
-};
+  createRestaurantAdminStep,
+} from "../steps/create-restaurant-admin"
 
 export type CreateUserWorkflowInput = {
   user: (CreateRestaurantAdminInput | CreateDriverInput) & {
@@ -884,7 +865,6 @@ export const createUserWorkflow = createWorkflow(
     // TODO create user
   }
 )
-
 ```
 
 In this file, you create the necessary types and the workflow with a `TODO`.
@@ -892,20 +872,38 @@ In this file, you create the necessary types and the workflow with a `TODO`.
 Replace the `TODO` with the following:
 
 export const createUserHighlights = [
-  ["1", "createUserStep", "Create the user."],
-  ["3", "transform", "Define the input for the next step."],
-  ["6", "key", "Set the key based on whether the user is a restaurant admin or a driver."],
-  ["13", "setAuthAppMetadataStep", "Update the authentication identity with to associate it with the new user."]
+  ["1", "restaurantUser", "Create a restaurant user if the actor type is `restaurant`."],
+  ["8", "driverUser", "Create a driver if the actor type is `driver`."],
+  ["15", "transform", "Define the input for the next step."],
+  ["27", "setAuthAppMetadataStep", "Update the authentication identity to associate it with the new user."]
 ]
 
 ```ts title="src/workflows/user/workflows/create-user.ts" highlights={createUserHighlights}
-const user = createUserStep(input.user)
+const restaurantUser = when(input, (input) => input.user.actor_type === "restaurant")
+  .then(() => {
+    return createRestaurantAdminStep(
+      input.user as CreateRestaurantAdminInput
+    )
+  })
 
-const authUserInput = transform({ input, user }, (data) => ({
-  authIdentityId: data.input.auth_identity_id,
-  actorType: data.input.user.actor_type,
-  value: data.user.id,
-}))
+  const driverUser = when(input, (input) => input.user.actor_type === "driver")
+  .then(() => {
+    return createDriverStep(
+      input.user as CreateDriverInput
+    )
+  })
+
+const { user, authUserInput } = transform({ input, restaurantUser, driverUser }, (data) => {
+  const user = data.restaurantUser || data.driverUser
+  return {
+    user,
+    authUserInput: {
+      authIdentityId: data.input.auth_identity_id,
+      actorType: data.input.user.actor_type,
+      value: user.id,
+    },
+  }
+})
 
 setAuthAppMetadataStep(authUserInput)
 
@@ -914,10 +912,11 @@ return new WorkflowResponse(user)
 
 In the workflow, you:
 
-1. Use the `createUserStep` to create the user.
-2. Use `transform` to create the input to be passed to the next step.
-3. Use `setAuthAppMetadataStep` from Medusa's core workflows to update the authentication identity and associate it with the new user.
-4. Return the created user.
+1. Create a restaurant admin if the actor type is `restaurant`.
+2. Create a driver if the actor type is `driver`.
+3. Use `transform` to create the input to be passed to the next step and return the created user, which is either a restaurant admin or a driver.
+4. Use `setAuthAppMetadataStep` from Medusa's core workflows to update the authentication identity and associate it with the new user.
+5. Return the created user.
 
 ### Create API Route
 
@@ -1294,7 +1293,7 @@ import {
   createProductsWorkflow,
   createRemoteLinkStep,
 } from "@medusajs/medusa/core-flows"
-import { CreateProductDTO } from "@medusajs/framework/types"
+import { CreateProductWorkflowInputDTO } from "@medusajs/framework/types"
 import { Modules } from "@medusajs/framework/utils"
 import {
   WorkflowResponse,
@@ -1304,7 +1303,7 @@ import {
 import { RESTAURANT_MODULE } from "../../../modules/restaurant"
 
 type WorkflowInput = {
-  products: CreateProductDTO[];
+  products: CreateProductWorkflowInputDTO[];
   restaurant_id: string;
 };
 

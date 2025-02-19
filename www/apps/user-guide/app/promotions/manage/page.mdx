@@ -1,0 +1,230 @@
+---
+sidebar_position: 2
+---
+
+import { EllipsisHorizontal } from "@medusajs/icons"
+import { Table } from "docs-ui"
+
+export const metadata = {
+  title: `Manage Promotions`,
+}
+
+# {metadata.title}
+
+In this guide, you’ll learn how to manage promotions.
+
+## View Promotion's Details
+
+To view a promotion's details:
+
+1. Go to Promotions from the sidebar.
+2. Choose the promotion from the list.
+
+This opens the promotion's details page. The sections in the details page may differ based on the promotion's type.
+
+![Promotion Details](https://res.cloudinary.com/dza7lstvk/image/upload/v1739951000/User%20Guide/Screenshot_2025-02-19_at_9.42.23_AM_fjpgv7.png)
+
+### Promotion Statuses
+
+A promotion's status is shown in the Promotions listing page, and in the promotion's details page at the top right of the first section. The status can be one of the following:
+
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Status</Table.HeaderCell>
+      <Table.HeaderCell>Description</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>Draft</Table.Cell>
+      <Table.Cell>The promotion is not active and can't be used.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Active</Table.Cell>
+      <Table.Cell>The promotion is active and can be used.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Inactive</Table.Cell>
+      <Table.Cell>The promotion was active but has been deactivated manually. It can't be used.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Scheduled</Table.Cell>
+      <Table.Cell>The promotion's campaign has a start date in the future. Once the start date is reached, the promotion becomes active.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>Expired</Table.Cell>
+      <Table.Cell>The promotion's campaign has an end date that has passed. The promotion can't be used.</Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
+
+---
+
+## Edit Promotion's Details
+
+To edit a promotion's general details:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the first section.
+3. Choose Edit from the dropdown.
+4. In the side window that opens:
+    - You can change the promotion's status to either **Draft**, **Active**, or **Inactive**. Inactive is useful if the promotion was originally active but you want to expire it.
+    - You can edit the promotion's method (whether it's applied manually or automatically) and code.
+    - You can change how the amount is discounted, either by a fixed amount or a percentage. You can also change the discounted amount.
+    - You can change how the promotion is applied, either on every applicable item or across all items in the cart.
+        - For example, if your promotion discounts an amount from applicable products in a cart, choosing **Each** applies the discount on each applicable product, whereas **Across** applies the discount across all applicable products.
+5. Once you're done, click the Save button.
+
+![Edit Promotion Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739951499/User%20Guide/Screenshot_2025-02-19_at_9.51.26_AM_zylmig.png)
+
+---
+
+## Edit Who Can Use the Promotion
+
+To edit who can use the promotion:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Who can use this code?" section.
+3. Choose Edit from the dropdown.
+4. In the side window that opens, you can edit existing conditions or add new ones by clicking the "Add condition" button. For each condition:
+    - Select the attribute in the first field. This is the attribute that the condition applies to. It can be:
+        - **Customer Group**: The customer must belong / not belong to the specified customer group(s).
+        - **Region**: The customer's region must belong / not belong to the specified region(s).
+        - **Country**: The customer's country, which is determined through their shipping address, must belong / not belong to the specified countries.
+        - **Sales Channel**: The customer must be / must not be placing the order from the specified sales channels.
+        - **Currency Code**: The currency code that the customer must / must not be placing the order in.
+    - Select the operator of the condition:
+        - **In**: The customer's value for the chosen attribute must belong to the specified values.
+        - **Equals**: The customer's value for the chosen attribute must be the same as the specified value.
+        - **Not In**: The customer's value for the chosen attribute must not belong to the specified values.
+    - Select the value of the attribute.
+    - For example, if you want to allow only customers belonging to the B2B group to use this promotion:
+        - Set the Attribute to Customer Group.
+        - Set the Operator to In or Equals.
+        - Set the Value to the B2B customer group.
+5. Once you're done, click the Save button.
+
+![Edit who can use the promotion form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739951824/User%20Guide/Screenshot_2025-02-19_at_9.56.55_AM_miqo10.png)
+
+---
+
+## Edit the Items the Promotion Applies To
+
+<Note title="Tip">
+
+For "Buy X Get Y" or "buyget" promotion types, this section allows you to edit which items the customer gets for free when they buy the specified items. To edit the items that the customer must buy to get the free items, refer to the [Edit Buy X Promotion Condition](#edit-buy-x-promotion-condition) section.
+
+</Note>
+
+To edit the items the promotion applies to:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "What items will the promotion be applied to?" section.
+3. Choose Edit from the dropdown.
+4. In the side window that opens, you can edit existing conditions or add new ones by clicking the "Add condition" button. For each condition:
+    - Select the attribute in the first field. This is the attribute that the condition applies to. It can be:
+        - **Product**: The promotion applies / doesn't apply to the specified product(s).
+        - **Product Category**: The promotion applies / doesn't apply to the products belonging to the specified categories.
+        - **Product Collection**: The promotion applies / doesn't apply to the products belonging to the specified collection(s).
+        - **Product Type**: The promotion applies / doesn't apply to the products belonging to the specified type(s).
+        - **Product Tag**: The promotion applies / doesn't apply to the products belonging to the specified tag(s).
+    - Select the operator of the condition:
+        - **In**: The value of the item in the cart must belong to the specified values.
+        - **Equals**: The value of the item in the cart must equal the specified values.
+        - **Not In**: The value of the item in the cart must not belong to the specified values.
+    - Select the value of the attribute.
+    - For example, if you want to apply the promotion on products in the "Business desktop PC" category:
+        - Set the Attribute to Product Category.
+        - Set the Operator to In or Equals.
+        - Set the Value to the "Business desktop PC" product category.
+5. Once you're done, click the Save button.
+
+![Edit the items the promotion applies to form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739951994/User%20Guide/Screenshot_2025-02-19_at_9.59.46_AM_n5jbpg.png)
+
+---
+
+## Edit Buy X Promotion Condition
+
+For "Buy X Get Y" or "buyget" promotion types, you can edit the "Buy X" part of the promotion. For example, change "Buy 3 shirts to get 1 for free" to "Buy 2 shirts to get 1 for free".
+
+<Note title="Tip">
+
+To edit the items that the customer gets for free when they buy the specified items, refer to the [Edit the Items the Promotion Applies To](#edit-the-items-the-promotion-applies-to) section.
+
+</Note>
+
+To edit the "Buy X" part of the promotion:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "What needs to be in the cart to unlock the promotion?" section.
+3. Choose Edit from the dropdown.
+4. In the side window, you can edit the minimum required quantity of the product in the "Buy X" condition, and any other existing conditions. You can also add new conditions by clicking the "Add condition" button. For each condition:
+    - Select the attribute in the first field. This is the attribute that the condition applies to. It can be:
+        - **Product**: The promotion applies / doesn't apply to the specified product(s).
+        - **Product Category**: The promotion applies / doesn't apply to the products belonging to the specified categories.
+        - **Product Collection**: The promotion applies / doesn't apply to the products belonging to the specified collection(s).
+        - **Product Type**: The promotion applies / doesn't apply to the products belonging to the specified type(s).
+        - **Product Tag**: The promotion applies / doesn't apply to the products belonging to the specified tag(s).
+    - Select the operator of the condition:
+        - **In**: The value of the item in the cart must belong to the specified values.
+        - **Equals**: The value of the item in the cart must equal the specified values.
+        - **Not In**: The value of the item in the cart must not belong to the specified values.
+    - Select the value of the attribute.
+    - For example, if you want to apply the promotion on products in the "Shirts" category:
+        - Set the Attribute to Product Category.
+        - Set the Operator to In or Equals.
+        - Set the Value to the "Shirts" product category.
+5. Once you're done, click the Save button.
+
+![Edit Buy X Promotion Condition form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739952429/User%20Guide/Screenshot_2025-02-19_at_10.06.59_AM_raqa9m.png)
+
+---
+
+## Add Promotion to Campaign
+
+If you created a promotion without a campaign, you can add it to an existing campaign from its details page.
+
+To add a promotion to a campaign:
+
+1. Go to the promotion's details page.
+2. Click on "Add to Campaign" at the top right of the "Campaign" section.
+3. In the side window that opens:
+    - Select "Existing Campaign".
+    - Choose the campaign from the "Existing Campaign" dropdown. For promotions that are applied as a fixed amount, only campaigns whose budget uses the same currency as the promotion are shown.
+4. Once you're done, click the Save button.
+
+![Add Promotion to Campaign form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739952681/User%20Guide/Screenshot_2025-02-19_at_10.11.12_AM_enjz4o.png)
+
+---
+
+## Change Promotion's Campaign
+
+You can change the campaign that a promotion belongs to, or remove it from a campaign.
+
+To change a promotion's campaign:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the "Campaign" section.
+3. Choose Edit from the dropdown.
+4. In the side window that opens:
+    - To remove the promotion from its current campaign, select "Without Campaign".
+    - To change the promotion's campaign, select "Existing Campaign" and choose the campaign from the "Existing Campaign" dropdown.
+5. Once you're done, click the Save button.
+
+---
+
+## Delete Promotion
+
+<Note type="warning">
+
+Deleting a promotion is irreversible.
+
+</Note>
+
+To delete a promotion:
+
+1. Go to the promotion's details page.
+2. Click the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon at the top right of the first section.
+3. Choose Delete from the dropdown.
+4. Confirm deleting the promotion in the pop-up by entering its code and clicking the "Delete" button.

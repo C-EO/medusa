@@ -28,6 +28,7 @@ export default [
       "**/node_modules",
       "**/public",
       "**/.eslintrc.js",
+      "generated",
     ],
   },
   ...compat.extends(

@@ -20,7 +20,7 @@ export type IndexQueryConfig<TEntry extends string> = {
 export type QueryFunctionReturnPagination = {
   skip?: number
   take?: number
-  count: number
+  count?: number
 }
 
 /**

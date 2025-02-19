@@ -1,270 +1,205 @@
-import { PencilSquare, Plus, Trash } from "@medusajs/icons"
-import { AdminApiKeyResponse, AdminSalesChannelResponse } from "@medusajs/types"
-import { Checkbox, Container, Heading, toast, usePrompt } from "@medusajs/ui"
+import { PencilSquare, Trash } from "@medusajs/icons"
+import { AdminApiKeyResponse, HttpTypes } from "@medusajs/types"
+import {
+  Container,
+  createDataTableColumnHelper,
+  createDataTableCommandHelper,
+  DataTableRowSelectionState,
+  toast,
+  usePrompt,
+} from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
-import { RowSelectionState, createColumnHelper } from "@tanstack/react-table"
-import { useMemo, useState } from "react"
+import { RowSelectionState } from "@tanstack/react-table"
+import { useCallback, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ActionMenu } from "../../../../../components/common/action-menu"
-import { _DataTable } from "../../../../../components/table/data-table"
+import { useNavigate } from "react-router-dom"
+import { DataTable } from "../../../../../components/data-table"
+import * as hooks from "../../../../../components/data-table/helpers/sales-channels"
 import { useBatchRemoveSalesChannelsFromApiKey } from "../../../../../hooks/api/api-keys"
 import { useSalesChannels } from "../../../../../hooks/api/sales-channels"
-import { useSalesChannelTableColumns } from "../../../../../hooks/table/columns/use-sales-channel-table-columns"
-import { useSalesChannelTableFilters } from "../../../../../hooks/table/filters/use-sales-channel-table-filters"
-import { useSalesChannelTableQuery } from "../../../../../hooks/table/query/use-sales-channel-table-query"
-import { useDataTable } from "../../../../../hooks/use-data-table"
 
 type ApiKeySalesChannelSectionProps = {
   apiKey: AdminApiKeyResponse["api_key"]
 }
 
 const PAGE_SIZE = 10
+const PREFIX = "sc"
 
 export const ApiKeySalesChannelSection = ({
   apiKey,
 }: ApiKeySalesChannelSectionProps) => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const { t } = useTranslation()
-  const prompt = usePrompt()
 
-  const { raw, searchParams } = useSalesChannelTableQuery({
+  const searchParams = hooks.useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
 
-  const { sales_channels, count, isLoading } = useSalesChannels(
+  const { sales_channels, count, isPending } = useSalesChannels(
     { ...searchParams, publishable_key_id: apiKey.id },
     {
       placeholderData: keepPreviousData,
     }
   )
 
-  const columns = useColumns()
-  const filters = useSalesChannelTableFilters()
-
-  const { table } = useDataTable({
-    data: sales_channels ?? [],
-    columns,
-    count,
-    enablePagination: true,
-    enableRowSelection: true,
-    getRowId: (row) => row.id,
-    pageSize: PAGE_SIZE,
-    rowSelection: {
-      state: rowSelection,
-      updater: setRowSelection,
-    },
-    meta: {
-      apiKey: apiKey.id,
-    },
-  })
-
-  const { mutateAsync } = useBatchRemoveSalesChannelsFromApiKey(apiKey.id)
-
-  const handleRemove = async () => {
-    const keys = Object.keys(rowSelection)
-
-    const res = await prompt({
-      title: t("general.areYouSure"),
-      description: t("apiKeyManagement.removeSalesChannel.warningBatch", {
-        count: keys.length,
-      }),
-      confirmText: t("actions.continue"),
-      cancelText: t("actions.cancel"),
-    })
-
-    if (!res) {
-      return
-    }
-
-    await mutateAsync(keys, {
-      onSuccess: () => {
-        toast.success(
-          t("apiKeyManagement.removeSalesChannel.successToastBatch", {
-            count: keys.length,
-          })
-        )
-        setRowSelection({})
-      },
-      onError: (err) => {
-        toast.error(err.message)
-      },
-    })
-  }
+  const columns = useColumns(apiKey.id)
+  const filters = hooks.useSalesChannelTableFilters()
+  const commands = useCommands(apiKey.id, setRowSelection)
+  const emptyState = hooks.useSalesChannelTableEmptyState()
 
   return (
     <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("salesChannels.domain")}</Heading>
-        <ActionMenu
-          groups={[
-            {
-              actions: [
-                {
-                  icon: <Plus />,
-                  label: t("actions.add"),
-                  to: "sales-channels",
-                },
-              ],
-            },
-          ]}
-        />
-      </div>
-      <_DataTable
-        table={table}
+      <DataTable
+        data={sales_channels}
         columns={columns}
         filters={filters}
-        count={count}
-        isLoading={isLoading}
-        queryObject={raw}
-        navigateTo={(row) => `/settings/sales-channels/${row.id}`}
-        orderBy={[
-          {
-            key: "name",
-            label: t("fields.name"),
-          },
-          {
-            key: "created_at",
-            label: t("fields.createdAt"),
-          },
-          {
-            key: "updated_at",
-            label: t("fields.updatedAt"),
-          },
-        ]}
-        commands={[
-          {
-            action: handleRemove,
-            label: t("actions.remove"),
-            shortcut: "r",
-          },
-        ]}
-        pageSize={PAGE_SIZE}
-        pagination
-        search
-        noRecords={{
-          message: t("apiKeyManagement.salesChannels.list.noRecordsMessage"),
+        commands={commands}
+        heading={t("salesChannels.domain")}
+        getRowId={(row) => row.id}
+        rowCount={count}
+        isLoading={isPending}
+        emptyState={emptyState}
+        rowSelection={{
+          state: rowSelection,
+          onRowSelectionChange: setRowSelection,
         }}
+        rowHref={(row) => `/settings/sales-channels/${row.id}`}
+        action={{
+          label: t("actions.add"),
+          to: "sales-channels",
+        }}
+        prefix={PREFIX}
+        pageSize={PAGE_SIZE}
       />
     </Container>
   )
 }
 
-const SalesChannelActions = ({
-  salesChannel,
-  apiKey,
-}: {
-  salesChannel: AdminSalesChannelResponse["sales_channel"]
-  apiKey: string
-}) => {
+const columnHelper = createDataTableColumnHelper<HttpTypes.AdminSalesChannel>()
+
+const useColumns = (id: string) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const prompt = usePrompt()
 
-  const { mutateAsync } = useBatchRemoveSalesChannelsFromApiKey(apiKey)
+  const base = hooks.useSalesChannelTableColumns()
 
-  const handleDelete = async () => {
-    const res = await prompt({
-      title: t("general.areYouSure"),
-      description: t("apiKeyManagement.removeSalesChannel.warning", {
-        name: salesChannel.name,
-      }),
-      confirmText: t("actions.delete"),
-      cancelText: t("actions.cancel"),
-    })
+  const { mutateAsync } = useBatchRemoveSalesChannelsFromApiKey(id)
 
-    if (!res) {
-      return
-    }
+  const handleDelete = useCallback(
+    async (salesChannel: HttpTypes.AdminSalesChannel) => {
+      const res = await prompt({
+        title: t("general.areYouSure"),
+        description: t("apiKeyManagement.removeSalesChannel.warning", {
+          name: salesChannel.name,
+        }),
+        confirmText: t("actions.delete"),
+        cancelText: t("actions.cancel"),
+      })
 
-    await mutateAsync([salesChannel.id], {
-      onSuccess: () => {
-        toast.success(
-          t("apiKeyManagement.removeSalesChannel.successToast", {
-            count: 1,
-          })
-        )
-      },
-      onError: (err) => {
-        toast.error(err.message)
-      },
-    })
-  }
+      if (!res) {
+        return
+      }
 
-  return (
-    <ActionMenu
-      groups={[
-        {
-          actions: [
-            {
-              icon: <PencilSquare />,
-              label: t("actions.edit"),
-              to: `/settings/sales-channels/${salesChannel.id}/edit`,
-            },
-          ],
+      await mutateAsync([salesChannel.id], {
+        onSuccess: () => {
+          toast.success(
+            t("apiKeyManagement.removeSalesChannel.successToast", {
+              count: 1,
+            })
+          )
         },
-        {
-          actions: [
-            {
-              icon: <Trash />,
-              label: t("actions.delete"),
-              onClick: handleDelete,
-            },
-          ],
+        onError: (err) => {
+          toast.error(err.message)
         },
-      ]}
-    />
+      })
+    },
+    [mutateAsync, prompt, t]
   )
-}
-
-const columnHelper =
-  createColumnHelper<AdminSalesChannelResponse["sales_channel"]>()
-
-const useColumns = () => {
-  const base = useSalesChannelTableColumns()
 
   return useMemo(
     () => [
-      columnHelper.display({
-        id: "select",
-        header: ({ table }) => {
-          return (
-            <Checkbox
-              checked={
-                table.getIsSomePageRowsSelected()
-                  ? "indeterminate"
-                  : table.getIsAllPageRowsSelected()
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-            />
-          )
-        },
-        cell: ({ row }) => {
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          )
-        },
-      }),
+      columnHelper.select(),
       ...base,
-      columnHelper.display({
-        id: "actions",
-        cell: ({ row, table }) => {
-          const { apiKey } = table.options.meta as {
-            apiKey: string
-          }
-
-          return (
-            <SalesChannelActions salesChannel={row.original} apiKey={apiKey} />
-          )
-        },
+      columnHelper.action({
+        actions: (ctx) => [
+          [
+            {
+              label: t("actions.edit"),
+              icon: <PencilSquare />,
+              onClick: () => {
+                navigate(`/settings/sales-channels/${ctx.row.original.id}/edit`)
+              },
+            },
+          ],
+          [
+            {
+              icon: <Trash />,
+              label: t("actions.delete"),
+              onClick: () => handleDelete(ctx.row.original),
+            },
+          ],
+        ],
       }),
     ],
-    [base]
+    [base, handleDelete, navigate, t]
+  )
+}
+
+const commandHelper = createDataTableCommandHelper()
+
+const useCommands = (
+  id: string,
+  setRowSelection: (state: DataTableRowSelectionState) => void
+) => {
+  const { t } = useTranslation()
+  const prompt = usePrompt()
+
+  const { mutateAsync } = useBatchRemoveSalesChannelsFromApiKey(id)
+
+  const handleRemove = useCallback(
+    async (rowSelection: DataTableRowSelectionState) => {
+      const keys = Object.keys(rowSelection)
+
+      const res = await prompt({
+        title: t("general.areYouSure"),
+        description: t("apiKeyManagement.removeSalesChannel.warningBatch", {
+          count: keys.length,
+        }),
+        confirmText: t("actions.continue"),
+        cancelText: t("actions.cancel"),
+      })
+
+      if (!res) {
+        return
+      }
+
+      await mutateAsync(keys, {
+        onSuccess: () => {
+          toast.success(
+            t("apiKeyManagement.removeSalesChannel.successToastBatch", {
+              count: keys.length,
+            })
+          )
+          setRowSelection({})
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      })
+    },
+    [mutateAsync, prompt, t, setRowSelection]
+  )
+
+  return useMemo(
+    () => [
+      commandHelper.command({
+        action: handleRemove,
+        label: t("actions.remove"),
+        shortcut: "r",
+      }),
+    ],
+    [handleRemove, t]
   )
 }

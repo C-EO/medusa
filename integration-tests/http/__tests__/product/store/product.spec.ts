@@ -862,6 +862,34 @@ medusaIntegrationTestRunner({
         ])
       })
 
+      it("returns a list of products with one of the given handles", async () => {
+        const response = await api.get(
+          `/store/products?handle[]=${product.handle}&handle[]=${product2.handle}`,
+          storeHeaders
+        )
+
+        expect(response.status).toEqual(200)
+        expect(response.data.count).toEqual(2)
+        expect(response.data.products).toEqual([
+          expect.objectContaining({ id: product.id }),
+          expect.objectContaining({ id: product2.id }),
+        ])
+      })
+
+      it("returns a list of products with one of the given titles", async () => {
+        const response = await api.get(
+          `/store/products?title[]=${product.title}&title[]=${product2.title}`,
+          storeHeaders
+        )
+
+        expect(response.status).toEqual(200)
+        expect(response.data.count).toEqual(2)
+        expect(response.data.products).toEqual([
+          expect.objectContaining({ id: product.id }),
+          expect.objectContaining({ id: product2.id }),
+        ])
+      })
+
       // TODO: Not implemented yet
       it.skip("returns gift card product", async () => {
         const response = await api

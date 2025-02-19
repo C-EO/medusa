@@ -276,9 +276,9 @@ You'll next execute the workflow in the hook handler.
 
 You can now consume the `productsCreated` hook, which is executed in the `createProductsWorkflow` after the product is created.
 
-To consume the hook, create the file `src/workflow/hooks/product-created.ts` with the following content:
+To consume the hook, create the file `src/workflows/hooks/product-created.ts` with the following content:
 
-```ts title="src/workflow/hooks/product-created.ts" collapsibleLines="1-6" expandButtonLabel="Show Imports"
+```ts title="src/workflows/hooks/product-created.ts" collapsibleLines="1-6" expandButtonLabel="Show Imports"
 import { createProductsWorkflow } from "@medusajs/medusa/core-flows"
 import { 
   createCustomFromProductWorkflow, 
@@ -319,6 +319,7 @@ curl -X POST 'localhost:9000/admin/products' \
         "values": ["Default option value"]
       }
     ],
+    "shipping_profile_id": "{shipping_profile_id}",
     "additional_data": {
         "custom_name": "test"
     }
@@ -326,6 +327,8 @@ curl -X POST 'localhost:9000/admin/products' \
 ```
 
 Make sure to replace `{token}` with an admin user's JWT token. Learn how to retrieve it in the [API reference](!api!/admin#1-bearer-authorization-with-jwt-tokens).
+
+Also, make sure to replace `{shipping_profile_id}` with an existing shipping profile's ID. You can retrieve one either from the Medusa Admin dashboard or using the [List Shipping Profiles API Route](!api!/admin#shipping-profiles_getshippingprofiles).
 
 The request will return the product's details. You'll learn how to retreive the `custom_name` property with the product's details in the next section.
 

@@ -59,7 +59,7 @@ export const serviceConfigs: JoinerServiceConfig[] = [
     fieldAlias: {
       user_shortcut: "product.user",
     },
-    primaryKeys: ["id"],
+    primaryKeys: ["id,product_id"],
     relationships: [
       {
         foreignKey: "product_id",

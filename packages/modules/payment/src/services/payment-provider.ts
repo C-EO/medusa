@@ -25,6 +25,8 @@ import {
   RefundPaymentOutput,
   SavePaymentMethodInput,
   SavePaymentMethodOutput,
+  UpdateAccountHolderInput,
+  UpdateAccountHolderOutput,
   UpdatePaymentInput,
   UpdatePaymentOutput,
   WebhookActionResult,
@@ -147,6 +149,21 @@ Please make sure that the provider is registered in the container and it is conf
     }
 
     return await provider.createAccountHolder(input)
+  }
+
+  async updateAccountHolder(
+    providerId: string,
+    input: UpdateAccountHolderInput
+  ): Promise<UpdateAccountHolderOutput> {
+    const provider = this.retrieveProvider(providerId)
+    if (!provider.updateAccountHolder) {
+      this.#logger.warn(
+        `Provider ${providerId} does not support updating account holders`
+      )
+      return {} as unknown as UpdateAccountHolderOutput
+    }
+
+    return await provider.updateAccountHolder(input)
   }
 
   async deleteAccountHolder(

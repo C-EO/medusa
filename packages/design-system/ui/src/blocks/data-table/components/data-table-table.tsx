@@ -27,7 +27,7 @@ interface DataTableTableProps {
  * This component renders the table in a data table, supporting advanced features.
  */
 const DataTableTable = (props: DataTableTableProps) => {
-  const [hoveredRowId, setHoveredRowId] = React.useState<string | null>(null)
+  const hoveredRowId = React.useRef<string | null>(null)
   const isKeyDown = React.useRef(false)
 
   const [showStickyBorder, setShowStickyBorder] = React.useState(false)
@@ -57,7 +57,7 @@ const DataTableTable = (props: DataTableTableProps) => {
 
         const row = instance
           .getRowModel()
-          .rows.find((r) => r.id === hoveredRowId)
+          .rows.find((r) => r.id === hoveredRowId.current)
 
         if (row && row.getCanSelect()) {
           row.toggleSelected()
@@ -190,10 +190,10 @@ const DataTableTable = (props: DataTableTableProps) => {
                 return (
                   <Table.Row
                     key={row.id}
-                    onMouseEnter={() => setHoveredRowId(row.id)}
-                    onMouseLeave={() => setHoveredRowId(null)}
+                    onMouseEnter={() => (hoveredRowId.current = row.id)}
+                    onMouseLeave={() => (hoveredRowId.current = null)}
                     onClick={(e) => instance.onRowClick?.(e, row)}
-                    className={clx("group/row last:border-b-0", {
+                    className={clx("group/row last-of-type:border-b-0", {
                       "cursor-pointer": !!instance.onRowClick,
                     })}
                   >
@@ -288,7 +288,7 @@ const DataTableEmptyStateDisplay = ({
     state === DataTableEmptyState.EMPTY ? props?.empty : props?.filtered
 
   return (
-    <div className="flex min-h-[250px] w-full flex-col items-center justify-center border-y px-6 py-4">
+    <div className="flex min-h-[250px] w-full flex-1 flex-col items-center justify-center border-y px-6 py-4">
       {content?.custom ?? (
         <DefaultEmptyStateContent
           heading={content?.heading}
@@ -332,4 +332,3 @@ function getIsEditableElementFocused() {
 
 export { DataTableTable }
 export type { DataTableEmptyStateProps, DataTableTableProps }
-

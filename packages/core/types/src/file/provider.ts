@@ -5,11 +5,17 @@
  */
 export type ProviderFileResultDTO = {
   /**
-   * The file's URL.
+   * The file's URL that users or systems
+   * can use to access the file.
    */
   url: string
   /**
-   * The file's key.
+   * The file's key allowing you to later
+   * identify the file in the third-party
+   * system. For example, the S3 Module Provider
+   * returns the file's key in S3, whereas the
+   * Local File Module Provider returns the file's
+   * path.
    */
   key: string
 }
@@ -21,7 +27,7 @@ export type ProviderFileResultDTO = {
  */
 export type ProviderGetFileDTO = {
   /**
-   * The file's key.
+   * The file's key as returned during upload.
    */
   fileKey: string
   [x: string]: unknown

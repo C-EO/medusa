@@ -1,5 +1,17 @@
 # @medusajs/core-flows
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11190](https://github.com/medusajs/medusa/pull/11190) [`e98d3c615e8a42e09974ded9cc3ca3277e3a9217`](https://github.com/medusajs/medusa/commit/e98d3c615e8a42e09974ded9cc3ca3277e3a9217) Thanks [@carlos-r-l-rodrigues](https://github.com/carlos-r-l-rodrigues)! - chore(orchestration): validate missing PK filters when throwIfKeyNotFound
+
+- [#11315](https://github.com/medusajs/medusa/pull/11315) [`da25980d2445a09a51220c0d4f005f41659057a6`](https://github.com/medusajs/medusa/commit/da25980d2445a09a51220c0d4f005f41659057a6) Thanks [@shahednasser](https://github.com/shahednasser)! - chore(core-flows): update the TSDocs of new steps
+
+- [#11362](https://github.com/medusajs/medusa/pull/11362) [`acefcd7d8052601308d75daf004069e95eb78a89`](https://github.com/medusajs/medusa/commit/acefcd7d8052601308d75daf004069e95eb78a89) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(core-flows): Fix broken import of MedusaError
+
+- [#11285](https://github.com/medusajs/medusa/pull/11285) [`f07af7b93c86673e730dc4e5eba8df2572013f9f`](https://github.com/medusajs/medusa/commit/f07af7b93c86673e730dc4e5eba8df2572013f9f) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard,core-flows,types,medusa): Allow editing Order metadata
+
 ## 2.4.0
 
 ### Minor Changes

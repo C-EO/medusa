@@ -4,6 +4,7 @@ import { RouteFocusModal } from "../../../components/modals"
 import { useStockLocation } from "../../../hooks/api/stock-locations"
 import { CreateShippingOptionsForm } from "./components/create-shipping-options-form"
 import { LOC_CREATE_SHIPPING_OPTION_FIELDS } from "./constants"
+import { FulfillmentSetType } from "../common/constants"
 
 export function LocationServiceZoneShippingOptionCreate() {
   const { location_id, fset_id, zone_id } = useParams()
@@ -15,9 +16,18 @@ export function LocationServiceZoneShippingOptionCreate() {
       fields: LOC_CREATE_SHIPPING_OPTION_FIELDS,
     })
 
-  const zone = stock_location?.fulfillment_sets
-    ?.find((f) => f.id === fset_id)
-    ?.service_zones?.find((z) => z.id === zone_id)
+  const fulfillmentSet = stock_location?.fulfillment_sets?.find(
+    (f) => f.id === fset_id
+  )
+
+  if (!isPending && !isFetching && !fulfillmentSet) {
+    throw json(
+      { message: `Fulfillment set with ID ${fset_id} was not found` },
+      404
+    )
+  }
+
+  const zone = fulfillmentSet?.service_zones?.find((z) => z.id === zone_id)
 
   if (!isPending && !isFetching && !zone) {
     throw json(
@@ -37,6 +47,7 @@ export function LocationServiceZoneShippingOptionCreate() {
           zone={zone}
           isReturn={isReturn}
           locationId={location_id!}
+          type={fulfillmentSet!.type as FulfillmentSetType}
         />
       )}
     </RouteFocusModal>

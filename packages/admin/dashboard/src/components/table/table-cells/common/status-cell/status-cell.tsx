@@ -5,6 +5,9 @@ type StatusCellProps = PropsWithChildren<{
   color?: "green" | "red" | "blue" | "orange" | "grey" | "purple"
 }>
 
+/**
+ * @deprecated Use the new DataTable and DataTableStatusCell instead
+ */
 export const StatusCell = ({ color, children }: StatusCellProps) => {
   return (
     <div className="txt-compact-small text-ui-fg-subtle flex h-full w-full items-center gap-x-2 overflow-hidden">

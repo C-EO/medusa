@@ -346,8 +346,7 @@ medusaIntegrationTestRunner({
         expect(paymentCollection).toEqual(
           expect.objectContaining({
             amount: 200,
-            // Q: Shouldn't this be paid?
-            status: "authorized",
+            status: "completed",
             payment_sessions: [
               expect.objectContaining({
                 status: "authorized",
@@ -639,8 +638,7 @@ medusaIntegrationTestRunner({
         expect(paymentCollection).toEqual(
           expect.objectContaining({
             amount: 115.9,
-            // Q: Shouldn't this be paid?
-            status: "authorized",
+            status: "completed",
             payment_sessions: [
               expect.objectContaining({
                 status: "authorized",

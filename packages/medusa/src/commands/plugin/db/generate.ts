@@ -1,14 +1,15 @@
+import { glob } from "glob"
 import { logger } from "@medusajs/framework/logger"
 import {
-  defineMikroOrmCliConfig,
+  toUnixSlash,
   DmlEntity,
   dynamicImport,
+  defineMikroOrmCliConfig,
 } from "@medusajs/framework/utils"
 import { dirname, join } from "path"
 
 import { MetadataStorage } from "@mikro-orm/core"
 import { MikroORM } from "@mikro-orm/postgresql"
-import { glob } from "glob"
 
 const TERMINAL_SIZE = process.stdout.columns
 
@@ -24,7 +25,7 @@ const main = async function ({ directory }) {
     }[]
 
     const modulePaths = glob.sync(
-      join(directory, "src", "modules", "*", "index.ts")
+      toUnixSlash(join(directory, "src", "modules", "*", "index.ts"))
     )
 
     for (const path of modulePaths) {
@@ -61,7 +62,7 @@ const main = async function ({ directory }) {
 async function getEntitiesForModule(path: string) {
   const entities = [] as any[]
 
-  const entityPaths = glob.sync(join(path, "models", "*.ts"), {
+  const entityPaths = glob.sync(toUnixSlash(join(path, "models", "*.ts")), {
     ignore: ["**/index.{js,ts}", "**/*.d.ts"],
   })
 
@@ -101,6 +102,8 @@ async function generateMigrations(
   const DB_HOST = process.env.DB_HOST ?? "localhost"
   const DB_USERNAME = process.env.DB_USERNAME ?? ""
   const DB_PASSWORD = process.env.DB_PASSWORD ?? ""
+  const DB_PORT = process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432
+  const DATABASE_URL = process.env.DATABASE_URL
 
   for (const moduleDescriptor of moduleDescriptors) {
     logger.info(
@@ -112,8 +115,10 @@ async function generateMigrations(
       {
         entities: moduleDescriptor.entities,
         host: DB_HOST,
+        port: DB_PORT,
         user: DB_USERNAME,
         password: DB_PASSWORD,
+        ...(DATABASE_URL ? { clientUrl: DATABASE_URL } : {}),
         migrations: {
           path: moduleDescriptor.migrationsPath,
         },

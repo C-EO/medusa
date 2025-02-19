@@ -36,7 +36,7 @@ export type CreateProductWorkflowInputDTO = Omit<
   /**
    * The product's shipping profile.
    */
-  shipping_profile_id: string
+  shipping_profile_id?: string
   /**
    * The product's variants.
    */
@@ -45,5 +45,5 @@ export type CreateProductWorkflowInputDTO = Omit<
 
 export type UpdateProductWorkflowInputDTO = ProductTypes.UpsertProductDTO & {
   sales_channels?: { id: string }[]
-  shipping_profile_id?: string
+  shipping_profile_id?: string | null
 }

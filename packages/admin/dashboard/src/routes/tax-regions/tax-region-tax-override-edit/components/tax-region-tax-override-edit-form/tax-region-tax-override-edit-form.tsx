@@ -3,6 +3,7 @@ import { MagnifyingGlass } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import {
   Button,
+  Divider,
   Heading,
   Hint,
   Input,
@@ -16,7 +17,6 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
-import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { SwitchBox } from "../../../../../components/common/switch-box"
 import { PercentageInput } from "../../../../../components/inputs/percentage-input"

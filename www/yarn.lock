@@ -5533,6 +5533,7 @@ __metadata:
     autoprefixer: 10.4.14
     clsx: ^2.0.0
     docs-ui: "*"
+    docs-utils: "*"
     eslint: ^9.13.0
     eslint-plugin-prettier: ^5.2.1
     eslint-plugin-react-hooks: ^5.0.0
@@ -5943,11 +5944,14 @@ __metadata:
   dependencies:
     "@types/node": ^20.11.20
     docs-utils: "*"
+    fdir: ^6.4.3
     rimraf: ^5.0.5
+    slugify: ^1.6.6
     tags: "*"
     tsconfig: "*"
     types: "*"
     typescript: ^5.3.3
+    yaml: ^2.7.0
   peerDependencies:
     docs-utils: "*"
   languageName: unknown
@@ -8512,6 +8516,18 @@ __metadata:
   dependencies:
     format: ^0.2.0
   checksum: b80fbf1019b9ce8b08ee09ce86e02b028563e13a32ac3be34e42bfac00a97b96d8dee6d31e26578ffc16224eb6729e01ff1f97ddfeee00494f4f56c0aeed4bdd
+  languageName: node
+  linkType: hard
+
+"fdir@npm:^6.4.3":
+  version: 6.4.3
+  resolution: "fdir@npm:6.4.3"
+  peerDependencies:
+    picomatch: ^3 || ^4
+  peerDependenciesMeta:
+    picomatch:
+      optional: true
+  checksum: d13c10120e9625adf21d8d80481586200759928c19405a816b77dd28eaeb80e7c59c5def3e2941508045eb06d34eb47fad865ccc8bf98e6ab988bb0ed160fb6f
   languageName: node
   linkType: hard
 
@@ -15885,6 +15901,15 @@ turbo@latest:
   bin:
     yaml: bin.mjs
   checksum: 97ab0b5a0714c92e4dd75120a6a63e470b0adc282afae0a701bf38f8c42cbf6429fcd6aca883e3a63c68936ab841862e6c69e2d66d355c3e4fc7cfd346af2108
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "yaml@npm:2.7.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 886a7d2abbd70704b79f1d2d05fe9fb0aa63aefb86e1cb9991837dced65193d300f5554747a872b4b10ae9a12bc5d5327e4d04205f70336e863e35e89d8f4ea9
   languageName: node
   linkType: hard
 

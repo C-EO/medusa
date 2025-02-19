@@ -1,8 +1,7 @@
-import { Heading } from "@medusajs/ui"
+import { Divider, Heading } from "@medusajs/ui"
 import { UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
-import { Divider } from "../../../../../components/common/divider"
 import {
   FormExtensionZone,
   useDashboardExtension,

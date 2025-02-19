@@ -100,12 +100,20 @@ export const query = [
     "path": "/references/medusa-workflows/batchProductsWorkflow"
   },
   {
+    "title": "createProductsWorkflow",
+    "path": "/references/medusa-workflows/createProductsWorkflow"
+  },
+  {
     "title": "deleteProductVariantsWorkflow",
     "path": "/references/medusa-workflows/deleteProductVariantsWorkflow"
   },
   {
     "title": "deleteProductsWorkflow",
     "path": "/references/medusa-workflows/deleteProductsWorkflow"
+  },
+  {
+    "title": "deleteShippingProfileWorkflow",
+    "path": "/references/medusa-workflows/deleteShippingProfileWorkflow"
   },
   {
     "title": "updateStockLocationsWorkflow",

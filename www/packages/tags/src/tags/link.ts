@@ -140,8 +140,16 @@ export const link = [
     "path": "/references/medusa-workflows/deleteOrderPaymentCollections"
   },
   {
+    "title": "markPaymentCollectionAsPaid",
+    "path": "/references/medusa-workflows/markPaymentCollectionAsPaid"
+  },
+  {
     "title": "requestOrderEditRequestWorkflow",
     "path": "/references/medusa-workflows/requestOrderEditRequestWorkflow"
+  },
+  {
+    "title": "createPaymentSessionsWorkflow",
+    "path": "/references/medusa-workflows/createPaymentSessionsWorkflow"
   },
   {
     "title": "createVariantPricingLinkStep",

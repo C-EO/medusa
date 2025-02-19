@@ -178,7 +178,7 @@ export const remoteJoinerData = {
       date: "2023-04-01T12:00:00Z",
       products: [
         {
-          product_id: [101, 103],
+          product_id: 103,
           variant_id: 993,
           quantity: 4,
         },

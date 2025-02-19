@@ -1528,6 +1528,63 @@ medusaIntegrationTestRunner({
           )
         })
 
+        it("updates products with shipping profiles", async () => {
+          const shippingProfile2 = (
+            await api.post(
+              `/admin/shipping-profiles`,
+              { name: "heavy", type: "heavy" },
+              adminHeaders
+            )
+          ).data.shipping_profile
+
+          let fetchProduct = await api.get(
+            `/admin/products/${baseProduct.id}?fields=+shipping_profile.id`,
+            adminHeaders
+          )
+
+          let payload: Record<string, any> = {
+            shipping_profile_id: shippingProfile2.id,
+          }
+
+          let response = await api
+            .post(`/admin/products/${baseProduct.id}`, payload, adminHeaders)
+            .catch((err) => {
+              console.log(err)
+            })
+
+          expect(response.status).toEqual(200)
+
+          fetchProduct = await api.get(
+            `/admin/products/${baseProduct.id}?fields=+shipping_profile.id`,
+            adminHeaders
+          )
+
+          expect(fetchProduct.data.product.shipping_profile.id).toEqual(
+            shippingProfile2.id
+          )
+
+          payload = {
+            subtitle: "new subtitle",
+          }
+
+          response = await api
+            .post(`/admin/products/${baseProduct.id}`, payload, adminHeaders)
+            .catch((err) => {
+              console.log(err)
+            })
+
+          expect(response.status).toEqual(200)
+
+          fetchProduct = await api.get(
+            `/admin/products/${baseProduct.id}?fields=+shipping_profile.id`,
+            adminHeaders
+          )
+
+          expect(fetchProduct.data.product.shipping_profile.id).toEqual(
+            shippingProfile2.id
+          )
+        })
+
         it("updates a product (update prices, tags, update status, delete collection, delete type, replaces images)", async () => {
           const payload = {
             collection_id: null,
@@ -3120,6 +3177,103 @@ medusaIntegrationTestRunner({
               }),
               expect.objectContaining({
                 title: "Test batch update variant",
+              }),
+            ])
+          )
+        })
+
+        it("should preserve variant prices when batch updating variants", async () => {
+          const productWithMultipleVariants = getProductFixture({
+            title: "Test batch variants",
+            handle: "test-batch-variants",
+            shipping_profile_id: shippingProfile.id,
+            variants: [
+              {
+                title: "Variant 1",
+                prices: [
+                  {
+                    currency_code: "usd",
+                    amount: 100,
+                  },
+                ],
+              },
+              {
+                title: "Variant 2",
+                prices: [
+                  {
+                    currency_code: "usd",
+                    amount: 200,
+                  },
+                ],
+              },
+            ],
+          })
+
+          const createdProduct = (
+            await api.post(
+              "/admin/products",
+              productWithMultipleVariants,
+              adminHeaders
+            )
+          ).data.product
+
+          const variant1Id = createdProduct.variants.find(
+            (v) => v.title === "Variant 1"
+          ).id
+
+          const variant2Id = createdProduct.variants.find(
+            (v) => v.title === "Variant 2"
+          ).id
+
+          const updatePayload1 = {
+            id: variant1Id,
+            title: "Test batch update variant",
+          }
+
+          const updatePayload2 = {
+            id: variant2Id,
+            prices: [{ currency_code: "usd", amount: 300 }],
+          }
+
+          const response = await api.post(
+            `/admin/products/${createdProduct.id}/variants/batch`,
+            {
+              update: [updatePayload1, updatePayload2],
+            },
+            adminHeaders
+          )
+
+          const dbData = (
+            await api.get(
+              `/admin/products/${createdProduct.id}?fields=*variants.prices`,
+              adminHeaders
+            )
+          ).data.product.variants
+
+          expect(response.status).toEqual(200)
+          expect(dbData).toHaveLength(2)
+          expect(dbData).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: variant1Id,
+                title: "Test batch update variant",
+                prices: expect.arrayContaining([
+                  // updated title but price remains the same
+                  expect.objectContaining({
+                    currency_code: "usd",
+                    amount: 100,
+                  }),
+                ]),
+              }),
+              expect.objectContaining({
+                id: variant2Id,
+                prices: expect.arrayContaining([
+                  expect.objectContaining({
+                    // updated price
+                    currency_code: "usd",
+                    amount: 300,
+                  }),
+                ]),
               }),
             ])
           )

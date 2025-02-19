@@ -21,7 +21,13 @@ export const CustomDirectives = {
 export function makeSchemaExecutable(inputSchema: string) {
   const { schema: cleanedSchema } = GraphQLUtils.cleanGraphQLSchema(inputSchema)
 
-  return GraphQLUtils.makeExecutableSchema({ typeDefs: cleanedSchema })
+  if (!cleanedSchema) {
+    return
+  }
+
+  return GraphQLUtils.makeExecutableSchema({
+    typeDefs: cleanedSchema,
+  })
 }
 
 function extractNameFromAlias(
@@ -68,9 +74,9 @@ function retrieveModuleAndAlias(entityName, moduleJoinerConfigs) {
 
     if (moduleSchema) {
       const executableSchema = makeSchemaExecutable(moduleSchema)
-      const entitiesMap = executableSchema.getTypeMap()
+      const entitiesMap = executableSchema?.getTypeMap()
 
-      if (entitiesMap[entityName]) {
+      if (entitiesMap?.[entityName]) {
         relatedModule = moduleJoinerConfig
       }
     }
@@ -191,6 +197,10 @@ function retrieveLinkModuleAndAlias({
         const executableSchema = makeSchemaExecutable(
           foreignModuleConfig.schema
         )
+        if (!executableSchema) {
+          continue
+        }
+
         const entitiesMap = executableSchema.getTypeMap()
 
         let intermediateEntities: string[] = []
@@ -704,7 +714,7 @@ export function buildSchemaObjectRepresentation(
 ): [IndexTypes.SchemaObjectRepresentation, Record<string, any>] {
   const moduleJoinerConfigs = MedusaModule.getAllJoinerConfigs()
   const augmentedSchema = CustomDirectives.Listeners.definition + schema
-  const executableSchema = makeSchemaExecutable(augmentedSchema)
+  const executableSchema = makeSchemaExecutable(augmentedSchema)!
   const entitiesMap = executableSchema.getTypeMap()
 
   const objectRepresentation = {

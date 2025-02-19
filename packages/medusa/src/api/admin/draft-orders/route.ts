@@ -1,21 +1,21 @@
 import { createOrderWorkflow } from "@medusajs/core-flows"
 import {
-  ContainerRegistrationKeys,
-  OrderStatus,
-  remoteQueryObjectFromString,
-} from "@medusajs/framework/utils"
-import {
   AuthenticatedMedusaRequest,
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
-import { AdminCreateDraftOrderType } from "./validators"
-import { refetchOrder } from "./helpers"
 import {
   AdditionalData,
   CreateOrderDTO,
   HttpTypes,
 } from "@medusajs/framework/types"
+import {
+  ContainerRegistrationKeys,
+  OrderStatus,
+  remoteQueryObjectFromString,
+} from "@medusajs/framework/utils"
+import { refetchOrder } from "./helpers"
+import { AdminCreateDraftOrderType } from "./validators"
 
 export const GET = async (
   req: MedusaRequest<HttpTypes.AdminOrderFilters>,
@@ -59,7 +59,10 @@ export const POST = async (
 
   const remoteQuery = req.scope.resolve(ContainerRegistrationKeys.REMOTE_QUERY)
 
-  if (!input.currency_code) {
+  /**
+   * If the currency code is not provided, we fetch the region and use the currency code from there.
+   */
+  if (!workflowInput.currency_code) {
     const queryObject = remoteQueryObjectFromString({
       entryPoint: "region",
       variables: {
@@ -68,10 +71,13 @@ export const POST = async (
       fields: ["currency_code"],
     })
     const [region] = await remoteQuery(queryObject)
-    input.currency_code = region?.currency_code
+    workflowInput.currency_code = region?.currency_code
   }
 
-  if (!input.email) {
+  /**
+   * If the email is not provided, we fetch the customer and use the email from there.
+   */
+  if (!workflowInput.email) {
     const queryObject = remoteQueryObjectFromString({
       entryPoint: "customer",
       variables: {
@@ -80,7 +86,22 @@ export const POST = async (
       fields: ["email"],
     })
     const [customer] = await remoteQuery(queryObject)
-    input.email = customer?.email
+    workflowInput.email = customer?.email
+  }
+
+  /**
+   * We accept either a ID or a payload for both billing and shipping addresses.
+   * If either field was received as a string, we assume it's an ID and
+   * then ensure that it is passed along correctly to the workflow.
+   */
+  if (typeof input.billing_address === "string") {
+    workflowInput.billing_address_id = input.billing_address
+    delete workflowInput.billing_address
+  }
+
+  if (typeof input.shipping_address === "string") {
+    workflowInput.shipping_address_id = input.shipping_address
+    delete workflowInput.shipping_address
   }
 
   const { result } = await createOrderWorkflow(req.scope).run({

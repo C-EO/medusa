@@ -10,9 +10,18 @@ In this document, you’ll learn how to create a fulfillment provider module and
 
 ---
 
-## 1. Create Module Directory
+## 1. Create Module Provider Directory
 
-Start by creating a new directory for your module. For example, `src/modules/my-fulfillment`.
+Start by creating a new directory for your module provider.
+
+If you're creating the module provider in a Medusa application, create it under the `src/modules` directory. For example, `src/modules/my-fulfillment`.
+If you're creating the module provider in a plugin, create it under the `src/providers` directory. For example, `src/providers/my-fulfillment`.
+
+<Note>
+
+The rest of this guide always uses the `src/modules/my-fulfillment` directory as an example.
+
+</Note>
 
 ---
 
@@ -534,6 +543,7 @@ module.exports = defineConfig({
             id: "manual",
           },
           {
+            // if module provider is in a plugin, use `plugin-name/providers/my-fulfillment`
             resolve: "./src/modules/my-fulfillment",
             id: "my-fulfillment",
             options: {

@@ -84,4 +84,9 @@ export interface StoreCartShippingOption {
    * Calculated price for the shipping option
    */
   calculated_price: StoreCalculatedPrice
+
+  /**
+   * Whether the stock location of the shipping option has insufficient inventory for items in the cart.
+   */
+  insufficient_inventory: boolean
 }

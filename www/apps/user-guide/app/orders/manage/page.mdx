@@ -4,7 +4,7 @@ sidebar_label: Manage Details
 ---
 
 import { 
-  ArrowsPointingOut, 
+  ArrowUpRightOnBox, 
   EllipsisHorizontal, 
   FaceSmile,
   ArrowUpCircleSolid
@@ -16,205 +16,163 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn how to find an order’s details page, what information you find on the order details page, and how to manage the order’s details.
+In this guide, you’ll learn how to find an order’s details page, what information you find on the order details page, and how to manage the order’s details. Order details include the general details, such as customer or address details.
 
 ## Open Order’s Details
 
 To open an order’s details:
 
-1. Go to Orders.
-2. Select one of the orders.
+1. Go to Orders from the sidebar.
+2. Select one of the orders to open its details page.
 
-This opens the order’s details page.
+![Order Details Page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739543439/User%20Guide/Screenshot_2025-02-14_at_4.30.14_PM_nirqsy.png)
+
+### Order Summary Section
+
+The Summary section includes the summary of the items the customer purchased as well as totals related to taxes, shipping, and more. Use this section to get a quick overview of the order, [create returns](../returns/page.mdx), [create exchanges](../exchanges/page.mdx), or manage the order’s details as explained later in this guide.
+
+![Order Summary](https://res.cloudinary.com/dza7lstvk/image/upload/v1739543620/User%20Guide/Screenshot_2025-02-14_at_4.33.05_PM_ockept.png)
+
+### Customer Section
+
+The Customer section includes the customer’s details, including their contact information and shipping address. Use this section to view and edit the customer’s details pertaining to the order as explained later in this guide.
+
+![Customer Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739543745/User%20Guide/Screenshot_2025-02-14_at_4.35.27_PM_b4vav0.png)
+
+### Activity Section
+
+The Activity section of the order details page shows a summary of the changes made on the order. That includes payments captured, returned items, shipped items, and more. Use this section to get a quick overview of the order’s history and actions taken on it.
+
+![Activity Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739543897/User%20Guide/Screenshot_2025-02-14_at_4.37.58_PM_dcl0lw.png)
+
+### Payments Section
+
+The Payment section of the order details page includes details related to the order’s payments, showing a full history of the changes in the payment's status. Use this section to view and [manage the payments](../payments/page.mdx) related to the order.
+
+![Payments Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739544008/User%20Guide/Screenshot_2025-02-14_at_4.39.51_PM_vufzzu.png)
+
+## Unfulfilled Items Section
+
+The Unfulfilled Items section of the order details page includes the details of items that haven't been fulfilled yet. Use this section to view the items that need to be fulfilled and [create their fulfillments](../fulfillments/page.mdx).
+
+![Unfulfilled Items Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739544116/User%20Guide/Screenshot_2025-02-14_at_4.40.44_PM_vjrput.png)
+
+### Fulfillment Sections
+
+For every fulfillment you create, a new fulfillment section is added with its number in the title. The section includes details of the fulfillment. Use this section to view and [manage the fulfillment](../fulfillments/page.mdx).
+
+![Fulfillment Section](https://res.cloudinary.com/dza7lstvk/image/upload/v1739544250/User%20Guide/Screenshot_2025-02-14_at_4.43.21_PM_lcm50k.png)
+
+### JSON Section
+
+The JSON section is useful for developers to view the raw order data in JSON structure. Developers can use this section to debug and troubleshoot issues related to the order.
+
+To view the JSON structure, click on the <InlineIcon Icon={ArrowUpRightOnBox} alt="Expand" /> icon. 
 
 ---
 
-## Sections of the Order Details Page
+## Allocate Order Items Manually
 
-### First Section
+If Medusa manages the inventory of an ordered item, it reserves or allocates the ordered quantity from the inventory. This ensures that the item's available quantity is reduced by the ordered quantity.
 
-The first section of the page shows the summary of the order, including its number, payment and fulfillment status, date created, sales channel, and more.
+Medusa allocates the ordered quantity from the stock location of the chosen shipping option in the order. For example, if the customer chooses a shipping option that uses a stock location in the US, Medusa allocates the ordered quantity from that stock location.
 
-### Summary
+However, in some cases you may need to allocate an item manually, such as if you [edit the order](../edit/page.mdx) if you changed the inventory management configurations of the item's product variant. You'll find next to the item's name in the Summary section a "Not allocated" badge.
 
-This section includes the summary of the items the customer purchased as well as totals related to taxes, shipping, and more.
+![Not Allocated Badge](https://res.cloudinary.com/dza7lstvk/image/upload/v1739546156/User%20Guide/Screenshot_2025-02-14_at_5.14.59_PM_fgc2d2.png)
 
-### Customer
+To allocate these items manually:
 
-This section includes the customer’s details, including their contact information and shipping address.
-
-### Activity
-
-{/* TODO check if these details are correct */}
-
-This section of the order details page shows a summary of the order’s history. This includes updates to the order’s status, requests for return or exchange, notes, and more.
-
-### Payments
-
-This section includes details related to the order’s payments, showing a full history of the changes in the payment's status. It also provides actions such as capture the authorized payment.
-
-## Unfulfilled Items
-
-This section includes the details of items that haven't been fulfilled yet. It also provides the action to fulfill items.
-
-### Fulfillment
-
-For every fulfillment you create, a new fulfillment section is added with its number in the title. The section includes details of the fulfillment and actions to perform on it.
-
-### JSON
-
-This section is useful for developers to view the JSON structure of the order's data.
-
-To view the JSON structure, click on the <InlineIcon Icon={ArrowsPointingOut} alt="Expand" /> icon. 
-
----
-
-## Manage Item Allocation
-
-When a customer places an order, the ordered quantity of the items's underlying product variant is considered reserved (or allocated) in a stock location. This is only applied to product variants that have "Manage Inventory" enabled.
-
-Manage the item's allocation by managing the location that the item's quantity is reserved from.
-
-{/* TODO check information in this section for correctness */}
-
-{/* TODO maybe the following sections belong to one section. */}
-
-### Allocate an Item
-
-Items are allocated by default. However, in some edge cases you may need to allocate an item manually.
-
-To allocate an item:
-
-{/* TODO check information after #5 */}
-
-1. Go to the order details page.
-2. Scroll to the Summary section.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the section.
-4. Choose "Allocate items" from the dropdown.
-5. In the form that opens:
+1. Go to the Summary section of the order's details page.
+2. If one or more items haven't been allocated, you'll find an "Allocate items" button at the bottom of the section. Click on it.
+3. In the form that opens:
   1. For the Location field, choose the location to allocate the item from.
-  2. In the Items to Allocate section, choose the quantity to allocate for each item.
-6. Once you're done, click the "Save allocation" button.
+  2. In the Items to Allocate section, enter the quantity to allocate for each item.
+4. Once you're done, click the "Allocate Items" button.
 
-### Edit Item Allocation
-
-If an item is already allocated, you can edit its allocation by following these steps:
-
-{/* TODO check information after #5 */}
-
-1. Go to the order details page.
-2. Scroll to the Summary section.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the section.
-4. Choose "Allocate items" from the dropdown.
-5. In the new window that opens:
-  1. In the Locations field, choose the location to allocate this item from.
-  2. Once done, click the "Save and close" button.
-
-### Delete Item Allocation
-
-{/* TODO check information after #5 */}
-
-To delete an item allocation:
-
-1. Go to the order details page.
-2. Scroll to the Summary section.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the section.
-4. Choose "Allocate items" from the dropdown.
-5. In the new window that opens, click on the "Delete allocation" button.
+![Allocate Items Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739545718/User%20Guide/Screenshot_2025-02-14_at_5.07.46_PM_mzi0bg.png)
 
 ---
 
 ## Edit the Shipping Address
 
-{/* TODO check information after #4 */}
-
 To edit the shipping address used for an order:
 
 1. Open the order details page.
 2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the Customer section.
-3. Click on "Edit shipping address" from the dropdown.
-4. This opens a drawer to edit the shipping address.
+3. Click on "Shipping address" from the dropdown.
+4. In the side window that opens, update the address details.
 5. Once you’re done, click on the Save button.
+
+![Edit Shipping Address Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739546317/User%20Guide/Screenshot_2025-02-14_at_5.18.13_PM_zfi5ly.png)
 
 ---
 
 ## Edit the Billing Address
 
-{/* TODO check information after #4 */}
-
 To edit the billing address used for an order:
 
 1. Open the order details page.
 2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the Customer section.
-3. Click on "Edit billing address" from the dropdown.
-4. This opens a drawer to edit the billing address.
+3. Click on "Billing address" from the dropdown.
+4. In the side window that opens, update the address details.
 5. Once you’re done, click on the Save button.
+
+![Edit Billing Address Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739546393/User%20Guide/Screenshot_2025-02-14_at_5.19.43_PM_wzmy8p.png)
 
 ---
 
 ## Edit Email Address
 
-{/* TODO check information after #4 */}
+You can edit the email address of an order to send order-update notifications to a new email address. This doesn't update the associated customer's address or transfer the order to a new customer. To transfer the order to a new customer, see the [Transfer Customer Ownership](#transfer-customer-ownership) section.
 
 To edit the email address associated with an order:
 
 1. Open the order details page.
 2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the Customer section.
-3. Click on "Edit email" from the dropdown.
-4. This opens a drawer to edit the email address.
+3. Click on "Email" from the dropdown.
+4. In the side window that opens, edit the email address.
 5. Once you’re done, click on the Save button.
+
+![Edit Email Address Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739546558/User%20Guide/Screenshot_2025-02-14_at_5.22.06_PM_fmrnc6.png)
 
 ---
 
 ## Transfer Customer Ownership
 
-{/* TODO check information after #4 */}
+You can transfer the ownership of an order to another registered customer. This changes the customer associated with the order and sends notifications for order updates to the new customer.
 
-To change the customer that placed this order:
+<Note>
+
+You can't transfer ownership to a guest customer, and that includes customers you create through the admin dashboard.
+
+</Note>
+
+When you transfer the ownership of an order, the original customer will receive a notification, such as an email, requesting their approval for the transfer. The order is transferred to the new customer only after the original customer approves the transfer.
+
+To transfer the ownership of an order to another customer:
 
 1. Open the order details page.
 2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dot" /> icon at the top right of the Customer section.
 3. Click on "Transfer ownership" from the dropdown.
-4. In the new window that opens choose the new customer to own this order.
-5. Once done, click on the Confirm button.
+4. In the side window that opens, choose the new customer from the dropdown under the "New owner" section.
+5. Once done, click on the Save button.
 
----
+The original customer will then receive a notification requesting their approval for the transfer.
 
-## Add a Note
+<Note>
 
-{/* TODO check information for correctness */}
-
-To add a note to an order:
-
-1. Open the order details page.
-2. In the Timeline section, enter the note in the text field. You can also choose emojis by clicking the <InlineIcon Icon={FaceSmile} alt="emoji" /> icon.
-3. Once done, click on the <InlineIcon Icon={ArrowUpCircleSolid} alt="send" /> icon.
-
-The note is added and shown in the timeline.
-
----
-
-## Delete a Note
-
-{/* TODO check information for correctness */}
-
-<Note type="warning">
-
-Deleting notes is irreversible.
+If a notification isn't sent, check with your technical team to debug the integrated notification service.
 
 </Note>
 
-To delete a note in an order:
-
-1. Open the order details page.
-2. In the Timeline section, find the note you want to delete from the timeline.
-3. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> icon next to the note.
-4. Click on Delete from the dropdown.
-5. Confirm deleting the note by clicking the “Yes, delete” button in the pop-up.
+![Transfer Ownership Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739546904/User%20Guide/Screenshot_2025-02-14_at_5.28.12_PM_brwpek.png)
 
 ---
 
 ## Cancel an Order
+
+You can cancel an order if no actions have been performed on it, such as payment captured or items fulfilled. Canceling an order will change its status to canceled and notify the customer about the cancellation.
 
 <Note type="warning">
 
@@ -225,6 +183,10 @@ Canceling an order is irreversible.
 To cancel an order:
 
 1. Open the order details page.
-2. In the first section showing the order’s number, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> at the top right.
-3. Click on Cancel Order from the dropdown.
+2. In the first section showing the order’s number, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three-dots" /> at its right.
+3. Click on Cancel from the dropdown.
 4. Confirm canceling the order by clicking the “Continue” button in the pop-up.
+
+If the order has been paid for or fulfilled, you'll receive an error message preventing you from canceling the order. Otherwise, the order will be canceled.
+
+![Cancel Order Dropdown](https://res.cloudinary.com/dza7lstvk/image/upload/v1739547244/User%20Guide/Screenshot_2025-02-14_at_5.32.38_PM_urp4yg.png)

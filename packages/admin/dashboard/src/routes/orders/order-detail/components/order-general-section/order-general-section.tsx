@@ -10,7 +10,6 @@ import {
   usePrompt,
 } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
-import { isPresent } from "../../../../../../../../core/utils/src/common/is-present"
 import { ActionMenu } from "../../../../../components/common/action-menu"
 import { useCancelOrder } from "../../../../../hooks/api/orders"
 import { useDate } from "../../../../../hooks/use-date"
@@ -125,8 +124,8 @@ const OrderBadge = ({ order }: { order: HttpTypes.AdminOrder }) => {
   const { t } = useTranslation()
   const orderStatus = getCanceledOrderStatus(t, order.status)
 
-  if (!isPresent(orderStatus)) {
-    return
+  if (!orderStatus) {
+    return null
   }
 
   return (

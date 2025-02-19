@@ -326,5 +326,402 @@ medusaIntegrationTestRunner({
         })
       })
     })
+
+    describe("with insufficient inventory", () => {
+      let appContainer
+      let salesChannel
+      let region
+      let product
+      let stockLocation1
+      let stockLocation2
+      let stockLocation3
+      let shippingProfile
+      let fulfillmentSet
+      let shippingOption1
+      let shippingOption2
+      let shippingOption3
+      let storeHeaders
+
+      beforeAll(async () => {
+        appContainer = getContainer()
+      })
+
+      beforeEach(async () => {
+        const publishableKey = await generatePublishableKey(appContainer)
+        storeHeaders = generateStoreHeaders({ publishableKey })
+
+        await createAdminUser(dbConnection, adminHeaders, appContainer)
+
+        region = (
+          await api.post(
+            "/admin/regions",
+            { name: "US", currency_code: "usd", countries: ["us"] },
+            adminHeaders
+          )
+        ).data.region
+
+        shippingProfile = (
+          await api.post(
+            `/admin/shipping-profiles`,
+            { name: "Test", type: "default" },
+            adminHeaders
+          )
+        ).data.shipping_profile
+
+        salesChannel = (
+          await api.post(
+            "/admin/sales-channels",
+            { name: "first channel", description: "channel" },
+            adminHeaders
+          )
+        ).data.sales_channel
+
+        stockLocation1 = (
+          await api.post(
+            `/admin/stock-locations`,
+            { name: "test location" },
+            adminHeaders
+          )
+        ).data.stock_location
+
+        const fulfillmentSets1 = (
+          await api.post(
+            `/admin/stock-locations/${stockLocation1.id}/fulfillment-sets?fields=*fulfillment_sets`,
+            {
+              name: "Test 1",
+              type: "pickup",
+            },
+            adminHeaders
+          )
+        ).data.stock_location.fulfillment_sets
+
+        fulfillmentSet = (
+          await api.post(
+            `/admin/fulfillment-sets/${fulfillmentSets1[0].id}/service-zones`,
+            {
+              name: "Test 1",
+              geo_zones: [
+                { type: "country", country_code: "us" },
+                { type: "country", country_code: "dk" },
+              ],
+            },
+            adminHeaders
+          )
+        ).data.fulfillment_set
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation1.id}/fulfillment-providers`,
+          { add: ["manual_test-provider"] },
+          adminHeaders
+        )
+
+        shippingOption1 = (
+          await api.post(
+            `/admin/shipping-options`,
+            {
+              name: "Pickup option 1",
+              service_zone_id: fulfillmentSet.service_zones[0].id,
+              shipping_profile_id: shippingProfile.id,
+              provider_id: "manual_test-provider",
+              price_type: "flat",
+              type: {
+                label: "Test type",
+                description: "Test description",
+                code: "test-code",
+              },
+              prices: [
+                {
+                  currency_code: "usd",
+                  amount: 0,
+                },
+                {
+                  region_id: region.id,
+                  amount: 0,
+                },
+              ],
+              rules: [],
+            },
+            adminHeaders
+          )
+        ).data.shipping_option
+
+        stockLocation2 = (
+          await api.post(
+            `/admin/stock-locations`,
+            { name: "test location" },
+            adminHeaders
+          )
+        ).data.stock_location
+
+        const fulfillmentSets2 = (
+          await api.post(
+            `/admin/stock-locations/${stockLocation2.id}/fulfillment-sets?fields=*fulfillment_sets`,
+            {
+              name: "Test 2",
+              type: "pickup",
+            },
+            adminHeaders
+          )
+        ).data.stock_location.fulfillment_sets
+
+        fulfillmentSet = (
+          await api.post(
+            `/admin/fulfillment-sets/${fulfillmentSets2[0].id}/service-zones`,
+            {
+              name: "Test 2",
+              geo_zones: [
+                { type: "country", country_code: "us" },
+                { type: "country", country_code: "dk" },
+              ],
+            },
+            adminHeaders
+          )
+        ).data.fulfillment_set
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation2.id}/fulfillment-providers`,
+          { add: ["manual_test-provider"] },
+          adminHeaders
+        )
+
+        shippingOption2 = (
+          await api.post(
+            `/admin/shipping-options`,
+            {
+              name: "Pickup option 2",
+              service_zone_id: fulfillmentSet.service_zones[0].id,
+              shipping_profile_id: shippingProfile.id,
+              provider_id: "manual_test-provider",
+              price_type: "flat",
+              type: {
+                label: "Test type",
+                description: "Test description",
+                code: "test-code",
+              },
+              prices: [
+                {
+                  currency_code: "usd",
+                  amount: 0,
+                },
+                {
+                  region_id: region.id,
+                  amount: 0,
+                },
+              ],
+              rules: [],
+            },
+            adminHeaders
+          )
+        ).data.shipping_option
+
+        stockLocation3 = (
+          await api.post(
+            `/admin/stock-locations`,
+            { name: "test location" },
+            adminHeaders
+          )
+        ).data.stock_location
+
+        const fulfillmentSets3 = (
+          await api.post(
+            `/admin/stock-locations/${stockLocation3.id}/fulfillment-sets?fields=*fulfillment_sets`,
+            {
+              name: "Test 3",
+              type: "pickup",
+            },
+            adminHeaders
+          )
+        ).data.stock_location.fulfillment_sets
+
+        fulfillmentSet = (
+          await api.post(
+            `/admin/fulfillment-sets/${fulfillmentSets3[0].id}/service-zones`,
+            {
+              name: "Test 3",
+              geo_zones: [
+                { type: "country", country_code: "us" },
+                { type: "country", country_code: "dk" },
+              ],
+            },
+            adminHeaders
+          )
+        ).data.fulfillment_set
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation3.id}/fulfillment-providers`,
+          { add: ["manual_test-provider"] },
+          adminHeaders
+        )
+
+        shippingOption3 = (
+          await api.post(
+            `/admin/shipping-options`,
+            {
+              name: "Pickup option 3",
+              service_zone_id: fulfillmentSet.service_zones[0].id,
+              shipping_profile_id: shippingProfile.id,
+              provider_id: "manual_test-provider",
+              price_type: "flat",
+              type: {
+                label: "Test type",
+                description: "Test description",
+                code: "test-code",
+              },
+              prices: [
+                {
+                  currency_code: "usd",
+                  amount: 0,
+                },
+                {
+                  region_id: region.id,
+                  amount: 0,
+                },
+              ],
+              rules: [],
+            },
+            adminHeaders
+          )
+        ).data.shipping_option
+
+        const inventoryItem = (
+          await api.post(
+            `/admin/inventory-items`,
+            { sku: "inventory-item" },
+            adminHeaders
+          )
+        ).data.inventory_item
+
+        await api.post(
+          `/admin/inventory-items/${inventoryItem.id}/location-levels`,
+          {
+            location_id: stockLocation1.id,
+            stocked_quantity: 10,
+          },
+          adminHeaders
+        )
+
+        await api.post(
+          `/admin/inventory-items/${inventoryItem.id}/location-levels`,
+          {
+            location_id: stockLocation2.id,
+            stocked_quantity: 5,
+          },
+          adminHeaders
+        )
+
+        // STOCK LOCATION 3 doesn't have any inventory for that item
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation1.id}/sales-channels`,
+          { add: [salesChannel.id] },
+          adminHeaders
+        )
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation2.id}/sales-channels`,
+          { add: [salesChannel.id] },
+          adminHeaders
+        )
+
+        await api.post(
+          `/admin/stock-locations/${stockLocation3.id}/sales-channels`,
+          { add: [salesChannel.id] },
+          adminHeaders
+        )
+
+        product = (
+          await api.post(
+            "/admin/products",
+            {
+              title: "Test prod",
+              options: [
+                { title: "size", values: ["large", "small"] },
+                { title: "color", values: ["green"] },
+              ],
+              shipping_profile_id: shippingProfile.id,
+              variants: [
+                {
+                  title: "Test variant",
+                  manage_inventory: true,
+                  inventory_items: [
+                    {
+                      inventory_item_id: inventoryItem.id,
+                      required_quantity: 1,
+                    },
+                  ],
+                  prices: [
+                    {
+                      currency_code: "usd",
+                      amount: 100,
+                    },
+                    {
+                      currency_code: "dkk",
+                      amount: 100,
+                    },
+                  ],
+                  options: {
+                    size: "large",
+                    color: "green",
+                  },
+                },
+              ],
+            },
+            adminHeaders
+          )
+        ).data.product
+      })
+
+      it("should get shipping options for a cart with insufficient inventory flag set correctly", async () => {
+        const cart = (
+          await api.post(
+            `/store/carts`,
+            {
+              region_id: region.id,
+              sales_channel_id: salesChannel.id,
+              currency_code: "usd",
+              email: "test@admin.com",
+              items: [
+                {
+                  variant_id: product.variants[0].id,
+                  quantity: 8,
+                },
+              ],
+            },
+            storeHeaders
+          )
+        ).data.cart
+
+        const resp = await api.get(
+          `/store/shipping-options?cart_id=${cart.id}`,
+          storeHeaders
+        )
+
+        const shippingOptions = resp.data.shipping_options
+
+        expect(shippingOptions.length).toBe(3)
+        expect(shippingOptions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: shippingOption1.id,
+              name: "Pickup option 1",
+              amount: 0,
+              insufficient_inventory: false, // sufficient inventory at location
+            }),
+            expect.objectContaining({
+              id: shippingOption2.id,
+              name: "Pickup option 2",
+              amount: 0,
+              insufficient_inventory: true, // inventory item is at location 2 but not enough quantity
+            }),
+            expect.objectContaining({
+              id: shippingOption3.id,
+              name: "Pickup option 3",
+              amount: 0,
+              insufficient_inventory: true, // inventory item is not at location 3
+            }),
+          ])
+        )
+      })
+    })
   },
 })

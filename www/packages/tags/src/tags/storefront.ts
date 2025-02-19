@@ -84,6 +84,10 @@ export const storefront = [
     "path": "/storefront-development/customers/third-party-login"
   },
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "List Product Categories in Storefront",
     "path": "/storefront-development/products/categories/list"
   },

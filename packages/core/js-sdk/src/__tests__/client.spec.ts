@@ -4,6 +4,8 @@ import { setupServer } from "msw/node"
 import { Client, FetchError, PUBLISHABLE_KEY_HEADER } from "../client"
 
 const baseUrl = "https://someurl.com"
+const token = "token-123"
+const jwtTokenStorageKey = "medusa_auth_token"
 
 // This is just a network-layer mocking, it doesn't start an actual server
 const server = setupServer(
@@ -77,7 +79,7 @@ const server = setupServer(
     return HttpResponse.json({ test: "test" })
   }),
   http.get(`${baseUrl}/jwt`, ({ request }) => {
-    if (request.headers.get("authorization") === "Bearer token-123") {
+    if (request.headers.get("authorization") === `Bearer ${token}`) {
       return HttpResponse.json({
         test: "test",
       })
@@ -259,9 +261,8 @@ describe("Client", () => {
     })
   })
 
-  describe("Authrized requests", () => {
+  describe("Authorized requests", () => {
     it("should not store the token by default", async () => {
-      const token = "token-123" // Eg. from a response after a successful authentication
       client.setToken(token)
 
       const resp = await client.fetch<any>("nostore")
@@ -274,13 +275,12 @@ describe("Client", () => {
         localStorage: { setItem: jest.fn(), getItem: () => token } as any,
       } as any
 
-      const token = "token-123" // Eg. from a response after a successful authentication
       client.setToken(token)
 
       const resp = await client.fetch<any>("jwt")
       expect(resp).toEqual({ test: "test" })
       expect(global.window.localStorage.setItem).toHaveBeenCalledWith(
-        "medusa_auth_token",
+        jwtTokenStorageKey,
         token
       )
 
@@ -289,5 +289,105 @@ describe("Client", () => {
     })
   })
 
-  
+  describe("Custom Storage", () => {
+    const mockSyncStorage = {
+      storage: new Map<string, string>(),
+      getItem: jest.fn(
+        (key: string) => mockSyncStorage.storage.get(key) || null
+      ),
+      setItem: jest.fn((key: string, value: string) =>
+        mockSyncStorage.storage.set(key, value)
+      ),
+      removeItem: jest.fn((key: string) => mockSyncStorage.storage.delete(key)),
+    }
+
+    const mockAsyncStorage = {
+      storage: new Map<string, string>(),
+      getItem: jest.fn(
+        async (key: string) => mockAsyncStorage.storage.get(key) || null
+      ),
+      setItem: jest.fn(async (key: string, value: string) =>
+        mockAsyncStorage.storage.set(key, value)
+      ),
+      removeItem: jest.fn(async (key: string) =>
+        mockAsyncStorage.storage.delete(key)
+      ),
+    }
+
+    describe("Synchronous Custom Storage", () => {
+      let client: Client
+
+      beforeEach(() => {
+        mockSyncStorage.storage.clear()
+        client = new Client({
+          baseUrl,
+          auth: {
+            type: "jwt",
+            jwtTokenStorageMethod: "custom",
+            storage: mockSyncStorage,
+          },
+        })
+      })
+
+      it("should store and retrieve token", async () => {
+        await client.setToken(token)
+        expect(mockSyncStorage.setItem).toHaveBeenCalledWith(
+          jwtTokenStorageKey,
+          token
+        )
+        const resp = await client.fetch<any>("jwt")
+        expect(resp).toEqual({ test: "test" })
+        expect(mockSyncStorage.getItem).toHaveBeenCalledWith(jwtTokenStorageKey)
+      })
+
+      it("should clear token", async () => {
+        await client.setToken(token)
+        await client.clearToken()
+        const resp = await client.fetch<any>("nostore")
+        expect(resp).toEqual({ test: "test" })
+      })
+    })
+
+    describe("Asynchronous Custom Storage", () => {
+      let client: Client
+
+      beforeEach(() => {
+        mockAsyncStorage.storage.clear()
+        jest.clearAllMocks()
+        client = new Client({
+          baseUrl,
+          auth: {
+            type: "jwt",
+            jwtTokenStorageMethod: "custom",
+            storage: mockAsyncStorage,
+          },
+        })
+      })
+
+      it("should store and retrieve token asynchronously", async () => {
+        await client.setToken(token)
+
+        expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
+          jwtTokenStorageKey,
+          token
+        )
+
+        const resp = await client.fetch<any>("jwt")
+        expect(resp).toEqual({ test: "test" })
+        expect(mockAsyncStorage.getItem).toHaveBeenCalled()
+      })
+
+      it("should clear token asynchronously", async () => {
+        await client.setToken(token)
+        await client.clearToken()
+
+        expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith(
+          jwtTokenStorageKey
+        )
+
+        const resp = await client.fetch<any>("nostore")
+        expect(resp).toEqual({ test: "test" })
+      })
+    })
+  })
 })

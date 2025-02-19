@@ -1,24 +1,27 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import { HttpTypes } from "@medusajs/types"
-import { Button, Checkbox, toast } from "@medusajs/ui"
+import {
+  Button,
+  createDataTableColumnHelper,
+  DataTableRowSelectionState,
+  toast,
+} from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
-import { RowSelectionState, createColumnHelper } from "@tanstack/react-table"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
+import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { DataTable } from "../../../../../components/data-table"
+import * as hooks from "../../../../../components/data-table/helpers/sales-channels"
 import {
   RouteFocusModal,
   useRouteModal,
 } from "../../../../../components/modals"
-import { _DataTable } from "../../../../../components/table/data-table"
+import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
+import { VisuallyHidden } from "../../../../../components/utilities/visually-hidden"
 import { useSalesChannels } from "../../../../../hooks/api/sales-channels"
 import { useUpdateStockLocationSalesChannels } from "../../../../../hooks/api/stock-locations"
-import { useSalesChannelTableColumns } from "../../../../../hooks/table/columns/use-sales-channel-table-columns"
-import { useSalesChannelTableFilters } from "../../../../../hooks/table/filters/use-sales-channel-table-filters"
-import { useSalesChannelTableQuery } from "../../../../../hooks/table/query/use-sales-channel-table-query"
-import { useDataTable } from "../../../../../hooks/use-data-table"
 
 type EditSalesChannelsFormProps = {
   location: HttpTypes.AdminStockLocation
@@ -29,6 +32,7 @@ const EditSalesChannelsSchema = zod.object({
 })
 
 const PAGE_SIZE = 50
+const PREFIX = "sc"
 
 export const LocationEditSalesChannelsForm = ({
   location,
@@ -45,28 +49,25 @@ export const LocationEditSalesChannelsForm = ({
 
   const { setValue } = form
 
-  const initialState =
-    location.sales_channels?.reduce((acc, curr) => {
-      acc[curr.id] = true
-      return acc
-    }, {} as RowSelectionState) ?? {}
+  const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>(
+    getInitialState(location)
+  )
 
-  const [rowSelection, setRowSelection] =
-    useState<RowSelectionState>(initialState)
-
-  useEffect(() => {
-    const ids = Object.keys(rowSelection)
+  const onRowSelectionChange = (selection: DataTableRowSelectionState) => {
+    const ids = Object.keys(selection)
     setValue("sales_channels", ids, {
       shouldDirty: true,
       shouldTouch: true,
     })
-  }, [rowSelection, setValue])
+    setRowSelection(selection)
+  }
 
-  const { searchParams, raw } = useSalesChannelTableQuery({
+  const searchParams = hooks.useSalesChannelTableQuery({
     pageSize: PAGE_SIZE,
+    prefix: PREFIX,
   })
 
-  const { sales_channels, count, isLoading, isError, error } = useSalesChannels(
+  const { sales_channels, count, isPending, isError, error } = useSalesChannels(
     {
       ...searchParams,
     },
@@ -75,22 +76,9 @@ export const LocationEditSalesChannelsForm = ({
     }
   )
 
-  const filters = useSalesChannelTableFilters()
+  const filters = hooks.useSalesChannelTableFilters()
   const columns = useColumns()
-
-  const { table } = useDataTable({
-    data: sales_channels ?? [],
-    columns,
-    count,
-    enablePagination: true,
-    enableRowSelection: true,
-    rowSelection: {
-      state: rowSelection,
-      updater: setRowSelection,
-    },
-    getRowId: (row) => row.id,
-    pageSize: PAGE_SIZE,
-  })
+  const emptyState = hooks.useSalesChannelTableEmptyState()
 
   const { mutateAsync, isPending: isMutating } =
     useUpdateStockLocationSalesChannels(location.id)
@@ -123,80 +111,67 @@ export const LocationEditSalesChannelsForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <div className="flex h-full flex-col overflow-hidden">
+      <KeyboundForm onSubmit={handleSubmit} className="flex h-full flex-col">
         <RouteFocusModal.Header>
+          <RouteFocusModal.Title asChild>
+            <VisuallyHidden>
+              {t("stockLocations.salesChannels.header")}
+            </VisuallyHidden>
+          </RouteFocusModal.Title>
+          <RouteFocusModal.Description asChild>
+            <VisuallyHidden>
+              {t("stockLocations.salesChannels.hint")}
+            </VisuallyHidden>
+          </RouteFocusModal.Description>
+        </RouteFocusModal.Header>
+        <RouteFocusModal.Body className="flex flex-1 flex-col overflow-auto">
+          <DataTable
+            data={sales_channels}
+            columns={columns}
+            filters={filters}
+            emptyState={emptyState}
+            prefix={PREFIX}
+            rowSelection={{
+              state: rowSelection,
+              onRowSelectionChange,
+            }}
+            pageSize={PAGE_SIZE}
+            isLoading={isPending}
+            rowCount={count}
+            layout="fill"
+            getRowId={(row) => row.id}
+          />
+        </RouteFocusModal.Body>
+        <RouteFocusModal.Footer>
           <div className="flex items-center justify-end gap-x-2">
             <RouteFocusModal.Close asChild>
-              <Button size="small" variant="secondary">
+              <Button size="small" variant="secondary" type="button">
                 {t("actions.cancel")}
               </Button>
             </RouteFocusModal.Close>
-            <Button size="small" isLoading={isMutating} onClick={handleSubmit}>
+            <Button size="small" isLoading={isMutating} type="submit">
               {t("actions.save")}
             </Button>
           </div>
-        </RouteFocusModal.Header>
-        <RouteFocusModal.Body>
-          <_DataTable
-            table={table}
-            columns={columns}
-            pageSize={PAGE_SIZE}
-            isLoading={isLoading}
-            count={count}
-            filters={filters}
-            search="autofocus"
-            pagination
-            orderBy={[
-              { key: "name", label: t("fields.name") },
-              { key: "created_at", label: t("fields.createdAt") },
-              { key: "updated_at", label: t("fields.updatedAt") },
-            ]}
-            queryObject={raw}
-            layout="fill"
-          />
-        </RouteFocusModal.Body>
-      </div>
+        </RouteFocusModal.Footer>
+      </KeyboundForm>
     </RouteFocusModal.Form>
   )
 }
 
-const columnHelper = createColumnHelper<HttpTypes.AdminSalesChannel>()
+const columnHelper = createDataTableColumnHelper<HttpTypes.AdminSalesChannel>()
 
 const useColumns = () => {
-  const columns = useSalesChannelTableColumns()
+  const base = hooks.useSalesChannelTableColumns()
 
-  return useMemo(
-    () => [
-      columnHelper.display({
-        id: "select",
-        header: ({ table }) => {
-          return (
-            <Checkbox
-              checked={
-                table.getIsSomePageRowsSelected()
-                  ? "indeterminate"
-                  : table.getIsAllPageRowsSelected()
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-            />
-          )
-        },
-        cell: ({ row }) => {
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          )
-        },
-      }),
-      ...columns,
-    ],
-    [columns]
+  return useMemo(() => [columnHelper.select(), ...base], [base])
+}
+
+function getInitialState(location: HttpTypes.AdminStockLocation) {
+  return (
+    location.sales_channels?.reduce((acc, curr) => {
+      acc[curr.id] = true
+      return acc
+    }, {} as DataTableRowSelectionState) ?? {}
   )
 }

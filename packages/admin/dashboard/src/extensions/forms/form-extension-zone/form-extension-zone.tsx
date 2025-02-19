@@ -1,8 +1,8 @@
-import { Input, Switch } from "@medusajs/ui"
+import { InlineTip, Input, Switch } from "@medusajs/ui"
 import { ComponentType } from "react"
 import { ControllerRenderProps, UseFormReturn } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { Form } from "../../../components/common/form"
-import { InlineTip } from "../../../components/common/inline-tip"
 import { FormField } from "../../types"
 import { FormFieldType } from "./types"
 import { getFieldType } from "./utils"
@@ -86,6 +86,8 @@ const FormExtensionFieldComponent = ({
   component,
   placeholder,
 }: FormExtensionFieldComponentProps) => {
+  const { t } = useTranslation()
+
   if (component) {
     const Component = component
 
@@ -104,7 +106,7 @@ const FormExtensionFieldComponent = ({
     }
     default: {
       return (
-        <InlineTip variant="warning">
+        <InlineTip variant="warning" label={t("general.warning")}>
           The field type does not support rendering a fallback component. Please
           provide a component prop.
         </InlineTip>

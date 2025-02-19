@@ -1,5 +1,9 @@
 export const region = [
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "Region Context in Storefront",
     "path": "/storefront-development/regions/context"
   },

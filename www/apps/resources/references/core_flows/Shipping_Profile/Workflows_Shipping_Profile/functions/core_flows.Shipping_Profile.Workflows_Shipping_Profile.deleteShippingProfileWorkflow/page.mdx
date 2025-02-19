@@ -3,6 +3,7 @@ slug: /references/medusa-workflows/deleteShippingProfileWorkflow
 sidebar_label: deleteShippingProfileWorkflow
 sidebar_description: Delete shipping profiles.
 tags:
+  - query
   - fulfillment
   - link
   - workflow
@@ -16,11 +17,12 @@ This documentation provides a reference to the `deleteShippingProfileWorkflow`. 
 
 This workflow deletes one or more shipping profiles. It's used by the
 [Delete Shipping Profile Admin API Route](https://docs.medusajs.com/api/admin#shipping-profiles\_deleteshippingprofilesid).
+Shipping profiles that are linked to products cannot be deleted.
 
 You can use this workflow within your customizations or your own custom workflows, allowing you to
 delete shipping profiles within your custom flows.
 
-<SourceCodeLink link="https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/shipping-profile/workflows/delete-shipping-profile.ts#L38" />
+<SourceCodeLink link="https://github.com/medusajs/medusa/blob/3c25aec00616c44b5bd0a66550749708f21aec3e/packages/core/core-flows/src/shipping-profile/workflows/delete-shipping-profile.ts#L92" />
 
 ## Examples
 
@@ -129,7 +131,7 @@ const myWorkflow = createWorkflow(
 
 ## Steps
 
-<WorkflowDiagram workflow={{"name":"deleteShippingProfileWorkflow","steps":[{"type":"step","name":"deleteShippingProfilesStep","description":"This step deletes one or more shipping profiles.","link":"../../../Steps_Shipping_Profile/functions/core_flows.Shipping_Profile.Steps_Shipping_Profile.deleteShippingProfilesStep/page.mdx","depth":1},{"type":"step","name":"removeRemoteLinkStep","description":"This step deletes linked records of a record.\n\nLearn more in the [Remote Link documentation](https://docs.medusajs.com/learn/fundamentals/module-links/remote-link#cascade-delete-linked-records)","link":"../../../../Common/Steps_Common/functions/core_flows.Common.Steps_Common.removeRemoteLinkStep/page.mdx","depth":2}]}} />
+<WorkflowDiagram workflow={{"name":"deleteShippingProfileWorkflow","steps":[{"type":"step","name":"useQueryGraphStep","description":"This step fetches data across modules using the Query.\n\nLearn more in the [Query documentation](https://docs.medusajs.com/learn/fundamentals/module-links/query).","link":"../../../../Common/Steps_Common/functions/core_flows.Common.Steps_Common.useQueryGraphStep/page.mdx","depth":1},{"type":"step","name":"validateStepShippingProfileDelete","description":"This step validates that the shipping profiles to delete are not linked to any products.\nOtherwise, an error is thrown.","link":"../core_flows.Shipping_Profile.Workflows_Shipping_Profile.validateStepShippingProfileDelete/page.mdx","depth":2},{"type":"step","name":"deleteShippingProfilesStep","description":"This step deletes one or more shipping profiles.","link":"../../../Steps_Shipping_Profile/functions/core_flows.Shipping_Profile.Steps_Shipping_Profile.deleteShippingProfilesStep/page.mdx","depth":3},{"type":"step","name":"removeRemoteLinkStep","description":"This step deletes linked records of a record.\n\nLearn more in the [Remote Link documentation](https://docs.medusajs.com/learn/fundamentals/module-links/remote-link#cascade-delete-linked-records)","link":"../../../../Common/Steps_Common/functions/core_flows.Common.Steps_Common.removeRemoteLinkStep/page.mdx","depth":4}]}} />
 
 ## Input
 

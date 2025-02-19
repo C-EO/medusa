@@ -1,0 +1,33 @@
+---
+sidebar_label: "Bundle Product"
+---
+
+export const metadata = {
+  title: `Create Bundle Product`,
+}
+
+# {metadata.title}
+
+In this guide, you'll learn how to create a product whose variants make up a bundle of products.
+
+## Bundle Products with Inventory Kits
+
+Consider you separately sell a camera, a lens, and a camera bag, but you want to sell these products as a bundle for a different price.
+
+Medusa supports variants with inventory kits, which is a collection of inventory items that make up the variant. To create a bundle product, you create a product with a variant that has an inventory kit of each product variant's inventory items.
+
+So, the camera bundle would be a variant having the inventory items of the camera, lens, and camera bag. You can then manage the bundle product separately, including its price. When the variant is purchased, the inventory items are automatically deducted from the stock based on the required quantity.
+
+![Bundle product diagram](https://res.cloudinary.com/dza7lstvk/image/upload/v1739870226/User%20Guide/bundle_product_oxdibk.jpg)
+
+---
+
+## How to Create a Bundle Product
+
+You create a product with bundle variants as explained in the [Create Product](../page.mdx) guide. For the variants that make up the bundle, you enable the "Has inventory kit" toggle in the "Variants" step.
+
+![Enable has inventory kit](https://res.cloudinary.com/dza7lstvk/image/upload/v1739865469/User%20Guide/Screenshot_2025-02-18_at_9.57.05_AM_j7cugr.png)
+
+This opens a new step in the product-creation form, where you can add inventory items of the product variants that make up the bundle. For each inventory item, you can specify the quantity required for the variant to be purchasable.
+
+![Create Product Fourth Step](https://res.cloudinary.com/dza7lstvk/image/upload/v1739866189/User%20Guide/Screenshot_2025-02-18_at_10.09.37_AM_lnd8jj.png)

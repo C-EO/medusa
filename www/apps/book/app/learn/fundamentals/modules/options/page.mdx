@@ -118,3 +118,48 @@ export default async function helloWorldLoader({
   )
 }
 ```
+
+---
+
+## Validate Module Options
+
+If you expect a certain option and want to throw an error if it's not provided or isn't valid, it's recommended to perform the validation in a loader. The module's service is only instantiated when it's used, whereas the loader runs the when the Medusa application starts.
+
+So, by performing the validation in the loader, you ensure you can throw an error at an early point, rather than when the module is used.
+
+For example, to validate that the Hello Module received an `apiKey` option, create the loader `src/modules/loaders/validate.ts`:
+
+```ts title="src/modules/hello/loaders/validate.ts" 
+import { LoaderOptions } from "@medusajs/framework/types"
+import { MedusaError } from "@medusajs/framework/utils"
+
+// recommended to define type in another file
+type ModuleOptions = {
+  apiKey?: string
+}
+
+export default async function validationLoader({
+  options,
+}: LoaderOptions<ModuleOptions>) {
+  if (!options.apiKey) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "Hello Module requires an apiKey option."
+    )
+  }
+}
+```
+
+Then, export the loader in the module's definition file, as explained in [this chapter](../loaders/page.mdx):
+
+```ts title="src/modules/hello/index.ts"
+// other imports...
+import validationLoader from "./loaders/validate"
+
+export default Module("hello", {
+  // ...
+  loaders: [validationLoader],
+})
+```
+
+Now, when the Medusa application starts, the loader will run, validating the module's options and throwing an error if the `apiKey` option is missing.

@@ -31,6 +31,7 @@ describe("GraphQL builder", () => {
     const group = model.define("group", {
       id: model.number(),
       name: model.text(),
+      admin: model.hasOne(() => user, { foreignKey: true }),
       users: model.hasMany(() => user),
     })
 
@@ -70,6 +71,7 @@ describe("GraphQL builder", () => {
         email: Email!
         spend_limit: String!
         phones: [String]!
+        group_id:String!
         group: Group!
         role: UserRoleEnum!
         tags: [Tag]!
@@ -82,6 +84,8 @@ describe("GraphQL builder", () => {
       type Group {
         id: Int!
         name: String!
+        admin_id: String!
+        admin: User!
         users: [User]!
         created_at: DateTime!
         updated_at: DateTime!

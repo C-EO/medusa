@@ -11,7 +11,10 @@ export const InlineIcon = ({ Icon, alt, ...props }: InlineIconProps) => {
   return (
     <Icon
       {...props}
-      className={clsx("text-medusa-fg-subtle inline", props.className)}
+      className={clsx(
+        "text-medusa-fg-subtle inline-block align-middle",
+        props.className
+      )}
       aria-label={alt}
     />
   )

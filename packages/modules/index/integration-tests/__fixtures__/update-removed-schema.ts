@@ -10,12 +10,6 @@ export const updateRemovedSchema = `
     id: String
     product_id: String
     sku: String
-    prices: [Price]
     description: String
-  }
-  
-  type Price @Listeners(values: ["price.created", "price.updated", "price.deleted"]) {
-    amount: Float
-    currency_code: String
   }
 `

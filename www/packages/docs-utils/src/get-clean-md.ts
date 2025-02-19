@@ -156,21 +156,23 @@ const getParsedAsString = (file: VFile): string => {
   return content
 }
 
-type Options = {
-  filePath: string
+export type GetCleanMdOptions = {
+  file: string
   plugins?: {
     before?: Plugin[]
     after?: Plugin[]
   }
   parserOptions?: ParserPluginOptions
+  type?: "file" | "content"
 }
 
 export const getCleanMd = async ({
-  filePath,
+  file,
   plugins,
   parserOptions,
-}: Options): Promise<string> => {
-  if (!filePath.endsWith(".md") && !filePath.endsWith(".mdx")) {
+  type = "file",
+}: GetCleanMdOptions): Promise<string> => {
+  if (type === "file" && !file.endsWith(".md") && !file.endsWith(".mdx")) {
     return ""
   }
   const unifier = unified()
@@ -196,7 +198,8 @@ export const getCleanMd = async ({
     unifier.use(...(Array.isArray(plugin) ? plugin : [plugin]))
   })
 
-  const parsed = await unifier.process(await read(filePath))
+  const content = type === "file" ? await read(file) : file
+  const parsed = await unifier.process(content)
 
   return getParsedAsString(parsed)
 }

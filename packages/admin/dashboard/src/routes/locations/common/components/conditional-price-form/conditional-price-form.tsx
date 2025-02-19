@@ -11,6 +11,7 @@ import {
   Button,
   clx,
   CurrencyInput,
+  Divider,
   Heading,
   IconButton,
   Label,
@@ -30,7 +31,6 @@ import {
 import { Trans, useTranslation } from "react-i18next"
 
 import { formatValue } from "react-currency-input-field"
-import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { StackedFocusModal } from "../../../../../components/modals"
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"

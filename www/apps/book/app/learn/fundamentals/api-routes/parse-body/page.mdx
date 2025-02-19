@@ -1,0 +1,190 @@
+export const metadata = {
+  title: `${pageNumber} Configure Request Body Parser`,
+}
+
+# {metadata.title}
+
+In this chapter, you'll learn how to configure the request body parser for your API routes.
+
+## Default Body Parser Configuration
+
+The Medusa application configures the body parser by default to parse JSON, URL-encoded, and text request content types. You can parse other data types by adding the relevant [Express middleware](https://expressjs.com/en/guide/using-middleware.html) or preserve the raw body data by configuring the body parser, which is useful for webhook requests.
+
+This chapter shares some examples of configuring the body parser for different data types or use cases.
+
+---
+
+## Preserve Raw Body Data for Webhooks
+
+If your API route receives webhook requests, you might want to preserve the raw body data. To do this, you can configure the body parser to parse the raw body data and store it in the `req.rawBody` property.
+
+To do that, create the file `src/api/middlewares.ts` with the following content:
+
+export const preserveHighlights = [
+  ["7", "preserveRawBody", "Enable preserving the raw body data."],
+]
+
+```ts title="src/api/middlewares.ts" highlights={preserveHighlights}
+import { defineMiddlewares } from "@medusajs/framework/http"
+
+export default defineMiddlewares({
+  routes: [
+    {
+      method: ["POST"],
+      bodyParser: { preserveRawBody: true },
+      matcher: "/custom",
+    },
+  ],
+})
+```
+
+The middleware route object passed to `routes` accepts a `bodyParser` property whose value is an object of configuration for the default body parser. By enabling the `preserveRawBody` property, the raw body data is preserved and stored in the `req.rawBody` property.
+
+<Note title="Tip">
+
+Learn more about [middlewares](../middlewares/page.mdx).
+
+</Note>
+
+You can then access the raw body data in your API route handler:
+
+```ts title="src/api/custom/route.ts"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+
+export async function POST(
+  req: MedusaRequest,
+  res: MedusaResponse
+) {
+  console.log(req.rawBody)
+
+  // TODO use raw body
+}
+```
+
+---
+
+## Configure Request Body Size Limit
+
+By default, the body parser limits the request body size to `100kb`. If a request body exceeds that size, the Medusa application throws an error.
+
+You can configure the body parser to accept larger request bodies by setting the `sizeLimit` property of the `bodyParser` object in a middleware route object. For example:
+
+export const sizeLimitHighlights = [
+  ["7", "sizeLimit", "Set the request body size limit."],
+]
+
+```ts title="src/api/middlewares.ts" highlights={sizeLimitHighlights}
+import { defineMiddlewares } from "@medusajs/framework/http"
+
+export default defineMiddlewares({
+  routes: [
+    {
+      method: ["POST"],
+      bodyParser: { sizeLimit: "2mb" },
+      matcher: "/custom",
+    },
+  ],
+})
+```
+
+The `sizeLimit` property accepts one of the following types of values:
+
+- A string representing the size limit in bytes (For example, `100kb`, `2mb`, `5gb`). It is passed to the [bytes](https://www.npmjs.com/package/bytes) library to parse the size.
+- A number representing the size limit in bytes. For example, `1024` for 1kb.
+
+---
+
+## Configure File Uploads
+
+To accept file uploads in your API routes, you can configure the [Express Multer middleware](https://expressjs.com/en/resources/middleware/multer.html) on your route.
+
+The `multer` package is available through the `@medusajs/medusa` package, so you don't need to install it. However, for better typing support, install the `@types/multer` package as a development dependency:
+
+```bash npm2yarn
+npm install --save-dev @types/multer
+```
+
+Then, to configure file upload for your route, create the file `src/api/middlewares.ts` with the following content:
+
+export const uploadHighlights = [
+  ["4", "upload", "Configure the upload middleware."],
+  ["13", "upload", "Add the upload middleware to the route."],
+]
+
+```ts title="src/api/middlewares.ts" highlights={uploadHighlights}
+import { defineMiddlewares } from "@medusajs/framework/http"
+import multer from "multer"
+
+const upload = multer({ storage: multer.memoryStorage() })
+
+export default defineMiddlewares({
+  routes: [
+    {
+      method: ["POST"],
+      matcher: "/custom",
+      middlewares: [
+        // @ts-ignore
+        upload.array("files"),
+      ],
+    },
+  ],
+})
+```
+
+In the example above, you configure the `multer` middleware to store the uploaded files in memory. Then, you apply the `upload.array("files")` middleware to the route to accept file uploads. By using the `array` method, you accept multiple file uploads with the same `files` field name.
+
+You can then access the uploaded files in your API route handler:
+
+```ts title="src/api/custom/route.ts"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+
+export async function POST(
+  req: MedusaRequest,
+  res: MedusaResponse
+) {
+  const files = req.files as Express.Multer.File[]
+
+  // TODO handle files
+}
+```
+
+The uploaded files are stored in the `req.files` property as an array of Multer file objects that have properties like `filename` and `mimetype`.
+
+### Uploading Files using File Module Provider
+
+The recommended way to upload the files to storage using the configured [File Module Provider](!resources!/architectural-modules/file) is to use the [uploadFilesWorkflow](!resources!/references/medusa-workflows/uploadFilesWorkflow):
+
+```ts title="src/api/custom/route.ts"
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { MedusaError } from "@medusajs/framework/utils"
+import { uploadFilesWorkflow } from "@medusajs/medusa/core-flows"
+
+export async function POST(
+  req: MedusaRequest,
+  res: MedusaResponse
+) {
+  const files = req.files as Express.Multer.File[]
+
+  if (!files?.length) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "No files were uploaded"
+    )
+  }
+
+  const { result } = await uploadFilesWorkflow(req.scope).run({
+    input: {
+      files: files?.map((f) => ({
+        filename: f.originalname,
+        mimeType: f.mimetype,
+        content: f.buffer.toString("binary"),
+        access: "public",
+      })),
+    },
+  })
+
+  res.status(200).json({ files: result })
+}
+```
+
+Check out the [uploadFilesWorkflow reference](!resources!/references/medusa-workflows/uploadFilesWorkflow) for details on the expected input and output of the workflow.

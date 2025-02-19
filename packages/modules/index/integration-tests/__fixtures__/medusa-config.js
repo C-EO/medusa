@@ -1,4 +1,8 @@
-const { defineConfig, Modules } = require("@medusajs/framework/utils")
+const {
+  defineConfig,
+  Modules,
+  ContainerRegistrationKeys,
+} = require("@medusajs/framework/utils")
 const { schema } = require("./schema")
 
 export const dbName = "medusa-index-integration-2024"
@@ -26,13 +30,20 @@ Object.keys(config.modules).forEach((key) => {
 
 config.modules[Modules.INDEX] = {
   resolve: "@medusajs/index",
-  dependencies: [Modules.EVENT_BUS],
+  dependencies: [
+    ContainerRegistrationKeys.LOGGER,
+    Modules.EVENT_BUS,
+    Modules.LOCKING,
+    ContainerRegistrationKeys.REMOTE_QUERY,
+    ContainerRegistrationKeys.QUERY,
+  ],
   options: {
     schema,
   },
 }
 
 config.modules[Modules.PRODUCT] = true
+config.modules[Modules.LOCKING] = true
 config.modules[Modules.PRICING] = true
 
 export default config

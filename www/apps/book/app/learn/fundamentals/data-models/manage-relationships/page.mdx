@@ -10,31 +10,31 @@ In this chapter, you'll learn how to manage relationships between data models wh
 
 ### BelongsTo Side of One-to-One
 
-When you create a record of a data model that belongs to another through a one-to-one relation, pass the ID of the other data model's record in the relation property.
+When you create a record of a data model that belongs to another through a one-to-one relation, pass the ID of the other data model's record in the `{relation}_id` property, where `{relation}` is the name of the relation property.
 
 For example, assuming you have the [User and Email data models from the previous chapter](../relationships/page.mdx#one-to-one-relationship), set an email's user ID as follows:
 
 export const belongsHighlights = [
-  ["4", "user", "The ID of the user the email belongs to."],
-  ["11", "user", "The ID of the user the email belongs to."]
+  ["4", "user_id", "The ID of the user the email belongs to."],
+  ["11", "user_id", "The ID of the user the email belongs to."]
 ]
 
 ```ts highlights={belongsHighlights}
 // when creating an email
 const email = await helloModuleService.createEmails({
   // other properties...
-  user: "123",
+  user_id: "123",
 })
 
 // when updating an email
 const email = await helloModuleService.updateEmails({
   id: "321",
   // other properties...
-  user: "123",
+  user_id: "123",
 })
 ```
 
-In the example above, you pass the `user` property when creating or updating an email to specify the user it belongs to.
+In the example above, you pass the `user_id` property when creating or updating an email to specify the user it belongs to.
 
 ### HasOne Side
 
@@ -43,8 +43,8 @@ When you create a record of a data model that has one of another, pass the ID of
 For example, assuming you have the [User and Email data models from the previous chapter](../relationships/page.mdx#one-to-one-relationship), set a user's email ID as follows:
 
 export const hasOneHighlights = [
-  ["4", "email", "The ID of the email that the user has."],
-  ["11", "email", "The ID of the email that the user has."]
+  ["4", "email_id", "The ID of the email that the user has."],
+  ["11", "email_id", "The ID of the email that the user has."]
 ]
 
 ```ts highlights={hasOneHighlights}

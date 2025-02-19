@@ -6,6 +6,7 @@ import {
   RemoteQueryObjectConfig,
   RemoteQueryObjectFromStringResult,
 } from "./remote-query-object-from-string"
+import { RemoteQueryFilters } from "./to-remote-query"
 
 /*type ExcludedProps = "__typename"*/
 
@@ -34,6 +35,20 @@ export type GraphResultSet<TEntry extends string> = {
 export type QueryGraphFunction = {
   <const TEntry extends string>(
     queryConfig: RemoteQueryInput<TEntry>,
+    options?: RemoteJoinerOptions
+  ): Promise<Prettify<GraphResultSet<TEntry>>>
+}
+
+/**
+ * QueryIndexFunction is a wrapper on top of remoteQuery
+ * that simplifies the input it accepts and returns
+ * a normalized/consistent output.
+ */
+export type QueryIndexFunction = {
+  <const TEntry extends string>(
+    queryOptions: RemoteQueryInput<TEntry> & {
+      joinFilters?: RemoteQueryFilters<TEntry>
+    },
     options?: RemoteJoinerOptions
   ): Promise<Prettify<GraphResultSet<TEntry>>>
 }
@@ -101,6 +116,12 @@ export type RemoteQueryFunction = {
    * returns a result set
    */
   graph: QueryGraphFunction
+
+  /**
+   * Index function uses the index module to query and remoteQuery to hydrate the data
+   * returns a result set
+   */
+  index: QueryIndexFunction
 
   /**
    * Query wrapper to provide specific GraphQL like API around remoteQuery.query

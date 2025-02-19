@@ -291,17 +291,11 @@ describe("RemoteJoiner", () => {
         date: "2023-04-01T12:00:00Z",
         products: [
           {
-            product_id: [101, 103],
-            product: [
-              {
-                name: "Product 1",
-                id: 101,
-              },
-              {
-                name: "Product 3",
-                id: 103,
-              },
-            ],
+            product_id: 103,
+            product: {
+              name: "Product 3",
+              id: 103,
+            },
           },
         ],
         user_id: 1,
@@ -438,19 +432,18 @@ describe("RemoteJoiner", () => {
               number: "ORD-202",
               products: [
                 {
-                  product_id: [101, 103],
+                  product_id: 103,
                   variant_id: 993,
                   quantity: 4,
-                  product: [
-                    {
-                      name: "Product 1",
-                      id: 101,
-                    },
-                    {
-                      name: "Product 3",
-                      id: 103,
-                    },
-                  ],
+                  product: {
+                    name: "Product 3",
+                    id: 103,
+                  },
+                  variant: {
+                    id: 993,
+                    name: "Product variant 33",
+                    product_id: 103,
+                  },
                 },
               ],
               id: 205,
@@ -468,19 +461,18 @@ describe("RemoteJoiner", () => {
             number: "ORD-202",
             products: [
               {
-                product_id: [101, 103],
+                product_id: 103,
                 variant_id: 993,
                 quantity: 4,
-                product: [
-                  {
-                    name: "Product 1",
-                    id: 101,
-                  },
-                  {
-                    name: "Product 3",
-                    id: 103,
-                  },
-                ],
+                product: {
+                  name: "Product 3",
+                  id: 103,
+                },
+                variant: {
+                  id: 993,
+                  name: "Product variant 33",
+                  product_id: 103,
+                },
               },
             ],
             id: 205,
@@ -518,16 +510,10 @@ describe("RemoteJoiner", () => {
         ],
       }),
       expect.objectContaining({
-        product_user_alias: [
-          {
-            email: "janedoe@example.com",
-            id: 2,
-          },
-          {
-            email: "aaa@example.com",
-            id: 3,
-          },
-        ],
+        product_user_alias: {
+          email: "aaa@example.com",
+          id: 3,
+        },
       }),
     ])
     expect(data[0].products[0].product).toEqual(undefined)
@@ -564,16 +550,10 @@ describe("RemoteJoiner", () => {
         ],
       }),
       expect.objectContaining({
-        product_user_alias: [
-          {
-            email: "janedoe@example.com",
-            id: 2,
-          },
-          {
-            email: "aaa@example.com",
-            id: 3,
-          },
-        ],
+        product_user_alias: {
+          email: "aaa@example.com",
+          id: 3,
+        },
       }),
     ])
     expect(data[0].products[0].product).toEqual({
@@ -619,18 +599,11 @@ describe("RemoteJoiner", () => {
         ],
       }),
       expect.objectContaining({
-        product_user_alias: [
-          {
-            name: "Jane Doe",
-            id: 2,
-            email: "janedoe@example.com",
-          },
-          {
-            name: "aaa bbb",
-            id: 3,
-            email: "aaa@example.com",
-          },
-        ],
+        product_user_alias: {
+          name: "aaa bbb",
+          id: 3,
+          email: "aaa@example.com",
+        },
       }),
     ])
     expect(data[0].products[0].product).toEqual({
@@ -725,16 +698,10 @@ describe("RemoteJoiner", () => {
 
     expect(data[1]).toEqual(
       expect.objectContaining({
-        product_user_alias: [
-          {
-            id: 2,
-            name: "Jane Doe",
-          },
-          {
-            id: 3,
-            name: "aaa bbb",
-          },
-        ],
+        product_user_alias: {
+          id: 3,
+          name: "aaa bbb",
+        },
       })
     )
 
@@ -857,10 +824,13 @@ describe("RemoteJoiner", () => {
           id
           number
           products {
-            product {
-              handler
-              user {
-                name
+            variant {
+              name
+              product {
+                handler
+                user {
+                  name
+                }
               }
             }
           }
@@ -878,18 +848,22 @@ describe("RemoteJoiner", () => {
         products: [
           {
             product_id: 101,
+            variant_id: 991,
             color: "red",
-            product: {
-              id: 101,
-              product_extra_field: "extra 101 - red",
+            variant: {
+              id: 991,
+              product_id: 101,
+              variant_extra_field: "extra 101 - var 991 - red",
             },
           },
           {
             product_id: 101,
+            variant_id: 992,
             color: "green",
-            product: {
-              id: 101,
-              product_extra_field: "extra 101 - green",
+            variant: {
+              id: 992,
+              product_id: 101,
+              variant_extra_field: "extra 101 - var 992 - green",
             },
           },
         ],
@@ -897,23 +871,6 @@ describe("RemoteJoiner", () => {
       {
         id: 205,
         extra_field: "extra",
-        products: [
-          {
-            product_id: [101, 103],
-            product: [
-              {
-                id: 101,
-                color: "blue",
-                product_extra_field: "extra 101 - blue",
-              },
-              {
-                id: 103,
-                color: "yellow",
-                product_extra_field: "extra 101 - yellow",
-              },
-            ],
-          },
-        ],
       },
     ]
 
@@ -928,29 +885,41 @@ describe("RemoteJoiner", () => {
         products: [
           {
             product_id: 101,
+            variant_id: 991,
             color: "red",
-            product: {
-              id: 101,
-              product_extra_field: "extra 101 - red",
-              handler: "product-1-handler",
-              user_id: 2,
-              user: {
-                name: "Jane Doe",
-                id: 2,
+            variant: {
+              id: 991,
+              product_id: 101,
+              variant_extra_field: "extra 101 - var 991 - red",
+              name: "Product variant 1",
+              product: {
+                handler: "product-1-handler",
+                id: 101,
+                user_id: 2,
+                user: {
+                  name: "Jane Doe",
+                  id: 2,
+                },
               },
             },
           },
           {
             product_id: 101,
+            variant_id: 992,
             color: "green",
-            product: {
-              id: 101,
-              product_extra_field: "extra 101 - green",
-              handler: "product-1-handler",
-              user_id: 2,
-              user: {
-                name: "Jane Doe",
-                id: 2,
+            variant: {
+              id: 992,
+              product_id: 101,
+              variant_extra_field: "extra 101 - var 992 - green",
+              name: "Product variant 2",
+              product: {
+                handler: "product-1-handler",
+                id: 101,
+                user_id: 2,
+                user: {
+                  name: "Jane Doe",
+                  id: 2,
+                },
               },
             },
           },
@@ -965,31 +934,22 @@ describe("RemoteJoiner", () => {
         number: "ORD-202",
         products: [
           {
-            product_id: [101, 103],
-            product: [
-              {
-                id: 101,
-                color: "blue",
-                product_extra_field: "extra 101 - blue",
-                handler: "product-1-handler",
-                user_id: 2,
-                user: {
-                  name: "Jane Doe",
-                  id: 2,
-                },
-              },
-              {
-                id: 103,
-                color: "yellow",
-                product_extra_field: "extra 101 - yellow",
+            variant_id: 993,
+            product_id: 103,
+            variant: {
+              name: "Product variant 33",
+              id: 993,
+              product_id: 103,
+              product: {
                 handler: "product-3-handler",
+                id: 103,
                 user_id: 3,
                 user: {
                   name: "aaa bbb",
                   id: 3,
                 },
               },
-            ],
+            },
           },
         ],
         extra_field: "extra",

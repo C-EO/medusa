@@ -214,6 +214,27 @@ export type InferSchemaFields<Schema extends DMLSchema> = Prettify<
 >
 
 /**
+ * Infers the types of the schema fields from the DML entity
+ * for module services
+ */
+export type InferSchemaFieldsForModuleServices<Schema extends DMLSchema> =
+  Prettify<
+    {
+      [K in keyof Schema]: Schema[K] extends RelationshipType<any>
+        ? Schema[K]["type"] extends "belongsTo"
+          ? string
+          : Schema[K]["type"] extends "hasOne" | "hasOneWithFK"
+          ? string
+          : Schema[K]["type"] extends "hasMany"
+          ? string[]
+          : Schema[K]["type"] extends "manyToMany"
+          ? string[]
+          : never
+        : Schema[K]["$dataType"]
+    } & InferForeignKeys<Schema>
+  >
+
+/**
  * Infers the schema properties without the relationships
  */
 export type InferSchemaProperties<Schema extends DMLSchema> = Prettify<
@@ -245,6 +266,13 @@ export type ExtractEntityRelations<
  */
 export type Infer<T> = T extends IDmlEntity<infer Schema, any>
   ? EntityConstructor<InferSchemaFields<Schema>>
+  : never
+
+export type InferEntityForModuleService<T> = T extends IDmlEntity<
+  infer Schema,
+  any
+>
+  ? InferSchemaFieldsForModuleServices<Schema>
   : never
 
 /**

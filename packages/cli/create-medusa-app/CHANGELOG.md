@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11037](https://github.com/medusajs/medusa/pull/11037) [`a16eaad6c97e1233bd30142adf314065d322af50`](https://github.com/medusajs/medusa/commit/a16eaad6c97e1233bd30142adf314065d322af50) Thanks [@Gederooney](https://github.com/Gederooney)! - Fix issue where create-medusa-app repeatedly asked for database credentials even when --db-url was specified. The logic in MedusaProjectCreator->create()->initializeProject()->setupDatabase() always defines a dbName. Updated the getDbClientAndCredentials() method to check db-url first
+
+- Updated dependencies []:
+  - @medusajs/telemetry@2.5.0
+
 ## 2.4.0
 
 ### Patch Changes

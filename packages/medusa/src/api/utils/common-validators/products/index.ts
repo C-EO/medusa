@@ -1,5 +1,5 @@
-import { FilterableProductProps } from "@medusajs/framework/types"
-import { ProductStatus } from "@medusajs/framework/utils"
+import { FilterableProductProps, OperatorMap } from "@medusajs/framework/types"
+import { isPresent, ProductStatus } from "@medusajs/framework/utils"
 import { z } from "zod"
 import { createOperatorMap } from "../../validators"
 import { booleanString } from "../common"
@@ -9,8 +9,8 @@ export const ProductStatusEnum = z.nativeEnum(ProductStatus)
 export const StoreGetProductParamsDirectFields = z.object({
   q: z.string().optional(),
   id: z.union([z.string(), z.array(z.string())]).optional(),
-  title: z.string().optional(),
-  handle: z.string().optional(),
+  title: z.union([z.string(), z.array(z.string())]).optional(),
+  handle: z.union([z.string(), z.array(z.string())]).optional(),
   is_giftcard: booleanString().optional(),
   category_id: z.union([z.string(), z.array(z.string())]).optional(),
   external_id: z.union([z.string(), z.array(z.string())]).optional(),
@@ -36,14 +36,19 @@ type HttpProductFilters = FilterableProductProps & {
 export const transformProductParams = (
   data: HttpProductFilters
 ): FilterableProductProps => {
-  const res = {
+  const res: HttpProductFilters = {
     ...data,
-    tags: { id: data.tag_id },
-    categories: { id: data.category_id },
   }
 
-  delete res.tag_id
-  delete res.category_id
+  if (isPresent(data.tag_id)) {
+    res.tags = { id: data.tag_id as string[] }
+    delete res.tag_id
+  }
+
+  if (isPresent(data.category_id)) {
+    res.categories = { id: data.category_id as OperatorMap<string> }
+    delete res.category_id
+  }
 
   return res as FilterableProductProps
 }

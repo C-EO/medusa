@@ -4,6 +4,8 @@ import PaymentCollection from "./payment-collection"
 import PaymentSession from "./payment-session"
 import Refund from "./refund"
 
+// TODO: We should remove the `Payment` model and use the `PaymentSession` model instead.
+// We just need to move the refunds, captures, canceled_at, and captured_at to it.
 const Payment = model
   .define("Payment", {
     id: model.id({ prefix: "pay" }).primaryKey(),

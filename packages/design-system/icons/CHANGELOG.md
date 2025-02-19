@@ -1,5 +1,11 @@
 # @medusajs/icons
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11361](https://github.com/medusajs/medusa/pull/11361) [`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(admin-vite-plugin,icons,ui,dashboard): Upgrade vitest in all packages and align Vite version
+
 ## 2.4.0
 
 ## 2.3.1

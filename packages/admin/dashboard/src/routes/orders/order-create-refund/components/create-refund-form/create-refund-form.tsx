@@ -44,7 +44,7 @@ export const CreateRefundForm = ({
   const paymentId = searchParams.get("paymentId")
   const payments = getPaymentsFromOrder(order)
   const payment = payments.find((p) => p.id === paymentId)!
-  const paymentAmount = payment.amount || 0
+  const paymentAmount = payment?.amount || 0
   const form = useForm<zod.infer<typeof CreateRefundSchema>>({
     defaultValues: {
       amount: paymentAmount,

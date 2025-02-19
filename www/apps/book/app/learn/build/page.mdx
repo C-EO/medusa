@@ -59,15 +59,10 @@ When `NODE_ENV=production`, the Medusa application loads the environment variabl
 
 </Note>
 
-- In the system environment variables, set `NODE_ENV` to `production`:
-
-```bash
-NODE_ENV=production
-```
-
-- Use the `start` command in the `.medusa/server` directory to run the application:
+- Set `NODE_ENV` to `production` in the system environment variable, then start the Medusa application from `.medusa/server`:
 
 ```bash npm2yarn title=".medusa/server"
+export NODE_ENV=production
 npm run start
 ```
 

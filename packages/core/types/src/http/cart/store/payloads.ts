@@ -172,3 +172,17 @@ export interface StoreAddAddress {
    */
   metadata?: Record<string, unknown> | null
 }
+
+export interface StoreCartRemovePromotion {
+  /**
+   * The promotion codes to remove from the cart.
+   */
+  promo_codes: string[]
+}
+
+export interface StoreCartAddPromotion {
+  /**
+   * The promotion codes to add to the cart.
+   */
+  promo_codes: string[]
+}

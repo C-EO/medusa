@@ -215,3 +215,11 @@ If you send a request to `http://localhost:9000/custom`, the middleware will run
 However, if you send a request to `http://localhost:9000/custom/`, the middleware won't run.
 
 In general, avoid adding trailing backslashes when sending requests to API routes.
+
+---
+
+## Middlewares Precedence in Registration
+
+The Medusa application registers your middlewares first, then registers middlewares defined in Medusa's core.
+
+So, if you add a middleware for a route defined in the core, it might get overridden by the core middleware. For example, if you add a middleware to change authentication of admin wrotes, the authentication middleware defined in the core will still run, leading to your middleware not being effective.

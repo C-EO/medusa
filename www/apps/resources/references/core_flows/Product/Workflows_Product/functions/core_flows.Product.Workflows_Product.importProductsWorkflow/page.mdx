@@ -6,6 +6,7 @@ tags:
   - region
   - product
   - sales channel
+  - fulfillment
   - notification
   - workflow
 ---
@@ -25,7 +26,7 @@ For example, you can import products from another system.
 The workflow only starts the import, but you'll have to confirm it using the [Workflow Engine](https://docs.medusajs.com/resources/architectural-modules/workflow-engine).
 The below example shows how to confirm the import.
 
-<SourceCodeLink link="https://github.com/medusajs/medusa/blob/43aa993971718063bb40e7e3f650ef0e84056d09/packages/core/core-flows/src/product/workflows/import-products.ts#L92" />
+<SourceCodeLink link="https://github.com/medusajs/medusa/blob/3c25aec00616c44b5bd0a66550749708f21aec3e/packages/core/core-flows/src/product/workflows/import-products.ts#L92" />
 
 ## Examples
 
@@ -277,7 +278,7 @@ This example API route uses the same implementation as the [Confirm Product Impo
 
 ## Steps
 
-<WorkflowDiagram workflow={{"name":"importProductsWorkflow","steps":[{"type":"step","name":"parseProductCsvStep","description":"This step parses a CSV file holding products to import, returning the products as \nobjects that can be imported.","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.parseProductCsvStep/page.mdx","depth":1},{"type":"step","name":"groupProductsForBatchStep","description":"This step groups products to be created or updated.","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.groupProductsForBatchStep/page.mdx","depth":2},{"type":"step","name":"waitConfirmationProductImportStep","description":"This step waits until a product import is confirmed. It's useful before executing the\nbatchProductsWorkflow.\n\nThis step is asynchronous and will make the workflow using it a [Long-Running Workflow](https://docs.medusajs.com/learn/fundamentals/workflows/long-running-workflow).","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.waitConfirmationProductImportStep/page.mdx","depth":3},{"type":"step","name":"notifyOnFailureStep","description":"This step sends one or more notification when a workflow fails. This\nstep can be used in the beginning of a workflow so that, when the workflow fails,\nthe step's compensation function is triggered to send the notification.","link":"../../../../Notification/Steps_Notification/functions/core_flows.Notification.Steps_Notification.notifyOnFailureStep/page.mdx","depth":4},{"type":"step","name":"sendNotificationsStep","description":"This step sends one or more notifications.","link":"../../../../Notification/Steps_Notification/functions/core_flows.Notification.Steps_Notification.sendNotificationsStep/page.mdx","depth":5}]}} />
+<WorkflowDiagram workflow={{"name":"importProductsWorkflow","steps":[{"type":"step","name":"parseProductCsvStep","description":"This step parses a CSV file holding products to import, returning the products as\nobjects that can be imported.","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.parseProductCsvStep/page.mdx","depth":1},{"type":"step","name":"groupProductsForBatchStep","description":"This step groups products to be created or updated.","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.groupProductsForBatchStep/page.mdx","depth":2},{"type":"step","name":"waitConfirmationProductImportStep","description":"This step waits until a product import is confirmed. It's useful before executing the\nbatchProductsWorkflow.\n\nThis step is asynchronous and will make the workflow using it a [Long-Running Workflow](https://docs.medusajs.com/learn/fundamentals/workflows/long-running-workflow).","link":"../../../Steps_Product/functions/core_flows.Product.Steps_Product.waitConfirmationProductImportStep/page.mdx","depth":3},{"type":"step","name":"notifyOnFailureStep","description":"This step sends one or more notification when a workflow fails. This\nstep can be used in the beginning of a workflow so that, when the workflow fails,\nthe step's compensation function is triggered to send the notification.","link":"../../../../Notification/Steps_Notification/functions/core_flows.Notification.Steps_Notification.notifyOnFailureStep/page.mdx","depth":4},{"type":"step","name":"sendNotificationsStep","description":"This step sends one or more notifications.","link":"../../../../Notification/Steps_Notification/functions/core_flows.Notification.Steps_Notification.sendNotificationsStep/page.mdx","depth":5}]}} />
 
 ## Input
 

@@ -1,5 +1,33 @@
 # @medusajs/dashboard
 
+## 2.5.0
+
+### Patch Changes
+
+- [#11300](https://github.com/medusajs/medusa/pull/11300) [`6db96c80d05730a9188937599baba2602f4e2a92`](https://github.com/medusajs/medusa/commit/6db96c80d05730a9188937599baba2602f4e2a92) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(ui,types): Add Metadata form for collection
+
+- [#11361](https://github.com/medusajs/medusa/pull/11361) [`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(admin-vite-plugin,icons,ui,dashboard): Upgrade vitest in all packages and align Vite version
+
+- [#11338](https://github.com/medusajs/medusa/pull/11338) [`211997b137b64ad1c21bc4fc138195ce51d98ce4`](https://github.com/medusajs/medusa/commit/211997b137b64ad1c21bc4fc138195ce51d98ce4) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard): Remove wrongful import of utils function
+
+- [#11106](https://github.com/medusajs/medusa/pull/11106) [`fcd3e2226ee389e89cc5b03defda9852cf99f624`](https://github.com/medusajs/medusa/commit/fcd3e2226ee389e89cc5b03defda9852cf99f624) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(ui,dashboard): Migrate SC tables to DataTable
+
+- [#11357](https://github.com/medusajs/medusa/pull/11357) [`d00825485f14c1d13123046fdc8a18e9843b16ce`](https://github.com/medusajs/medusa/commit/d00825485f14c1d13123046fdc8a18e9843b16ce) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - feat(ui,dashboard): Move Divider component to UI package
+
+- [#11335](https://github.com/medusajs/medusa/pull/11335) [`7d208afb07a2ebf5f6a66b15139e31b03fda1e12`](https://github.com/medusajs/medusa/commit/7d208afb07a2ebf5f6a66b15139e31b03fda1e12) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard): Ensure conditional prices are assigned to region
+
+- [#11195](https://github.com/medusajs/medusa/pull/11195) [`9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754`](https://github.com/medusajs/medusa/commit/9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - chore(ui,dashboard): Use radix-ui package
+
+- [#11285](https://github.com/medusajs/medusa/pull/11285) [`f07af7b93c86673e730dc4e5eba8df2572013f9f`](https://github.com/medusajs/medusa/commit/f07af7b93c86673e730dc4e5eba8df2572013f9f) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard,core-flows,types,medusa): Allow editing Order metadata
+
+- [#11196](https://github.com/medusajs/medusa/pull/11196) [`51d2960a5717c41e79312dd2269fb87e3a4a5b4c`](https://github.com/medusajs/medusa/commit/51d2960a5717c41e79312dd2269fb87e3a4a5b4c) Thanks [@kasperkristensen](https://github.com/kasperkristensen)! - fix(dashboard): Allow admins to update default Sales Channel and Stock Location
+
+- Updated dependencies [[`3dbef519d95cf694d06843cb694c0d2abdac2146`](https://github.com/medusajs/medusa/commit/3dbef519d95cf694d06843cb694c0d2abdac2146), [`fcd3e2226ee389e89cc5b03defda9852cf99f624`](https://github.com/medusajs/medusa/commit/fcd3e2226ee389e89cc5b03defda9852cf99f624), [`d00825485f14c1d13123046fdc8a18e9843b16ce`](https://github.com/medusajs/medusa/commit/d00825485f14c1d13123046fdc8a18e9843b16ce), [`65d8d6dc0eae23c7c969664d0c2d127511cc0bd9`](https://github.com/medusajs/medusa/commit/65d8d6dc0eae23c7c969664d0c2d127511cc0bd9), [`3cf430729698c5f62fb6e6d0ebf06ea930981653`](https://github.com/medusajs/medusa/commit/3cf430729698c5f62fb6e6d0ebf06ea930981653), [`3f6425badae771a62c98508f9e6ceab20cee9354`](https://github.com/medusajs/medusa/commit/3f6425badae771a62c98508f9e6ceab20cee9354), [`9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754`](https://github.com/medusajs/medusa/commit/9822bd930b55f1dfe9429cc3dfc1c2d0d4edc754)]:
+  - @medusajs/icons@2.5.0
+  - @medusajs/ui@4.0.5
+  - @medusajs/js-sdk@2.5.0
+  - @medusajs/admin-shared@2.5.0
+
 ## 2.4.0
 
 ### Minor Changes

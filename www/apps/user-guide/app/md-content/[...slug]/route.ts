@@ -68,7 +68,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 const getCleanMd_ = unstable_cache(
   async (filePath: string, plugins?: { before?: Plugin[]; after?: Plugin[] }) =>
-    getCleanMd({ filePath, plugins }),
+    getCleanMd({ file: filePath, plugins }),
   ["clean-md"],
   {
     revalidate: 3600,

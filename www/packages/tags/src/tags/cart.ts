@@ -1,5 +1,9 @@
 export const cart = [
   {
+    "title": "Implement Custom Line Item Pricing in Medusa",
+    "path": "/examples/guides/custom-item-price"
+  },
+  {
     "title": "Create Cart Context in Storefront",
     "path": "/storefront-development/cart/context"
   },
@@ -42,6 +46,10 @@ export const cart = [
   {
     "title": "Checkout Step 3: Choose Shipping Method",
     "path": "/storefront-development/checkout/shipping"
+  },
+  {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
   },
   {
     "title": "addShippingMethodToCartStep",

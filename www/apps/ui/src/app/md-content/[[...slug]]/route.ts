@@ -58,7 +58,7 @@ const getCleanMd_ = unstable_cache(
     const iconNames = Object.keys(Icons).filter((name) => name !== "default")
 
     return getCleanMd({
-      filePath,
+      file: filePath,
       plugins,
       parserOptions: {
         ComponentExample: {

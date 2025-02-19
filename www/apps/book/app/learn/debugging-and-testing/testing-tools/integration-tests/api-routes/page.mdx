@@ -1,4 +1,4 @@
-import { Prerequisites } from "docs-ui"
+import { Prerequisites, CodeTabs, CodeTab } from "docs-ui"
 
 export const metadata = {
   title: `${pageNumber} Example: Write Integration Tests for API Routes`,
@@ -312,6 +312,8 @@ Some requests require passing headers. For example, all routes prefixed with `/s
 
 The `get`, `post`, and `delete` methods accept an optional third parameter that you can pass a `headers` property to, whose value is an object of headers to pass in the request.
 
+### Pass Publishable API Key
+
 For example, to pass a publishable API key in the header for a request to a `/store` route:
 
 export const headersHighlights = [
@@ -335,10 +337,10 @@ medusaIntegrationTestRunner({
               {
                 type: "publishable",
                 title: "Test Key",
-                created_by: ""
-              }
-            ]
-          }
+                created_by: "",
+              },
+            ],
+          },
         })).result[0]
       })
       describe("GET /custom", () => {
@@ -347,8 +349,8 @@ medusaIntegrationTestRunner({
             `/store/custom`,
             {
               headers: {
-                "x-publishable-api-key": pak.token
-              }
+                "x-publishable-api-key": pak.token,
+              },
             }
           )
   
@@ -367,3 +369,263 @@ jest.setTimeout(60 * 1000)
 In your test suit, you add a `beforeAll` hook to create a publishable API key before the tests run. To create the API key, you can use the `createApiKeysWorkflow` or the [API Key Module's service](!resources!/commerce-modules/api-key).
 
 Then, in the test, you pass an object as the last parameter to `api.get` with a `headers` property. The `headers` property is an object with the key `x-publishable-api-key` and the value of the API key's token.
+
+### Send Authenticated Requests
+
+If your custom route is accessible by authenticated users only, such as routes prefixed by `/admin` or `/store/customers/me`, you can create a test customer or user, generate a JWT token for them, and pass the token in the request's Authorization header.
+
+For example:
+
+<Note title="Tips">
+
+- The `jsonwebtoken` is available in your application by default.
+- For custom actor types, you only need to change the `actorType` value in the `jwt.sign` method.
+
+</Note>
+
+<CodeTabs group="user-type">
+  <CodeTab label="Admin User" value="admin">
+
+export const adminHighlights = [
+  ["8", "headers", "Define the headers that you'll pass in the request."],
+  ["10", "beforeEach", "Run before every test."],
+  ["16", "user", "Create the admin user."],
+  ["20", "authIdentity", "Create the auth identity for the user."],
+  ["35", "token", "Generate a JWT token for the user."],
+  ["47", "headers", "Set the token in the Authorization header."],
+  ["52", "headers", "Pass the headers to the request."]
+]
+
+```ts title="integration-tests/http/custom-routes.spec.ts" highlights={adminHighlights}
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
+import jwt from "jsonwebtoken"
+
+medusaIntegrationTestRunner({
+  testSuite: ({ api, getContainer }) => {
+    describe("Custom endpoints", () => {
+      describe("GET /custom", () => {
+        const headers: Record<string, string> = {
+        }
+        beforeEach(async () => {
+          const container = getContainer()
+          
+          const authModuleService = container.resolve("auth")
+          const userModuleService = container.resolve("user")
+          
+          const user = await userModuleService.createUsers({
+            email: "admin@medusa.js",
+            
+          })
+          const authIdentity = await authModuleService.createAuthIdentities({
+            provider_identities: [
+              {
+                provider: "emailpass",
+                entity_id: "admin@medusa.js",
+                provider_metadata: {
+                  password: "supersecret",
+                },
+              },
+            ],
+            app_metadata: {
+              user_id: user.id,
+            },
+          })
+  
+          const token = jwt.sign(
+            {
+              actor_id: user.id,
+              actor_type: "user",
+              auth_identity_id: authIdentity.id,
+            },
+            "supersecret",
+            {
+              expiresIn: "1d",
+            }
+          )
+        
+          headers["authorization"] = `Bearer ${token}`
+        })
+        it("returns correct message", async () => {
+          const response = await api.get(
+            `/admin/custom`,
+            { headers }
+          )
+  
+          expect(response.status).toEqual(200)
+        })
+      })
+    })
+  },
+})
+
+jest.setTimeout(60 * 1000)
+```
+
+  </CodeTab>
+  <CodeTab label="Customer User" value="customer">
+
+export const customerHighlights = [
+  ["10", "headers", "Define the headers that you'll pass in the request."],
+  ["12", "beforeEach", "Run before every test."],
+  ["18", "customer", "Create the customer."],
+  ["22", "authIdentity", "Create the auth identity for the customer."],
+  ["37", "token", "Generate a JWT token for the customer."],
+  ["49", "headers", "Set the token in the Authorization header."],
+  ["52", "pak", "Create a publishable API key"],
+  ["64", "headers", "Set the publishable API key in the request's header."],
+  ["69", "headers", "Pass the headers to the request."]
+]
+
+```ts title="integration-tests/http/custom-routes.spec.ts" highlights={customerHighlights}
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
+import { ApiKeyDTO } from "@medusajs/framework/types"
+import jwt from "jsonwebtoken"
+import { createApiKeysWorkflow } from "@medusajs/medusa/core-flows"
+
+medusaIntegrationTestRunner({
+  testSuite: ({ api, getContainer }) => {
+    describe("Custom endpoints", () => {
+      describe("GET /custom", () => {
+        const headers: Record<string, string> = {
+        }
+        beforeEach(async () => {
+          const container = getContainer()
+          
+          const authModuleService = container.resolve("auth")
+          const customerModuleService = container.resolve("customer")
+          
+          const customer = await customerModuleService.createCustomers({
+            email: "admin@medusa.js",
+            
+          })
+          const authIdentity = await authModuleService.createAuthIdentities({
+            provider_identities: [
+              {
+                provider: "emailpass",
+                entity_id: "customer@medusa.js",
+                provider_metadata: {
+                  password: "supersecret",
+                },
+              },
+            ],
+            app_metadata: {
+              user_id: customer.id,
+            },
+          })
+  
+          const token = jwt.sign(
+            {
+              actor_id: customer.id,
+              actor_type: "customer",
+              auth_identity_id: authIdentity.id,
+            },
+            "supersecret",
+            {
+              expiresIn: "1d",
+            }
+          )
+        
+          headers["authorization"] = `Bearer ${token}`
+
+
+          const pak = (await createApiKeysWorkflow(getContainer()).run({
+            input: {
+              api_keys: [
+                {
+                  type: "publishable",
+                  title: "Test Key",
+                  created_by: "",
+                },
+              ],
+            },
+          })).result[0]
+
+          headers["x-publishable-api-key"] = pak.token
+        })
+        it("returns correct message", async () => {
+          const response = await api.get(
+            `/store/customers/me/custom`,
+            { headers }
+          )
+  
+          expect(response.status).toEqual(200)
+        })
+      })
+    })
+  },
+})
+
+jest.setTimeout(60 * 1000)
+```
+
+  </CodeTab>
+</CodeTabs>
+
+In the test suite, you add a `beforeEach` hook that creates a user or customer, an auth identity, and generates a JWT token for them. The JWT token is then set in the `Authorization` header of the request.
+
+You also create and pass a publishable API key in the header for the customer as it's required for requests to `/store` routes. Learn more in [this section](#pass-publishable-api-key).
+
+---
+
+## Upload Files in Test Requests
+
+If your API route requires uploading a file, create a `FormData` object imported from the `form-data` object, then pass the form data headers in the request.
+
+For example:
+
+<Note title="Tip">
+
+The `form-data` package is available by default.
+
+</Note>
+
+```ts title="integration-tests/http/custom-routes.spec.ts"
+import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
+import FormData from "form-data"
+
+medusaIntegrationTestRunner({
+  testSuite: ({ api, getContainer }) => {
+    describe("Custom endpoints", () => {
+      describe("GET /custom", () => {
+        it("upload file", async () => {
+          const form = new FormData()
+          form.append("files", Buffer.from("content 1"), "image1.jpg")
+          form.append("files", Buffer.from("content 2"), "image2.jpg")
+
+          const response = await api.post(`/custom`, form, {
+            headers: form.getHeaders(),
+          })
+  
+          expect(response.status).toEqual(200)
+          expect(response.data).toHaveProperty("files")
+          expect(response.data.files).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: expect.any(String),
+                url: expect.any(String),
+              }),
+            ])
+          )
+        })
+      })
+    })
+  },
+})
+
+jest.setTimeout(60 * 1000)
+```
+
+You don't have to actually upload a file, you use the `form.append` method to append to a `files` field in the form data object, and you pass random content using the `Buffer.from` method.
+
+Then, you pass to the `api.post` method the form data object as a second parameter, and an object with the `headers` property set to the form data object's headers as a third parameter.
+
+If you're passing authentication or other headers, you can pass both the form data headers and the authentication headers in the same object:
+
+```ts title="integration-tests/http/custom-routes.spec.ts"
+const response = await api.post(`/custom`, form, {
+  headers: {
+    ...form.getHeaders(),
+    ...authHeaders,
+  },
+})
+```

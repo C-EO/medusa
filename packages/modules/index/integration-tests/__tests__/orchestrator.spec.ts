@@ -1,7 +1,7 @@
 import { asValue } from "awilix"
 import { container } from "@medusajs/framework"
 import type { IndexTypes } from "@medusajs/types"
-import { Orchestrator } from "../../src/orchestrator"
+import { Orchestrator } from "@utils"
 
 function creatingFakeLockingModule() {
   return {
@@ -46,15 +46,19 @@ describe("Orchestrator", () => {
       locking: asValue(lockingModule),
     })
 
-    const orchestrator = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        expect(orchestrator.state).toEqual("processing")
-        processedEntities.push(entity.entity)
-      },
-    })
+    async function taskRunner(entity: string) {
+      processedEntities.push(entity)
+    }
 
-    await orchestrator.process()
+    const orchestrator = new Orchestrator(
+      container.resolve("locking"),
+      entities.map((e) => e.entity),
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
+
+    await orchestrator.process(taskRunner)
     expect(lockingModule.lockEntities.size).toEqual(0)
     expect(orchestrator.state).toEqual("completed")
     expect(processedEntities).toEqual(["brand", "product"])
@@ -92,14 +96,19 @@ describe("Orchestrator", () => {
       }),
     })
 
-    const orchestrator = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        processedEntities.push(entity.entity)
-      },
-    })
+    const orchestrator = new Orchestrator(
+      container.resolve("locking"),
+      entities.map((e) => e.entity),
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
 
-    await orchestrator.process()
+    async function taskRunner(entity: string) {
+      processedEntities.push(entity)
+    }
+
+    await orchestrator.process(taskRunner)
     expect(processedEntities).toEqual([])
   })
 
@@ -130,20 +139,36 @@ describe("Orchestrator", () => {
       locking: asValue(lockingModule),
     })
 
-    const orchestrator = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        processedEntities.push({ entity: entity.entity, owner: "instance-1" })
-      },
-    })
-    const orchestrator1 = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        processedEntities.push({ entity: entity.entity, owner: "instance-2" })
-      },
-    })
+    const entityNames = entities.map((e) => e.entity)
 
-    await Promise.all([orchestrator.process(), orchestrator1.process()])
+    async function taskRunner(entity: string) {
+      processedEntities.push({ entity: entity, owner: "instance-1" })
+    }
+
+    const orchestrator = new Orchestrator(
+      container.resolve("locking"),
+      entityNames,
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
+
+    async function taskRunner2(entity: string) {
+      processedEntities.push({ entity: entity, owner: "instance-2" })
+    }
+
+    const orchestrator1 = new Orchestrator(
+      container.resolve("locking"),
+      entityNames,
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
+
+    await Promise.all([
+      orchestrator.process(taskRunner),
+      orchestrator1.process(taskRunner2),
+    ])
     expect(processedEntities).toEqual([
       {
         entity: "brand",
@@ -184,17 +209,24 @@ describe("Orchestrator", () => {
       locking: asValue(lockingModule),
     })
 
-    const orchestrator = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        if (entity.entity === "product") {
-          throw new Error("Cannot process")
-        }
-        processedEntities.push(entity.entity)
-      },
-    })
+    async function taskRunner(entity: string) {
+      if (entity === "product") {
+        throw new Error("Cannot process")
+      }
+      processedEntities.push(entity)
+    }
 
-    await expect(orchestrator.process()).rejects.toThrow("Cannot process")
+    const orchestrator = new Orchestrator(
+      container.resolve("locking"),
+      entities.map((e) => e.entity),
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
+
+    await expect(orchestrator.process(taskRunner)).rejects.toThrow(
+      "Cannot process"
+    )
     expect(orchestrator.state).toEqual("error")
     expect(processedEntities).toEqual(["brand"])
     expect(lockingModule.lockEntities.size).toEqual(0)
@@ -227,16 +259,24 @@ describe("Orchestrator", () => {
       locking: asValue(lockingModule),
     })
 
-    const orchestrator = new Orchestrator(container, entities, {
-      lockDuration: 60 * 1000,
-      async taskRunner(entity) {
-        expect(orchestrator.state).toEqual("processing")
-        processedEntities.push(entity.entity)
-      },
-    })
+    async function taskRunner(entity: string) {
+      expect(orchestrator.state).toEqual("processing")
+      processedEntities.push(entity)
+    }
+
+    const orchestrator = new Orchestrator(
+      container.resolve("locking"),
+      entities.map((e) => e.entity),
+      {
+        lockDuration: 60 * 1000,
+      }
+    )
 
     await expect(
-      Promise.all([orchestrator.process(), orchestrator.process()])
+      Promise.all([
+        orchestrator.process(taskRunner),
+        orchestrator.process(taskRunner),
+      ])
     ).rejects.toThrow("Cannot re-run an already running orchestrator instance")
 
     expect(lockingModule.lockEntities.size).toEqual(0)

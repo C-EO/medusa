@@ -13,6 +13,7 @@ This document showcases the module links defined between the Payment Module and 
 The Payment Module has the following links to other modules:
 
 - [`Cart` data model of Cart Module \<\> `PaymentCollection` data model](#cart-module).
+- [`Customer` data model of Customer Module \<\> `AccountHolder` data model](#customer-module).
 - [`Order` data model of Order Module \<\> `PaymentCollection` data model](#order-module).
 - [`OrderClaim` data model of Order Module \<\> `PaymentCollection` data model](#order-module).
 - [`OrderExchange` data model of Order Module \<\> `PaymentCollection` data model](#order-module).
@@ -103,6 +104,100 @@ createRemoteLinkStep({
   },
   [Modules.PAYMENT]: {
     payment_collection_id: "paycol_123",
+  },
+})
+```
+
+  </CodeTab>
+</CodeTabs>
+
+---
+
+## Customer Module
+
+Medusa defines a link between the `Customer` and `AccountHolder` data models, allowing payment providers to save payment methods for a customer, if the payment provider supports it.
+
+<Note>
+
+This link is available starting from Medusa `v2.5.0`.
+
+</Note>
+
+### Retrieve with Query
+
+To retrieve the customer associated with an account holder with [Query](!docs!/learn/fundamentals/module-links/query), pass `customer.*` in `fields`:
+
+<CodeTabs group="relation-query">
+  <CodeTab label="query.graph" value="method">
+
+```ts
+const { data: accountHolders } = await query.graph({
+  entity: "account_holder",
+  fields: [
+    "customer.*",
+  ],
+})
+
+// accountHolders.customer
+```
+
+  </CodeTab>
+  <CodeTab label="useQueryGraphStep" value="step">
+
+```ts
+import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+const { data: accountHolders } = useQueryGraphStep({
+  entity: "account_holder",
+  fields: [
+    "customer.*",
+  ],
+})
+
+// accountHolders.customer
+```
+
+  </CodeTab>
+</CodeTabs>
+
+### Manage with Link
+
+To manage the account holders of a customer, use [Link](!docs!/learn/fundamentals/module-links/link):
+
+<CodeTabs group="relation-link">
+  <CodeTab label="link.create" value="method">
+
+```ts
+import { Modules } from "@medusajs/framework/utils"
+
+// ...
+
+await link.create({
+  [Modules.CUSTOMER]: {
+    customer_id: "cus_123",
+  },
+  [Modules.PAYMENT]: {
+    account_holder_id: "acchld_123",
+  },
+})
+```
+
+  </CodeTab>
+  <CodeTab label="createRemoteLinkStep" value="step">
+
+```ts
+import { createRemoteLinkStep } from "@medusajs/medusa/core-flows"
+
+// ...
+
+createRemoteLinkStep({
+  [Modules.CUSTOMER]: {
+    customer_id: "cus_123",
+  },
+  [Modules.PAYMENT]: {
+    account_holder_id: "acchld_123",
   },
 })
 ```

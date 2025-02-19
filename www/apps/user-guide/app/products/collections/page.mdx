@@ -1,8 +1,8 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
 ---
 
-import { EllipsisHorizontal } from "@medusajs/icons"
+import { EllipsisHorizontal,ArrowUpRightOnBox, EllipsisVertical } from "@medusajs/icons"
 
 export const metadata = {
   title: `Manage Product Collections`,
@@ -10,52 +10,97 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn how to create a new product collection, edit an existing collection, delete a collection, and more.
+In this guide, you’ll learn how to create and manage product collections.
 
-## Create a Collection
+## Product Collections to Organize Products
+
+A product collection is a group of products that share a common theme or purpose. For example, a summer collection can include products like swimsuits, sunglasses, and beach towels. Collections help customers find products that are relevant to them and make it easier to browse your store.
+
+A product can be in a single collection. You can learn how to set the collection of a product in [this guide](../edit/page.mdx#manage-product-organization).
+
+### Product Collections List
+
+To view all product collections, go to the Products → Collections page. From here, you can see a list, filter, and search through all collections.
+
+![Product Collections List](https://res.cloudinary.com/dza7lstvk/image/upload/v1739871944/User%20Guide/Screenshot_2025-02-18_at_11.45.27_AM_ca1kie.png)
+
+---
+
+## Create Product Collection
 
 To create a collection:
 
 1. Go to the Products → Collections page.
-2. Click on the Create button.
+2. Click on the Create button at the top right.
 3. In the form that opens:
     1. Enter the collection's name in the Title field.
-    2. In the Handle field, enter a dash (`-`) separated string that's used as part of the collection's URL when the customer views it on the storefront. If not specified, the handle is generated from the Title field's value.
-5. Once done, click the Create button.
+    2. The value of the Handle field is used in the collection's URL on the storefront. It allows you to create a human-readable URL for the collection. The handle must be unique across all collections, and it must contain lowercase letters, numbers, and hyphens (`-`). If not specified, Medusa will generate a handle from the title.
+4. Once done, click the Create button.
+
+![Create Collection Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739872385/User%20Guide/Screenshot_2025-02-18_at_11.50.24_AM_mqznbe.png)
 
 ---
 
-## View a collection's details
+## View Product Collection's Details
 
 To view a collection's details:
 
 1. Go to the Products → Collections page.
-2. From the table, choose the collection you want to view.
+2. From the list, choose the collection you want to view.
+
+![Collection details page](https://res.cloudinary.com/dza7lstvk/image/upload/v1739873635/User%20Guide/Screenshot_2025-02-18_at_12.13.43_PM_xaicy4.png)
 
 ---
 
-## Edit a Collection
+## Edit Product Collection
 
 To edit a collection:
 
 1. Go to the collection's details page.
 2. Click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon at the top right of the first section.
 3. Choose Edit from the dropdown.
-4. In the drawer that opens, edit any of the collection details.
+4. In the side window that opens, you can edit the collection's title and handle.
 5. Once done, click the Save button.
+
+![Edit collection form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739873760/User%20Guide/Screenshot_2025-02-18_at_12.15.46_PM_mze7zv.png)
 
 ---
 
-## Manage a Collection’s Products
+## Edit Product Collection Metadata
+
+Metadata is custom data that can be associated with the product collection in key-value pairs. This is usually used by developers for custom integrations or to store additional information about the product collection.
+
+To edit the product collection's metadata:
+
+1. Go to the product collection's details page.
+2. Click the <InlineIcon Icon={ArrowUpRightOnBox} alt="arrow" /> icon at the right of the "Metadata" section.
+3. In the side window that opens:
+    - Manage the key-value pairs in the table.
+    - To add a new row of key-value pairs before or after a row:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Insert row above" or "Insert row below" from the dropdown.
+    - To delete a row of key-value pairs:
+        - Hover over the row and click the <InlineIcon Icon={EllipsisVertical} alt="three-dots" /> icon at its right.
+        - Choose "Delete row" from the dropdown.
+4. Once you're done, click the Save button.
+
+---
+
+## Manage Collection’s Products
+
+From the product collection's details page, you can manage the products in the collection.
 
 ### Add Products to a Collection
 
 To add products to a collection:
 
 1. Go to the collection's details page.
-2. In the Products section, click the Add button.
-3. From the list of products, check the box next to the products you want to add to the collection.
-4. Once done, click on the Save button.
+2. In the Products section, click on the <InlineIcon Icon={EllipsisHorizontal} alt="three dots" /> icon at the top right.
+3. Choose Add from the dropdown.
+4. From the list of products, check the products you want to add to the collection.
+5. Once done, click on the Save button.
+
+![Add products to collection form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739873949/User%20Guide/Screenshot_2025-02-18_at_12.18.55_PM_q6lgsk.png)
 
 ### Remove a Product from a Collection
 

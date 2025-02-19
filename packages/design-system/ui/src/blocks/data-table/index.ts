@@ -19,6 +19,8 @@ export type {
   DataTableFilteringState,
   DataTableHeaderContext,
   DataTablePaginationState,
+  DataTableRow,
+  DataTableRowData,
   DataTableRowSelectionState,
   DataTableSortDirection,
   DataTableSortingState,

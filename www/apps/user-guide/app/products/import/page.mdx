@@ -1,8 +1,9 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 ---
 
-import { ArrowDownTray, Trash, BellAlert } from "@medusajs/icons"
+import { ArrowDownTray, Trash, BellAlert, EllipsisHorizontal } from "@medusajs/icons"
+import { Prerequisites, Table } from "docs-ui"
 
 export const metadata = {
   title: `Import Products`,
@@ -10,43 +11,267 @@ export const metadata = {
 
 # {metadata.title}
 
-In this document, you’ll learn how to import products into your Medusa store.
+In this guide, you’ll learn how to import products into your Medusa store.
 
-## Overview
+## Import Products from a CSV File
 
-To import products, you must have the products in a CSV file. You can see a template of the CSV file during the import process.
+If you're migrating from another commerce platform, or from Medusa v1, you can import products into Medusa using a CSV file.
 
-{/* <Note>
+When you import the CSV file, Medusa will either create or update products based on the CSV file you upload.
 
-TODO add link [this guide](../../modules/products/admin/import-products.mdx#csv-file)
+### CSV File Format
 
-For a list of accepted columns, refer to this guide.
+In the import form, you can download a template CSV file to see the format required for the import.
 
-</Note> */}
+Each row in the CSV file represents a product variant to create or update. The columns in the CSV file holds the details of the product variant and its associated product. The CSV file can have the following columns:
 
-When you import products into your Medusa store, you’ll either create new products or update existing ones.
+<Table>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Column</Table.HeaderCell>
+      <Table.HeaderCell>Description</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    <Table.Row>
+      <Table.Cell>`Product Id`</Table.Cell>
+      <Table.Cell>The ID for an existing product to update. If provided, no other columns are required.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Handle`</Table.Cell>
+      <Table.Cell>A unique identifier used in the product's URL on the storefront. It allows you to create a human-readable URL for the product. The handle must be unique across all products, and it must contain lowercase letters, numbers, and hyphens (`-`). If not specified, Medusa will generate a handle from the title.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Title`</Table.Cell>
+      <Table.Cell>The product’s title. This is the only required field if you don't provide a `Product Id`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Status`</Table.Cell>
+      <Table.Cell>The status of the product. Can be `draft` (default), `published`, `proposed`, or `rejected`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Description`</Table.Cell>
+      <Table.Cell>A description of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Subtitle`</Table.Cell>
+      <Table.Cell>A subtitle for the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product External Id`</Table.Cell>
+      <Table.Cell>The ID of the product in an external system, such as an ERP.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Thumbnail`</Table.Cell>
+      <Table.Cell>The URL of the product's thumbnail image.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Collection Id`</Table.Cell>
+      <Table.Cell>The ID of the collection the product belongs to.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Type Id`</Table.Cell>
+      <Table.Cell>The ID of the product type.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Category *`</Table.Cell>
+      <Table.Cell>The ID of a product category, where `*` is the number of the category, allowing you to add more than one category. For example, `Product Category 1`. </Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Created At`</Table.Cell>
+      <Table.Cell>The date and time when the product was created.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Deleted At`</Table.Cell>
+      <Table.Cell>The date and time when the product was deleted.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Discountable`</Table.Cell>
+      <Table.Cell>Whether the product can be discounted. Can be `true` or `false`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Height`</Table.Cell>
+      <Table.Cell>The height of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Hs Code`</Table.Cell>
+      <Table.Cell>The Harmonized System (HS) code for the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Image *`</Table.Cell>
+      <Table.Cell>The URL of a product image, where `*` is the image's number, allowing you to add more than one image. For example, `Product Image 1`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Length`</Table.Cell>
+      <Table.Cell>The length of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Material`</Table.Cell>
+      <Table.Cell>The material of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Mid Code`</Table.Cell>
+      <Table.Cell>The Manufacturer Identification Number (MID) for the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Origin Country`</Table.Cell>
+      <Table.Cell>The country of origin for the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Tag *`</Table.Cell>
+      <Table.Cell>The ID of the product's tag, where `*` is the tag's number, allowing you to add more than one tag. For example, `Product Tag 1`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Sales Channel *`</Table.Cell>
+      <Table.Cell>The ID of a sales channel the product is available in, where `*` is the sales channel's number, allowing you to add more than one sales channel. For example, `Product Sales Channel 1`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Updated At`</Table.Cell>
+      <Table.Cell>The date and time when the product was last updated.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Weight`</Table.Cell>
+      <Table.Cell>The weight of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Product Width`</Table.Cell>
+      <Table.Cell>The width of the product.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Id`</Table.Cell>
+      <Table.Cell>The ID for an existing variant to update. The variant must belong to the product specified in the `Product Id` column. If provided, no other variant-related columns are required.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Title`</Table.Cell>
+      <Table.Cell>The title of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Sku`</Table.Cell>
+      <Table.Cell>The SKU of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Upc`</Table.Cell>
+      <Table.Cell>The UPC of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Ean`</Table.Cell>
+      <Table.Cell>The EAN of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Hs Code`</Table.Cell>
+      <Table.Cell>The Harmonized System (HS) code for the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Mid Code`</Table.Cell>
+      <Table.Cell>The Manufacturer Identification Number (MID) for the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Manage Inventory`</Table.Cell>
+      <Table.Cell>Whether Medusa manages the variant's inventory. Can be `true` or `false`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Allow Backorder`</Table.Cell>
+      <Table.Cell>Whether the variant allows backorders. Can be `true` or `false`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Barcode`</Table.Cell>
+      <Table.Cell>The barcode of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Created At`</Table.Cell>
+      <Table.Cell>The date and time when the variant was created.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Deleted At`</Table.Cell>
+      <Table.Cell>The date and time when the variant was deleted.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Height`</Table.Cell>
+      <Table.Cell>The height of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Length`</Table.Cell>
+      <Table.Cell>The length of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Material`</Table.Cell>
+      <Table.Cell>The material of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Metadata`</Table.Cell>
+      <Table.Cell>Metadata for the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Option * Name`</Table.Cell>
+      <Table.Cell>The name of the variant's option, where `*` is the option's number. For example, `Variant Option 1 Name`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Option * Value`</Table.Cell>
+      <Table.Cell>The value of the variant's option, where `*` is the option's number. For example, `Variant Option 1 Value`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Origin Country`</Table.Cell>
+      <Table.Cell>The country of origin for the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Price *`</Table.Cell>
+      <Table.Cell>The price of the variant in a currency, where `*` is the currency's ISO code. For example, `Variant Price USD`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Price [X] Y`</Table.Cell>
+      <Table.Cell>The price of the variant in a region, where `X` is the region's name, and `Y` is the ISO currency code of the region. For example, `Variant Price Europe [EUR]`.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Product Id`</Table.Cell>
+      <Table.Cell>The ID of the product the variant belongs to.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Updated At`</Table.Cell>
+      <Table.Cell>The date and time when the variant was last updated.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Variant Rank`</Table.Cell>
+      <Table.Cell>The rank of the variant among its siblings. Can be `0` or higher.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Weight`</Table.Cell>
+      <Table.Cell>The weight of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Variant Width`</Table.Cell>
+      <Table.Cell>The width of the variant.</Table.Cell>
+    </Table.Row>
+    <Table.Row>
+      <Table.Cell>`Shipping Profile Id`</Table.Cell>
+      <Table.Cell>The ID of the shipping profile that the product belongs to.</Table.Cell>
+    </Table.Row>
+  </Table.Body>
+</Table>
 
 ---
 
 ## Import List of Products
 
-{/* TODO check info for correctness */}
+<Prerequisites
+  items={[
+    {
+      text: "A CSV file to import.",
+      link: "#csv-file-format",
+    }
+  ]}
+/>
 
 To import products:
 
 1. Go to the Products page.
 2. Click on the Import button at the top right.
-3. In the new window:
-    1. If you’re unsure of what the CSV file’s format must be like, you can download a template CSV file by clicking the <InlineIcon Icon={ArrowDownTray} alt="download" /> icon.
-    2. To upload the CSV file you want to import products from, either:
-        1. Drag and drop the file into the dashed box;
-        2. Or click on the dashed box and choose the file you want to import the products from.
+3. In the side window:
+    1. If you’re unsure of what the CSV file’s format must be like, you can download the template CSV file.
+    2. To upload the CSV file you want to import products from, either drag-and-drop the file to the upload area or click on the area to open a file picker.
     3. After you upload the CSV file:
-        1. Check the number of products to be created or updated above the uploaded file’s name.
-        2. You can remove the file you choose by clicking the <InlineIcon Icon={Trash} alt="trash" /> icon.
-4. Once you’re done choosing a file to import products from, click on the Import List button.
-
-This starts the import process. Based on the number of products you’re importing, it can take some time.
+        1. Check the number of products to be created or updated.
+        2. To remove the uploaded file, click the <InlineIcon Icon={EllipsisHorizontal} alt="trash" /> icon, and choose Delete from the dropdown.
+4. Once you’re done, click the Import button.
 
 <Note>
 
@@ -54,29 +279,21 @@ If you face any errors or difficulties, please contact your technical support te
 
 </Note>
 
+![Import Products Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739878759/User%20Guide/Screenshot_2025-02-18_at_1.39.01_PM_ctovne.png)
+
+This starts the import process which may take some time.
+
 ### Check Import Status
 
-{/* TODO check info for correctness */}
-
-To check the status of the import:
+To check whether the import is in progress, finished, or failed:
 
 1. Click on the <InlineIcon Icon={BellAlert} alt="bell" /> icon at the top right of the page.
 2. Find the product import, which should be the latest item on the list.
 
-If a loading indicator is showing, then the import process is still in progress.
+The text on the import item will explain the current state of the import.
 
-If the import is done, you should see the text “Import of products is done.”
+<Note>
 
-Once the import is done, you should find the created/updated products on the Products page.
+If the product import fails, please contact your technical support to check the error logs.
 
----
-
-## Cancel Import
-
-{/* TODO check for correctness and if feature is still available */}
-
-To cancel a product import:
-
-1. Click on the <InlineIcon Icon={BellAlert} alt="bell" /> icon at the top right of the page.
-2. Find the import you want to cancel.
-3. Click on the cancel button.
+</Note>

@@ -90,9 +90,13 @@ export class AbstractFileProviderService implements IFileProvider {
   }
 
   /**
-   * This method uploads a file using your provider's custom logic.
+   * This method uploads a file using your provider's custom logic. In this method, you can upload the file
+   * into your provider's storage, and return the uploaded file's details.
+   * 
+   * This method will be used when uploading product images, CSV files for imports, or other
+   * custom file uploads.
    *
-   * @param {FileTypes.ProviderUploadFileDTO} file - The file to upload
+   * @param {FileTypes.ProviderUploadFileDTO} file - The file to upload.
    * @returns {Promise<FileTypes.ProviderFileResultDTO>} The uploaded file's details.
    *
    * @example
@@ -103,10 +107,12 @@ export class AbstractFileProviderService implements IFileProvider {
    *   ): Promise<ProviderFileResultDTO> {
    *     // TODO upload file to third-party provider
    *     // or using custom logic
+   *     // for example:
+   *     this.client.upload(file)
    *
    *     return {
    *       url: "some-url.com",
-   *       key: "file-name"
+   *       key: "file-name-or-id"
    *     }
    *   }
    * }
@@ -118,7 +124,8 @@ export class AbstractFileProviderService implements IFileProvider {
   }
 
   /**
-   * This method deletes the file from storage.
+   * This method deletes the file from storage. It's used when an admin user deletes a product image,
+   * or other custom file deletions.
    *
    * @param {FileTypes.ProviderDeleteFileDTO} file - The details of the file to delete.
    * @returns {Promise<void>} Resolves when the file is deleted.

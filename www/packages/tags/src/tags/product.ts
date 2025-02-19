@@ -12,6 +12,10 @@ export const product = [
     "path": "/commerce-modules/product/guides/price-with-taxes"
   },
   {
+    "title": "Implement Express Checkout with Medusa",
+    "path": "/storefront-development/guides/express-checkout"
+  },
+  {
     "title": "List Product Categories in Storefront",
     "path": "/storefront-development/products/categories/list"
   },

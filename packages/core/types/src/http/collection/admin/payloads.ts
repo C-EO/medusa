@@ -25,7 +25,7 @@ export interface AdminUpdateCollection {
   /**
    * Key-value pairs of custom data.
    */
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }
 
 export interface AdminUpdateCollectionProducts {

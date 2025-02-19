@@ -2,6 +2,7 @@ import { MagnifyingGlass, XMarkMini } from "@medusajs/icons"
 import {
   Button,
   DatePicker,
+  Divider,
   Heading,
   IconButton,
   Input,
@@ -14,7 +15,6 @@ import {
 import { useFieldArray, type UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
-import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { StackedFocusModal } from "../../../../../components/modals/stacked-focus-modal"
 import { useStackedModal } from "../../../../../components/modals/stacked-modal-provider"

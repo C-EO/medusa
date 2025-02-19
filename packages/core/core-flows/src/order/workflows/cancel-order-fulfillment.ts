@@ -38,7 +38,7 @@ export type CancelOrderFulfillmentValidateOrderStep = {
   order: OrderDTO & {
     /**
      * The order's fulfillments.
-     */ 
+     */
     fulfillments: FulfillmentDTO[]
   }
   /**
@@ -48,16 +48,16 @@ export type CancelOrderFulfillmentValidateOrderStep = {
 }
 
 /**
- * This step validates that an order fulfillment can be canceled. If 
+ * This step validates that an order fulfillment can be canceled. If
  * the fulfillment doesn't exist, or it has already been shipped, the step throws an error.
- * 
+ *
  * :::note
- * 
+ *
  * You can retrieve an order and fulfillment details using [Query](https://docs.medusajs.com/learn/fundamentals/module-links/query),
  * or [useQueryGraphStep](https://docs.medusajs.com/resources/references/medusa-workflows/steps/useQueryGraphStep).
- * 
+ *
  * :::
- * 
+ *
  * @example
  * const data = cancelOrderFulfillmentValidateOrder({
  *   order: {
@@ -78,10 +78,7 @@ export type CancelOrderFulfillmentValidateOrderStep = {
  */
 export const cancelOrderFulfillmentValidateOrder = createStep(
   "cancel-fulfillment-validate-order",
-  ({
-    order,
-    input,
-  }: CancelOrderFulfillmentValidateOrderStep) => {
+  ({ order, input }: CancelOrderFulfillmentValidateOrderStep) => {
     throwIfOrderIsCancelled({ order })
 
     const fulfillment = order.fulfillments.find(
@@ -162,17 +159,18 @@ function prepareInventoryUpdate({
 /**
  * The data to cancel an order's fulfillment, along with custom data that's passed to the workflow's hooks.
  */
-export type CancelOrderFulfillmentWorkflowInput = OrderWorkflow.CancelOrderFulfillmentWorkflowInput & AdditionalData
+export type CancelOrderFulfillmentWorkflowInput =
+  OrderWorkflow.CancelOrderFulfillmentWorkflowInput & AdditionalData
 
 export const cancelOrderFulfillmentWorkflowId = "cancel-order-fulfillment"
 /**
  * This workflow cancels an order's fulfillment. It's used by the [Cancel Order's Fulfillment Admin API Route](https://docs.medusajs.com/api/admin#orders_postordersidfulfillmentsfulfillment_idcancel).
- * 
- * This workflow has a hook that allows you to perform custom actions on the canceled fulfillment. For example, you can pass under `additional_data` custom data that 
+ *
+ * This workflow has a hook that allows you to perform custom actions on the canceled fulfillment. For example, you can pass under `additional_data` custom data that
  * allows you to update custom data models linked to the fulfillment.
- * 
+ *
  * You can also use this workflow within your customizations or your own custom workflows, allowing you to wrap custom logic around canceling a fulfillment.
- * 
+ *
  * @example
  * const { result } = await cancelOrderFulfillmentWorkflow(container)
  * .run({
@@ -184,18 +182,16 @@ export const cancelOrderFulfillmentWorkflowId = "cancel-order-fulfillment"
  *     }
  *   }
  * })
- * 
+ *
  * @summary
- * 
+ *
  * Cancel an order's fulfillment.
- * 
+ *
  * @property hooks.orderFulfillmentCanceled - This hook is executed after the fulfillment is canceled. You can consume this hook to perform custom actions on the canceled fulfillment.
  */
 export const cancelOrderFulfillmentWorkflow = createWorkflow(
   cancelOrderFulfillmentWorkflowId,
-  (
-    input: WorkflowData<CancelOrderFulfillmentWorkflowInput>
-  ) => {
+  (input: WorkflowData<CancelOrderFulfillmentWorkflowInput>) => {
     const order: OrderDTO & { fulfillments: FulfillmentDTO[] } =
       useRemoteQueryStep({
         entry_point: "orders",
@@ -227,10 +223,11 @@ export const cancelOrderFulfillmentWorkflow = createWorkflow(
       prepareInventoryUpdate
     )
 
-    const eventData = transform({ order, fulfillment }, (data) => {
+    const eventData = transform({ order, fulfillment, input }, (data) => {
       return {
         order_id: data.order.id,
         fulfillment_id: data.fulfillment.id,
+        no_notification: data.input.no_notification,
       }
     })
 

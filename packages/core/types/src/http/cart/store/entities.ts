@@ -1,3 +1,4 @@
+import { ApplicationMethodTypeValues } from "../../../promotion"
 import { StorePaymentCollection } from "../../payment"
 import { StoreProduct, StoreProductVariant } from "../../product"
 import { StoreRegion } from "../../region"
@@ -37,6 +38,10 @@ export interface StoreCart extends Omit<BaseCart, "items"> {
    * The cart's region
    */
   region?: StoreRegion
+  /**
+   * The promotions applied to the cart.
+   */
+  promotions: StoreCartPromotion[]
 }
 export interface StoreCartLineItem
   extends Omit<BaseCartLineItem, "product" | "variant" | "cart"> {
@@ -79,4 +84,38 @@ export interface StoreCartShippingMethod extends BaseCartShippingMethod {
   adjustments?: (BaseShippingMethodAdjustment & {
     shipping_method: StoreCartShippingMethod
   })[]
+}
+export interface StoreCartPromotion {
+  /**
+   * The promotion's ID.
+   */
+  id: string
+  /**
+   * The promotion's code.
+   */
+  code?: string
+  /**
+   * Whether the promotion is applied automatically (without the customer needing to enter a code).
+   */
+  is_automatic?: boolean
+  /**
+   * How the promotion is applied.
+   */
+  application_method?: {
+    /**
+     * The amount to be discounted.
+     */
+    value: string
+    /**
+     * The application method's type. If it's `fixed`, the promotion discounts a fixed amount. 
+     * If it's `percentage`, the promotion discounts a percentage.
+     */
+    type: ApplicationMethodTypeValues
+    /**
+     * The currency code of the discount.
+     * 
+     * @example usd
+     */
+    currency_code: string
+  }
 }

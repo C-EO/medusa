@@ -3,7 +3,7 @@ export enum PaymentWebhookEvents {
 }
 
 /**
- * Normalized events from payment provider to internal payment module events.
+ * Normalized events from payment provider to internal payment module events. In principle, these should match the payment status.
  */
 export enum PaymentActions {
   /**
@@ -18,6 +18,18 @@ export enum PaymentActions {
    * Payment failed.
    */
   FAILED = "failed",
+  /**
+   * Payment is pending.
+   */
+  PENDING = "pending",
+  /**
+   * Payment requires more information.
+   */
+  REQUIRES_MORE = "requires_more",
+  /**
+   * Payment was canceled.
+   */
+  CANCELED = "canceled",
   /**
    * Received an event that is not processable.
    */

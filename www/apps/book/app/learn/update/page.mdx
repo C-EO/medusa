@@ -61,7 +61,7 @@ Before updating a Medusa application, make sure to check the [release notes](htt
 Then, to update your Medusa application, bump the version of all `@medusajs/*` dependencies in your `package.json`. Then, re-install dependencies:
 
 ```bash npm2yarn
-npm run install
+npm install
 ```
 
 This will update all Medusa packages to the latest version.
@@ -91,7 +91,7 @@ npx medusa db:rollback cart product
 Then, revert the update by changing the version of all `@medusajs/*` dependencies in your `package.json` to the previous version and re-installing dependencies:
 
 ```bash npm2yarn
-npm run install
+npm  install
 ```
 
 Finally, run the migrations to sync link changes:
@@ -116,5 +116,5 @@ In the Medusa codebase, our team uses the following [TSDoc](https://tsdoc.org/) 
 If you have a Medusa plugin project, you only need to update its `@medusajs/*` dependencies in the `package.json` file to the latest version. Then, re-install dependencies:
 
 ```bash npm2yarn
-npm run install
+npm  install
 ```

@@ -89,15 +89,14 @@
 			"created_by": "The created by of the capture"
 		}
 	},
-	"PaymentMethodToken": {
-		"filePath": "packages/modules/payment/src/models/payment-method-token.ts",
+	"AccountHolder": {
+		"filePath": "packages/modules/payment/src/models/account-holder.ts",
 		"properties": {
-			"id": "The ID of the payment method token.",
-			"provider_id": "The ID of the Payment Module Provider this token belongs to.",
-			"data": "The data of the payment method token useful for retrieving the payment details from the third-party service.",
-			"name": "The name of the associated saved payment method.",
-			"type_detail": "The details of the saved payment method's type.",
-			"description_detail": "The details of the saved payment method's description.",
+			"id": "The ID of the account holder.",
+			"provider_id": "The ID of the payment provider storing the account holder's saved payment methods.",
+			"external_id": "The ID of the account holder in the payment provider's system.",
+			"email": "The email of the account holder",
+			"data": "The data returned by the payment provider when the account holder is created.",
 			"metadata": "Holds custom data in key-value pairs."
 		}
 	}

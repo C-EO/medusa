@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Button,
+  clx,
+  Divider,
   Heading,
   Input,
   ProgressStatus,
   ProgressTabs,
   Textarea,
-  clx,
   toast,
 } from "@medusajs/ui"
 import { useCallback, useEffect, useState } from "react"
@@ -14,7 +15,6 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
 import { HttpTypes } from "@medusajs/types"
-import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { SwitchBox } from "../../../../../components/common/switch-box"
 import { CountrySelect } from "../../../../../components/inputs/country-select"

@@ -35,7 +35,14 @@ export default async function paymentWebhookhandler({
 
   const processedEvent = await paymentService.getWebhookActionAndData(input)
 
-  if (processedEvent?.action === PaymentActions.NOT_SUPPORTED) {
+  if (
+    processedEvent?.action === PaymentActions.NOT_SUPPORTED ||
+    // Currently none of these are handled by the processPaymentWorkflow, so we ignore them.
+    // Remove once the processPaymentWorkflow is handling them.
+    processedEvent?.action === PaymentActions.CANCELED ||
+    processedEvent?.action === PaymentActions.FAILED ||
+    processedEvent?.action === PaymentActions.REQUIRES_MORE
+  ) {
     return
   }
 

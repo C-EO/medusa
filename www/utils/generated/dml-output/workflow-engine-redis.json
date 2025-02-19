@@ -7,7 +7,8 @@
 			"transaction_id": "The transaction id of the workflow execution",
 			"execution": "The execution of the workflow execution",
 			"context": "The context of the workflow execution",
-			"state": "The state of the workflow execution"
+			"state": "The state of the workflow execution",
+			"retention_time": "The retention time of the workflow execution"
 		}
 	}
 }

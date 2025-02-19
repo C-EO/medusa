@@ -19,10 +19,6 @@ export const ProductShippingProfileSection = ({
 
   const shippingProfile = product.shipping_profile
 
-  if (!shippingProfile) {
-    return null
-  }
-
   return (
     <Container className="p-0">
       <div className="flex items-center justify-between px-6 py-4">
@@ -42,12 +38,14 @@ export const ProductShippingProfileSection = ({
         />
       </div>
 
-      <SidebarLink
-        to={`/settings/locations/shipping-profiles/${shippingProfile.id}`}
-        labelKey={shippingProfile.name}
-        descriptionKey={shippingProfile.type}
-        icon={<ShoppingBag />}
-      />
+      {shippingProfile && (
+        <SidebarLink
+          to={`/settings/locations/shipping-profiles/${shippingProfile.id}`}
+          labelKey={shippingProfile.name}
+          descriptionKey={shippingProfile.type}
+          icon={<ShoppingBag />}
+        />
+      )}
     </Container>
   )
 }

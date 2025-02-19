@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  BarsThree,
-  Book,
-  QuestionMarkCircle,
-  SidebarLeft,
-  TimelineVertical,
-} from "@medusajs/icons"
+import { BarsThree, Book, SidebarLeft, TimelineVertical } from "@medusajs/icons"
 import React, { useMemo, useRef, useState } from "react"
 import {
   Button,
@@ -50,12 +44,6 @@ export const MainNavDesktopMenu = () => {
         icon: <TimelineVertical />,
         title: "Changelog",
         link: "https://medusajs.com/changelog",
-      },
-      {
-        type: "link",
-        icon: <QuestionMarkCircle />,
-        title: "Troubleshooting",
-        link: "https://docs.medusajs.com/resources/troubleshooting",
       },
     ]
 

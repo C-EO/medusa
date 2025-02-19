@@ -40,6 +40,7 @@ After the installation is done, the plugin structure will look like this:
 - `src/jobs`: Contains [scheduled jobs](../../scheduled-jobs/page.mdx).
 - `src/links`: Contains [module links](../../module-links/page.mdx).
 - `src/modules`: Contains [modules](../../modules/page.mdx).
+- `src/provider`: Contains [module providers](#create-module-providers).
 - `src/subscribers`: Contains [subscribers](../../events-and-subscribers/page.mdx).
 - `src/workflows`: Contains [workflows](../../workflows/page.mdx). You can also add [hooks](../../workflows/add-workflow-hook/page.mdx) under `src/workflows/hooks`.
 - `package.json`: Contains the plugin's package information, including general information and dependencies.
@@ -259,6 +260,112 @@ This command generates migrations for all modules in the plugin. You can then ru
 ```bash title="Medusa application"
 npx medusa db:migrate
 ```
+
+### Importing Module Resources
+
+Your plugin project should have the following exports in `package.json`:
+
+```json title="package.json"
+{
+  "exports": {
+    "./package.json": "./package.json",
+    "./workflows": "./.medusa/server/src/workflows/index.js",
+    "./.medusa/server/src/modules/*": "./.medusa/server/src/modules/*/index.js",
+    "./providers/*": "./.medusa/server/src/providers/*/index.js",
+    "./*": "./.medusa/server/src/*.js"
+  }
+}
+```
+
+<Note title="Tip">
+
+Aside from the `./package.json` and `./providers`, these exports are only a recommendation. You can cherry-pick the files and directories you want to export.
+
+</Note>
+
+The plugin exports the following files and directories:
+
+- `./package.json`: The package.json file. Medusa needs to access the `package.json` when registering the plugin.
+- `./workflows`: The workflows exported in `./src/workflows/index.ts`.
+- `./.medusa/server/src/modules/*`: The definition file of modules. This is useful if you create links to the plugin's modules in the Medusa application.
+- `./providers/*`: The definition file of module providers. This allows you to register the plugin's providers in the Medusa application.
+- `./*`: Any other files in the plugin's `src` directory.
+
+With these exports, you can import the plugin's resources in the Medusa application's code like this:
+
+<Note title="Tip">
+
+`@myorg/plugin-name` is the plugin package's name.
+
+</Note>
+
+```ts
+import { Workflow1, Workflow2 } from "@myorg/plugin-name/workflows"
+import BlogModule from "@myorg/plugin-name/modules/blog"
+// import other files created in plugin like ./src/types/blog.ts
+import BlogType from "@myorg/plugin-name/types/blog"
+```
+
+And you can register a module provider in the Medusa application's `medusa-config.ts` like this:
+
+```ts highlights={[["9"]]} title="medusa-config.ts"
+module.exports = defineConfig({
+  // ...
+  modules: [
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "@myorg/plugin-name/providers/my-notification",
+            id: "my-notification",
+            options: {
+              channels: ["email"],
+              // provider options...
+            },
+          },
+        ],
+      },
+    },
+  ],
+})
+```
+
+You pass to `resolve` the path to the provider relative to the plugin package. So, in this example, the `my-notification` provider is located in `./src/providers/my-notification/index.ts` of the plugin.
+
+### Create Module Providers
+
+To learn how to create module providers, refer to the following guides:
+
+<CardList
+  items={[
+    {
+      title: "File Module Provider",
+      href: "!resources!/references/file-provider-module",
+    },
+    {
+      title: "Notification Module Provider",
+      href: "!resources!/references/notification-provider-module",
+    },
+    {
+      title: "Auth Module Provider",
+      href: "!resources!/references/auth/provider",
+    },
+    {
+      title: "Payment Module Provider",
+      href: "!resources!/references/payment/provider",
+    },
+    {
+      title: "Fulfillment Module Provider",
+      href: "!resources!/references/fulfillment/provider",
+    },
+    {
+      title: "Tax Module Provider",
+      href: "!resources!/references/tax/provider",
+    },
+  ]}
+  className="mb-1.5"
+/>
 
 ---
 

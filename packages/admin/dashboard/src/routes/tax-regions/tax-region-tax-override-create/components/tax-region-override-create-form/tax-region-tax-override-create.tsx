@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Button,
+  Divider,
   Heading,
   Hint,
   Input,
@@ -16,7 +17,6 @@ import { z } from "zod"
 import { MagnifyingGlass } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { useTranslation } from "react-i18next"
-import { Divider } from "../../../../../components/common/divider"
 import { Form } from "../../../../../components/common/form"
 import { SwitchBox } from "../../../../../components/common/switch-box"
 import { PercentageInput } from "../../../../../components/inputs/percentage-input"

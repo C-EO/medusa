@@ -9,18 +9,22 @@ import { Menu } from "../../../.."
 type MainNavItemDropdownProps = {
   item: NavigationItemDropdown
   isActive: boolean
+  className?: string
+  wrapperClassName?: string
 }
 
 export const MainNavItemDropdown = ({
   item,
   isActive,
+  className,
+  wrapperClassName,
 }: MainNavItemDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   return (
     <div
-      className={clsx("relative")}
+      className={clsx("relative", wrapperClassName)}
       ref={ref}
       onMouseOver={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
@@ -32,7 +36,8 @@ export const MainNavItemDropdown = ({
           !isActive && [
             "text-medusa-fg-muted hover:text-medusa-fg-subtle",
             isOpen && "text-medusa-fg-subtle",
-          ]
+          ],
+          className
         )}
         tabIndex={-1}
       >

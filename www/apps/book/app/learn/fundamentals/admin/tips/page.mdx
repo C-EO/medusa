@@ -138,6 +138,16 @@ You can also send requests to custom routes as explained in the [JS SDK referenc
 
 ---
 
+## Global Variables in Admin Customizations
+
+In your admin customizations, you can use the following global variables:
+
+- `__BASE__`: The base path of the Medusa Admin, as set in the [admin.path](!resources!/references/medusa-config#path) configuration in `medusa-config.ts`.
+- `__BACKEND_URL__`: The URL to the Medusa backend, as set in the [admin.backendUrl](!resources!/references/medusa-config#backendurl) configuration in `medusa-config.ts`.
+- `__STOREFRONT_URL__`: The URL to the storefront, as set in the [admin.storefrontUrl](!resources!/references/medusa-config#storefrontUrl) configuration in `medusa-config.ts`.
+
+---
+
 ## Routing Functionalities
 
 To navigate or link to other pages, or perform other routing functionalities, use the [react-router-dom](https://reactrouter.com/en/main) package. It's installed in your project through the Medusa Admin.

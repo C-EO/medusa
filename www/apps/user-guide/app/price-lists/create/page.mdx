@@ -1,0 +1,66 @@
+---
+sidebar_position: 1
+---
+
+import { EllipsisHorizontal } from "@medusajs/icons"
+
+export const metadata = {
+  title: `Create a Price List`,
+}
+
+# {metadata.title}
+
+In this guide, you’ll learn how to create a price list.
+
+To create a price list:
+
+1. Go to Price Lists from the sidebar.
+2. Click the Create button at the top right.
+
+This will open the form to create a price, which is made up of three steps: Details, Products, and Prices.
+
+## Step 1: Details
+
+In th first step of creating a price list, you'll enter the general information of the price list:
+
+1. For the Type section, choose either:
+    - **Sale**: Useful if you're creating a temporary sale on some products.
+    - **Override**: Useful if you're overriding prices permanently for a segment of customers.
+2. In the Title field, enter the price list's title.
+3. In the Status field, choose one of the following statuses:
+    - **Active**: The price list is active and can be used. If you later set a start date, the price list will be active from that date.
+    - **Draft**: The price list is not active and can't be used.
+4. In the Description field, enter a description for your price list.
+5. If you want the price list to be active starting from a specific date, choose that date in the "Price list has a start date" field.
+6. If you want the price list to automatically expire after a specific date, choose that date in the "Price list has an expiry date" field.
+7. In the "Customer availability" section, you can specify the customer groups that this price list applies for. Customers in these groups will see the prices set in this price list. To choose the customer groups:
+    - Click the Browse button.
+    - In the list that opens, check the customer groups to apply the price list to.
+    - Once you're done, click the Save button.
+8. Once you're done, click the Continue button to move to the next step.
+
+![Create Price List Details Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739959087/User%20Guide/Screenshot_2025-02-19_at_11.57.54_AM_if1uxe.png)
+
+---
+
+## Step 2: Products
+
+In the second step, you'll choose the products you want to change their prices in the price list.
+
+To do that, check the products you want to include in the price list. You can search, filter, and sort the products to find the specific ones you are looking for.
+
+Once you're done, click the Continue button to go to the next step.
+
+![Create Price List Products Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739959206/User%20Guide/Screenshot_2025-02-19_at_11.59.53_AM_hgmtl4.png)
+
+---
+
+## Step 3: Prices
+
+In the last step, you'll use the [Bulk Editor](../../tips/bulk-editor/page.mdx) to enter the new prices for the variants of each product you selected. You can set the prices for every currency and region in your store.
+
+Once you're done, click the Save button to create the price list.
+
+![Create Price List Pricing Form](https://res.cloudinary.com/dza7lstvk/image/upload/v1739959865/User%20Guide/Screenshot_2025-02-19_at_12.10.10_PM_aaxecg.png)
+
+You can now [manage the price list](../manage/page.mdx) you created.

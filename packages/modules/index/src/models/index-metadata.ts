@@ -3,7 +3,7 @@ import { IndexMetadataStatus } from "../utils/index-metadata-status"
 
 const IndexMetadata = model
   .define("IndexMetadata", {
-    id: model.id().primaryKey(),
+    id: model.id({ prefix: "idxmeta" }).primaryKey(),
     entity: model.text(),
     fields: model.text(),
     fields_hash: model.text(),

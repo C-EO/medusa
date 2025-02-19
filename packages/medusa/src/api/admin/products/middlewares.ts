@@ -1,4 +1,5 @@
 import {
+  featureFlagRouter,
   validateAndTransformBody,
   validateAndTransformQuery,
 } from "@medusajs/framework"
@@ -35,6 +36,7 @@ import {
   CreateProduct,
   CreateProductVariant,
 } from "./validators"
+import IndexEngineFeatureFlag from "../../../loaders/feature-flags/index-engine"
 
 // TODO: For now we keep the files in memory, as that's how they get passed to the workflows
 // This will need revisiting once we are closer to prod-ready v2, since with workflows and potentially
@@ -50,11 +52,17 @@ export const adminProductRoutesMiddlewares: MiddlewareRoute[] = [
         AdminGetProductsParams,
         QueryConfig.listProductQueryConfig
       ),
-      maybeApplyLinkFilter({
-        entryPoint: "product_sales_channel",
-        resourceId: "product_id",
-        filterableField: "sales_channel_id",
-      }),
+      (req, res, next) => {
+        if (featureFlagRouter.isFeatureEnabled(IndexEngineFeatureFlag.key)) {
+          return next()
+        }
+
+        return maybeApplyLinkFilter({
+          entryPoint: "product_sales_channel",
+          resourceId: "product_id",
+          filterableField: "sales_channel_id",
+        })(req, res, next)
+      },
       maybeApplyPriceListsFilter(),
     ],
   },
