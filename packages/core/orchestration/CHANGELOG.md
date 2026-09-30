@@ -1,5 +1,13 @@
 # @medusajs/orchestration
 
+## 2.21.3
+
+### Patch Changes
+
+- Updated dependencies [[`fdac7de4c3268ccf0f86c47c140662d84c141832`](https://github.com/medusajs/medusa/commit/fdac7de4c3268ccf0f86c47c140662d84c141832)]:
+  - @medusajs/utils@2.21.3
+  - @medusajs/deps@2.21.3
+
 ## 2.21.2
 
 ### Patch Changes
