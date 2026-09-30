@@ -1,5 +1,67 @@
 # Change Log
 
+## 2.21.3
+
+### Patch Changes
+
+- Updated dependencies [[`735231340d130af0c3565bc7340f1163863c283f`](https://github.com/medusajs/medusa/commit/735231340d130af0c3565bc7340f1163863c283f), [`fdac7de4c3268ccf0f86c47c140662d84c141832`](https://github.com/medusajs/medusa/commit/fdac7de4c3268ccf0f86c47c140662d84c141832)]:
+  - @medusajs/product@2.21.3
+  - @medusajs/core-flows@2.21.3
+  - @medusajs/framework@2.21.3
+  - @medusajs/event-bus-redis@2.21.3
+  - @medusajs/analytics@2.21.3
+  - @medusajs/api-key@2.21.3
+  - @medusajs/auth@2.21.3
+  - @medusajs/caching@2.21.3
+  - @medusajs/cart@2.21.3
+  - @medusajs/currency@2.21.3
+  - @medusajs/customer@2.21.3
+  - @medusajs/file@2.21.3
+  - @medusajs/fulfillment@2.21.3
+  - @medusajs/index@2.21.3
+  - @medusajs/inventory@2.21.3
+  - @medusajs/link-modules@2.21.3
+  - @medusajs/locking@2.21.3
+  - @medusajs/notification@2.21.3
+  - @medusajs/order@2.21.3
+  - @medusajs/payment@2.21.3
+  - @medusajs/pricing@2.21.3
+  - @medusajs/promotion@2.21.3
+  - @medusajs/search-postgres@2.21.3
+  - @medusajs/rbac@2.21.3
+  - @medusajs/region@2.21.3
+  - @medusajs/sales-channel@2.21.3
+  - @medusajs/search@2.21.3
+  - @medusajs/settings@2.21.3
+  - @medusajs/stock-location@2.21.3
+  - @medusajs/store@2.21.3
+  - @medusajs/tax@2.21.3
+  - @medusajs/translation@2.21.3
+  - @medusajs/user@2.21.3
+  - @medusajs/workflow-engine-inmemory@2.21.3
+  - @medusajs/workflow-engine-redis@2.21.3
+  - @medusajs/draft-order@2.21.3
+  - @medusajs/cache-inmemory@2.21.3
+  - @medusajs/cache-redis@2.21.3
+  - @medusajs/event-bus-local@2.21.3
+  - @medusajs/analytics-local@2.21.3
+  - @medusajs/analytics-posthog@2.21.3
+  - @medusajs/auth-emailpass@2.21.3
+  - @medusajs/auth-github@2.21.3
+  - @medusajs/auth-google@2.21.3
+  - @medusajs/auth-oidc@2.21.3
+  - @medusajs/caching-redis@2.21.3
+  - @medusajs/file-local@2.21.3
+  - @medusajs/file-s3@2.21.3
+  - @medusajs/fulfillment-manual@2.21.3
+  - @medusajs/locking-postgres@2.21.3
+  - @medusajs/locking-redis@2.21.3
+  - @medusajs/notification-local@2.21.3
+  - @medusajs/notification-sendgrid@2.21.3
+  - @medusajs/payment-stripe@2.21.3
+  - @medusajs/admin-bundler@2.21.3
+  - @medusajs/telemetry@2.21.3
+
 ## 2.21.2
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @medusajs/product
 
+## 2.21.3
+
+### Patch Changes
+
+- [#16925](https://github.com/medusajs/medusa/pull/16925) [`735231340d130af0c3565bc7340f1163863c283f`](https://github.com/medusajs/medusa/commit/735231340d130af0c3565bc7340f1163863c283f) Thanks [@shahednasser](https://github.com/shahednasser)! - fix(product): detach option values from variants when their option is removed from the product
+
+- Updated dependencies []:
+  - @medusajs/framework@2.21.3
+
 ## 2.21.2
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @medusajs/core-flows
 
+## 2.21.3
+
+### Patch Changes
+
+- [#17067](https://github.com/medusajs/medusa/pull/17067) [`fdac7de4c3268ccf0f86c47c140662d84c141832`](https://github.com/medusajs/medusa/commit/fdac7de4c3268ccf0f86c47c140662d84c141832) Thanks [@sradevski](https://github.com/sradevski)! - feat(core-flows,utils): emit events for price list changes and product link, variant price and variant image workflows
+
+- Updated dependencies []:
+  - @medusajs/framework@2.21.3
+
 ## 2.21.2
 
 ### Patch Changes

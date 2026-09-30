@@ -1,5 +1,14 @@
 # @medusajs/admin-bundler
 
+## 2.21.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @medusajs/admin-shared@2.21.3
+  - @medusajs/admin-vite-plugin@2.21.3
+  - @medusajs/dashboard@2.21.3
+
 ## 2.21.2
 
 ### Patch Changes
